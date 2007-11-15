@@ -1,0 +1,97 @@
+LightMP3 Changelog
+------------------
+
+Version 1.6.0
+-------------
+-Added: LightMP3 is now a 3.xx application (install it in PSP/GAME3XX directory)
+-Added: support to OGG Vorbis file (with streaming, so no filesize-related problems)
+        OGG Vorbis has fast forward and rewind
+        Note: the equalizer won't work with OGG Vorbis file.
+	      OGG Vorbis works fine with CPU @ 50Mhz
+-Added: Now supports 8khz, 11khz, 12khz, 16khz, 22khz, 24khz, 32khz, 44khz, 48khz (both MP3 and OGG Vorbis)
+        (many thanks to crazyc!)
+-Added: "Repeat track" mode (old "Repeat" becomes "Repeat all")
+-Fixed: volume up and down with remote controller didn't update volume bar.
+-Fixed: display brightness is restored when you quit.
+
+
+Version 1.5.0 (PSPSource Summer Coding Version)
+-------------
+-Added: HP and RM on first line if headphones and/or remote controller are plugged.
+-Added: the program checks the display brightness at startup and asks if you want to lower it
+-Added: support to 22khz (plays fine with CPU at 40mhz), 24khz (plays fine with CPU at 40mhz) and 48khz mp3. 
+        Note that to play 48khz mp3s the cpu must be raised to 80/85 mhz
+-Added: Fastforward (no rewind, sorry). Press right and left to raise and lower playing speed.
+-Added: volume bar
+-Fixed: if you delete .scrobbler.log with LightMP3 running (activating USB), the file is recreated.
+-Fixed: if the sample rate isn't supported an error message is shown
+
+
+Version 1.4.1
+-------------
+-Added: in the file browser you can activate USB (press SELECT)
+-Fixed: display didn't turn on (if turned off with START) when playlist or directory finish.
+-Fixed: bug if you're using mp3s without ID3 (or only ID3v2). --> Error opening file
+-Fixed: shuffle. Now pressing L will go back to previous track
+
+
+Version 1.4.0
+-------------
+-Added: Audioscrobbler log (disabled by default look a the settings file).
+        The app writes a .scrobbler.log file you can upload to your last.fm account through this page:
+	http://paulstead.com/scrob/
+-Added: Settings (CPU/BUS clock, EQ) are saved in the file settings
+-Added: you can switch from old or new volume boost method.
+        Default is new method.
+        Check the settings file(it's commented).
+-Added: display of instant bitrate
+-Added: Playing a single file will actually play the directory (starting from the selected file)
+-Added: the app is a little lighter, you can lower cpu 2/3 mhz more (if not using EQ or volume boost).
+        Many mp3 of mine are now playing good with the cpu at 65/67mhz (with 1.3.0 was 70mhz)
+-Fixed: File without ID3 now display filename in playlist
+-Fixed: Trying to open a file too big will show an error (and not make the app crash)
+-Fixed: The app now correctly exits pressing HOME.
+-Fixed: some bugs in the playlist editor (removing the last song, clearing the playlist)
+
+
+Version 1.3.0
+-------------
+-Added: Equalizers settings are now read from a file (look at equalizers)
+-Fixed: volume boost is more precise (-20 Db / +20 Db)
+-Fixed: with HOLD the analog was still working.
+-Fixed: shuffle
+
+
+Version 1.2.0
+-------------
+-Added equalizer's presets (press NOTE while playing a file)
+-Reduced analog sensitivity
+-You can now turn off the display pressing start while playling a file (display won't turn on if you press another key)
+-Pressing NOTE in playlist editor will play the current playlist.
+-Fixed: current playlist is cleared at startup.
+
+
+Version 1.1.2
+-------------
+-Fixed: file browser cannot enter in some directory
+
+
+Version 1.1.1
+-------------
+-Fixed: freeze if both ms0:/MUSIC and ms0:/PSP/MUSIC are empty
+-Fixed: crash when listening or adding to playlist directory with subdirs.
+
+
+Version 1.1.0
+-------------
+-Added support for M3U file
+-Added playlist browser
+-Added playlist editor
+-File browser now filters files, showing only mp3 and m3u.
+-Added shuffle and repeat
+-Added volume boost option
+
+
+Version 1.0.0
+-------------
+-First public release
