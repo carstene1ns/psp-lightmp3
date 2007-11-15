@@ -1,4 +1,4 @@
-/////////////////////////////////////////<br>
+{{{/////////////////////////////////////////
 //       LightMP3, 2007 by Sakya       //
 /////////////////////////////////////////
 Homepage: http://sakya.altervista.org/new/index.php?mod=none_lightmp3
@@ -99,4 +99,4 @@ MANY THANKS TO
 -AlphaWeapon for the icon. :)
 -crazyc for his usefull patch
 -John_K & adresd (PSPMediaCenter authors)
--Xart for the ID3v2 tag code.
+-Xart for the ID3v2 tag code.}}}
