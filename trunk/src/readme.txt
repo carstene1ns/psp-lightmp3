@@ -1,0 +1,99 @@
+/////////////////////////////////////////
+//       LightMP3, 2007 by Sakya       //
+/////////////////////////////////////////
+Homepage: http://sakya.altervista.org/new/index.php?mod=none_lightmp3
+Contacts: sakya_tg@yahoo.it
+LightMP3 is ditributed under GNU General Public License, read LICENSE.TXT for details.
+
+
+WHAT'S THAT?
+------------
+LightMP3 is a basic mp3/ogg Vorbis player designed to drain little energy from your battery.
+Can decode 128kbit (tested also with 160, 193, 320) MP3 at 70mhz CPU and 54mhz BUS.
+Can decode 128kbit (tested also with 160, 193, 320) OGG Vorbis at 60mhz CPU and 54mhz BUS.
+With battery at 100% and display set to minimum brightness it should last 9 hours.
+With battery at 100% and display turned off (press the brightness button for a couple of seconds) it should last more than 11 hours.
+
+
+INSTALL
+-------
+Simply copy the LightMP3 directory under ms0:/PSP/GAME3xx
+
+
+FEATURES
+--------
+-Browse all your memstick
+-Play a single file or an entire directory
+-Support m3u playlists.
+-Built-in playlist editor
+-Plays mp3 with 8khz, 11khz, 12khz, 16khz, 22khz, 24khz, 32khz, 44khz, 48khz sample rate
+-Plays mp3 up to ~22Mb (sorry, no streaming/buffering...sorry: it's my first C program)
+-Plays OGG vorbis with 8khz, 11khz, 12khz, 16khz, 22khz, 24khz, 32khz, 44khz, 48khz sample rate
+-Plays OGG vorbis file without filesize limit
+-Detailed ID3v1 and file information
+-Works with remote controller
+-Four playing mode: Normal, Repeat, Repeat All and Shuffle
+-Boost mp3's volume
+-Equalizer presets (only for MP3): Rock, Classical, Pop, Dance, Reaggae, Soft
+-Audioscrobbler log (you can upload you log to your last.fm's account with this page http://paulstead.com/scrob/)
+
+
+USB CONNECTION
+--------------
+I'm experiencing problems loading and starting the prx needed for usb link to work...
+To bypass this problem you have to copy two files from your flash0 to the LightMP3 directory.
+
+flash0:/kd/usbstorms.prx
+flash0:/kd/usbstorboot.prx
+
+You can enable flash0 USB through the recovery menu (keep R pressed while booting your psp).
+
+
+EQUALIZERS
+----------
+NOTE: Equalizer works only with MP3 file.
+If you want to add your own preset or change the standard ones you have to edit the file equzlizers
+This file contains one row for each preset.
+Every row contains 34 columns separated by ;
+The first column is the equalizer's long name
+The second column is the equalizer's short name (the letters printed at the bottom EQ:xx)
+Then 32 columns with the equalizer's values (in dB).
+
+Example:
+User EQ n.1;U1;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;
+
+
+AUDIOSCROBBLER LOG
+------------------
+LightMP3 can save a .scrobbler.log file that you can then upload to your last.fm account (visit http://www.last.fm).
+This feature is disabled by default.
+To enable scrobbler log launch LightMP3 once (so it writes the default settings).
+Open the file x:/PSP/GAME/LightMP3/settings and change the line 
+
+SCROBBLER=0
+to
+SCROBBLER=1
+
+You can upload the log through this page (remember to delete the .scrobbler.log file after uploading it):
+http://paulstead.com/scrob/
+
+
+DEPENDENCIES
+------------
+To compile LightMP3 you need:
+-libMad (add -O3 to CFLAGS in tha makefile)
+-libTremor
+
+
+KNOWN BUGS:
+-----------
+
+
+MANY THANKS TO
+--------------
+-jonny for the original menu code
+-sturatt for the original ID3 tag code
+-John_K for mp3player.c and mp3player.h
+-Smerity for his audio tutorial
+-AlphaWeapon for the icon. :)
+-crazyc for his usefull patch
