@@ -1,5 +1,5 @@
 TARGET = support
-OBJS = main.o
+OBJS = sceSysreg_driver.o sceDisplay_driver.o sceCtrl_driver.o main.o
 
 INCDIR =
 CFLAGS = -O2 -G0 -Wall
@@ -14,7 +14,7 @@ USE_KERNEL_LIBS=1
 
 LIBDIR =
 LDFLAGS = -mno-crt0 -nostartfiles
-LIBS = -lpspdisplay_driver
+LIBS = 
 
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak

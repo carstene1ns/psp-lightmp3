@@ -38,7 +38,10 @@ int isPlaying = 0;
 unsigned int OGG_volume_boost = 0.0;
 double OGG_milliSeconds = 0.0;
 int OGG_playingSpeed = 0; // 0 = normal
+int OGG_playingDelta = 0;
 int outputInProgress = 0;
+long suspendPosition = -1;
+long suspendIsPlaying = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Audio callback
@@ -74,8 +77,8 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
 
         //Check for playing speed:
         if (OGG_playingSpeed){
-            if (ov_raw_seek(&OGG_VorbisFile, ov_raw_tell(&OGG_VorbisFile) + (PSP_NUM_AUDIO_SAMPLES * 4 * OGG_playingSpeed)) != 0)
-                OGG_playingSpeed = 0;
+            if (ov_raw_seek(&OGG_VorbisFile, ov_raw_tell(&OGG_VorbisFile) + OGG_playingDelta) != 0)
+                OGG_setPlayingSpeed(0);
         }
 
 		if (tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
@@ -157,8 +160,8 @@ void splitComment(char *comment, char *name, char *value){
 void getOGGTagInfo(OggVorbis_File OGG_VorbisFile, struct fileInfo *targetInfo){
 	int i;
 	vorbis_comment *comment;
-	char name[30];
-	char value[256];
+	char name[31];
+	char value[257];
 
     strcpy(targetInfo->title, "");
     strcpy(targetInfo->album, "");
@@ -212,7 +215,7 @@ void OGGgetInfo(){
 
 
 void OGG_Init(int channel){
-    MIN_PLAYING_SPEED=-9;
+    MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;     
 	OGG_audio_channel = channel;
     pspAudioSetChannelCallback(OGG_audio_channel, oggDecodeThread, NULL); 
@@ -273,7 +276,7 @@ int OGG_Stop(){
 void OGG_FreeTune(){
 	ov_clear(&OGG_VorbisFile);
     if (OGG_file)
-        sceIoClose(OGG_file);
+        sceIoClose(OGG_file);   
 }
 
 void OGG_GetTimeString(char *dest){
@@ -361,6 +364,7 @@ int OGG_setPlayingSpeed(int playingSpeed){
 			pspAudioSetVolume(OGG_audio_channel, 0x8000, 0x8000);
 		else
 			pspAudioSetVolume(OGG_audio_channel, FASTFORWARD_VOLUME, FASTFORWARD_VOLUME);
+        OGG_playingDelta = PSP_NUM_AUDIO_SAMPLES * 4 * OGG_playingSpeed;
 		return 0;
 	}else{
 		return -1;
@@ -398,3 +402,25 @@ int OGG_isFilterSupported(){
 int OGG_isFilterEnabled(){
 	return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Manage suspend:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
+int OGG_suspend(){
+    suspendPosition = ov_raw_tell(&OGG_VorbisFile);
+    suspendIsPlaying = isPlaying;
+    OGG_End();
+    return 0;
+}         
+
+int OGG_resume(){
+    if (suspendPosition >= 0){
+       OGG_Load(OGG_fileName);
+       if (ov_raw_seek(&OGG_VorbisFile, suspendPosition)){
+          if (suspendIsPlaying)
+             OGG_Play();                                        
+       }
+       suspendPosition = -1;       
+    }
+    return 0;
+}         

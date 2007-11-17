@@ -87,6 +87,7 @@ To compile LightMP3 you need:
 
 KNOWN BUGS:
 -----------
+-Suspend isn't supported
 
 
 MANY THANKS TO
@@ -97,3 +98,5 @@ MANY THANKS TO
 -Smerity for his audio tutorial
 -AlphaWeapon for the icon. :)
 -crazyc for his usefull patch
+-John_K & adresd (PSPMediaCenter authors)
+-Xart for the ID3v2 tag code.

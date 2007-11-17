@@ -42,3 +42,7 @@ void OGG_enableFilter();
 void OGG_disableFilter();
 int OGG_isFilterEnabled();
 int OGG_isFilterSupported();
+
+//Manage suspend:
+int OGG_suspend();
+int OGG_resume();

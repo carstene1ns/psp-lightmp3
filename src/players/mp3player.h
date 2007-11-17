@@ -44,3 +44,7 @@ void MP3_enableFilter();
 void MP3_disableFilter();
 int MP3_isFilterEnabled();
 int MP3_isFilterSupported();
+
+//Manage suspend:
+int MP3_suspend();
+int MP3_resume();
