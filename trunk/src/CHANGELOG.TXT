@@ -1,8 +1,19 @@
 LightMP3 Changelog
 ------------------
 
-Version 1.6.0
--------------
+Version 1.6.0 BETA 2
+--------------------
+-Added: support to kernel 3.71 and S&L
+-Added: support to ID3v2 tag (many thanks to Xart!)
+-Added: the app restores initial volume when exiting
+-Added: the app saves the volume level when exiting and restores it next time is started.
+-Added: Replaced the exit screen with a custom one
+-Fixed: USB connection problem, no more need to copy prx from your flash0.
+-Fixed: Going up one level in the file browser will select the diretory you were in (and not always the first)
+
+
+Version 1.6.0 BETA 1
+--------------------
 -Added: LightMP3 is now a 3.xx application (install it in PSP/GAME3XX directory)
 -Added: support to OGG Vorbis file (with streaming, so no filesize-related problems)
         OGG Vorbis has fast forward and rewind

@@ -20,6 +20,7 @@
 #include <pspiofilemgr.h>
 #include <pspdisplay.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
@@ -327,6 +328,7 @@ void getMP3TagInfo(char *filename, struct fileInfo *targetInfo){
     strcpy(targetInfo->album, ID3.ID3Album);
     strcpy(targetInfo->year, ID3.ID3Year);
     strcpy(targetInfo->genre, ID3.ID3GenreText);
+    strcpy(targetInfo->trackNumber, ID3.ID3TrackText);
 }
 
 void MP3getInfo(){
@@ -405,6 +407,10 @@ void MP3getInfo(){
 				break;
 			}			
 		}
+		//Controllo il cambio di sample rate (ma non dovrebbe succedere)
+		if (header.samplerate > MP3_info.hz)
+  		   MP3_info.hz = header.samplerate;
+  		   
 		//Conteggio frame e durata totale:
 		FrameCount++;
 		mad_timer_add (&libMadlength, header.duration);
@@ -629,7 +635,6 @@ int MP3_setFilter(double tFilter[32], int copyFilter){
 		{
 			DoFilter = 0;
 			return(0);
-			//Filter[i] = mad_f_tofixed(mad_f_todouble(MAD_F_MAX));
 		}else{
 			Filter[i]=mad_f_tofixed(AmpFactor);
 		}
@@ -702,3 +707,14 @@ int MP3_setMute(int onOff){
 	}
 	return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Manage suspend:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
+int MP3_suspend(){
+    return 0;
+}         
+
+int MP3_resume(){
+    return 0;
+}         

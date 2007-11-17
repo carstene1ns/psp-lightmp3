@@ -15,19 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-//Settings:
-struct settings{
-	char fileName[262];
-	int CPU;
-	int BUS;
-	char EQ[5];
-	char BOOST[4];
-	int SCROBBLER;
-	int VOLUME;
-};
-
-int SETTINGS_load(char *fileName);
-struct settings SETTINGS_get();
-struct settings SETTINGS_default();
-int SETTINGS_save();
+int LoadStartModule(char *path);
+int USBinit();
+int USBActivate();
+int USBDeactivate();

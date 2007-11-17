@@ -50,6 +50,7 @@ struct fileInfo{
 	char strLength[10];
 	long frames;
 	long framesDecoded;
+	int  encapsulatedPictureOffset;
 
     //Tag/comments:
 	char album[256];
@@ -82,7 +83,11 @@ extern int (*setFilterFunct)(double[32], int copyFilter);
 extern void (*enableFilterFunct)();
 extern void (*disableFilterFunct)();
 extern int (*isFilterEnabledFunct)();
-extern int (*isFilterSupported)();
+extern int (*isFilterSupportedFunct)();
+extern int (*suspendFunct)();
+extern int (*resumeFunct)();
+
 extern void setAudioFunctions(char *filename);
+extern void unsetAudioFunctions();
 
 short volume_boost(short *Sample, unsigned int *boost);

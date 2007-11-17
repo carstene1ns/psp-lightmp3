@@ -34,7 +34,7 @@ int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;
 int MIN_PLAYING_SPEED=0;
 int MAX_PLAYING_SPEED=9;
-//Set pointer to audio functions based on filename:
+
 //Pointers for functions:
 void (*initFunct)(int);
 int (*loadFunct)(char *);
@@ -56,8 +56,11 @@ int (*setFilterFunct)(double[32], int copyFilter);
 void (*enableFilterFunct)();
 void (*disableFilterFunct)();
 int (*isFilterEnabledFunct)();
-int (*isFilterSupported)();
+int (*isFilterSupportedFunct)();
+int (*suspendFunct)();
+int (*resumeFunct)();
 
+//Set pointer to audio functions based on filename:
 void setAudioFunctions(char *filename){
 	char ext[5];
 	memcpy(ext, filename + strlen(filename) - 4, 5);
@@ -82,7 +85,10 @@ void setAudioFunctions(char *filename){
         enableFilterFunct = OGG_enableFilter;
         disableFilterFunct = OGG_disableFilter;
         isFilterEnabledFunct = OGG_isFilterEnabled;
-        isFilterSupported = OGG_isFilterSupported;
+        isFilterSupportedFunct = OGG_isFilterSupported;
+
+        suspendFunct = OGG_suspend;
+        resumeFunct = OGG_resume;                
     } else if (!stricmp(ext, ".mp3")){
 		initFunct = MP3_Init;
 		loadFunct = MP3_Load;		 
@@ -104,8 +110,39 @@ void setAudioFunctions(char *filename){
         enableFilterFunct = MP3_enableFilter;
         disableFilterFunct = MP3_disableFilter;
         isFilterEnabledFunct = MP3_isFilterEnabled;
-        isFilterSupported = MP3_isFilterSupported;
+        isFilterSupportedFunct = MP3_isFilterSupported;
+
+        suspendFunct = MP3_suspend;
+        resumeFunct = MP3_resume;        
     }
+}
+
+//Unset pointer to audio functions:
+void unsetAudioFunctions(){
+    initFunct = NULL;
+    loadFunct = NULL;
+    playFunct = NULL;
+    pauseFunct = NULL;
+    endFunct = NULL;
+    setVolumeBoostTypeFunct = NULL;
+    setVolumeBoostFunct = NULL;
+    getInfoFunct = NULL;
+    getTagInfoFunct = NULL;
+    getTimeStringFunct = NULL;
+    getPercentageFunct = NULL;
+    getPlayingSpeedFunct = NULL;
+    setPlayingSpeedFunct = NULL;
+    endOfStreamFunct = NULL;
+    
+    setMuteFunct = NULL;
+    setFilterFunct = NULL;
+    enableFilterFunct = NULL;
+    disableFilterFunct = NULL;
+    isFilterEnabledFunct = NULL;
+    isFilterSupportedFunct = NULL;
+    
+    suspendFunct = NULL;
+    resumeFunct = NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

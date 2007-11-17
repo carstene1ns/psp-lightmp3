@@ -19,8 +19,12 @@ PSP_EXPORT_FUNC(imposeGetBrightness)
 PSP_EXPORT_FUNC(displayEnable)
 PSP_EXPORT_FUNC(displayDisable)
 PSP_EXPORT_FUNC(imposeGetVolume)
+PSP_EXPORT_FUNC(imposeSetVolume)
 PSP_EXPORT_FUNC(readButtons)
 PSP_EXPORT_FUNC(MEDisable)
+PSP_EXPORT_FUNC(imposeGetMute)
+PSP_EXPORT_FUNC(imposeSetMute)
+PSP_EXPORT_FUNC(imposeSetHomePopup)
 PSP_EXPORT_END
 
 PSP_END_EXPORTS

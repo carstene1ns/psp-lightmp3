@@ -65,6 +65,8 @@ int SETTINGS_load(char *fileName){
 								strcpy(localSettings.BOOST, result);
 							}else if (strcmp(parName, "SCROBBLER") == 0){
 								localSettings.SCROBBLER = atoi(result);
+							}else if (strcmp(parName, "VOLUME") == 0){
+								localSettings.VOLUME = atoi(result);
 							}
 						}
 						element++;
@@ -93,6 +95,7 @@ struct settings SETTINGS_default(){
 	strcpy(localSettings.EQ, "NO");
 	strcpy(localSettings.BOOST, "NEW");
 	localSettings.SCROBBLER = 0;
+	localSettings.VOLUME = 20;
 	return localSettings;
 }
 
@@ -126,6 +129,10 @@ int SETTINGS_save(struct settings tSettings){
 
     fwrite("#SCROBBLER Log (1/0):\n", 1, strlen("#SCROBBLER Log (1/0):\n"), f);
     snprintf(testo, sizeof(testo), "SCROBBLER=%i\n\n", tSettings.SCROBBLER);
+    fwrite(testo, 1, strlen(testo), f);
+
+    fwrite("#Volume level (0-30):\n", 1, strlen("#Volume level (0-30):\n"), f);
+    snprintf(testo, sizeof(testo), "VOLUME=%i\n\n", tSettings.VOLUME);
     fwrite(testo, 1, strlen(testo), f);
 	
 	fclose(f);
