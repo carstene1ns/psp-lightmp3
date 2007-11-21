@@ -1,15 +1,17 @@
 LightMP3 Changelog
 ------------------
 
-Version 1.6.0 BETA 2
+Version 1.6.0 FINAL
 --------------------
 -Added: support to kernel 3.71 and S&L
+        NOTE: in kernel 3.71 the bus cannot be properly set, so it's stuck @ 95Mhz.
 -Added: support to ID3v2 tag (many thanks to Xart!)
 -Added: the app restores initial volume when exiting
 -Added: the app saves the volume level when exiting and restores it next time is started.
 -Added: Replaced the exit screen with a custom one
 -Fixed: USB connection problem, no more need to copy prx from your flash0.
 -Fixed: Going up one level in the file browser will select the diretory you were in (and not always the first)
+-Fixed: Removed exit pressing TRIANGLE (exit only with HOME)
 
 
 Version 1.6.0 BETA 1
@@ -30,7 +32,7 @@ Version 1.5.0 (PSPSource Summer Coding Version)
 -------------
 -Added: HP and RM on first line if headphones and/or remote controller are plugged.
 -Added: the program checks the display brightness at startup and asks if you want to lower it
--Added: support to 22khz (plays fine with CPU at 40mhz), 24khz (plays fine with CPU at 40mhz) and 48khz mp3. 
+-Added: support to 22khz (plays fine with CPU at 40mhz), 24khz (plays fine with CPU at 40mhz) and 48khz mp3.
         Note that to play 48khz mp3s the cpu must be raised to 80/85 mhz
 -Added: Fastforward (no rewind, sorry). Press right and left to raise and lower playing speed.
 -Added: volume bar
