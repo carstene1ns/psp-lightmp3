@@ -10,7 +10,8 @@ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LIBDIR =
 
-LIBS = -lm -lpspgu -lmad -lvorbisidec  -lpspaudio -lpsppower -lpsphprm -lpspusb -lpspusbstor -lpspkubridge
+LIBS = -lm -lpspgu -lmad -lvorbisidec  -lpspaudio -lpsppower \
+       -lpsphprm -lpspusb -lpspusbstor -lpspkubridge
 LDFLAGS =
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = LightMP3

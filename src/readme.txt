@@ -2,6 +2,7 @@
 //       LightMP3, 2007 by Sakya       //
 /////////////////////////////////////////
 Homepage: http://sakya.altervista.org/new/index.php?mod=none_lightmp3
+Google Code: http://code.google.com/p/lightmp3/
 Contacts: sakya_tg@yahoo.it
 LightMP3 is ditributed under GNU General Public License, read LICENSE.TXT for details.
 
@@ -22,8 +23,8 @@ Simply copy the LightMP3 directory under ms0:/PSP/GAME3xx
 
 FEATURES
 --------
+-Support for kernel 3.x and S&L
 -Browse all your memstick
--Play a single file or an entire directory
 -Support m3u playlists.
 -Built-in playlist editor
 -Plays mp3 with 8khz, 11khz, 12khz, 16khz, 22khz, 24khz, 32khz, 44khz, 48khz sample rate
@@ -68,7 +69,7 @@ AUDIOSCROBBLER LOG
 LightMP3 can save a .scrobbler.log file that you can then upload to your last.fm account (visit http://www.last.fm).
 This feature is disabled by default.
 To enable scrobbler log launch LightMP3 once (so it writes the default settings).
-Open the file x:/PSP/GAME/LightMP3/settings and change the line 
+Open the file x:/PSP/GAME/LightMP3/settings and change the line
 
 SCROBBLER=0
 to
@@ -85,9 +86,17 @@ To compile LightMP3 you need:
 -libTremor
 
 
-KNOWN BUGS:
------------
--Suspend isn't supported
+BUGS:
+-----
+To report a bug or check for known bugs please refer to:
+http://code.google.com/p/lightmp3/issues/list
+
+
+SOURCE:
+-------
+In every release sources are included.
+If you want to check the development version you can use svn:
+svn checkout http://lightmp3.googlecode.com/svn/trunk/ lightmp3-read-only
 
 
 MANY THANKS TO

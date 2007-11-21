@@ -39,7 +39,7 @@
 #include "equalizer.h"
 #include "audioscrobbler.h"
 
-#include "log.h"
+//#include "log.h"
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
@@ -89,7 +89,7 @@ int imposeSetHomePopup(int value);
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int current_mode;
-char version[10] = "1.6.0";
+char version[10] = "1.6.1";
 int oldBrightness = 0;
 char ebootDirectory[262] = "";
 char currentPlaylist[262] = "";
@@ -118,28 +118,28 @@ static int suspended = 0;
 int powerCallback(int unknown, int powerInfo, void *common){
     if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_STANDBY) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
        if (!suspended){
-           writeLog("Suspend: start\n");                   
+           //writeLog("Suspend: start\n");
            resuming = 1;                   
            //Suspend
            if (suspendFunct != NULL){
-              writeLog("Suspend: function\n");                                   
+              //writeLog("Suspend: function\n");
               (*suspendFunct)();
            }
            pspAudioEnd();
            suspended = 1;
-           writeLog("Suspend: end\n");
+           //writeLog("Suspend: end\n");
        }
     }else if ((powerInfo & PSP_POWER_CB_RESUMING)){
        resuming = 1;
     }else if ((powerInfo & PSP_POWER_CB_RESUME_COMPLETE)){
-       writeLog("Resume: start\n");
+       //writeLog("Resume: start\n");
        //Resume
        pspAudioInit();          
        if (resumeFunct != NULL)
           (*resumeFunct)();
        resuming = 0;       
        suspended = 0;       
-       writeLog("Resume: end\n");          
+       //writeLog("Resume: end\n");
     }
     return 0;
 }
@@ -778,6 +778,23 @@ int exitScreen(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Funzioni gestione BUS & CLOCK
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void setBusClock(int bus){
+    if (bus >= 54 && bus <= 111 && sceKernelDevkitVersion() < 0x03070110)
+        scePowerSetBusClockFrequency(bus);
+}
+
+void setCpuClock(int cpu){
+    if (cpu >= 33 && cpu <= 266){
+        if (sceKernelDevkitVersion() < 0x03070110)
+            scePowerSetCpuClockFrequency(cpu);
+        else
+            scePowerSetClockFrequency(cpu, cpu, cpu/2);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Inizializzazioni video:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Stringa azione corrente del player:
@@ -859,21 +876,19 @@ void screen_sysinfo(){
 	}
 
     //Check for headphones and remote controller:
-    if (sceHprmIsHeadphoneExist()){
+    if (sceHprmIsHeadphoneExist())
         strcpy(headPhones, "HP");
-    }
-    if (sceHprmIsRemoteExist()){
+
+    if (sceHprmIsRemoteExist())
         strcpy(remote, "RM");
-    }
 
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetBackColor(0x882200);
 	pspDebugScreenSetXY(26, 0);
-	if (!scePowerIsPowerOnline()){
-		pspDebugScreenPrintf("[CPU:%i BUS:%i BATT:%i%% - %2.2i:%2.2i]", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency(), battPerc, btrh, btrm);
-	}else{
-		pspDebugScreenPrintf("[CPU:%i BUS:%i BATT:%i%% -PLUGGED]", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency(), battPerc);
-	}
+	if (!scePowerIsPowerOnline())
+		pspDebugScreenPrintf("[CPU:%i BUS:%i BATT:%i%% - %2.2i:%2.2i] ", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency(), battPerc, btrh, btrm);
+	else
+		pspDebugScreenPrintf("[CPU:%i BUS:%i BATT:%i%% -PLUGGED] ", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency(), battPerc);
 
 	pspDebugScreenSetTextColor(RED);
 	pspDebugScreenSetXY(60, 0);
@@ -895,8 +910,7 @@ void screen_sysinfo(){
 }
 
 //Inizializzazione video:
-void screen_init()
-	{
+void screen_init(){
 	char testo[68] = "";
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetBackColor(BLACK);
@@ -918,21 +932,18 @@ void screen_init()
 }
 
 //Schermo per menu
-void screen_menu_init()
-{
+void screen_menu_init(){
 	pspDebugScreenSetTextColor(RED);
 	pspDebugScreenSetXY(0, 2);
 	pspDebugScreenPrintf("Mode: File browser");
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
-	pspDebugScreenSetXY(0, 27);
+	pspDebugScreenSetXY(0, 28);
 	pspDebugScreenPrintf("Press X to enter directory/play file");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press SQUARE to play directory");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press O to go up one level");
-	pspDebugScreenPrintf("\n");
-	pspDebugScreenPrintf("Press TRIANGLE to exit");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press START to add file/directory to playlist");
 	pspDebugScreenPrintf("\n");
@@ -941,26 +952,22 @@ void screen_menu_init()
 }
 
 //Schermo per playlist
-void screen_playlist_init()
-{
+void screen_playlist_init(){
 	pspDebugScreenSetTextColor(RED);
 	pspDebugScreenSetXY(0, 2);
 	pspDebugScreenPrintf("Mode: Playlist browser");
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
-	pspDebugScreenSetXY(0, 27);
+	pspDebugScreenSetXY(0, 28);
 	pspDebugScreenPrintf("Press X to play playlist");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press SQUARE to load playlist");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press CIRCLE to remove playlist");
-	pspDebugScreenPrintf("\n");
-	pspDebugScreenPrintf("Press TRIANGLE to exit");
 }
 
 //Schermo per playlist editor
-void screen_playlistEditor_init()
-{
+void screen_playlistEditor_init(){
 	pspDebugScreenSetTextColor(RED);
 	pspDebugScreenSetXY(0, 2);
 	pspDebugScreenPrintf("Mode: Playlist editor");
@@ -974,7 +981,7 @@ void screen_playlistEditor_init()
 	pspDebugScreenPrintf("Album    : %-30.30s", "");
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
-	pspDebugScreenSetXY(0, 26);
+	pspDebugScreenSetXY(0, 27);
 	pspDebugScreenPrintf("Press X to move track down");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press SQUARE to move track up");
@@ -986,8 +993,6 @@ void screen_playlistEditor_init()
 	pspDebugScreenPrintf("Press SELECT to clear playlist");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press NOTE to play the playlist");
-	pspDebugScreenPrintf("\n");
-	pspDebugScreenPrintf("Press TRIANGLE to exit");
 }
 
 //Schermo per player
@@ -1005,8 +1010,7 @@ void screen_player_tagInfo(struct fileInfo tag){
 	pspDebugScreenPrintf("Genre      : %-54.54s", tag.genre);
 }
 
-void screen_player_init(char *filename, struct fileInfo tag, char *numbers)
-{
+void screen_player_init(char *filename, struct fileInfo tag, char *numbers){
 	char file[262] = "";
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetBackColor(BLACK);
@@ -1053,8 +1057,7 @@ void screen_player_init(char *filename, struct fileInfo tag, char *numbers)
 }
 
 //Informazioni sul file:
-void screen_fileinfo(struct fileInfo info)
-{
+void screen_fileinfo(struct fileInfo info){
     pspDebugScreenSetXY(0, 16);
 	pspDebugScreenSetTextColor(DEEPSKYBLUE);
     pspDebugScreenPrintf("Layer      : %s", info.layer);
@@ -1273,14 +1276,16 @@ int playFile(char *filename, char *numbers, char *message) {
 			} else if(pad.Ly > 128 + ANALOG_SENS && !(pad.Buttons & PSP_CTRL_HOLD)) {
 				if (clock > 33){
 					clock--;
-					scePowerSetCpuClockFrequency(clock);
+					//scePowerSetCpuClockFrequency(clock);
+                    setCpuClock(clock);
 					screen_sysinfo();
 					sceKernelDelayThread(100000);
 				}
 			} else if(pad.Ly < 128 - ANALOG_SENS && !(pad.Buttons & PSP_CTRL_HOLD)) {
 				if (clock < 333){
 					clock++;
-					scePowerSetCpuClockFrequency(clock);
+					//scePowerSetCpuClockFrequency(clock);
+                    setCpuClock(clock);
 					screen_sysinfo();
 					sceKernelDelayThread(100000);
 				}
@@ -1821,7 +1826,7 @@ void fileBrowser_menu(){
 			pspDebugScreenSetXY(55, starting_row + maximum_number_of_rows + 1);
 			pspDebugScreenPrintf("Objects: %3.1i", directory.number_of_directory_entries);
 
-			if (controller.Buttons & PSP_CTRL_CROSS || controller.Buttons & PSP_CTRL_CIRCLE || controller.Buttons & PSP_CTRL_TRIANGLE ||
+			if (controller.Buttons & PSP_CTRL_CROSS || controller.Buttons & PSP_CTRL_CIRCLE ||
 				controller.Buttons & PSP_CTRL_SQUARE || controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER ||
 				controller.Buttons & PSP_CTRL_START || controller.Buttons & PSP_CTRL_SELECT){
 				break;
@@ -1829,10 +1834,7 @@ void fileBrowser_menu(){
 			sceKernelDelayThread(100000);
 		}
 
-		if (controller.Buttons & PSP_CTRL_TRIANGLE){
-			current_mode = -1;
-			break;
-		} else if (controller.Buttons & PSP_CTRL_CROSS) {
+        if (controller.Buttons & PSP_CTRL_CROSS) {
 			//Controllo se è un file o una directory:
 			if (FIO_S_ISREG(directory.directory_entry[selected_entry].d_stat.st_mode)){
 				if (strstr(directory.directory_entry[selected_entry].d_name, ".m3u") != NULL || strstr(directory.directory_entry[selected_entry].d_name, ".M3U") != NULL){
@@ -2243,15 +2245,13 @@ void playlist_menu(){
 		}
 
 		//Tasti di uscita:
-		if (controller.Buttons & PSP_CTRL_TRIANGLE || controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER){
+		if (controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER){
 			break;
 		}
 		sceKernelDelayThread(100000);
 	}
 	//Controllo input:
-	if (controller.Buttons & PSP_CTRL_TRIANGLE){
-		current_mode = -1;
-	} else if (controller.Buttons & PSP_CTRL_RTRIGGER){
+    if (controller.Buttons & PSP_CTRL_RTRIGGER){
 		nextMode();
 	} else if (controller.Buttons & PSP_CTRL_LTRIGGER){
 		previousMode();
@@ -2526,7 +2526,7 @@ void playlist_editor(){
 			}
 
 			//Tasti di uscita:
-			if (controller.Buttons & PSP_CTRL_TRIANGLE || controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER){
+			if (controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER){
 				break;
 			}
 			sceKernelDelayThread(100000);
@@ -2535,9 +2535,7 @@ void playlist_editor(){
 		playListModified = M3U_isModified();
 
 		//Controllo input:
-		if (controller.Buttons & PSP_CTRL_TRIANGLE){
-			current_mode = -1;
-		} else if (controller.Buttons & PSP_CTRL_RTRIGGER){
+        if (controller.Buttons & PSP_CTRL_RTRIGGER){
 			M3U_save(M3Ufilename);
 			nextMode();
 		} else if (controller.Buttons & PSP_CTRL_LTRIGGER){
@@ -2567,9 +2565,10 @@ int main() {
 	}
 
     //Disable the ME (su slim freeza al cambio di clock di CPU se lo eseguo):
-    //MEDisable();
+    if (sceKernelDevkitVersion() < 0x03070110)
+        MEDisable();
 
-	openLog("ms0:/lightMP3.log");
+	//openLog("ms0:/lightMP3.log");
     //Directory corrente:
 	getcwd(ebootDirectory, 256);
 
@@ -2600,9 +2599,11 @@ int main() {
     else
         scePowerSetClockFrequency(222, 222, 95);
 
-	scePowerSetCpuClockFrequency(userSettings.CPU);
+	//scePowerSetCpuClockFrequency(userSettings.CPU);
+    setCpuClock(userSettings.CPU);
     if (scePowerGetCpuClockFrequency() < userSettings.CPU){
-        scePowerSetCpuClockFrequency(++userSettings.CPU);
+        //scePowerSetCpuClockFrequency(++userSettings.CPU);
+        setCpuClock(++userSettings.CPU);
     }
 
     if (sceKernelDevkitVersion() < 0x03070110){
