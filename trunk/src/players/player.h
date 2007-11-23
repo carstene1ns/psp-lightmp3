@@ -21,6 +21,8 @@
 //    This code is based upon this sample code from ps2dev.org
 //    http://forums.ps2dev.org/viewtopic.php?t=8469
 //    and the source code of Music prx by joek2100
+#include <pspsdk.h>
+
 #define OPENING_OK 0
 #define ERROR_OPENING -1
 #define ERROR_INVALID_SAMPLE_RATE -2

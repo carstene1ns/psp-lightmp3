@@ -8,7 +8,7 @@ OBJS = prx/supportlib.o usb.o audioscrobbler.o settings.o equalizer.o log.o m3u.
 BUILD_PRX = 1
 #PSP_LARGE_MEMORY = 1
 
-CFLAGS = -O3 -frename-registers -G0 -Wall
+CFLAGS = -O3 -fomit-frame-pointer -ffast-math -frename-registers -G0 -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LIBDIR =
