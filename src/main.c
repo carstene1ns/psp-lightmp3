@@ -628,7 +628,7 @@ void addFileToPlaylist(char *fileName, int save){
 	struct fileInfo info;
 	char onlyName[262] = "";
 
-    setAudioFunctions(fileName);
+    setAudioFunctions(fileName, userSettings.MP3_ME);
 	(*initFunct)(0);
 	if ((*loadFunct)(fileName) == OPENING_OK){
 		info = (*getInfoFunct)();
@@ -786,7 +786,7 @@ void setBusClock(int bus){
 }
 
 void setCpuClock(int cpu){
-    if (cpu >= 33 && cpu <= 266){
+    if (cpu >= 10 && cpu <= 266){
         if (sceKernelDevkitVersion() < 0x03070110)
             scePowerSetCpuClockFrequency(cpu);
         else
@@ -1105,7 +1105,7 @@ int playFile(char *filename, char *numbers, char *message) {
 	  info.kbit = 0;
 	  info.hz = 0;
 
-      setAudioFunctions(filename);
+      setAudioFunctions(filename, userSettings.MP3_ME);
       //Tipo di volume boost:
       if (strcmp(userSettings.BOOST, "OLD") == 0){
           (*setVolumeBoostTypeFunct)("OLD");
@@ -1274,7 +1274,7 @@ int playFile(char *filename, char *numbers, char *message) {
 				}
 				sceKernelDelayThread(200000);
 			} else if(pad.Ly > 128 + ANALOG_SENS && !(pad.Buttons & PSP_CTRL_HOLD)) {
-				if (clock > 33){
+				if (clock >= 10){
 					clock--;
 					//scePowerSetCpuClockFrequency(clock);
                     setCpuClock(clock);
@@ -1282,7 +1282,7 @@ int playFile(char *filename, char *numbers, char *message) {
 					sceKernelDelayThread(100000);
 				}
 			} else if(pad.Ly < 128 - ANALOG_SENS && !(pad.Buttons & PSP_CTRL_HOLD)) {
-				if (clock < 333){
+				if (clock <= 222){
 					clock++;
 					//scePowerSetCpuClockFrequency(clock);
                     setCpuClock(clock);
@@ -1297,7 +1297,7 @@ int playFile(char *filename, char *numbers, char *message) {
                     sceKernelDelayThread(100000);
 				}
 			} else if(pad.Lx > 128 + ANALOG_SENS && !(pad.Buttons & PSP_CTRL_HOLD)) {
-				if (clock < 166 && sceKernelDevkitVersion() < 0x03070110){
+				if (clock < 111 && sceKernelDevkitVersion() < 0x03070110){
 					bus++;
 					scePowerSetBusClockFrequency(bus);
 					screen_sysinfo();
@@ -2285,7 +2285,7 @@ void playlist_editor(){
 		//Info primo file:
 		if (M3U_getSongCount() > 0){
 			song = M3U_getSong(0);
-            setAudioFunctions(song.fileName);
+            setAudioFunctions(song.fileName, userSettings.MP3_ME);
 			tagInfo = (*getTagInfoFunct)(song.fileName);
 			sel_updateInfo = 1;
 		}
@@ -2323,7 +2323,7 @@ void playlist_editor(){
 				if (selected_entry + 1 < M3U_getSongCount()){
 					selected_entry++;
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName);
+                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
                     tagInfo = (*getTagInfoFunct)(song.fileName);
 					sel_updateInfo = 1;
 
@@ -2335,7 +2335,7 @@ void playlist_editor(){
 				if (selected_entry){
 					selected_entry--;
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName);
+                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
                     tagInfo = (*getTagInfoFunct)(song.fileName);
 					sel_updateInfo = 1;
 
@@ -2356,7 +2356,7 @@ void playlist_editor(){
 						selected_entry = M3U_getSongCount() - 1;
 					}
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName);
+                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
                     tagInfo = (*getTagInfoFunct)(song.fileName);
 					sel_updateInfo = 1;
 					sceKernelDelayThread(100000);
@@ -2372,7 +2372,7 @@ void playlist_editor(){
 						selected_entry = 0;
 					}
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName);
+                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
                     tagInfo = (*getTagInfoFunct)(song.fileName);
 					sel_updateInfo = 1;
 					sceKernelDelayThread(100000);
@@ -2404,7 +2404,7 @@ void playlist_editor(){
 							selected_entry--;
 						}
 						song = M3U_getSong(selected_entry);
-                        setAudioFunctions(song.fileName);
+                        setAudioFunctions(song.fileName, userSettings.MP3_ME);
                         tagInfo = (*getTagInfoFunct)(song.fileName);
 						sel_updateInfo = 1;
 						if (selected_entry == top_entry - 1){
@@ -2564,10 +2564,6 @@ int main() {
         return -1;
 	}
 
-    //Disable the ME (su slim freeza al cambio di clock di CPU se lo eseguo):
-    if (sceKernelDevkitVersion() < 0x03070110)
-        MEDisable();
-
 	//openLog("ms0:/lightMP3.log");
     //Directory corrente:
 	getcwd(ebootDirectory, 256);
@@ -2586,6 +2582,12 @@ int main() {
 		strcpy(userSettings.fileName, playlistDir);
     }
 
+    //Disable the ME (su slim freeza al cambio di clock di CPU se lo eseguo):
+    if (sceKernelDevkitVersion() < 0x03070110 && !userSettings.MP3_ME)
+        MEDisable();
+        
+    volumeBoost = userSettings.BOOST_VALUE;
+    
     //Volume iniziale:
     int initialMute = imposeGetMute();
     if (initialMute)

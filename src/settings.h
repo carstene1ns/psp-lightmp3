@@ -23,8 +23,10 @@ struct settings{
 	int BUS;
 	char EQ[5];
 	char BOOST[4];
+	int BOOST_VALUE;
 	int SCROBBLER;
 	int VOLUME;
+	int MP3_ME;
 };
 
 int SETTINGS_load(char *fileName);
