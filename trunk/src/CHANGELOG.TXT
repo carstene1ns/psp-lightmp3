@@ -1,6 +1,12 @@
 LightMP3 Changelog
 ------------------
 
+Version 1.6.1
+--------------------
+-Added: Volume boost value is saved in the settings file and restored at startup
+-Added: mp3 playback via Media Engine (plays fine with CPU @ 15Mhz) (many thanks to joek2100)
+
+
 Version 1.6.0 FINAL
 --------------------
 -Added: support to kernel 3.71 and S&L

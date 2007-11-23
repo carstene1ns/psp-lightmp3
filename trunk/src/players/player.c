@@ -24,9 +24,12 @@
 #include <pspkernel.h>
 #include <pspsdk.h>
 #include <string.h>
+#include <psputility_avmodules.h>
 
 #include "player.h"
 #include "mp3player.h"
+#include "mp3playerME.h"
+#include "aa3playerME.h"
 #include "oggplayer.h"
 
 //shared global vars
@@ -34,6 +37,26 @@ int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;
 int MIN_PLAYING_SPEED=0;
 int MAX_PLAYING_SPEED=9;
+
+//shared global vars for ME
+int HW_ModulesInit = 0;
+SceUID fd;
+u16 data_align;
+u32 sample_per_frame;
+u16 channel_mode;
+u32 samplerate;
+long data_start;
+long data_size;
+u8 getEDRAM;
+u32 channels;
+SceUID data_memid;
+volatile int OutputBuffer_flip;
+//shared between at3+aa3
+u16 at3_type;
+u8* at3_data_buffer;
+u8 at3_at3plus_flagdata[2];
+unsigned char   AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE]__attribute__((aligned(64))),
+                *AT3_OutputPtr=AT3_OutputBuffer[0];
 
 //Pointers for functions:
 void (*initFunct)(int);
@@ -60,11 +83,117 @@ int (*isFilterSupportedFunct)();
 int (*suspendFunct)();
 int (*resumeFunct)();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Functions for ME
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Load a module:
+SceUID LoadStartAudioModule(char *modname, int partition){
+    SceKernelLMOption option;
+    SceUID modid;
+
+    memset(&option, 0, sizeof(option));
+    option.size = sizeof(option);
+    option.mpidtext = partition;
+    option.mpiddata = partition;
+    option.position = 0;
+    option.access = 1;
+
+    modid = sceKernelLoadModule(modname, 0, &option);
+    if (modid < 0)
+        return modid;
+
+    return sceKernelStartModule(modid, 0, NULL, NULL, NULL);
+}
+
+//Load and start needed modules:
+int initMEAudioModules(){
+   if (!HW_ModulesInit){
+        if (sceKernelDevkitVersion() == 0x01050001)
+        {
+            LoadStartAudioModule("flash0:/kd/me_for_vsh.prx", PSP_MEMORY_PARTITION_KERNEL);
+            LoadStartAudioModule("flash0:/kd/audiocodec.prx", PSP_MEMORY_PARTITION_KERNEL);
+        }
+        else
+        {
+            sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
+        }
+       HW_ModulesInit = 1;
+   }
+   return 0;
+}
+
+int GetID3TagSize(char *fname)
+{
+    SceUID fd;
+    char header[10];
+    int size = 0;
+    fd = sceIoOpen(fname, PSP_O_RDONLY, 0777);
+    if (fd < 0)
+        return 0;
+
+    sceIoRead(fd, header, sizeof(header));
+    sceIoClose(fd);
+
+    if (!strncmp((char*)header, "ea3", 3) || !strncmp((char*)header, "EA3", 3)
+      ||!strncmp((char*)header, "ID3", 3))
+    {
+        //get the real size from the syncsafe int
+        size = header[6];
+        size = (size<<7) | header[7];
+        size = (size<<7) | header[8];
+        size = (size<<7) | header[9];
+
+        size += 10;
+
+        if (header[5] & 0x10) //has footer
+            size += 10;
+         return size;
+    }
+    return 0;
+}
+
+char GetOMGFileType(char *fname)
+{
+    SceUID fd;
+    int size;
+    char ea3_header[0x60];
+
+    size = GetID3TagSize(fname);
+
+    fd = sceIoOpen(fname, PSP_O_RDONLY, 0777);
+    if (fd < 0)
+        return UNK_TYPE;
+
+    sceIoLseek32(fd, size, PSP_SEEK_SET);
+
+    if (sceIoRead(fd, ea3_header, 0x60) != 0x60)
+        return UNK_TYPE;
+
+    sceIoClose(fd);
+
+    if (strncmp(ea3_header, "EA3", 3) != 0)
+        return UNK_TYPE;
+
+    switch (ea3_header[3])
+    {
+        case 1:
+        case 3:
+            return AT3_TYPE;
+        case 2:
+            return MP3_TYPE;
+        default:
+            return UNK_TYPE;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set pointer to audio functions based on filename:
-void setAudioFunctions(char *filename){
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void setAudioFunctions(char *filename, int useME){
 	char ext[5];
 	memcpy(ext, filename + strlen(filename) - 4, 5);
 	if (!stricmp(ext, ".ogg")){
+        //OGG Vorbis
 		initFunct = OGG_Init;
 		loadFunct = OGG_Load;
 		playFunct = OGG_Play;
@@ -88,8 +217,35 @@ void setAudioFunctions(char *filename){
         isFilterSupportedFunct = OGG_isFilterSupported;
 
         suspendFunct = OGG_suspend;
-        resumeFunct = OGG_resume;                
+        resumeFunct = OGG_resume;
+    } else if (!stricmp(ext, ".mp3") && useME){
+        //MP3 via Media Engine
+		initFunct = MP3ME_Init;
+		loadFunct = MP3ME_Load;
+		playFunct = MP3ME_Play;
+		pauseFunct = MP3ME_Pause;
+		endFunct = MP3ME_End;
+        setVolumeBoostTypeFunct = MP3ME_setVolumeBoostType;
+        setVolumeBoostFunct = MP3ME_setVolumeBoost;
+        getInfoFunct = MP3ME_GetInfo;
+        getTagInfoFunct = MP3ME_GetTagInfoOnly;
+        getTimeStringFunct = MP3ME_GetTimeString;
+        getPercentageFunct = MP3ME_GetPercentage;
+        getPlayingSpeedFunct = MP3ME_getPlayingSpeed;
+        setPlayingSpeedFunct = MP3ME_setPlayingSpeed;
+        endOfStreamFunct = MP3ME_EndOfStream;
+
+        setMuteFunct = MP3ME_setMute;
+        setFilterFunct = MP3ME_setFilter;
+        enableFilterFunct = MP3ME_enableFilter;
+        disableFilterFunct = MP3ME_disableFilter;
+        isFilterEnabledFunct = MP3ME_isFilterEnabled;
+        isFilterSupportedFunct = MP3ME_isFilterSupported;
+
+        suspendFunct = MP3ME_suspend;
+        resumeFunct = MP3ME_resume;
     } else if (!stricmp(ext, ".mp3")){
+        //MP3 via LibMad
 		initFunct = MP3_Init;
 		loadFunct = MP3_Load;		 
 		playFunct = MP3_Play;
@@ -114,10 +270,38 @@ void setAudioFunctions(char *filename){
 
         suspendFunct = MP3_suspend;
         resumeFunct = MP3_resume;        
+    } else if (!stricmp(ext, ".aa3") || !stricmp(ext, ".oma") || !stricmp(ext, ".omg")){
+        //AA3
+		initFunct = AA3ME_Init;
+		loadFunct = AA3ME_Load;
+		playFunct = AA3ME_Play;
+		pauseFunct = AA3ME_Pause;
+		endFunct = AA3ME_End;
+        setVolumeBoostTypeFunct = AA3ME_setVolumeBoostType;
+        setVolumeBoostFunct = AA3ME_setVolumeBoost;
+        getInfoFunct = AA3ME_GetInfo;
+        getTagInfoFunct = AA3ME_GetTagInfoOnly;
+        getTimeStringFunct = AA3ME_GetTimeString;
+        getPercentageFunct = AA3ME_GetPercentage;
+        getPlayingSpeedFunct = AA3ME_getPlayingSpeed;
+        setPlayingSpeedFunct = AA3ME_setPlayingSpeed;
+        endOfStreamFunct = AA3ME_EndOfStream;
+
+        setMuteFunct = AA3ME_setMute;
+        setFilterFunct = AA3ME_setFilter;
+        enableFilterFunct = AA3ME_enableFilter;
+        disableFilterFunct = AA3ME_disableFilter;
+        isFilterEnabledFunct = AA3ME_isFilterEnabled;
+        isFilterSupportedFunct = AA3ME_isFilterSupported;
+
+        suspendFunct = AA3ME_suspend;
+        resumeFunct = AA3ME_resume;
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Unset pointer to audio functions:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void unsetAudioFunctions(){
     initFunct = NULL;
     loadFunct = NULL;

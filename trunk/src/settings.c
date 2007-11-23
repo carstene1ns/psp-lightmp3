@@ -63,10 +63,14 @@ int SETTINGS_load(char *fileName){
 								strcpy(localSettings.EQ, result);
 							}else if (strcmp(parName, "BOOST") == 0){
 								strcpy(localSettings.BOOST, result);
+							}else if (strcmp(parName, "BOOST_VALUE") == 0){
+								localSettings.BOOST_VALUE = atoi(result);
 							}else if (strcmp(parName, "SCROBBLER") == 0){
 								localSettings.SCROBBLER = atoi(result);
 							}else if (strcmp(parName, "VOLUME") == 0){
 								localSettings.VOLUME = atoi(result);
+							}else if (strcmp(parName, "MP3_ME") == 0){
+								localSettings.MP3_ME = atoi(result);
 							}
 						}
 						element++;
@@ -94,8 +98,10 @@ struct settings SETTINGS_default(){
 	localSettings.BUS = 54;
 	strcpy(localSettings.EQ, "NO");
 	strcpy(localSettings.BOOST, "NEW");
+	localSettings.BOOST_VALUE = 0;
 	localSettings.SCROBBLER = 0;
 	localSettings.VOLUME = 20;
+	localSettings.MP3_ME = 0;
 	return localSettings;
 }
 
@@ -111,11 +117,11 @@ int SETTINGS_save(struct settings tSettings){
 		return(-1);
 	}
 
-    fwrite("#CPU speed at startup (33-333):\n", 1, strlen("#CPU speed at startup (33-333):\n"), f);
+    fwrite("#CPU speed at startup (10-222):\n", 1, strlen("#CPU speed at startup (33-333):\n"), f);
     snprintf(testo, sizeof(testo), "CPU=%i\n\n", tSettings.CPU);
     fwrite(testo, 1, strlen(testo), f);
 
-    fwrite("#BUS speed at startup (54-166):\n", 1, strlen("#BUS speed at startup (54-166):\n"), f);
+    fwrite("#BUS speed at startup (54-111):\n", 1, strlen("#BUS speed at startup (54-166):\n"), f);
     snprintf(testo, sizeof(testo), "BUS=%i\n\n", tSettings.BUS);
     fwrite(testo, 1, strlen(testo), f);
 
@@ -123,8 +129,14 @@ int SETTINGS_save(struct settings tSettings){
     snprintf(testo, sizeof(testo), "EQ=%s\n\n", tSettings.EQ);
     fwrite(testo, 1, strlen(testo), f);
 
-    fwrite("#Volume boost method (OLD/NEW):\n", 1, strlen("#Volume boost method (OLD/NEW):\n"), f);
-    snprintf(testo, sizeof(testo), "BOOST=%s\n\n", tSettings.BOOST);
+    fwrite("#Volume boost method (OLD/NEW) and value:\n", 1, strlen("#Volume boost method (OLD/NEW) and value:\n"), f);
+    snprintf(testo, sizeof(testo), "BOOST=%s\n", tSettings.BOOST);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "BOOST_VALUE=%i\n\n", tSettings.BOOST_VALUE);
+    fwrite(testo, 1, strlen(testo), f);
+
+    fwrite("#Use ME for MP3 0/1):\n", 1, strlen("#Use ME for MP3 0/1):\n"), f);
+    snprintf(testo, sizeof(testo), "MP3_ME=%i\n\n", tSettings.MP3_ME);
     fwrite(testo, 1, strlen(testo), f);
 
     fwrite("#SCROBBLER Log (1/0):\n", 1, strlen("#SCROBBLER Log (1/0):\n"), f);

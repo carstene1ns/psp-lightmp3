@@ -39,17 +39,6 @@ FEATURES
 -Audioscrobbler log (you can upload you log to your last.fm's account with this page http://paulstead.com/scrob/)
 
 
-USB CONNECTION
---------------
-I'm experiencing problems loading and starting the prx needed for usb link to work...
-To bypass this problem you have to copy two files from your flash0 to the LightMP3 directory.
-
-flash0:/kd/usbstorms.prx
-flash0:/kd/usbstorboot.prx
-
-You can enable flash0 USB through the recovery menu (keep R pressed while booting your psp).
-
-
 EQUALIZERS
 ----------
 NOTE: Equalizer works only with MP3 file.
@@ -94,8 +83,8 @@ http://code.google.com/p/lightmp3/issues/list
 
 SOURCE:
 -------
-In every release sources are included.
-If you want to check the development version you can use svn:
+Sources are included in every release.
+If you want to check the development version (untested, maybe broken) you can use svn:
 svn checkout http://lightmp3.googlecode.com/svn/trunk/ lightmp3-read-only
 
 
@@ -109,3 +98,4 @@ MANY THANKS TO
 -crazyc for his usefull patch
 -John_K & adresd (PSPMediaCenter authors)
 -Xart for the ID3v2 tag code.
+-joek2100 for the Media Engine functions (taken from Music prx 0.55 and adapted)

@@ -28,6 +28,8 @@
 
 #define MP3_TYPE 0
 #define OGG_TYPE 1
+#define AT3_TYPE 1
+#define UNK_TYPE -1
 
 #define MUTED_VOLUME 0x800
 #define FASTFORWARD_VOLUME 0x2200
@@ -36,6 +38,35 @@ extern int MAX_VOLUME_BOOST;
 extern int MIN_VOLUME_BOOST;
 extern int MIN_PLAYING_SPEED;
 extern int MAX_PLAYING_SPEED;
+
+//shared global vars for ME
+extern int HW_ModulesInit;
+extern SceUID fd;
+extern u16 data_align;
+extern u32 sample_per_frame;
+extern u16 channel_mode;
+extern u32 samplerate;
+extern long data_start;
+extern long data_size;
+extern u8 getEDRAM;
+extern u32 channels;
+extern SceUID data_memid;
+extern volatile int OutputBuffer_flip;
+
+//shared between at3+aa3
+#define AT3_OUTPUT_BUFFER_SIZE	(2048*2*4)
+extern u16 at3_type;
+extern u8 at3_at3plus_flagdata[2];
+extern unsigned char AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE];
+extern unsigned char *AT3_OutputPtr;
+
+SceUID LoadStartAudioModule(char *modname, int partition);
+int initMEAudioModules();
+int GetID3TagSize(char *fname);
+
+int sceAudio_38553111(int samplecount, int samplerate, int unk);//unk = 2 (only func called by sceAudioOutput2Reserve)
+int sceAudio_E0727056(int vol, void *buf);//sceAudioOutput2OutputBlocking alias, present in 1.5
+int sceAudio_5C37C0AE(void);//sceAudioOutput2Release alias, also present in 1.5
 
 struct fileInfo{
     int fileType;
@@ -87,7 +118,7 @@ extern int (*isFilterSupportedFunct)();
 extern int (*suspendFunct)();
 extern int (*resumeFunct)();
 
-extern void setAudioFunctions(char *filename);
+extern void setAudioFunctions(char *filename, int useME);
 extern void unsetAudioFunctions();
 
 short volume_boost(short *Sample, unsigned int *boost);
