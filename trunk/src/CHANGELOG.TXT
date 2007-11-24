@@ -3,6 +3,7 @@ LightMP3 Changelog
 
 Version 1.6.1
 --------------------
+-Added: Fadeout when changing track
 -Added: Volume boost value is saved in the settings file and restored at startup
 -Added: mp3 playback via Media Engine (plays fine with CPU @ 15Mhz) (many thanks to joek2100)
 

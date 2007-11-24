@@ -20,15 +20,10 @@
 //    This code is based upon this sample code from ps2dev.org
 //    http://forums.ps2dev.org/viewtopic.php?t=8469
 //    and the source code of Music prx by joek2100
-#include <pspkernel.h>
-#include <pspsdk.h>
-#include <pspaudiocodec.h>
-#include <pspaudio.h>
 #include <string.h>
 #include <malloc.h>
 //#include "log.h"
 
-#include "pspaudiolib.h"
 #include "player.h"
 #include "aa3playerME.h"
 #define AT3_THREAD_PRIORITY 12
@@ -239,6 +234,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 
 //Get info on file:
 int AA3ME_getInfo(){
+    AA3ME_info.fileType = AT3_TYPE;
     return 0;
 }
 
@@ -334,12 +330,14 @@ int AA3ME_resume(){
 }
 
 int AA3ME_setMute(int onOff){
-	if (onOff){
-		pspAudioSetVolume(AA3ME_audio_channel, MUTED_VOLUME, MUTED_VOLUME);
-	}else{
-		pspAudioSetVolume(AA3ME_audio_channel, 0x8000, 0x8000);
-	}
-	return 0;
+    return setMute(AA3ME_audio_channel, onOff);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Fade out:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void AA3ME_fadeOut(float seconds){
+    fadeOut(AA3ME_audio_channel, seconds);
 }
 
 //TODO:

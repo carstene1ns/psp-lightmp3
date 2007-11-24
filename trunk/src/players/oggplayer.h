@@ -35,6 +35,7 @@ int OGG_getVolumeBoost();
 int OGG_getPlayingSpeed();
 int OGG_setPlayingSpeed(int playingSpeed);
 int OGG_setMute(int onOff);
+void OGG_fadeOut(float seconds);
 
 //Functions for filter (equalizer):	
 int OGG_setFilter(double tFilter[32], int copyFilter);

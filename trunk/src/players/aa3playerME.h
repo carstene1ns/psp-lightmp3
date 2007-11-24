@@ -38,6 +38,7 @@ int AA3ME_getVolumeBoost();
 int AA3ME_getPlayingSpeed();
 int AA3ME_setPlayingSpeed(int playingSpeed);
 int AA3ME_setMute(int onOff);
+void AA3ME_fadeOut(float seconds);
 
 //Functions for filter (equalizer):
 int AA3ME_setFilter(double tFilter[32], int copyFilter);

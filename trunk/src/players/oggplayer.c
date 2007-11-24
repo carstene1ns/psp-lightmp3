@@ -15,11 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#include <pspkernel.h>
-#include <pspaudio.h>
 #include <string.h>
 
-#include "pspaudiolib.h"
 #include "tremor/ivorbiscodec.h"
 #include "tremor/ivorbisfile.h"
 #include "player.h"
@@ -339,12 +336,14 @@ void OGG_End(){
 }
 
 int OGG_setMute(int onOff){
-	if (onOff){
-		pspAudioSetVolume(OGG_audio_channel, MUTED_VOLUME, MUTED_VOLUME);
-	}else{
-		pspAudioSetVolume(OGG_audio_channel, 0x8000, 0x8000);
-	}
-	return 0;
+    return setMute(OGG_audio_channel, onOff);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Fade out:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void OGG_fadeOut(float seconds){
+    fadeOut(OGG_audio_channel, seconds);
 }
 
 
@@ -361,9 +360,9 @@ int OGG_setPlayingSpeed(int playingSpeed){
 	if (playingSpeed >= MIN_PLAYING_SPEED && playingSpeed <= MAX_PLAYING_SPEED){
 		OGG_playingSpeed = playingSpeed;
 		if (playingSpeed == 0)
-			pspAudioSetVolume(OGG_audio_channel, 0x8000, 0x8000);
+			setVolume(OGG_audio_channel, 0x8000);
 		else
-			pspAudioSetVolume(OGG_audio_channel, FASTFORWARD_VOLUME, FASTFORWARD_VOLUME);
+			setVolume(OGG_audio_channel, FASTFORWARD_VOLUME);
         OGG_playingDelta = PSP_NUM_AUDIO_SAMPLES * 4 * OGG_playingSpeed;
 		return 0;
 	}else{

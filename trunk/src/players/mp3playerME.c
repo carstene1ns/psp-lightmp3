@@ -20,15 +20,10 @@
 //    This code is based upon this sample code from ps2dev.org
 //    http://forums.ps2dev.org/viewtopic.php?t=8469
 //    and the source code of Music prx by joek2100
-#include <pspkernel.h>
-#include <pspsdk.h>
-#include <pspaudiocodec.h>
-#include <pspaudio.h>
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
 
-#include "pspaudiolib.h"
 #include "id3.h"
 #include "player.h"
 #include "mp3playerME.h"
@@ -675,9 +670,9 @@ int MP3ME_setPlayingSpeed(int playingSpeed){
 			MP3ME_playingDirection = 1;
 		}
 		if (playingSpeed == 0)
-			pspAudioSetVolume(MP3ME_audio_channel, 0x8000, 0x8000);
+			setVolume(MP3ME_audio_channel, 0x8000);
 		else
-			pspAudioSetVolume(MP3ME_audio_channel, FASTFORWARD_VOLUME, FASTFORWARD_VOLUME);
+			setVolume(MP3ME_audio_channel, FASTFORWARD_VOLUME);
 		return 0;
 	}else{
 		return -1;
@@ -715,13 +710,16 @@ int MP3ME_isFilterSupported(){
 }
 
 int MP3ME_setMute(int onOff){
-	if (onOff){
-		pspAudioSetVolume(MP3ME_audio_channel, MUTED_VOLUME, MUTED_VOLUME);
-	}else{
-		pspAudioSetVolume(MP3ME_audio_channel, 0x8000, 0x8000);
-	}
-	return 0;
+    return setMute(MP3ME_audio_channel, onOff);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Fade out:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MP3ME_fadeOut(float seconds){
+    fadeOut(MP3ME_audio_channel, seconds);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Manage suspend:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
