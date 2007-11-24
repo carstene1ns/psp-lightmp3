@@ -15,16 +15,14 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#include <pspkernel.h>
-#include <pspdebug.h>
 #include <pspiofilemgr.h>
-#include <pspdisplay.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
 #include <math.h>
+
 #include "id3.h"
 #include "player.h"
 #include "mp3player.h"
@@ -687,9 +685,9 @@ int MP3_setPlayingSpeed(int playingSpeed){
 	if (playingSpeed >= 0){
 		MP3_playingSpeed = playingSpeed;
 		if (playingSpeed == 0)
-			pspAudioSetVolume(myChannel, 0x8000, 0x8000);
+            setVolume(myChannel, 0x8000);
 		else
-			pspAudioSetVolume(myChannel, FASTFORWARD_VOLUME, FASTFORWARD_VOLUME);
+    		setVolume(myChannel, FASTFORWARD_VOLUME);
 		return 0;
 	}else{
 		return -1;
@@ -700,12 +698,14 @@ int MP3_setPlayingSpeed(int playingSpeed){
 //Set mute:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int MP3_setMute(int onOff){
-	if (onOff){
-		pspAudioSetVolume(myChannel, MUTED_VOLUME, MUTED_VOLUME);
-	}else{
-		pspAudioSetVolume(myChannel, 0x8000, 0x8000);
-	}
-	return 0;
+    return setMute(myChannel, onOff);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Fade out:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MP3_fadeOut(float seconds){
+    fadeOut(myChannel, seconds);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

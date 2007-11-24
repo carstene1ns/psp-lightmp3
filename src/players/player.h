@@ -21,7 +21,11 @@
 //    This code is based upon this sample code from ps2dev.org
 //    http://forums.ps2dev.org/viewtopic.php?t=8469
 //    and the source code of Music prx by joek2100
+#include <pspkernel.h>
 #include <pspsdk.h>
+#include <pspaudiocodec.h>
+#include <pspaudio.h>
+#include "pspaudiolib.h"
 
 #define OPENING_OK 0
 #define ERROR_OPENING -1
@@ -36,6 +40,7 @@
 #define MUTED_VOLUME 0x800
 #define FASTFORWARD_VOLUME 0x2200
 
+extern int currentVolume;
 extern int MAX_VOLUME_BOOST;
 extern int MIN_VOLUME_BOOST;
 extern int MIN_PLAYING_SPEED;
@@ -119,8 +124,12 @@ extern int (*isFilterEnabledFunct)();
 extern int (*isFilterSupportedFunct)();
 extern int (*suspendFunct)();
 extern int (*resumeFunct)();
+extern void (*fadeOutFunct)(float seconds);
 
 extern void setAudioFunctions(char *filename, int useME);
 extern void unsetAudioFunctions();
 
 short volume_boost(short *Sample, unsigned int *boost);
+int setVolume(int channel, int volume);
+int setMute(int channel, int onOff);
+void fadeOut(int channel, float seconds);

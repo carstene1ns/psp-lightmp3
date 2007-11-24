@@ -37,6 +37,7 @@ int MP3ME_getVolumeBoost();
 int MP3ME_getPlayingSpeed();
 int MP3ME_setPlayingSpeed(int playingSpeed);
 int MP3ME_setMute(int onOff);
+void MP3ME_fadeOut(float seconds);
 
 //Functions for filter (equalizer):
 int MP3ME_setFilter(double tFilter[32], int copyFilter);

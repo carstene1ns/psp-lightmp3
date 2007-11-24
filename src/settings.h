@@ -27,6 +27,7 @@ struct settings{
 	int SCROBBLER;
 	int VOLUME;
 	int MP3_ME;
+	int FADE_OUT;
 };
 
 int SETTINGS_load(char *fileName);

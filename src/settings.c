@@ -71,6 +71,8 @@ int SETTINGS_load(char *fileName){
 								localSettings.VOLUME = atoi(result);
 							}else if (strcmp(parName, "MP3_ME") == 0){
 								localSettings.MP3_ME = atoi(result);
+							}else if (strcmp(parName, "FADE_OUT") == 0){
+								localSettings.FADE_OUT = atoi(result);
 							}
 						}
 						element++;
@@ -102,6 +104,7 @@ struct settings SETTINGS_default(){
 	localSettings.SCROBBLER = 0;
 	localSettings.VOLUME = 20;
 	localSettings.MP3_ME = 0;
+	localSettings.FADE_OUT = 0;
 	return localSettings;
 }
 
@@ -146,7 +149,11 @@ int SETTINGS_save(struct settings tSettings){
     fwrite("#Volume level (0-30):\n", 1, strlen("#Volume level (0-30):\n"), f);
     snprintf(testo, sizeof(testo), "VOLUME=%i\n\n", tSettings.VOLUME);
     fwrite(testo, 1, strlen(testo), f);
-	
+
+    fwrite("#Fade out when changing track (0/1):\n", 1, strlen("#Fade out when changing track (0/1):\n"), f);
+    snprintf(testo, sizeof(testo), "FADE_OUT=%i\n\n", tSettings.FADE_OUT);
+    fwrite(testo, 1, strlen(testo), f);
+
 	fclose(f);
     return(0);
 }

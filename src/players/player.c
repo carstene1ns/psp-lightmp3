@@ -25,6 +25,7 @@
 #include <pspsdk.h>
 #include <string.h>
 #include <psputility_avmodules.h>
+#include <pspaudio.h>
 
 #include "player.h"
 #include "mp3player.h"
@@ -37,6 +38,7 @@ int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;
 int MIN_PLAYING_SPEED=0;
 int MAX_PLAYING_SPEED=9;
+int currentVolume = 0;
 
 //shared global vars for ME
 int HW_ModulesInit = 0;
@@ -82,6 +84,7 @@ int (*isFilterEnabledFunct)();
 int (*isFilterSupportedFunct)();
 int (*suspendFunct)();
 int (*resumeFunct)();
+void (*fadeOutFunct)(float seconds);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions for ME
@@ -218,6 +221,7 @@ void setAudioFunctions(char *filename, int useME){
 
         suspendFunct = OGG_suspend;
         resumeFunct = OGG_resume;
+        fadeOutFunct = OGG_fadeOut;
     } else if (!stricmp(ext, ".mp3") && useME){
         //MP3 via Media Engine
 		initFunct = MP3ME_Init;
@@ -244,6 +248,7 @@ void setAudioFunctions(char *filename, int useME){
 
         suspendFunct = MP3ME_suspend;
         resumeFunct = MP3ME_resume;
+        fadeOutFunct = MP3ME_fadeOut;
     } else if (!stricmp(ext, ".mp3")){
         //MP3 via LibMad
 		initFunct = MP3_Init;
@@ -270,6 +275,7 @@ void setAudioFunctions(char *filename, int useME){
 
         suspendFunct = MP3_suspend;
         resumeFunct = MP3_resume;        
+        fadeOutFunct = MP3_fadeOut;
     } else if (!stricmp(ext, ".aa3") || !stricmp(ext, ".oma") || !stricmp(ext, ".omg")){
         //AA3
 		initFunct = AA3ME_Init;
@@ -296,6 +302,7 @@ void setAudioFunctions(char *filename, int useME){
 
         suspendFunct = AA3ME_suspend;
         resumeFunct = AA3ME_resume;
+        fadeOutFunct = AA3ME_fadeOut;
     }
 }
 
@@ -341,4 +348,36 @@ short volume_boost(short *Sample, unsigned int *boost){
 		return -32768;
 	else
     	return intSample;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Set volume:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int setVolume(int channel, int volume){
+    pspAudioSetVolume(channel, volume, volume);
+    currentVolume = volume;
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Set mute:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int setMute(int channel, int onOff){
+	if (onOff)
+        setVolume(channel, MUTED_VOLUME);
+	else
+        setVolume(channel, 0x8000);
+	return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Fade out:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void fadeOut(int channel, float seconds){
+    int i = 0;
+    long timeToWait = (seconds * 1000) / (float)currentVolume;
+    for (i=currentVolume; i>=0; i--){
+        pspAudioSetVolume(channel, i, i);
+        sceKernelDelayThread(timeToWait);
+    }
 }
