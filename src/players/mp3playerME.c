@@ -44,6 +44,7 @@ int MP3ME_playingSpeed = 0; // 0 = normal
 int MP3ME_playingDirection = 1;
 int MP3ME_volume_boost = 0;
 float MP3ME_playingTime = 0;
+int MP3ME_volume = 0;
 
 //Globals for decoding:
 SceUID MP3ME_handle;
@@ -131,8 +132,8 @@ int SeekNextFrame(SceUID fd)
 
 //Open audio for player:
 int openAudio(int samplecount){
-	int audio_id = sceAudioChReserve(MP3ME_audio_channel, samplecount, PSP_AUDIO_FORMAT_STEREO );
-    if(audio_id < 0)   
+	MP3ME_audio_channel = sceAudioChReserve(MP3ME_audio_channel, samplecount, PSP_AUDIO_FORMAT_STEREO );
+    if(MP3ME_audio_channel < 0)
         MP3ME_audio_channel = sceAudioChReserve(PSP_AUDIO_NEXT_CHANNEL, samplecount, PSP_AUDIO_FORMAT_STEREO );
 	return 0;
 }
@@ -318,10 +319,10 @@ int decodeThread(SceSize args, void *argp){
 			if( OutputPtrME + (sample_per_frame * 4) > &OutputBuffer[OutputBuffer_flip][OUTPUT_BUFFER_SIZE])
 			{
 				if (!output2init)
-					sceAudioOutputBlocking(MP3ME_audio_channel, PSP_AUDIO_VOLUME_MAX, OutputBuffer[OutputBuffer_flip] );
+					sceAudioOutputBlocking(MP3ME_audio_channel, MP3ME_volume, OutputBuffer[OutputBuffer_flip] );
 				else
 				{
-					 res = sceAudio_E0727056(PSP_AUDIO_VOLUME_MAX, OutputBuffer[OutputBuffer_flip]);//sceAudioOutput2OutputBlocking
+					 res = sceAudio_E0727056(MP3ME_volume, OutputBuffer[OutputBuffer_flip]);//sceAudioOutput2OutputBlocking
 					 if (res < 0) //error, re-alloc output2
 						 output2init = 0;
 				}
@@ -592,6 +593,7 @@ void MP3ME_Init(int channel){
 	MP3ME_playingDirection = 1;
     MP3ME_playingTime = 0;
 	MP3ME_volume_boost = 0;
+	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
 	initMEAudioModules();
 }
 
@@ -670,9 +672,9 @@ int MP3ME_setPlayingSpeed(int playingSpeed){
 			MP3ME_playingDirection = 1;
 		}
 		if (playingSpeed == 0)
-			setVolume(MP3ME_audio_channel, 0x8000);
+    		MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
 		else
-			setVolume(MP3ME_audio_channel, FASTFORWARD_VOLUME);
+    		MP3ME_volume = FASTFORWARD_VOLUME;
 		return 0;
 	}else{
 		return -1;
@@ -709,15 +711,27 @@ int MP3ME_isFilterSupported(){
 	return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Set mute:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int MP3ME_setMute(int onOff){
-    return setMute(MP3ME_audio_channel, onOff);
+	if (onOff)
+    	MP3ME_volume = MUTED_VOLUME;
+	else
+    	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Fade out:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MP3ME_fadeOut(float seconds){
-    fadeOut(MP3ME_audio_channel, seconds);
+    int i = 0;
+    long timeToWait = (seconds * 1000) / (float)MP3ME_volume;
+    for (i=MP3ME_volume; i>=0; i--){
+        MP3ME_volume = i;
+        sceKernelDelayThread(timeToWait);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -731,16 +745,16 @@ int MP3ME_resume(){
     return 0;
 }
 
-//TODO:
-
-int MP3ME_GetStatus(){
-    return 0;
-}
-
 void MP3ME_setVolumeBoostType(char *boostType){
     //Only old method supported
     MAX_VOLUME_BOOST = 4;
     MIN_VOLUME_BOOST = 0;
+}
+
+//TODO:
+
+int MP3ME_GetStatus(){
+    return 0;
 }
 
 
