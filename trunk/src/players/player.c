@@ -366,7 +366,7 @@ int setMute(int channel, int onOff){
 	if (onOff)
         setVolume(channel, MUTED_VOLUME);
 	else
-        setVolume(channel, 0x8000);
+        setVolume(channel, PSP_AUDIO_VOLUME_MAX);
 	return 0;
 }
 
