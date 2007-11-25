@@ -49,7 +49,6 @@ unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the
 //Decode thread:
 int AA3ME_decodeThread(SceSize args, void *argp){
     u8 ea3_header[0x60];
-    int AA3ME_eof = 0;
     int temp_size;
     int mod_64;
     int res;
@@ -244,10 +243,162 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 }
 
 //Get info on file:
-int AA3ME_getInfo(){
+int AA3MEgetInfo(){
     AA3ME_info.fileType = AT3_TYPE;
     strcpy(AA3ME_info.layer, "");
+
+    u8 ea3_header[0x60];
+    int eof = 0;
+    int temp_size;
+    int mod_64;
+    int res;
+    unsigned long decode_type;
+    int tag_size;
+	int offset = 0;
+    float totalPlayingTime = 0;
     
+    OutputBuffer_flip = 0;
+    AT3_OutputPtr = AT3_OutputBuffer[0];
+
+    tag_size = GetID3TagSize(AA3ME_fileName);
+    fd = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
+    if (fd < 0)
+        return -1;
+
+    sceIoLseek32(fd, tag_size, PSP_SEEK_SET);//not all omg files have a fixed header
+
+    if ( sceIoRead( fd, ea3_header, 0x60 ) != 0x60 )
+        return -1;
+
+    if ( ea3_header[0] != 0x45 || ea3_header[1] != 0x41 || ea3_header[2] != 0x33 )
+        return -1;
+
+    at3_at3plus_flagdata[0] = ea3_header[0x22];
+    at3_at3plus_flagdata[1] = ea3_header[0x23];
+
+    at3_type = (ea3_header[0x22] == 0x20) ? TYPE_ATRAC3 : ((ea3_header[0x22] == 0x28) ? TYPE_ATRAC3PLUS : 0x0);
+
+    if ( at3_type != TYPE_ATRAC3 && at3_type != TYPE_ATRAC3PLUS )
+        return -1;
+
+    if ( at3_type == TYPE_ATRAC3 )
+        data_align = ea3_header[0x23]*8;
+    else
+        data_align = (ea3_header[0x23]+1)*8;
+
+    data_start = tag_size+0x60;
+    data_size = sceIoLseek32(fd, 0, PSP_SEEK_END) - data_start;
+
+    sceIoLseek32(fd, data_start, PSP_SEEK_SET);
+
+    memset(AA3ME_codec_buffer, 0, sizeof(AA3ME_codec_buffer));
+
+    if ( at3_type == TYPE_ATRAC3 )
+    {
+        channel_mode = 0x0;
+
+        if ( data_align == 0xC0 ) // atract3 have 3 bitrate, 132k,105k,66k, 132k align=0x180, 105k align = 0x130, 66k align = 0xc0
+            channel_mode = 0x1;
+
+        sample_per_frame = 1024;
+
+        AA3ME_codec_buffer[26] = 0x20;
+
+        getEDRAM = 1;
+
+        AA3ME_codec_buffer[10] = 4;
+        AA3ME_codec_buffer[44] = 2;
+
+        if ( data_align == 0x130 )
+            AA3ME_codec_buffer[10] = 6;
+    }
+    else if ( at3_type == TYPE_ATRAC3PLUS )
+    {
+        sample_per_frame = 2048;
+        temp_size = data_align+8;
+        mod_64 = temp_size & 0x3f;
+        if (mod_64 != 0) temp_size += 64 - mod_64;
+
+        AA3ME_codec_buffer[5] = 0x1;
+        AA3ME_codec_buffer[10] = at3_at3plus_flagdata[1];
+        AA3ME_codec_buffer[10] = (AA3ME_codec_buffer[10] << 8 ) | at3_at3plus_flagdata[0];
+        AA3ME_codec_buffer[12] = 0x1;
+        AA3ME_codec_buffer[14] = 0x1;
+    }
+    else
+        return -1;
+    samplerate = 44100;
+
+	while( !eof )
+	{
+		data_start = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+
+		if (data_start < 0)
+			break;
+
+		if ( at3_type == TYPE_ATRAC3 )
+		{
+			memset( AA3ME_input_buffer, 0, 0x180);
+
+			res = sceIoRead( fd, AA3ME_input_buffer, data_align );
+
+			if (res < 0){//error reading suspend/usb problem
+				break;
+			}else if (res != data_align){
+				eof = 1;
+				continue;
+			}
+
+			if ( channel_mode )
+				memcpy(AA3ME_input_buffer+data_align, AA3ME_input_buffer, data_align);
+
+			decode_type = 0x1001;
+		}
+		else
+		{
+			memset( AA3ME_input_buffer, 0, data_align+8);
+
+			AA3ME_input_buffer[0] = 0x0F;
+			AA3ME_input_buffer[1] = 0xD0;
+			AA3ME_input_buffer[2] = at3_at3plus_flagdata[0];
+			AA3ME_input_buffer[3] = at3_at3plus_flagdata[1];
+
+			res = sceIoRead( fd, AA3ME_input_buffer+8, data_align );
+
+			if (res < 0){//error reading suspend/usb problem
+				break;
+			}else if (res != data_align)
+			{
+				eof = 1;
+				continue;
+			}
+			decode_type = 0x1000;
+		}
+
+		offset = data_start;
+
+		data_size -= data_align;
+		if (data_size <= 0)
+		{
+			eof = 1;
+			continue;
+		}
+
+		AA3ME_codec_buffer[6] = (unsigned long)AA3ME_input_buffer;
+		AA3ME_codec_buffer[8] = (unsigned long)AA3ME_output_buffer;
+
+        totalPlayingTime += (float)sample_per_frame/(float)samplerate;
+	}
+	
+	AA3ME_info.hz = samplerate;
+	AA3ME_info.length = totalPlayingTime;
+	long secs = AA3ME_info.length;
+	int h = secs / 3600;
+	int m = (secs - h * 3600) / 60;
+	int s = secs - h * 3600 - m * 60;
+	snprintf(AA3ME_info.strLength, sizeof(AA3ME_info.strLength), "%2.2i:%2.2i:%2.2i", h, m, s);
+	strcpy(AA3ME_info.mode, "normal LR stereo");
+	
     return 0;
 }
 
@@ -256,16 +407,16 @@ int AA3ME_getInfo(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void AA3ME_Init(int channel){
     AA3ME_audio_channel = channel;
+    AA3ME_playingTime = 0;
 	initMEAudioModules();
 }
 
 
 int AA3ME_Load(char *fileName){
-    if (AA3ME_getInfo() != 0){
+    strcpy(AA3ME_fileName, fileName);
+    if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;
     }
-
-    strcpy(AA3ME_fileName, fileName);
     AA3ME_thid = -1;
     AA3ME_eof = 0;
     AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, 0x4000, 0, NULL);
@@ -310,17 +461,12 @@ struct fileInfo AA3ME_GetInfo(){
 
 
 int AA3ME_GetPercentage(){
-    int perc = 0;
-    if (!AA3ME_info.frames){
-        return 0;
-    }
-    perc = (double)AA3ME_info.framesDecoded / (double)AA3ME_info.frames * 100.0;
-    return perc;
+    return (int)(AA3ME_playingTime/1000.0/(double)AA3ME_info.length*100.0);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Get atg info:
+//Get tag info:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
     int aa3fd; //our local file descriptor
