@@ -89,6 +89,14 @@ void (*fadeOutFunct)(float seconds);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions for ME
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Open audio for player:
+int openAudio(int channel, int samplecount){
+	int audio_channel = sceAudioChReserve(channel, samplecount, PSP_AUDIO_FORMAT_STEREO );
+    if(audio_channel < 0)
+        audio_channel = sceAudioChReserve(PSP_AUDIO_NEXT_CHANNEL, samplecount, PSP_AUDIO_FORMAT_STEREO );
+	return audio_channel;
+}
+
 //Load a module:
 SceUID LoadStartAudioModule(char *modname, int partition){
     SceKernelLMOption option;
