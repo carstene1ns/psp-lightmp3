@@ -130,14 +130,6 @@ int SeekNextFrame(SceUID fd)
     } 
 }
 
-//Open audio for player:
-int openAudio(int samplecount){
-	MP3ME_audio_channel = sceAudioChReserve(MP3ME_audio_channel, samplecount, PSP_AUDIO_FORMAT_STEREO );
-    if(MP3ME_audio_channel < 0)
-        MP3ME_audio_channel = sceAudioChReserve(PSP_AUDIO_NEXT_CHANNEL, samplecount, PSP_AUDIO_FORMAT_STEREO );
-	return 0;
-}
-
 //Decode thread:
 int decodeThread(SceSize args, void *argp){
     int res;
@@ -155,7 +147,7 @@ int decodeThread(SceSize args, void *argp){
 
 	sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another mp3.
 	MP3ME_threadActive = 1;
-	openAudio(OUTPUT_BUFFER_SIZE/4);
+	openAudio(MP3ME_audio_channel, OUTPUT_BUFFER_SIZE/4);
     OutputBuffer_flip = 0;
     OutputPtrME = OutputBuffer[0];
 
@@ -236,7 +228,7 @@ int decodeThread(SceSize args, void *argp){
 
 			if (output2init && (samplerate == 44100))//bad mp3,changes samplerate, fix, really should re-encode this song...
 			{
-				openAudio(OUTPUT_BUFFER_SIZE/4);
+				openAudio(MP3ME_audio_channel, OUTPUT_BUFFER_SIZE/4);
 				output2init = 0;        
 			}
 
@@ -303,8 +295,8 @@ int decodeThread(SceSize args, void *argp){
 				offset = data_start;
 				continue;
 			}
-            MP3ME_playingTime += 32.0*36.0/(float)samplerate;
-            //MP3ME_playingTime += (float)OUTPUT_BUFFER_SIZE/(float)samplerate;
+            //MP3ME_playingTime += 32.0*36.0/(float)samplerate;
+            MP3ME_playingTime += (float)sample_per_frame/(float)samplerate;
 		    MP3ME_info.framesDecoded++;
 
 			//Controllo la velocità:

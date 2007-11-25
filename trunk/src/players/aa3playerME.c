@@ -21,6 +21,7 @@
 //    http://forums.ps2dev.org/viewtopic.php?t=8469
 //    and the source code of Music prx by joek2100
 #include <string.h>
+#include <stdio.h>
 #include <malloc.h>
 //#include "log.h"
 
@@ -37,6 +38,7 @@ int AA3ME_thid = -1;
 int AA3ME_audio_channel = 0;
 int AA3ME_eof = 0;
 struct fileInfo AA3ME_info;
+float AA3ME_playingTime = 0;
 
 unsigned char AA3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
 unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
@@ -54,7 +56,10 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     unsigned long decode_type;
     int tag_size;
 	int offset = 0;
-
+	
+    AA3ME_threadActive = 1;
+    openAudio(AA3ME_audio_channel, AT3_OUTPUT_BUFFER_SIZE/4);
+    
 	sceAudiocodecReleaseEDRAM(AA3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another file.
     OutputBuffer_flip = 0;
     AT3_OutputPtr = AT3_OutputBuffer[0];
@@ -143,6 +148,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     }
     else
         AA3ME_threadActive = 0;
+    samplerate = 44100;
    
 	while (AA3ME_threadActive){
 		while( !AA3ME_eof && AA3ME_isPlaying )
@@ -217,6 +223,10 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				continue;
 			}
 
+            AA3ME_playingTime += (float)sample_per_frame/(float)samplerate;
+		    AA3ME_info.framesDecoded++;
+		    
+            //Output:
 			memcpy( AT3_OutputPtr, AA3ME_output_buffer, sample_per_frame*4);
 			AT3_OutputPtr += (sample_per_frame * 4);
 			if( AT3_OutputPtr + (sample_per_frame * 4) > &AT3_OutputBuffer[OutputBuffer_flip][AT3_OUTPUT_BUFFER_SIZE])
@@ -229,12 +239,15 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 		}
 		sceKernelDelayThread(10000);
 	}
-   return 0;
+    sceAudioChRelease(AA3ME_audio_channel);
+    return 0;
 }
 
 //Get info on file:
 int AA3ME_getInfo(){
     AA3ME_info.fileType = AT3_TYPE;
+    strcpy(AA3ME_info.layer, "");
+    
     return 0;
 }
 
@@ -257,7 +270,7 @@ int AA3ME_Load(char *fileName){
     AA3ME_eof = 0;
     AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, 0x4000, 0, NULL);
     if(AA3ME_thid < 0)
-        return -1;
+        return ERROR_OPENING;
 
     sceKernelStartThread(AA3ME_thid, 0, NULL);
     return OPENING_OK;
@@ -305,7 +318,23 @@ int AA3ME_GetPercentage(){
     return perc;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Get atg info:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
+    int aa3fd; //our local file descriptor
+    char aa3buffer[512];
+    aa3fd = sceIoOpen(filename, 0x0001, 0777);
+
+    if (aa3fd < 0)
+        return;
+    sceIoRead(aa3fd,aa3buffer,3);
+
+    if (strstr(aa3buffer,"ea3") != NULL){
+
+    }
+    sceIoClose(aa3fd);
 }
 
 struct fileInfo AA3ME_GetTagInfoOnly(char *filename){
@@ -333,6 +362,16 @@ int AA3ME_setMute(int onOff){
     return setMute(AA3ME_audio_channel, onOff);
 }
 
+void AA3ME_GetTimeString(char *dest){
+    char timeString[9];
+    int secs = (int)AA3ME_playingTime;
+    int hh = secs / 3600;
+    int mm = (secs - hh * 3600) / 60;
+    int ss = secs - hh * 3600 - mm * 60;
+    snprintf(timeString, sizeof(timeString), "%2.2i:%2.2i:%2.2i", hh, mm, ss);
+    strcpy(dest, timeString);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Fade out:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,9 +382,6 @@ void AA3ME_fadeOut(float seconds){
 //TODO:
 int AA3_GetPercentage(){
     return 0;
-}
-
-void AA3ME_GetTimeString(char *dest){
 }
 
 int AA3ME_GetStatus(){

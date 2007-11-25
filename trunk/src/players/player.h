@@ -67,6 +67,7 @@ extern u8 at3_at3plus_flagdata[2];
 extern unsigned char AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE];
 extern unsigned char *AT3_OutputPtr;
 
+int openAudio(int channel, int samplecount);
 SceUID LoadStartAudioModule(char *modname, int partition);
 int initMEAudioModules();
 int GetID3TagSize(char *fname);
