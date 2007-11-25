@@ -193,9 +193,9 @@ void OGGgetInfo(){
 	OGG_info.hz = vi->rate;
 	OGG_info.length = (long)ov_time_total(&OGG_VorbisFile, -1)/1000;
     if (vi->channels == 1)
-        strcpy(OGG_info.mode, "Mono");
+        strcpy(OGG_info.mode, "single channel");
     else if (vi->channels == 2)
-        strcpy(OGG_info.mode, "Stereo");
+        strcpy(OGG_info.mode, "normal LR stereo");
     strcpy(OGG_info.emphasis, "no");
 
 	int h = 0;
