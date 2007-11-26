@@ -188,6 +188,7 @@ void OGGgetInfo(){
     //Estraggo le informazioni:
 	vorbis_info *vi = ov_info(&OGG_VorbisFile, -1);
     OGG_info.fileType = OGG_TYPE;
+    OGG_info.needsME = 0;
 	OGG_info.kbit = vi->bitrate_nominal/1000;
     OGG_info.instantBitrate = vi->bitrate_nominal;
 	OGG_info.hz = vi->rate;
@@ -213,9 +214,9 @@ void OGGgetInfo(){
 
 void OGG_Init(int channel){
     MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;     
-	OGG_audio_channel = channel;
-    pspAudioSetChannelCallback(OGG_audio_channel, oggDecodeThread, NULL); 
+    MAX_PLAYING_SPEED=9;
+    OGG_audio_channel = channel;
+    pspAudioSetChannelCallback(OGG_audio_channel, oggDecodeThread, NULL);
 }
 
 

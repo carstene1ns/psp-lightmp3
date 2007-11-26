@@ -1863,7 +1863,7 @@ void fileBrowser_menu(){
 				opendir_close(&directory);
 				selected_entry = 0;
 				top_entry = 0;
-				result = opendir_open(&directory, curDir, ext, 3, 1);
+				result = opendir_open(&directory, curDir, ext, 4, 1);
 				sortDirectory(directory);
 				sceKernelDelayThread(200000);
 			}
@@ -1875,7 +1875,7 @@ void fileBrowser_menu(){
 					opendir_close(&directory);
 					selected_entry = 0;
 					top_entry = 0;
-					result = opendir_open(&directory, curDir, ext, 3, 1);
+					result = opendir_open(&directory, curDir, ext, 4, 1);
 					sortDirectory(directory);
                     //Mi riposiziono:
                     for (i = 0; i < directory.number_of_directory_entries; i++){
@@ -1936,7 +1936,7 @@ void fileBrowser_menu(){
 			opendir_close(&directory);
 			selected_entry = 0;
 			top_entry = 0;
-			result = opendir_open(&directory, curDir, ext, 3, 1);
+			result = opendir_open(&directory, curDir, ext, 4, 1);
 			sortDirectory(directory);
 			sceKernelDelayThread(200000);
 		}
@@ -2587,8 +2587,8 @@ int main() {
     }
 
     //Disable the ME (su slim freeza al cambio di clock di CPU se lo eseguo):
-    if (sceKernelDevkitVersion() < 0x03070110 && !userSettings.MP3_ME)
-        MEDisable();
+    //if (sceKernelDevkitVersion() < 0x03070110 && !userSettings.MP3_ME)
+    //    MEDisable();
         
     volumeBoost = userSettings.BOOST_VALUE;
     

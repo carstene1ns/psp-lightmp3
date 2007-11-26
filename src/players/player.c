@@ -198,9 +198,19 @@ char GetOMGFileType(char *fname)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Search a free channel
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int checkChannel(int channel){
+    int audio_channel = openAudio(channel, 4096);
+    if(audio_channel >= 0)
+        sceAudioChRelease(audio_channel);
+	return audio_channel;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set pointer to audio functions based on filename:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void setAudioFunctions(char *filename, int useME){
+void setAudioFunctions(char *filename, int useME_MP3){
 	char ext[5];
 	memcpy(ext, filename + strlen(filename) - 4, 5);
 	if (!stricmp(ext, ".ogg")){
@@ -230,7 +240,7 @@ void setAudioFunctions(char *filename, int useME){
         suspendFunct = OGG_suspend;
         resumeFunct = OGG_resume;
         fadeOutFunct = OGG_fadeOut;
-    } else if (!stricmp(ext, ".mp3") && useME){
+    } else if (!stricmp(ext, ".mp3") && useME_MP3){
         //MP3 via Media Engine
 		initFunct = MP3ME_Init;
 		loadFunct = MP3ME_Load;
@@ -383,7 +393,7 @@ int setMute(int channel, int onOff){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void fadeOut(int channel, float seconds){
     int i = 0;
-    long timeToWait = (seconds * 1000) / (float)currentVolume;
+    long timeToWait = (long)((seconds * 1000.0) / (float)currentVolume);
     for (i=currentVolume; i>=0; i--){
         pspAudioSetVolume(channel, i, i);
         sceKernelDelayThread(timeToWait);
