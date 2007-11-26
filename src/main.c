@@ -649,14 +649,14 @@ void addFileToPlaylist(char *fileName, int save){
 
 //Aggiungo una directory alla playlist temporanea:
 void addDirectoryToPlaylist(char *dirName){
-	char ext[3][4] = {"MP3", "OGG", "AA3"};
+	char ext[4][5] = {"MP3", "OGG", "AA3", "FLAC"};
 	char fileToAdd[262] = "";
 	char message[10] = "";
 	int i;
 	float perc;
 	struct opendir_struct dirToAdd;
 
-	char *result = opendir_open(&dirToAdd, dirName, ext, 3, 0);
+	char *result = opendir_open(&dirToAdd, dirName, ext, 4, 0);
 	if (result == 0){
 		for (i = 0; i < dirToAdd.number_of_directory_entries; i++){
 			strcpy(fileToAdd, dirName);
@@ -1440,12 +1440,12 @@ int playFile(char *filename, char *numbers, char *message) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void playDirectory(char *dirName, char *initialFileName){
 	struct opendir_struct dirToPlay;
-	char ext[3][4] = {"MP3", "OGG", "AA3"};
+	char ext[4][5] = {"MP3", "OGG", "AA3", "FLAC"};
 	char testo[10] = "";
 	char fileToPlay[262] = "";
 	char message[68] = "";
 
-	char *result = opendir_open(&dirToPlay, dirName, ext, 3, 0);
+	char *result = opendir_open(&dirToPlay, dirName, ext, 4, 0);
 	unsigned int playedTracks[dirToPlay.number_of_directory_entries];
 	unsigned int playedTracksNumber = 0;
 	unsigned int currentTrack = 0;
@@ -1664,17 +1664,17 @@ void fileBrowser_menu(){
 	char curDir[262] = "";
 	char dirToPlay[262] = "";
 	char fileToPlay[262] = "";
-	char ext[4][4] = {"MP3", "M3U", "OGG", "AA3"};
+	char ext[5][5] = {"MP3", "M3U", "OGG", "AA3", "FLAC"};
 	char *result;
 
 	if (strlen(fileBrowserDir) == 0){
 		//Provo la prima directory:
 		strcpy(curDir, music_directory_1);
-		result = opendir_open(&directory, curDir, ext, 4, 1);
+		result = opendir_open(&directory, curDir, ext, 5, 1);
 		if (result){
 			//Provo la seconda directory:
 			strcpy(curDir, music_directory_2);
-			result = opendir_open(&directory, curDir, ext, 4, 1);
+			result = opendir_open(&directory, curDir, ext, 5, 1);
 			if (result){
 				screen_init();
 				pspDebugScreenSetXY(0, 4);
@@ -1690,7 +1690,7 @@ void fileBrowser_menu(){
 		}
 	}else{
 		strcpy(curDir, fileBrowserDir);
-		result = opendir_open(&directory, curDir, ext, 4, 1);
+		result = opendir_open(&directory, curDir, ext, 5, 1);
 	}
 	sortDirectory(directory);
 
@@ -1863,7 +1863,7 @@ void fileBrowser_menu(){
 				opendir_close(&directory);
 				selected_entry = 0;
 				top_entry = 0;
-				result = opendir_open(&directory, curDir, ext, 4, 1);
+				result = opendir_open(&directory, curDir, ext, 5, 1);
 				sortDirectory(directory);
 				sceKernelDelayThread(200000);
 			}
@@ -1875,7 +1875,7 @@ void fileBrowser_menu(){
 					opendir_close(&directory);
 					selected_entry = 0;
 					top_entry = 0;
-					result = opendir_open(&directory, curDir, ext, 4, 1);
+					result = opendir_open(&directory, curDir, ext, 5, 1);
 					sortDirectory(directory);
                     //Mi riposiziono:
                     for (i = 0; i < directory.number_of_directory_entries; i++){
@@ -1936,7 +1936,7 @@ void fileBrowser_menu(){
 			opendir_close(&directory);
 			selected_entry = 0;
 			top_entry = 0;
-			result = opendir_open(&directory, curDir, ext, 4, 1);
+			result = opendir_open(&directory, curDir, ext, 5, 1);
 			sortDirectory(directory);
 			sceKernelDelayThread(200000);
 		}
@@ -1969,7 +1969,7 @@ void playlist_menu(){
 		strcat(curDir, "/");
 	}
 	strcat(curDir, "playLists");
-	char ext[1][4] = {"M3U"};
+	char ext[1][5] = {"M3U"};
 	char *result = opendir_open(&directory, curDir, ext, 1, 0);
 	sortDirectory(directory);
 	if (result){

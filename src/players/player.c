@@ -32,6 +32,7 @@
 #include "mp3playerME.h"
 #include "aa3playerME.h"
 #include "oggplayer.h"
+#include "flacplayer.h"
 
 //shared global vars
 int MAX_VOLUME_BOOST=15;
@@ -211,8 +212,11 @@ int checkChannel(int channel){
 //Set pointer to audio functions based on filename:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void setAudioFunctions(char *filename, int useME_MP3){
-	char ext[5];
-	memcpy(ext, filename + strlen(filename) - 4, 5);
+	char ext[6];
+	if (strrchr(filename, '.'))
+		memcpy(ext, strrchr(filename, '.'), 6);
+	else
+		memcpy(ext, filename + strlen(filename) - 4, 5);
 	if (!stricmp(ext, ".ogg")){
         //OGG Vorbis
 		initFunct = OGG_Init;
@@ -321,6 +325,33 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = AA3ME_suspend;
         resumeFunct = AA3ME_resume;
         fadeOutFunct = AA3ME_fadeOut;
+    } else 	if (!stricmp(ext, ".flac")){
+        //FLAC
+		initFunct = FLAC_Init;
+		loadFunct = FLAC_Load;
+		playFunct = FLAC_Play;
+		pauseFunct = FLAC_Pause;
+		endFunct = FLAC_End;
+        setVolumeBoostTypeFunct = FLAC_setVolumeBoostType;
+        setVolumeBoostFunct = FLAC_setVolumeBoost;
+        getInfoFunct = FLAC_GetInfo;
+        getTagInfoFunct = FLAC_GetTagInfoOnly;
+        getTimeStringFunct = FLAC_GetTimeString;
+        getPercentageFunct = FLAC_GetPercentage;
+        getPlayingSpeedFunct = FLAC_getPlayingSpeed;
+        setPlayingSpeedFunct = FLAC_setPlayingSpeed;
+        endOfStreamFunct = FLAC_EndOfStream;
+
+        setMuteFunct = FLAC_setMute;
+        setFilterFunct = FLAC_setFilter;
+        enableFilterFunct = FLAC_enableFilter;
+        disableFilterFunct = FLAC_disableFilter;
+        isFilterEnabledFunct = FLAC_isFilterEnabled;
+        isFilterSupportedFunct = FLAC_isFilterSupported;
+
+        suspendFunct = FLAC_suspend;
+        resumeFunct = FLAC_resume;
+        fadeOutFunct = FLAC_fadeOut;
     }
 }
 

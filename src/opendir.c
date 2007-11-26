@@ -50,7 +50,7 @@ void opendir_close(struct opendir_struct *p)
 	}
 
 
-char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][4], int extNumber, int includeDirs)
+char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5], int extNumber, int includeDirs)
 	{
 	opendir_safe_constructor(p);
 
@@ -148,11 +148,14 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][4
 			//Controllo il filtro sulle estensioni (solo per i files):
 			if (FIO_S_ISREG(p->directory_entry[p->number_of_directory_entries].d_stat.st_mode)){
 				int extOK = 0;
-				int i;
-				char ext[4] = "";
-
-				for (i = strlen(p->directory_entry[p->number_of_directory_entries].d_name) - 3; i < strlen(p->directory_entry[p->number_of_directory_entries].d_name); i++){
-					ext[i - strlen(p->directory_entry[p->number_of_directory_entries].d_name) + 3] = toupper(p->directory_entry[p->number_of_directory_entries].d_name[i]);
+				int i, j;
+				char ext[5] = "";
+				if (p->directory_entry[p->number_of_directory_entries].d_name[strlen(p->directory_entry[p->number_of_directory_entries].d_name) - 5] == '.')
+					j = 4;
+				else
+					j = 3;
+				for (i = strlen(p->directory_entry[p->number_of_directory_entries].d_name) - j; i < strlen(p->directory_entry[p->number_of_directory_entries].d_name); i++){
+					ext[i - strlen(p->directory_entry[p->number_of_directory_entries].d_name) + j] = toupper(p->directory_entry[p->number_of_directory_entries].d_name[i]);
 				}
 
 				extOK = 0;
