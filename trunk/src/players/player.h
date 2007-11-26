@@ -71,6 +71,7 @@ int openAudio(int channel, int samplecount);
 SceUID LoadStartAudioModule(char *modname, int partition);
 int initMEAudioModules();
 int GetID3TagSize(char *fname);
+int checkChannel(int channel);
 
 int sceAudio_38553111(int samplecount, int samplerate, int unk);//unk = 2 (only func called by sceAudioOutput2Reserve)
 int sceAudio_E0727056(int vol, void *buf);//sceAudioOutput2OutputBlocking alias, present in 1.5
@@ -78,6 +79,7 @@ int sceAudio_5C37C0AE(void);//sceAudioOutput2Release alias, also present in 1.5
 
 struct fileInfo{
     int fileType;
+    int needsME;
 	int fileSize;
 	char layer[10];
 	int kbit;

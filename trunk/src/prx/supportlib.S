@@ -2,7 +2,7 @@
 
 #include "pspstub.s"
 
-	STUB_START "supportlib",0x40090000,0x000D0005
+	STUB_START "supportlib",0x40090000,0x000E0005
 	STUB_FUNC  0x19F94895,getBrightness
 	STUB_FUNC  0xB6551455,setBrightness
 	STUB_FUNC  0x1191DE7B,imposeSetBrightness
@@ -12,6 +12,7 @@
 	STUB_FUNC  0x521EAC81,imposeGetVolume
 	STUB_FUNC  0x0F4D9C96,imposeSetVolume
 	STUB_FUNC  0x4F0D8ADE,readButtons
+	STUB_FUNC  0x98B8D7B4,MEEnable
 	STUB_FUNC  0x0D340F77,MEDisable
 	STUB_FUNC  0xBF6F954F,imposeGetMute
 	STUB_FUNC  0x0CBCC445,imposeSetMute

@@ -370,6 +370,7 @@ int MP3MEgetInfo(){
     sceIoLseek(fd, 0, PSP_SEEK_SET);
     
     MP3ME_info.fileType = MP3_TYPE;
+    MP3ME_info.needsME = 1;
 	MP3ME_info.fileSize = size;
     MP3ME_info.framesDecoded = 0;
 	mad_timer_reset(&libMadlength);
@@ -598,7 +599,7 @@ int MP3ME_Load(char *fileName){
     }
     MP3ME_thid = -1;
     MP3ME_eof = 0;
-    MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x4000, 0, NULL);
+    MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x4000, PSP_THREAD_ATTR_USER, NULL);
     if(MP3ME_thid < 0)
         return -1;
 
@@ -719,7 +720,7 @@ int MP3ME_setMute(int onOff){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MP3ME_fadeOut(float seconds){
     int i = 0;
-    long timeToWait = (seconds * 1000) / (float)MP3ME_volume;
+    long timeToWait = (long)((seconds * 1000.0) / (float)MP3ME_volume);
     for (i=MP3ME_volume; i>=0; i--){
         MP3ME_volume = i;
         sceKernelDelayThread(timeToWait);
