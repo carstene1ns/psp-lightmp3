@@ -34,7 +34,8 @@
 
 #define MP3_TYPE 0
 #define OGG_TYPE 1
-#define AT3_TYPE 1
+#define AT3_TYPE 2
+#define FLAC_TYPE 3
 #define UNK_TYPE -1
 
 #define MUTED_VOLUME 0x800
