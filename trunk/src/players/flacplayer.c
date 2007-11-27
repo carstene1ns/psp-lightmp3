@@ -16,7 +16,7 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //    CREDITS:
-//    All credits dor this goes to JLF65
+//    All credits for this goes to JLF65
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -38,13 +38,13 @@ FILE *FLAC_file = 0;
 int FLAC_eos = 0;
 struct fileInfo FLAC_info;
 static int isPlaying = 0;
-unsigned int FLAC_volume_boost = 0.0;
+unsigned int FLAC_volume_boost = 0;
 int FLAC_playingSpeed = 0; // 0 = normal
 int FLAC_playingDelta = 0;
 static int outputInProgress = 0;
 static long suspendPosition = -1;
 static long suspendIsPlaying = 0;
-int FLAC_defaultCPUClock = 140;
+int FLAC_defaultCPUClock = 150;
 
 int kill_flac_thread;
 int bufferLow;
