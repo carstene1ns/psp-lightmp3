@@ -73,6 +73,20 @@ int SETTINGS_load(char *fileName){
 								localSettings.MP3_ME = atoi(result);
 							}else if (strcmp(parName, "FADE_OUT") == 0){
 								localSettings.FADE_OUT = atoi(result);
+							}else if (strcmp(parName, "CLOCK_GUI") == 0){
+								localSettings.CLOCK_GUI = atoi(result);
+							}else if (strcmp(parName, "CLOCK_AUTO") == 0){
+								localSettings.CLOCK_AUTO = atoi(result);
+							}else if (strcmp(parName, "CLOCK_MP3") == 0){
+								localSettings.CLOCK_MP3 = atoi(result);
+							}else if (strcmp(parName, "CLOCK_MP3ME") == 0){
+								localSettings.CLOCK_MP3ME = atoi(result);
+							}else if (strcmp(parName, "CLOCK_OGG") == 0){
+								localSettings.CLOCK_OGG = atoi(result);
+							}else if (strcmp(parName, "CLOCK_FLAC") == 0){
+								localSettings.CLOCK_FLAC = atoi(result);
+							}else if (strcmp(parName, "CLOCK_AA3") == 0){
+								localSettings.CLOCK_AA3 = atoi(result);
 							}
 						}
 						element++;
@@ -105,6 +119,13 @@ struct settings SETTINGS_default(){
 	localSettings.VOLUME = 20;
 	localSettings.MP3_ME = 0;
 	localSettings.FADE_OUT = 0;
+	localSettings.CLOCK_AUTO = 1;
+	localSettings.CLOCK_GUI = 50;
+	localSettings.CLOCK_MP3 = 70;
+	localSettings.CLOCK_MP3ME = 20;
+	localSettings.CLOCK_OGG = 50;
+	localSettings.CLOCK_FLAC = 140;
+	localSettings.CLOCK_AA3 = 20;
 	return localSettings;
 }
 
@@ -152,6 +173,26 @@ int SETTINGS_save(struct settings tSettings){
 
     fwrite("#Fade out when changing track (0/1):\n", 1, strlen("#Fade out when changing track (0/1):\n"), f);
     snprintf(testo, sizeof(testo), "FADE_OUT=%i\n\n", tSettings.FADE_OUT);
+    fwrite(testo, 1, strlen(testo), f);
+
+    fwrite("#Automatic CPU clock (0/1):\n", 1, strlen("#Automatic CPU clock (0/1):\n"), f);
+    snprintf(testo, sizeof(testo), "CLOCK_AUTO=%i\n\n", tSettings.CLOCK_AUTO);
+    fwrite(testo, 1, strlen(testo), f);
+
+    fwrite("#CPU clock for GUI (10/222):\n", 1, strlen("#CPU clock for GUI (10/222):\n"), f);
+    snprintf(testo, sizeof(testo), "CLOCK_GUI=%i\n\n", tSettings.CLOCK_GUI);
+    fwrite(testo, 1, strlen(testo), f);
+    
+    fwrite("#Clock for filetype (10/222):\n", 1, strlen("#Clock for filetype (10/222):\n"), f);
+    snprintf(testo, sizeof(testo), "CLOCK_MP3=%i\n", tSettings.CLOCK_MP3);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "CLOCK_MP3ME=%i\n", tSettings.CLOCK_MP3ME);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "CLOCK_OGG=%i\n", tSettings.CLOCK_OGG);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "CLOCK_FLAC=%i\n", tSettings.CLOCK_FLAC);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "CLOCK_AA3=%i\n\n", tSettings.CLOCK_AA3);
     fwrite(testo, 1, strlen(testo), f);
 
 	fclose(f);

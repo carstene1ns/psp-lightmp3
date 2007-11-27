@@ -15,6 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+extern int FLAC_defaultCPUClock;
+
 //private functions
 void FLAC_Init(int channel);
 int FLAC_Play();
@@ -47,3 +49,4 @@ int FLAC_isFilterSupported();
 //Manage suspend:
 int FLAC_suspend();
 int FLAC_resume();
+

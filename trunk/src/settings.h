@@ -28,6 +28,15 @@ struct settings{
 	int VOLUME;
 	int MP3_ME;
 	int FADE_OUT;
+
+	//CPU clock for filetype:
+    int CLOCK_GUI;
+    int CLOCK_AUTO;
+    int CLOCK_MP3;
+    int CLOCK_MP3ME;
+    int CLOCK_OGG;
+    int CLOCK_FLAC;
+    int CLOCK_AA3;
 };
 
 int SETTINGS_load(char *fileName);

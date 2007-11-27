@@ -108,7 +108,6 @@ int currentEQ = 0;
 
 static int runningFlag = 1;
 struct settings userSettings;
-static int USBready = 0;
 static int resuming = 0;
 static int suspended = 0;
 
@@ -723,8 +722,13 @@ void checkBrightness(){
 int showUSBactivate(){
 	int i;
 
-	if (!USBready){
-		//return -1;
+	//init USB:
+    int retUSB = USBinit();
+	if (retUSB){
+        pspDebugScreenSetXY(0, 4);
+        pspDebugScreenSetTextColor(RED);
+        pspDebugScreenPrintf("Error %i initializing USB.\n", retUSB);
+        sceKernelDelayThread(3000000);
 	}
 
     USBActivate();
@@ -752,6 +756,7 @@ int showUSBactivate(){
 			break;
 		}
 	}
+	USBEnd();
 	return(0);
 }
 
@@ -787,10 +792,17 @@ void setBusClock(int bus){
 
 void setCpuClock(int cpu){
     if (cpu >= 10 && cpu <= 266){
-        if (sceKernelDevkitVersion() < 0x03070110)
+        if (sceKernelDevkitVersion() < 0x03070110){
             scePowerSetCpuClockFrequency(cpu);
-        else
+            if (scePowerGetCpuClockFrequency() < cpu)
+                scePowerSetCpuClockFrequency(++cpu);
+        }else{
             scePowerSetClockFrequency(cpu, cpu, cpu/2);
+            if (scePowerGetCpuClockFrequency() < cpu){
+                cpu++;
+                scePowerSetClockFrequency(cpu, cpu, cpu/2);
+            }
+        }
     }
 }
 
@@ -931,11 +943,34 @@ void screen_init(){
 	pspDebugScreenSetXY(0, 33);
 }
 
+//Toolbar:
+void screen_toolbar(){
+    //<<L___File Browser____Playlists____Playlist Editor____Options___R>>
+    char tb[68] = "<<L                                                             R>>";
+    char tbElement[4][30] = {"File browser", "Playlists", "Playlist editor", "Options"};
+    int tbElementPos[4] = {7, 23, 36, 55};
+    int i;
+
+    pspDebugScreenSetBackColor(0x882200);
+	pspDebugScreenSetTextColor(WHITE);
+	pspDebugScreenSetXY(0, 2);
+	pspDebugScreenPrintf(tb);
+
+    for (i=0; i<5; i++){
+        if (i==current_mode)
+	       pspDebugScreenSetBackColor(RED);
+        else
+            pspDebugScreenSetBackColor(0x882200);
+        pspDebugScreenSetXY(tbElementPos[i], 2);
+        pspDebugScreenPrintf(tbElement[i]);
+    }
+}
+
 //Schermo per menu
 void screen_menu_init(){
-	pspDebugScreenSetTextColor(RED);
-	pspDebugScreenSetXY(0, 2);
-	pspDebugScreenPrintf("Mode: File browser");
+	//pspDebugScreenSetTextColor(RED);
+	//pspDebugScreenSetXY(0, 2);
+	//pspDebugScreenPrintf("Mode: File browser");
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetXY(0, 28);
@@ -953,9 +988,9 @@ void screen_menu_init(){
 
 //Schermo per playlist
 void screen_playlist_init(){
-	pspDebugScreenSetTextColor(RED);
-	pspDebugScreenSetXY(0, 2);
-	pspDebugScreenPrintf("Mode: Playlist browser");
+	//pspDebugScreenSetTextColor(RED);
+	//pspDebugScreenSetXY(0, 2);
+	//pspDebugScreenPrintf("Mode: Playlist browser");
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetXY(0, 28);
@@ -968,9 +1003,9 @@ void screen_playlist_init(){
 
 //Schermo per playlist editor
 void screen_playlistEditor_init(){
-	pspDebugScreenSetTextColor(RED);
-	pspDebugScreenSetXY(0, 2);
-	pspDebugScreenPrintf("Mode: Playlist editor");
+	//pspDebugScreenSetTextColor(RED);
+	//pspDebugScreenSetXY(0, 2);
+	//pspDebugScreenPrintf("Mode: Playlist editor");
 	pspDebugScreenSetTextColor(YELLOW);
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetXY(0, 22);
@@ -1172,6 +1207,13 @@ int playFile(char *filename, char *numbers, char *message) {
 	  }
 	  info = (*getInfoFunct)();
 	  screen_fileinfo(info);
+	  
+	  //Imposto il clock:
+      if (userSettings.CLOCK_AUTO){
+          clock = info.defaultCPUClock;
+          setCpuClock(info.defaultCPUClock);
+      }
+          
 	  (*playFunct)();
 	  action = 1;
 	  screen_playerAction(&action);
@@ -1432,6 +1474,10 @@ int playFile(char *filename, char *numbers, char *message) {
         displayStatus = 1;
       }
 	  unsetAudioFunctions();
+
+	  //Imposto il clock:
+      if (userSettings.CLOCK_AUTO)
+          setCpuClock(userSettings.CLOCK_GUI);
 	  return(retVal);
 }
 
@@ -1706,6 +1752,7 @@ void fileBrowser_menu(){
 		{
         SceCtrlData controller;
 		screen_init();
+		screen_toolbar();
 		screen_menu_init();
 		pspDebugScreenSetTextColor(WHITE);
 		pspDebugScreenSetXY(0, 3);
@@ -1963,6 +2010,7 @@ void playlist_menu(){
 	int sel_total = 0;
 
 	screen_init();
+    screen_toolbar();
 	screen_playlist_init();
 	strcpy(curDir, ebootDirectory);
 	if (curDir[strlen(curDir)-1] != '/'){
@@ -2160,6 +2208,7 @@ void playlist_menu(){
 					strcat(fileToPlay, directory.directory_entry[selected_entry].d_name);
 					playM3U(fileToPlay);
 					screen_init();
+					screen_toolbar();
 					screen_playlist_init();
 					//Carico i dati della playlist selezionata:
 					strcpy(fileToPlay, curDir);
@@ -2281,6 +2330,7 @@ void playlist_editor(){
 	int sel_updateInfo = 0;
 
 	screen_init();
+	screen_toolbar();
 	//Apro il file temporaneo m3u:
 	strcpy(M3Ufilename, tempM3Ufile);
 
@@ -2459,6 +2509,7 @@ void playlist_editor(){
 					M3U_save(M3Ufilename);
 					playM3U(M3Ufilename);
 					screen_init();
+					screen_toolbar();
 					screen_playlistEditor_init();
 					sel_updateInfo = 1;
 					sceKernelDelayThread(200000);
@@ -2586,6 +2637,13 @@ int main() {
 		strcpy(userSettings.fileName, playlistDir);
     }
 
+    //Clock per filetype:
+    MP3_defaultCPUClock = userSettings.CLOCK_MP3;
+    MP3ME_defaultCPUClock = userSettings.CLOCK_MP3ME;
+    OGG_defaultCPUClock = userSettings.CLOCK_OGG;
+    FLAC_defaultCPUClock = userSettings.CLOCK_FLAC;
+    AA3ME_defaultCPUClock = userSettings.CLOCK_AA3;
+    
     //Disable the ME (su slim freeza al cambio di clock di CPU se lo eseguo):
     //if (sceKernelDevkitVersion() < 0x03070110 && !userSettings.MP3_ME)
     //    MEDisable();
@@ -2659,18 +2717,6 @@ int main() {
     int initialBrightness = getBrightness();
 	int initialBrightnessValue = imposeGetBrightness();
 	checkBrightness();
-
-	//init USB:
-    int retUSB = USBinit();
-	if (!retUSB){
-		USBready = 1;
-	}else{
-        pspDebugScreenSetXY(0, 4);
-        pspDebugScreenSetTextColor(RED);
-        pspDebugScreenPrintf("Error %i initializing USB.\n", retUSB);
-        sceKernelDelayThread(3000000);
-		USBready = 0;
-	}
     
 	//Equalizer init:
 	struct equalizer tEQ;

@@ -90,6 +90,7 @@ double MP3_volume_boost = 0.0;
 unsigned int MP3_volume_boost_old = 0;
 double DB_forBoost = 1.0;
 int MP3_playingSpeed = 0; // 0 = normal
+int MP3_defaultCPUClock = 70;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Applies a frequency-domain filter to audio data in the subband-domain.	
@@ -338,6 +339,7 @@ void MP3getInfo(){
 	mad_header_init (&header);
 
     MP3_info.fileType = MP3_TYPE;
+    MP3_info.defaultCPUClock = MP3_defaultCPUClock;
     MP3_info.needsME = 0;
 	MP3_info.fileSize = size;
     MP3_info.framesDecoded = 0;

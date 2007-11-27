@@ -39,6 +39,7 @@ int OGG_playingDelta = 0;
 int outputInProgress = 0;
 long suspendPosition = -1;
 long suspendIsPlaying = 0;
+int OGG_defaultCPUClock = 50;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Audio callback
@@ -188,6 +189,7 @@ void OGGgetInfo(){
     //Estraggo le informazioni:
 	vorbis_info *vi = ov_info(&OGG_VorbisFile, -1);
     OGG_info.fileType = OGG_TYPE;
+    OGG_info.defaultCPUClock = OGG_defaultCPUClock;
     OGG_info.needsME = 0;
 	OGG_info.kbit = vi->bitrate_nominal/1000;
     OGG_info.instantBitrate = vi->bitrate_nominal;
@@ -225,6 +227,7 @@ int OGG_Load(char *filename){
 	OGG_milliSeconds = 0;
 	OGG_eos = 0;
     OGG_playingSpeed = 0;
+    OGG_playingDelta = 0;
 	strcpy(OGG_fileName, filename);
 	//Apro il file OGG:
     OGG_file = sceIoOpen(OGG_fileName, PSP_O_RDONLY, 0777);

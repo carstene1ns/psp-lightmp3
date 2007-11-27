@@ -45,6 +45,7 @@ int MP3ME_playingDirection = 1;
 int MP3ME_volume_boost = 0;
 float MP3ME_playingTime = 0;
 int MP3ME_volume = 0;
+int MP3ME_defaultCPUClock = 20;
 
 //Globals for decoding:
 SceUID MP3ME_handle;
@@ -370,6 +371,7 @@ int MP3MEgetInfo(){
     sceIoLseek(fd, 0, PSP_SEEK_SET);
     
     MP3ME_info.fileType = MP3_TYPE;
+    MP3ME_info.defaultCPUClock = MP3ME_defaultCPUClock;
     MP3ME_info.needsME = 1;
 	MP3ME_info.fileSize = size;
     MP3ME_info.framesDecoded = 0;
