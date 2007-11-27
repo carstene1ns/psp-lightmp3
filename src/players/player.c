@@ -26,13 +26,8 @@
 #include <string.h>
 #include <psputility_avmodules.h>
 #include <pspaudio.h>
-
 #include "player.h"
-#include "mp3player.h"
-#include "mp3playerME.h"
-#include "aa3playerME.h"
-#include "oggplayer.h"
-#include "flacplayer.h"
+
 
 //shared global vars
 int MAX_VOLUME_BOOST=15;

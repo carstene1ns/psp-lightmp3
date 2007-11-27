@@ -27,6 +27,12 @@
 #include <pspaudio.h>
 #include "pspaudiolib.h"
 
+#include "mp3player.h"
+#include "mp3playerME.h"
+#include "aa3playerME.h"
+#include "oggplayer.h"
+#include "flacplayer.h"
+
 #define OPENING_OK 0
 #define ERROR_OPENING -1
 #define ERROR_INVALID_SAMPLE_RATE -2
@@ -80,6 +86,7 @@ int sceAudio_5C37C0AE(void);//sceAudioOutput2Release alias, also present in 1.5
 
 struct fileInfo{
     int fileType;
+    int defaultCPUClock;
     int needsME;
 	int fileSize;
 	char layer[10];

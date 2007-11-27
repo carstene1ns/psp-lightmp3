@@ -17,6 +17,8 @@
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <mad.h>
 
+extern int MP3_defaultCPUClock;
+
 //private functions
 void MP3_Init(int channel);
 int MP3_Play();
@@ -49,3 +51,4 @@ int MP3_isFilterSupported();
 //Manage suspend:
 int MP3_suspend();
 int MP3_resume();
+

@@ -20,6 +20,8 @@
 #include <pspusbstor.h>
 #include <kubridge.h>
 
+SceUID modules[7];
+
 //Init USB:
 int LoadStartModule(char *path)
 {
@@ -40,17 +42,24 @@ int LoadStartModule(char *path)
     return 0;
 } 
 
+int StopUnloadModule(SceUID modID){
+    int status;
+    sceKernelStopModule(modID, 0, NULL, &status, NULL);
+    sceKernelUnloadModule(modID);
+    return 0;
+}
+
 int USBinit(){
 	u32 retVal;
 
     //start necessary drivers
-    LoadStartModule("flash0:/kd/chkreg.prx");    
-    LoadStartModule("flash0:/kd/npdrm.prx");
-    LoadStartModule("flash0:/kd/semawm.prx");
-    LoadStartModule("flash0:/kd/usbstor.prx");
-    LoadStartModule("flash0:/kd/usbstormgr.prx");
-    LoadStartModule("flash0:/kd/usbstorms.prx");
-    LoadStartModule("flash0:/kd/usbstorboot.prx");
+    modules[0] = LoadStartModule("flash0:/kd/chkreg.prx");
+    modules[1] = LoadStartModule("flash0:/kd/npdrm.prx");
+    modules[2] = LoadStartModule("flash0:/kd/semawm.prx");
+    modules[3] = LoadStartModule("flash0:/kd/usbstor.prx");
+    modules[4] = LoadStartModule("flash0:/kd/usbstormgr.prx");
+    modules[5] = LoadStartModule("flash0:/kd/usbstorms.prx");
+    modules[6] = LoadStartModule("flash0:/kd/usbstorboot.prx");
 
     //setup USB drivers
     retVal = sceUsbStart(PSP_USBBUS_DRIVERNAME, 0, 0);
@@ -77,5 +86,16 @@ int USBActivate(){
 int USBDeactivate(){
     sceUsbDeactivate(0x1c8);
     sceIoDevctl("fatms0:", 0x0240D81E, NULL, 0, NULL, 0 ); //Avoid corrupted files
+    return 0;
+}
+
+int USBEnd(){
+    int i;
+    
+    sceUsbStop(PSP_USBSTOR_DRIVERNAME, 0, 0);
+    sceUsbStop(PSP_USBBUS_DRIVERNAME, 0, 0);
+    for (i=0; i<7; i++){
+        StopUnloadModule(modules[i]);
+    }
     return 0;
 }

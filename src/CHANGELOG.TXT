@@ -5,7 +5,10 @@ Version 1.6.1
 --------------------
 -Added: Fadeout when skipping track
 -Added: Volume boost value is saved in the settings file and restored at startup
--Added: mp3 playback via Media Engine (plays fine with CPU @ 15Mhz) (many thanks to joek2100)
+-Added: MP3 playback via Media Engine (plays fine with CPU @ 15Mhz) (many thanks to joek2100)
+-Added: ATRAC3 playback (*.aa3, *.omg, *.oma) via Media Engine (plays fine with CPU @ 15Mhz) (many thanks to joek2100)
+-Added: FLAC playback (via libFLAC). Unfortunately plays fine with CPU @ 130Mhz. (many thanks to JLF65)
+-Added: Automatic cpu clock (look at the settings file)
 
 
 Version 1.6.0 FINAL

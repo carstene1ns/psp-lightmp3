@@ -15,6 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//    CREDITS:
+//    All credits dor this goes to JLF65
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -42,6 +44,7 @@ int FLAC_playingDelta = 0;
 static int outputInProgress = 0;
 static long suspendPosition = -1;
 static long suspendIsPlaying = 0;
+int FLAC_defaultCPUClock = 140;
 
 int kill_flac_thread;
 int bufferLow;
@@ -257,7 +260,7 @@ void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 	if (FLAC__metadata_get_tags(filename, &info)) {
 		if(info->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
 			for(i = 0; i < info->data.vorbis_comment.num_comments; ++i) {
-				splitComment(info->data.vorbis_comment.comments[i].entry, name, value);
+				splitComment((char*)info->data.vorbis_comment.comments[i].entry, name, value);
 				if (!strcmp(name, "TITLE"))
 					strcpy(targetInfo->title, value);
 				else if(!strcmp(name, "ALBUM"))
@@ -282,6 +285,7 @@ void FLACgetInfo(char *filename){
 
     if (FLAC__metadata_get_streaminfo(filename, &streaminfo)) {
         FLAC_info.fileType = FLAC_TYPE;
+        FLAC_info.defaultCPUClock = FLAC_defaultCPUClock;
 	    FLAC_info.kbit = streaminfo.data.stream_info.sample_rate * streaminfo.data.stream_info.bits_per_sample * streaminfo.data.stream_info.channels / 1000;
 	    FLAC_info.instantBitrate = streaminfo.data.stream_info.sample_rate * streaminfo.data.stream_info.bits_per_sample * streaminfo.data.stream_info.channels;
 		FLAC_info.hz = streaminfo.data.stream_info.sample_rate;

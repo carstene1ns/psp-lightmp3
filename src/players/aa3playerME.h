@@ -18,6 +18,8 @@
 #define TYPE_ATRAC3 0x270
 #define TYPE_ATRAC3PLUS 0xFFFE
 
+extern int AA3ME_defaultCPUClock;
+
 //private functions
 void AA3ME_Init(int channel);
 int AA3ME_Play();
@@ -50,3 +52,4 @@ int AA3ME_isFilterSupported();
 //Manage suspend:
 int AA3ME_suspend();
 int AA3ME_resume();
+

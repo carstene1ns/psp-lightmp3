@@ -39,6 +39,9 @@ int AA3ME_audio_channel = 0;
 int AA3ME_eof = 0;
 struct fileInfo AA3ME_info;
 float AA3ME_playingTime = 0;
+int AA3ME_volume = 0;
+int AA3ME_playingSpeed = 0; // 0 = normal
+int AA3ME_defaultCPUClock = 20;
 
 unsigned char AA3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
 unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
@@ -230,14 +233,20 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 			AT3_OutputPtr += (sample_per_frame * 4);
 			if( AT3_OutputPtr + (sample_per_frame * 4) > &AT3_OutputBuffer[OutputBuffer_flip][AT3_OUTPUT_BUFFER_SIZE])
 			{
-				sceAudioOutputBlocking(AA3ME_audio_channel, PSP_AUDIO_VOLUME_MAX, AT3_OutputBuffer[OutputBuffer_flip] );
+				sceAudioOutputBlocking(AA3ME_audio_channel, AA3ME_volume, AT3_OutputBuffer[OutputBuffer_flip] );
 
 				OutputBuffer_flip ^= 1;
 				AT3_OutputPtr = AT3_OutputBuffer[OutputBuffer_flip];
+		        //Check for playing speed:
+                if (AA3ME_playingSpeed){
+                    sceIoLseek32(fd, sceIoLseek32(fd, 0, PSP_SEEK_CUR) + data_align * 3 * AA3ME_playingSpeed, PSP_SEEK_SET);
+                    AA3ME_playingTime += (float)(data_align * 3 * AA3ME_playingSpeed) / (float)data_align * (float)sample_per_frame/(float)samplerate;
+                }
 			}
 		}
 		sceKernelDelayThread(10000);
 	}
+	sceIoClose(fd);
     sceAudioChRelease(AA3ME_audio_channel);
     return 0;
 }
@@ -245,6 +254,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 //Get info on file:
 int AA3MEgetInfo(){
     AA3ME_info.fileType = AT3_TYPE;
+    AA3ME_info.defaultCPUClock = AA3ME_defaultCPUClock;
     AA3ME_info.needsME = 1;
     strcpy(AA3ME_info.layer, "");
 
@@ -311,11 +321,15 @@ int AA3MEgetInfo(){
 void AA3ME_Init(int channel){
     AA3ME_audio_channel = channel;
     AA3ME_playingTime = 0;
+    AA3ME_volume = PSP_AUDIO_VOLUME_MAX;
+    MIN_PLAYING_SPEED=-10;
+    MAX_PLAYING_SPEED=9;
 	initMEAudioModules();
 }
 
 
 int AA3ME_Load(char *fileName){
+    AA3ME_playingSpeed = 0;
     strcpy(AA3ME_fileName, fileName);
     if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;
@@ -408,7 +422,11 @@ int AA3ME_resume(){
 }
 
 int AA3ME_setMute(int onOff){
-    return setMute(AA3ME_audio_channel, onOff);
+	if (onOff)
+    	AA3ME_volume = MUTED_VOLUME;
+	else
+    	AA3ME_volume = PSP_AUDIO_VOLUME_MAX;
+    return 0;
 }
 
 void AA3ME_GetTimeString(char *dest){
@@ -428,13 +446,21 @@ void AA3ME_fadeOut(float seconds){
     fadeOut(AA3ME_audio_channel, seconds);
 }
 
-//TODO:
-int AA3_GetPercentage(){
-    return 0;
+int AA3ME_getPlayingSpeed(){
+	return AA3ME_playingSpeed;
 }
 
-int AA3ME_GetStatus(){
-    return 0;
+int AA3ME_setPlayingSpeed(int playingSpeed){
+	if (playingSpeed >= MIN_PLAYING_SPEED && playingSpeed <= MAX_PLAYING_SPEED){
+		AA3ME_playingSpeed = playingSpeed;
+		if (playingSpeed == 0)
+			AA3ME_volume = PSP_AUDIO_VOLUME_MAX;
+		else
+			AA3ME_volume = FASTFORWARD_VOLUME;
+		return 0;
+	}else{
+		return -1;
+	}
 }
 
 void AA3ME_setVolumeBoostType(char *boostType){
@@ -443,19 +469,17 @@ void AA3ME_setVolumeBoostType(char *boostType){
     MIN_VOLUME_BOOST = 0;
 }
 
+//TODO:
+int AA3ME_GetStatus(){
+    return 0;
+}
+
+
 void AA3ME_setVolumeBoost(int boost){
 
 }
 
 int AA3ME_getVolumeBoost(){
-    return 0;
-}
-
-int AA3ME_getPlayingSpeed(){
-    return 0;
-}
-
-int AA3ME_setPlayingSpeed(int playingSpeed){
     return 0;
 }
 
