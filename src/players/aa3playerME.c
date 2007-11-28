@@ -42,6 +42,7 @@ float AA3ME_playingTime = 0;
 int AA3ME_volume = 0;
 int AA3ME_playingSpeed = 0; // 0 = normal
 int AA3ME_defaultCPUClock = 20;
+unsigned int AA3ME_volume_boost = 0;
 
 unsigned char AA3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
 unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
@@ -163,8 +164,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				continue;
 			}
 
-			if ( at3_type == TYPE_ATRAC3 )
-			{
+			if ( at3_type == TYPE_ATRAC3 ) {
 				memset( AA3ME_input_buffer, 0, 0x180);
 
 				res = sceIoRead( fd, AA3ME_input_buffer, data_align );
@@ -233,6 +233,13 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 			AT3_OutputPtr += (sample_per_frame * 4);
 			if( AT3_OutputPtr + (sample_per_frame * 4) > &AT3_OutputBuffer[OutputBuffer_flip][AT3_OUTPUT_BUFFER_SIZE])
 			{
+				//Volume Boost:
+				if (AA3ME_volume_boost){
+                    int i;
+                    for (i=0; i<AT3_OUTPUT_BUFFER_SIZE; i++){
+    					AT3_OutputBuffer[OutputBuffer_flip][i] = volume_boost_char(&AT3_OutputBuffer[OutputBuffer_flip][i], &AA3ME_volume_boost);
+                    }
+                }
 				sceAudioOutputBlocking(AA3ME_audio_channel, AA3ME_volume, AT3_OutputBuffer[OutputBuffer_flip] );
 
 				OutputBuffer_flip ^= 1;
@@ -336,7 +343,7 @@ int AA3ME_Load(char *fileName){
     }
     AA3ME_thid = -1;
     AA3ME_eof = 0;
-    AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, 0x4000, PSP_THREAD_ATTR_USER, NULL);
+    AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
     if(AA3ME_thid < 0)
         return ERROR_OPENING;
 
@@ -385,19 +392,101 @@ int AA3ME_GetPercentage(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get tag info:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
-    int aa3fd;
-    char aa3buffer[512];
-    aa3fd = sceIoOpen(filename, 0x0001, 0777);
+void readTagData(FILE *fp, int tagLength, char *tagValue){
+    int i;
+    int count = 0;
+    char carattere[tagLength];
+    
+    strcpy(tagValue, "");
+    tagValue[0] = '\0';
 
-    if (aa3fd < 0)
-        return;
-    sceIoRead(aa3fd,aa3buffer,3);
-
-    if (strstr(aa3buffer,"ea3") != NULL){
-
+    fread(carattere, sizeof(char), tagLength, fp);
+    for (i=0; i<tagLength; i++){
+        if ((int)carattere[i] >= 32){
+            tagValue[count] = carattere[i];
+            count++;
+        }
     }
-    sceIoClose(aa3fd);
+    tagValue[count] = '\0';
+}
+
+int convInt32BigToHost(int arg)
+{
+   int i=0;
+   int checkEndian = 1;
+   if( 1 == *(char *)&checkEndian )
+   {
+      // Intel (little endian)
+      i=arg;
+      i=((i&0xFF000000)>>24)|((i&0x00FF0000)>>8)|((i&0x0000FF00)<<8)|((i&0x000000FF)<<24);
+   }
+   else
+   {
+      // PPC (big endian)
+      i=arg;
+   }
+   return i;
+}
+
+void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
+    FILE *fp = NULL;
+
+    int size;
+    int tag_length;
+    char tag[4];
+    
+    size = GetID3TagSize(filename);
+    
+    fp = fopen(filename, "rb");
+    if (fp == NULL) return;
+    fseek(fp, 10, SEEK_SET);
+
+    while (size != 0) {
+        fread(tag, sizeof(char), 4, fp);
+        size -= 4;
+
+        /* read 4 byte big endian tag length */
+        fread(&tag_length, sizeof(unsigned int), 1, fp);
+        tag_length = (unsigned int) convInt32BigToHost((int)tag_length);
+        size -= 4;
+
+        fseek(fp, 2, SEEK_CUR);
+        size -= 2;
+
+        /* Perform checks for end of tags and tag length overflow or zero */
+        if(*tag == 0 || tag_length > size || tag_length == 0) break;
+        
+        if(!strncmp("TPE1",tag,4)) /* Artist */
+        {
+            readTagData(fp, tag_length, targetInfo->artist);
+        }
+        else if(!strncmp("TIT2",tag,4)) /* Title */
+        {
+            readTagData(fp, tag_length, targetInfo->title);
+        }
+        else if(!strncmp("TALB",tag,4)) /* Album */
+        {
+            readTagData(fp, tag_length, targetInfo->album);
+        }
+        else if(!strncmp("TRCK",tag,4)) /* Track No. */
+        {
+            readTagData(fp, tag_length, targetInfo->trackNumber);
+        }
+        else if(!strncmp("TYER",tag,4)) /* Year */
+        {
+            readTagData(fp, tag_length, targetInfo->year);
+        }
+        else if(!strncmp("TCON",tag,4)) /* Genre */
+        {
+            readTagData(fp, tag_length, targetInfo->genre);
+        }
+        else
+        {
+            fseek(fp, tag_length, SEEK_CUR);
+        }
+        size -= tag_length;
+	}
+	fclose(fp);
 }
 
 struct fileInfo AA3ME_GetTagInfoOnly(char *filename){
@@ -469,17 +558,16 @@ void AA3ME_setVolumeBoostType(char *boostType){
     MIN_VOLUME_BOOST = 0;
 }
 
-//TODO:
-int AA3ME_GetStatus(){
-    return 0;
-}
-
-
 void AA3ME_setVolumeBoost(int boost){
-
+    AA3ME_volume_boost = boost;
 }
 
 int AA3ME_getVolumeBoost(){
+    return AA3ME_volume_boost;
+}
+
+//TODO:
+int AA3ME_GetStatus(){
     return 0;
 }
 

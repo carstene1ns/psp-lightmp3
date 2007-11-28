@@ -141,6 +141,7 @@ extern void setAudioFunctions(char *filename, int useME);
 extern void unsetAudioFunctions();
 
 short volume_boost(short *Sample, unsigned int *boost);
+unsigned char volume_boost_char(unsigned char *Sample, unsigned int *boost);
 int setVolume(int channel, int volume);
 int setMute(int channel, int onOff);
 void fadeOut(int channel, float seconds);

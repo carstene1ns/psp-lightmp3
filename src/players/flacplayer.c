@@ -160,6 +160,16 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 	if (isPlaying) {	// Playing , so mix up a buffer
         outputInProgress = 1;
 
+		while (tempmixleft < numSamples) {	//  Not enough in buffer, so we must mix more
+			sceKernelSignalSema(bufferLow, 1);
+			sceKernelDelayThread(10); // allow buffer filling thread to run
+			if (FLAC_eos) {	//EOF
+                isPlaying = 0;
+				outputInProgress = 0;
+				break;
+			}
+		}
+        //FLAC_info.instantBitrate = ???;
         //Check for playing speed:
         if (FLAC_playingSpeed && isPlaying){
         	FLAC__uint64 sample = (FLAC__uint64)(samples_played + FLAC_playingDelta);
@@ -171,17 +181,6 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
             }
             FLAC__stream_decoder_flush(decoder);
         }
-
-		while (tempmixleft < numSamples) {	//  Not enough in buffer, so we must mix more
-			sceKernelSignalSema(bufferLow, 1);
-			sceKernelDelayThread(10); // allow buffer filling thread to run
-			if (FLAC_eos) {	//EOF
-                isPlaying = 0;
-				outputInProgress = 0;
-				break;
-			}
-		}
-        //FLAC_info.instantBitrate = ???;
 
 		if (tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
 			int count, count2;
@@ -291,9 +290,9 @@ void FLACgetInfo(char *filename){
 		FLAC_info.hz = streaminfo.data.stream_info.sample_rate;
 		FLAC_info.length = (long)(streaminfo.data.stream_info.total_samples / streaminfo.data.stream_info.sample_rate);
 	    if (streaminfo.data.stream_info.channels == 1)
-	        strcpy(FLAC_info.mode, "Mono");
+	        strcpy(FLAC_info.mode, "single channel");
 	    else if (streaminfo.data.stream_info.channels == 2)
-	        strcpy(FLAC_info.mode, "Stereo");
+	        strcpy(FLAC_info.mode, "normal LR stereo");
 	    strcpy(FLAC_info.emphasis, "no");
 
 		int h = 0;
@@ -454,7 +453,7 @@ int FLAC_setPlayingSpeed(int playingSpeed){
 			setVolume(FLAC_audio_channel, 0x8000);
 		else
 			setVolume(FLAC_audio_channel, FASTFORWARD_VOLUME);
-        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * 4 * FLAC_playingSpeed;
+        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * FLAC_playingSpeed;
 		return 0;
 	}else{
 		return -1;

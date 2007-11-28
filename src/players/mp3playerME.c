@@ -41,7 +41,6 @@ int MP3ME_audio_channel = 0;
 int MP3ME_eof = 0;
 struct fileInfo MP3ME_info;
 int MP3ME_playingSpeed = 0; // 0 = normal
-int MP3ME_playingDirection = 1;
 int MP3ME_volume_boost = 0;
 float MP3ME_playingTime = 0;
 int MP3ME_volume = 0;
@@ -98,12 +97,10 @@ int SeekNextFrame(SceUID fd)
             size += 10;
     }
 
-    sceIoLseek32(fd, offset + (MP3ME_playingDirection*size), PSP_SEEK_SET); //now seek for a sync
+    sceIoLseek32(fd, offset, PSP_SEEK_SET); //now seek for a sync
     while(1) 
     {
         offset = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
-		if (MP3ME_playingDirection < 0)
-			offset = sceIoLseek32(fd, -2*sizeof(buf), PSP_SEEK_CUR);
         size = sceIoRead(fd, buf, sizeof(buf));
 
         if (size <= 2)//at end of file
@@ -300,10 +297,6 @@ int decodeThread(SceSize args, void *argp){
             MP3ME_playingTime += (float)sample_per_frame/(float)samplerate;
 		    MP3ME_info.framesDecoded++;
 
-			//Controllo la velocità:
-			if (++framesSkipped <= MP3ME_playingSpeed){
-                continue;
-            }
             framesSkipped = 0;
 
             //Output:
@@ -322,6 +315,17 @@ int decodeThread(SceSize args, void *argp){
 
 				OutputBuffer_flip ^= 1;
 				OutputPtrME = OutputBuffer[OutputBuffer_flip];
+		        //Check for playing speed:
+                if (MP3ME_playingSpeed){
+                    sceIoLseek32(MP3ME_handle, sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_CUR) + frame_size * 3 * MP3ME_playingSpeed, PSP_SEEK_SET);
+                    MP3ME_playingTime += (float)sample_per_frame/(float)samplerate * MP3ME_playingSpeed;
+                    data_start = SeekNextFrame(MP3ME_handle);
+    				if(data_start < 0)
+    				{
+    					MP3ME_eof = 1;
+    					continue;
+    				}
+                }
 			}
 		}
 		sceKernelDelayThread(10000);
@@ -585,7 +589,6 @@ int MP3MEgetInfo(){
 void MP3ME_Init(int channel){
     MP3ME_audio_channel = channel;
 	MP3ME_playingSpeed = 0;
-	MP3ME_playingDirection = 1;
     MP3ME_playingTime = 0;
 	MP3ME_volume_boost = 0;
 	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
@@ -601,7 +604,7 @@ int MP3ME_Load(char *fileName){
     }
     MP3ME_thid = -1;
     MP3ME_eof = 0;
-    MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x4000, PSP_THREAD_ATTR_USER, NULL);
+    MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
     if(MP3ME_thid < 0)
         return -1;
 
@@ -653,23 +656,17 @@ int MP3ME_GetPercentage(){
 
 
 int MP3ME_getPlayingSpeed(){
-	return MP3ME_playingDirection*MP3ME_playingSpeed;
+	return MP3ME_playingSpeed;
 }
 
 
 int MP3ME_setPlayingSpeed(int playingSpeed){
-	if (playingSpeed > -10 && playingSpeed < 10){
+	if (playingSpeed >= MIN_PLAYING_SPEED && playingSpeed <= MAX_PLAYING_SPEED){
 		MP3ME_playingSpeed = playingSpeed;
-		if (playingSpeed < 0){
-			MP3ME_playingDirection = -1;
-			MP3ME_playingSpeed *= -1;
-		}else{
-			MP3ME_playingDirection = 1;
-		}
 		if (playingSpeed == 0)
-    		MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
+			MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
 		else
-    		MP3ME_volume = FASTFORWARD_VOLUME;
+			MP3ME_volume = FASTFORWARD_VOLUME;
 		return 0;
 	}else{
 		return -1;
