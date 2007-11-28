@@ -21,7 +21,6 @@
 #include <stdlib.h>
 
 #include "id3.h"
-
 struct genre
 {
 	int code;
@@ -254,7 +253,7 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
          /* Perform checks for end of tags and tag length overflow or zero */
          if(*tag == 0 || tag_length > size || tag_length == 0) break;
          
-         if(!strncmp("TEP1",tag,4)) /* Artist */
+         if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
             fread(id3tag->ID3Artist, sizeof(char), tag_length - 1, fp);
@@ -339,7 +338,7 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
          /* Perform checks for end of tags and tag length overflow or zero */
          if(*tag == 0 || tag_length > size || tag_length == 0) break;
          
-         if(!strncmp("TEP1",tag,4)) /* Artist */
+         if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
             fread(id3tag->ID3Artist, sizeof(char), tag_length - 1, fp);
