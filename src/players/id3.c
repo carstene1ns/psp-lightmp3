@@ -478,6 +478,7 @@ int ParseID3v1(const char *mp3path, struct ID3Tag *id3tag){
         sceIoClose(id3fd);               
         return -1;
      }
+     sceIoClose(id3fd);
 }
 
 // Main function:

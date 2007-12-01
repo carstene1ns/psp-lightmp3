@@ -37,6 +37,8 @@ struct settings{
     int CLOCK_OGG;
     int CLOCK_FLAC;
     int CLOCK_AA3;
+    
+    int USE_OSK;
 };
 
 int SETTINGS_load(char *fileName);

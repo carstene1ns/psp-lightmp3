@@ -255,6 +255,8 @@ int decodeThread(SceSize args, void *argp){
 			// handle has been invalidated by syspend/resume/usb
 			if ( sceIoRead( MP3ME_handle, MP3ME_input_buffer, frame_size ) != frame_size ){
                 //Resume from suspend:
+                if ( MP3ME_handle )
+                   sceIoClose(MP3ME_handle);
                 MP3ME_handle = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
                 if (MP3ME_handle < 0){
                     MP3ME_isPlaying = 0;

@@ -71,6 +71,8 @@ int SETTINGS_load(char *fileName){
 								localSettings.VOLUME = atoi(result);
 							}else if (strcmp(parName, "MP3_ME") == 0){
 								localSettings.MP3_ME = atoi(result);
+							}else if (strcmp(parName, "USE_OSK") == 0){
+								localSettings.USE_OSK = atoi(result);
 							}else if (strcmp(parName, "FADE_OUT") == 0){
 								localSettings.FADE_OUT = atoi(result);
 							}else if (strcmp(parName, "CLOCK_GUI") == 0){
@@ -124,8 +126,9 @@ struct settings SETTINGS_default(){
 	localSettings.CLOCK_MP3 = 70;
 	localSettings.CLOCK_MP3ME = 20;
 	localSettings.CLOCK_OGG = 50;
-	localSettings.CLOCK_FLAC = 140;
+	localSettings.CLOCK_FLAC = 166;
 	localSettings.CLOCK_AA3 = 20;
+	localSettings.USE_OSK = 1;
 	return localSettings;
 }
 
@@ -161,6 +164,10 @@ int SETTINGS_save(struct settings tSettings){
 
     fwrite("#Use ME for MP3 0/1):\n", 1, strlen("#Use ME for MP3 0/1):\n"), f);
     snprintf(testo, sizeof(testo), "MP3_ME=%i\n\n", tSettings.MP3_ME);
+    fwrite(testo, 1, strlen(testo), f);
+
+    fwrite("#Use OSK (1/0):\n", 1, strlen("#Use OSK (1/0):\n"), f);
+    snprintf(testo, sizeof(testo), "USE_OSK=%i\n\n", tSettings.USE_OSK);
     fwrite(testo, 1, strlen(testo), f);
 
     fwrite("#SCROBBLER Log (1/0):\n", 1, strlen("#SCROBBLER Log (1/0):\n"), f);

@@ -44,7 +44,7 @@ int FLAC_playingDelta = 0;
 static int outputInProgress = 0;
 static long suspendPosition = -1;
 static long suspendIsPlaying = 0;
-int FLAC_defaultCPUClock = 150;
+int FLAC_defaultCPUClock = 166;
 
 int kill_flac_thread;
 int bufferLow;
@@ -84,8 +84,20 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
 
    (void)decoder, (void)client_data;
 
-   if (tempmixleft + frame->header.blocksize > MIX_BUF_SIZE)
+   if (tempmixleft + frame->header.blocksize > MIX_BUF_SIZE){
+        //Check for playing speed:
+        if (FLAC_playingSpeed && isPlaying){
+        	FLAC__uint64 sample = (FLAC__uint64)(samples_played + FLAC_playingDelta);
+        	if (!FLAC__stream_decoder_seek_absolute(decoder, sample)) {
+                FLAC_setPlayingSpeed(0);
+            } else {
+            	samples_played += FLAC_playingDelta;
+            	//tempmixleft = 0; // clear buffer of stale samples
+            }
+            //FLAC__stream_decoder_flush(decoder);
+        }
       sceKernelWaitSema(bufferLow, 1, 0); // wait for buffer to get low
+   }
 
    if (kill_flac_thread)
       return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
@@ -170,18 +182,6 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 			}
 		}
         //FLAC_info.instantBitrate = ???;
-        //Check for playing speed:
-        if (FLAC_playingSpeed && isPlaying){
-        	FLAC__uint64 sample = (FLAC__uint64)(samples_played + FLAC_playingDelta);
-        	if (!FLAC__stream_decoder_seek_absolute(decoder, sample)) {
-                FLAC_setPlayingSpeed(0);
-            } else {
-            	samples_played += FLAC_playingDelta;
-            	tempmixleft = 0; // clear buffer of stale samples
-            }
-            FLAC__stream_decoder_flush(decoder);
-        }
-
 		if (tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
 			int count, count2;
 			short *_buf2;
@@ -197,6 +197,7 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
                     *(_buf2 + 1) = tempmixbuf[count2 + 1];
                 }
 			}
+			
 			//  Move the pointers
 			tempmixleft -= numSamples;
 			//  Now shuffle the buffer along
