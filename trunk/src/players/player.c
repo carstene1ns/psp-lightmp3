@@ -173,23 +173,33 @@ char GetOMGFileType(char *fname)
 
     sceIoLseek32(fd, size, PSP_SEEK_SET);
 
-    if (sceIoRead(fd, ea3_header, 0x60) != 0x60)
+    if (sceIoRead(fd, ea3_header, 0x60) != 0x60){
+        sceIoClose(fd);
         return UNK_TYPE;
+    }
 
     sceIoClose(fd);
 
-    if (strncmp(ea3_header, "EA3", 3) != 0)
+    if (strncmp(ea3_header, "EA3", 3) != 0){
+        sceIoClose(fd);
         return UNK_TYPE;
+    }
 
     switch (ea3_header[3])
     {
         case 1:
         case 3:
+            sceIoClose(fd);
             return AT3_TYPE;
+            break;
         case 2:
+            sceIoClose(fd);
             return MP3_TYPE;
+            break;
         default:
+            sceIoClose(fd);
             return UNK_TYPE;
+            break;
     }
 }
 
@@ -395,13 +405,21 @@ short volume_boost(short *Sample, unsigned int *boost){
 }
 
 unsigned char volume_boost_char(unsigned char *Sample, unsigned int *boost){
-	int intSample = *Sample * (*boost + 1);
+    /*int intSample = *Sample - 127;
+    intSample = intSample * (*boost + 1);
+    if (intSample>127)
+       return 255;
+    else if (intSample < -127)
+       return 0;
+    else
+       return (unsigned char)(intSample + 127);*/
+	int intSample = (int)*Sample * (*boost + 1);
 	if (intSample > 255)
 		return 255;
 	else if (intSample < 0)
 		return 0;
 	else
-    	return intSample;
+    	return (unsigned char)intSample;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set volume:

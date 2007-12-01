@@ -280,19 +280,25 @@ int AA3MEgetInfo(){
 	sceIoLseek(fd, 0, PSP_SEEK_SET);
     sceIoLseek32(fd, tag_size, PSP_SEEK_SET);
 
-    if ( sceIoRead( fd, ea3_header, 0x60 ) != 0x60 )
+    if ( sceIoRead( fd, ea3_header, 0x60 ) != 0x60 ){
+        sceIoClose(fd);
         return -1;
+    }
 
-    if ( ea3_header[0] != 0x45 || ea3_header[1] != 0x41 || ea3_header[2] != 0x33 )
+    if ( ea3_header[0] != 0x45 || ea3_header[1] != 0x41 || ea3_header[2] != 0x33 ){
+        sceIoClose(fd);
         return -1;
+    }
 
     at3_at3plus_flagdata[0] = ea3_header[0x22];
     at3_at3plus_flagdata[1] = ea3_header[0x23];
 
     at3_type = (ea3_header[0x22] == 0x20) ? TYPE_ATRAC3 : ((ea3_header[0x22] == 0x28) ? TYPE_ATRAC3PLUS : 0x0);
 
-    if ( at3_type != TYPE_ATRAC3 && at3_type != TYPE_ATRAC3PLUS )
+    if ( at3_type != TYPE_ATRAC3 && at3_type != TYPE_ATRAC3PLUS ){
+        sceIoClose(fd);
         return -1;
+    }
 
     if ( at3_type == TYPE_ATRAC3 )
         data_align = ea3_header[0x23]*8;
@@ -303,8 +309,10 @@ int AA3MEgetInfo(){
         sample_per_frame = 1024;
     else if ( at3_type == TYPE_ATRAC3PLUS )
         sample_per_frame = 2048;
-    else
+    else{
+        sceIoClose(fd);
         return -1;
+    }
     samplerate = 44100;
     
     totalPlayingTime = (float)fileSize / (float)data_align * (float)sample_per_frame/(float)samplerate;
@@ -316,7 +324,7 @@ int AA3MEgetInfo(){
 	int m = (secs - h * 3600) / 60;
 	int s = secs - h * 3600 - m * 60;
 	snprintf(AA3ME_info.strLength, sizeof(AA3ME_info.strLength), "%2.2i:%2.2i:%2.2i", h, m, s);
-	strcpy(AA3ME_info.mode, "normal LR stereo");
+	strcpy(AA3ME_info.mode, "joint (MS/intensity) stereo");
 	strcpy(AA3ME_info.emphasis,"no");
 	sceIoClose(fd);
     return 0;
@@ -532,7 +540,12 @@ void AA3ME_GetTimeString(char *dest){
 //Fade out:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void AA3ME_fadeOut(float seconds){
-    fadeOut(AA3ME_audio_channel, seconds);
+    int i = 0;
+    long timeToWait = (long)((seconds * 1000.0) / (float)AA3ME_volume);
+    for (i=AA3ME_volume; i>=0; i--){
+        AA3ME_volume = i;
+        sceKernelDelayThread(timeToWait);
+    }
 }
 
 int AA3ME_getPlayingSpeed(){

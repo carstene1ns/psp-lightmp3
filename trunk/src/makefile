@@ -1,5 +1,5 @@
 TARGET = mp3
-OBJS = prx/supportlib.o usb.o audioscrobbler.o settings.o equalizer.o log.o m3u.o \
+OBJS = prx/supportlib.o usb.o audioscrobbler.o settings.o pspequalizer.o equalizer.o log.o m3u.o \
        players/pspaudiolib.o players/id3.o players/mp3player.o players/oggplayer.o \
        players/mp3playerME.o players/aa3playerME.o players/flacplayer.o players/player.o \
        mem64.o opendir.o main.o
@@ -13,8 +13,9 @@ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LIBDIR =
 
-LIBS = -lpspgu -lFLAC -lmad -lvorbisidec  -lpspaudio -lpsppower -lm \
-       -lpsphprm -lpspusb -lpspusbstor -lpspkubridge -lpspaudio -lpspaudiocodec
+LIBS = -lFLAC -lmad -lvorbisidec -lm \
+       -lpspgu -lpspgum -lpspaudio -lpsppower \
+       -lpsphprm -lpspusb -lpspusbstor -lpspaudio -lpspaudiocodec -lpspkubridge
 LDFLAGS =
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = LightMP3
