@@ -84,20 +84,8 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
 
    (void)decoder, (void)client_data;
 
-   if (tempmixleft + frame->header.blocksize > MIX_BUF_SIZE){
-        //Check for playing speed:
-        if (FLAC_playingSpeed && isPlaying){
-        	FLAC__uint64 sample = (FLAC__uint64)(samples_played + FLAC_playingDelta);
-        	if (!FLAC__stream_decoder_seek_absolute(decoder, sample)) {
-                FLAC_setPlayingSpeed(0);
-            } else {
-            	samples_played += FLAC_playingDelta;
-            	//tempmixleft = 0; // clear buffer of stale samples
-            }
-            //FLAC__stream_decoder_flush(decoder);
-        }
+   if (tempmixleft + frame->header.blocksize > MIX_BUF_SIZE)
       sceKernelWaitSema(bufferLow, 1, 0); // wait for buffer to get low
-   }
 
    if (kill_flac_thread)
       return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
@@ -206,6 +194,17 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 				tempmixbuf[j] = tempmixbuf[(numSamples<<1) + j];
 				tempmixbuf[j + 1] = tempmixbuf[(numSamples<<1) + j + 1];
 			}
+            //Check for playing speed:
+            if (FLAC_playingSpeed){
+            	FLAC__uint64 sample = (FLAC__uint64)(samples_played + FLAC_playingDelta);
+            	if (!FLAC__stream_decoder_seek_absolute(decoder, sample)) {
+                    FLAC_setPlayingSpeed(0);
+                } else {
+                	samples_played += FLAC_playingDelta;
+                	//tempmixleft = 0; // clear buffer of stale samples
+                }
+                FLAC__stream_decoder_flush(decoder);
+            }
 		}
 		samples_played += numSamples;
         outputInProgress = 0;
@@ -454,7 +453,7 @@ int FLAC_setPlayingSpeed(int playingSpeed){
 			setVolume(FLAC_audio_channel, 0x8000);
 		else
 			setVolume(FLAC_audio_channel, FASTFORWARD_VOLUME);
-        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * FLAC_playingSpeed;
+        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * 2 * FLAC_playingSpeed;
 		return 0;
 	}else{
 		return -1;
