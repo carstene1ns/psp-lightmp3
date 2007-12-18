@@ -1,14 +1,18 @@
 LightMP3 Changelog
 ------------------
 
-Version 1.6.1
+Version 1.7.0
 --------------------
+-Added: Options screen
+-Added: muted volume in settings file
 -Added: Fadeout when skipping track
+-Added: Option to set initial brightness check (on with warning/on without warning/off)
 -Added: Volume boost value is saved in the settings file and restored at startup
 -Added: MP3 playback via Media Engine (plays fine with CPU @ 15Mhz) (many thanks to joek2100)
--Added: ATRAC3 playback (*.aa3, *.omg, *.oma) via Media Engine (plays fine with CPU @ 15Mhz) (many thanks to joek2100)
+-Added: ATRAC3 playback (*.aa3, *.omg, *.oma) via Media Engine (plays fine with CPU @ 20Mhz) (many thanks to joek2100)
 -Added: FLAC playback (via libFLAC). Unfortunately plays fine with CPU @ 130Mhz. (many thanks to JLF65)
 -Added: Automatic cpu clock (look at the settings file)
+-Fixed: Directories are now listed before files.
 
 
 Version 1.6.0 FINAL

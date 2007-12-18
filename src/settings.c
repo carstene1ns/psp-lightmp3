@@ -75,6 +75,10 @@ int SETTINGS_load(char *fileName){
 								localSettings.USE_OSK = atoi(result);
 							}else if (strcmp(parName, "FADE_OUT") == 0){
 								localSettings.FADE_OUT = atoi(result);
+							}else if (strcmp(parName, "BRIGHTNESS_CHECK") == 0){
+								localSettings.BRIGHTNESS_CHECK = atoi(result);
+							}else if (strcmp(parName, "MUTED_VOLUME") == 0){
+								localSettings.MUTED_VOLUME = atoi(result);
 							}else if (strcmp(parName, "CLOCK_GUI") == 0){
 								localSettings.CLOCK_GUI = atoi(result);
 							}else if (strcmp(parName, "CLOCK_AUTO") == 0){
@@ -121,13 +125,15 @@ struct settings SETTINGS_default(){
 	localSettings.VOLUME = 20;
 	localSettings.MP3_ME = 0;
 	localSettings.FADE_OUT = 0;
+	localSettings.BRIGHTNESS_CHECK = 1;
+	localSettings.MUTED_VOLUME = 800;
 	localSettings.CLOCK_AUTO = 1;
 	localSettings.CLOCK_GUI = 50;
-	localSettings.CLOCK_MP3 = 70;
-	localSettings.CLOCK_MP3ME = 20;
-	localSettings.CLOCK_OGG = 50;
+	localSettings.CLOCK_MP3 = 90;
+	localSettings.CLOCK_MP3ME = 40;
+	localSettings.CLOCK_OGG = 70;
 	localSettings.CLOCK_FLAC = 166;
-	localSettings.CLOCK_AA3 = 20;
+	localSettings.CLOCK_AA3 = 40;
 	localSettings.USE_OSK = 1;
 	return localSettings;
 }
@@ -143,6 +149,9 @@ int SETTINGS_save(struct settings tSettings){
 		//Error opening file:
 		return(-1);
 	}
+    fwrite("#Brightness check at startup (0=No, 1=Yes with warning, 2=Yes without warning):\n", 1, strlen("#Brightness check at startup (0=No, 1=Yes with warning, 2=Yes without warning):\n"), f);
+    snprintf(testo, sizeof(testo), "BRIGHTNESS_CHECK=%i\n\n", tSettings.BRIGHTNESS_CHECK);
+    fwrite(testo, 1, strlen(testo), f);
 
     fwrite("#CPU speed at startup (10-222):\n", 1, strlen("#CPU speed at startup (33-333):\n"), f);
     snprintf(testo, sizeof(testo), "CPU=%i\n\n", tSettings.CPU);
@@ -180,6 +189,10 @@ int SETTINGS_save(struct settings tSettings){
 
     fwrite("#Fade out when changing track (0/1):\n", 1, strlen("#Fade out when changing track (0/1):\n"), f);
     snprintf(testo, sizeof(testo), "FADE_OUT=%i\n\n", tSettings.FADE_OUT);
+    fwrite(testo, 1, strlen(testo), f);
+
+    fwrite("#Muted volume (0/8000):\n", 1, strlen("#Muted volume (0/8000):\n"), f);
+    snprintf(testo, sizeof(testo), "MUTED_VOLUME=%i\n\n", tSettings.MUTED_VOLUME);
     fwrite(testo, 1, strlen(testo), f);
 
     fwrite("#Automatic CPU clock (0/1):\n", 1, strlen("#Automatic CPU clock (0/1):\n"), f);

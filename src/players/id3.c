@@ -218,10 +218,9 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
          }
          size -= tag_length;
       }
-      
+      strcpy(id3tag->versionfound, "2.2");
+      fclose(fp);
    }
-   strcpy(id3tag->versionfound, "2.2");
-   fclose(fp);
 }
 
 void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
@@ -303,10 +302,9 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
          }
          size -= tag_length;
       }
-      
+      strcpy(id3tag->versionfound, "2.3");
+      fclose(fp);
    }
-   strcpy(id3tag->versionfound, "2.3");
-   fclose(fp);
 }
 
 void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
@@ -388,10 +386,9 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
          }
          size -= tag_length;
       }
-      
+      strcpy(id3tag->versionfound, "2.4");
+      fclose(fp);
    }
-   strcpy(id3tag->versionfound, "2.4");
-   fclose(fp);
 }
 
 int ParseID3v2(const char *mp3path, struct ID3Tag *id3tag)

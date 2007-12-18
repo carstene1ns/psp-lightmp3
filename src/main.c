@@ -32,6 +32,7 @@
 #include "players/pspaudiolib.h"
 #include "players/player.h"
 
+//#include "osk.h"
 #include "usb.h"
 #include "settings.h"
 #include "opendir.h"
@@ -89,7 +90,7 @@ int imposeSetHomePopup(int value);
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int current_mode;
-char version[10] = "1.6.1";
+char version[10] = "1.7.0";
 int oldBrightness = 0;
 char ebootDirectory[262] = "";
 char currentPlaylist[262] = "";
@@ -144,40 +145,6 @@ int powerCallback(int unknown, int powerInfo, void *common){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Callbacks:
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* Exit callback */
-int exit_callback(int arg1, int arg2, void *common) {
-    setVolume(0,0);
-    runningFlag = 0;
-    return 0;
-}
-
-/* Callback thread */
-int CallbackThread(SceSize args, void *argp) {
-    int cbid;    
-    cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
-    sceKernelRegisterExitCallback(cbid);
-    
-    int power_cbid;
-    power_cbid = sceKernelCreateCallback("powercb", (SceKernelCallbackFunction)powerCallback, NULL);
-    scePowerRegisterCallback(0, power_cbid);         
-    sceKernelSleepThreadCB();
-    return 0;
-}
-
-/* Sets up the callback thread and returns its thread id */
-int SetupCallbacks(void) {
-    int thid = 0;
-    
-    thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0xFA0, PSP_THREAD_ATTR_USER, 0);
-    if(thid >= 0) {
-        sceKernelStartThread(thid, 0, 0);
-    }
-    return thid;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Funzioni generiche
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Memoria libera totale:
@@ -227,25 +194,13 @@ int freemem(){
 
 //Modalità precedente/successiva:
 void nextMode(){
-	if (++current_mode > 2){
+	if (++current_mode > 3){
 		current_mode = 0;
 	}
 }
 void previousMode(){
 	if (--current_mode < 0){
-		current_mode = 2;
-	}
-}
-
-//Ordinamento dei file di una directory:
-void sortDirectory(struct opendir_struct directory)
-{
-	int n = directory.number_of_directory_entries;
-	int i = 0;
-
-	while (i < n) {
-		if (i == 0 || strcmp(directory.directory_entry[i-1].d_name, directory.directory_entry[i].d_name) <= 0) i++;
-		else {SceIoDirent tmp = directory.directory_entry[i]; directory.directory_entry[i] = directory.directory_entry[i-1]; directory.directory_entry[--i] = tmp;}
+		current_mode = 3;
 	}
 }
 
@@ -474,6 +429,11 @@ int askString(char *string){
 	//Salvo il nome:
 	strcpy(oldName, string);
 
+    /*if (userSettings.USE_OSK){
+        string = requestString(oldName);
+        return 0;
+    }*/
+        
 	pspDebugScreenSetBackColor(BLACK);
 	for (i=0; i < 5 ; i++){
 		pspDebugScreenSetXY(11, 10+i);
@@ -896,7 +856,7 @@ void screen_sysinfo(){
 
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetBackColor(0x882200);
-	pspDebugScreenSetXY(26, 0);
+	pspDebugScreenSetXY(25, 0);
 	if (!scePowerIsPowerOnline())
 		pspDebugScreenPrintf("[CPU:%i BUS:%i BATT:%i%% - %2.2i:%2.2i] ", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency(), battPerc, btrh, btrm);
 	else
@@ -956,7 +916,7 @@ void screen_toolbar(){
 	pspDebugScreenSetXY(0, 2);
 	pspDebugScreenPrintf(tb);
 
-    for (i=0; i<5; i++){
+    for (i=0; i<4; i++){
         if (i==current_mode)
 	       pspDebugScreenSetBackColor(RED);
         else
@@ -968,9 +928,6 @@ void screen_toolbar(){
 
 //Schermo per menu
 void screen_menu_init(){
-	//pspDebugScreenSetTextColor(RED);
-	//pspDebugScreenSetXY(0, 2);
-	//pspDebugScreenPrintf("Mode: File browser");
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetXY(0, 28);
@@ -988,9 +945,6 @@ void screen_menu_init(){
 
 //Schermo per playlist
 void screen_playlist_init(){
-	//pspDebugScreenSetTextColor(RED);
-	//pspDebugScreenSetXY(0, 2);
-	//pspDebugScreenPrintf("Mode: Playlist browser");
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetXY(0, 28);
@@ -1003,9 +957,6 @@ void screen_playlist_init(){
 
 //Schermo per playlist editor
 void screen_playlistEditor_init(){
-	//pspDebugScreenSetTextColor(RED);
-	//pspDebugScreenSetXY(0, 2);
-	//pspDebugScreenPrintf("Mode: Playlist editor");
 	pspDebugScreenSetTextColor(YELLOW);
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetXY(0, 22);
@@ -1106,6 +1057,19 @@ void screen_fileinfo(struct fileInfo info){
     pspDebugScreenPrintf("Emphasis   : %s", info.emphasis);
 }
 
+//Init for options screen:
+void screen_options_init(){
+	pspDebugScreenSetBackColor(BLACK);
+	pspDebugScreenSetTextColor(WHITE);
+	pspDebugScreenSetXY(0, 30);
+	pspDebugScreenPrintf("Press LEFT or RIGHT to change current option");
+	pspDebugScreenPrintf("\n");
+	pspDebugScreenPrintf("Press START to save options");
+    pspDebugScreenPrintf("\n");
+    pspDebugScreenPrintf("Press SELECT to restore default values");
+	pspDebugScreenPrintf("\n");
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Play a single file:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1135,7 +1099,7 @@ int playFile(char *filename, char *numbers, char *message) {
    	  int currentSpeed = 0;
       struct fileInfo tempInfo;
       int barLength = 22;
-      
+
 	  screen_init();
 	  info.kbit = 0;
 	  info.hz = 0;
@@ -1153,8 +1117,9 @@ int playFile(char *filename, char *numbers, char *message) {
           volumeBoost = MIN_VOLUME_BOOST;
 
       //Equalizzatore:
-      if (!(*isFilterSupportedFunct)())
+      if (!(*isFilterSupportedFunct)()){
           currentEQ = 0;
+      }
 
       tEQ = EQ_getIndex(currentEQ);
       (*setFilterFunct)(tEQ.filter, 1);
@@ -1499,7 +1464,7 @@ void playDirectory(char *dirName, char *initialFileName){
 		int i = 0;
 		int playerReturn = 0;
 		char onlyName[262] = "";
-		sortDirectory(dirToPlay);
+		sortDirectory(&dirToPlay);
 		getFileName(dirName, onlyName);
 		snprintf(message, sizeof(message), "Directory  : %-60.60s", onlyName);
 
@@ -1677,10 +1642,6 @@ void playM3U(char *m3uName){
 		}else if (playerReturn == -1){
 			//Controllo se sono in shuffle:
 			if (playingMode == MODE_SHUFFLE){
-				/*i = randomTrack(songCount, playedTracksNumber, playedTracks);
-				if (i == -1){
-					break;
-				}*/
 				if (currentTrack){
 					i = playedTracks[--currentTrack];
 				}
@@ -1738,7 +1699,7 @@ void fileBrowser_menu(){
 		strcpy(curDir, fileBrowserDir);
 		result = opendir_open(&directory, curDir, ext, 5, 1);
 	}
-	sortDirectory(directory);
+	sortDirectory(&directory);
 
 	int selected_entry         = 0;
 	int top_entry              = 0;
@@ -1911,7 +1872,7 @@ void fileBrowser_menu(){
 				selected_entry = 0;
 				top_entry = 0;
 				result = opendir_open(&directory, curDir, ext, 5, 1);
-				sortDirectory(directory);
+				sortDirectory(&directory);
 				sceKernelDelayThread(200000);
 			}
 		} else if (controller.Buttons & PSP_CTRL_CIRCLE){
@@ -1923,7 +1884,7 @@ void fileBrowser_menu(){
 					selected_entry = 0;
 					top_entry = 0;
 					result = opendir_open(&directory, curDir, ext, 5, 1);
-					sortDirectory(directory);
+					sortDirectory(&directory);
                     //Mi riposiziono:
                     for (i = 0; i < directory.number_of_directory_entries; i++){
                         if (strstr(tempDir, directory.directory_entry[i].d_name) != NULL){
@@ -1984,7 +1945,7 @@ void fileBrowser_menu(){
 			selected_entry = 0;
 			top_entry = 0;
 			result = opendir_open(&directory, curDir, ext, 5, 1);
-			sortDirectory(directory);
+			sortDirectory(&directory);
 			sceKernelDelayThread(200000);
 		}
 	}
@@ -2019,7 +1980,7 @@ void playlist_menu(){
 	strcat(curDir, "playLists");
 	char ext[1][5] = {"M3U"};
 	char *result = opendir_open(&directory, curDir, ext, 1, 0);
-	sortDirectory(directory);
+	sortDirectory(&directory);
 	if (result){
 		//current_mode = 0;
 		//return;
@@ -2155,7 +2116,7 @@ void playlist_menu(){
 				selected_entry = 0;
 				top_entry = 0;
 				result = opendir_open(&directory, curDir, ext, 1, 0);
-				sortDirectory(directory);
+				sortDirectory(&directory);
 				if (directory.number_of_directory_entries > 0){
 					//Carico i dati della playlist selezionata:
 					strcpy(fileToPlay, curDir);
@@ -2502,7 +2463,7 @@ void playlist_editor(){
 					pspDebugScreenPrintf("Filename: %-55.55s", "NEW PLAYLIST");
 					selected_entry = 0;
 					top_entry = 0;
-					sceKernelDelayThread(100000);
+					sceKernelDelayThread(200000);
 				}
 			} else if (controller.Buttons & PSP_CTRL_NOTE && M3U_getSongCount() > 0){
 				if (confirm("Play the playlist?", BLACK) == 1){
@@ -2600,13 +2561,259 @@ void playlist_editor(){
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Options menu:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void options_menu(){
+    int optionsNumber = 13;
+    char optionsText[13][51] = {"Audio Scrobbler Log",
+                                "Fadeout when skipping track",
+                                "Muted volume",
+                                "Brightness check",
+                                "Play MP3 using Media Engine",
+                                "Boost type for MP3 using libMAD",
+                                "Automatic CPU Clock",
+                                "CPU Clock: GUI",
+                                "CPU Clock: MP3 libMAD",
+                                "CPU Clock: MP3 Media Engine",
+                                "CPU Clock: OGG Vorbis",
+                                "CPU Clock: Flac",
+                                "CPU Clock: ATRAC3"
+                               };
+	int selected_entry         = 0;
+	int top_entry              = 0;
+	int maximum_number_of_rows = 20;
+	int starting_row           = 4;
+	char optionValue[17];
+    SceCtrlData controller;
+    
+    screen_init();
+    screen_options_init();
+    screen_toolbar();
+
+	while(runningFlag){
+    	pspDebugScreenSetXY(1, starting_row);
+    	pspDebugScreenSetTextColor(WHITE);
+    	pspDebugScreenSetBackColor(0xaa4400);
+
+    	//Segno precedente:
+    	if (top_entry > 0){
+    		pspDebugScreenPrintf("%-66.66s", "...");
+    	}else{
+    		pspDebugScreenPrintf("%-66.66s", "");
+    	}
+    	int i = 0;
+    	for (; i < maximum_number_of_rows; i++){
+    		int current_entry = top_entry + i;
+
+    		pspDebugScreenSetXY(1, starting_row + i + 1);
+
+    		if (current_entry < optionsNumber){
+    			if (current_entry == selected_entry){
+    				pspDebugScreenSetBackColor(0x882200);
+    			} else {
+    				pspDebugScreenSetBackColor(0xcc6600);
+    			}
+    			pspDebugScreenSetTextColor(YELLOW);
+    			
+    			//Check for value:
+                switch (current_entry){
+                    case 0:
+                        sprintf(optionValue, "%i", userSettings.SCROBBLER);
+                        break;
+                    case 1:
+                        sprintf(optionValue, "%i", userSettings.FADE_OUT);
+                        break;
+                    case 2:
+                        sprintf(optionValue, "%i", userSettings.MUTED_VOLUME);
+                        break;
+                    case 3:
+                        sprintf(optionValue, "%i", userSettings.BRIGHTNESS_CHECK);
+                        break;
+                    case 4:
+                        sprintf(optionValue, "%i", userSettings.MP3_ME);
+                        break;
+                    case 5:
+                        sprintf(optionValue, "%s", userSettings.BOOST);
+                        break;
+                    case 6:
+                        sprintf(optionValue, "%i", userSettings.CLOCK_AUTO);
+                        break;
+                    case 7:
+                        sprintf(optionValue, "%i", userSettings.CLOCK_GUI);
+                        break;
+                    case 8:
+                        sprintf(optionValue, "%i", userSettings.CLOCK_MP3);
+                        break;
+                    case 9:
+                        sprintf(optionValue, "%i", userSettings.CLOCK_MP3ME);
+                        break;
+                    case 10:
+                        sprintf(optionValue, "%i", userSettings.CLOCK_OGG);
+                        break;
+                    case 11:
+                        sprintf(optionValue, "%i", userSettings.CLOCK_FLAC);
+                        break;
+                    case 12:
+                        sprintf(optionValue, "%i", userSettings.CLOCK_AA3);
+                        break;
+                    default:
+                        strcpy(optionValue, "");
+                }
+                
+    			pspDebugScreenPrintf("%-50.50s%-16.16s", optionsText[current_entry], optionValue);
+    		} else {
+    			pspDebugScreenSetTextColor(WHITE);
+    			pspDebugScreenSetBackColor(0xaa4400);
+    			pspDebugScreenPrintf("%-66.66s", "");
+    		}
+    	}
+    	pspDebugScreenSetXY(1, starting_row + maximum_number_of_rows + 1);
+    	pspDebugScreenSetTextColor(WHITE);
+    	pspDebugScreenSetBackColor(0xaa4400);
+    	//Segno successivo:
+    	if (top_entry + maximum_number_of_rows < optionsNumber){
+    		pspDebugScreenPrintf("%-66.66s", "...");
+    	}else{
+    		pspDebugScreenPrintf("%-66.66s", "");
+    	}
+
+        readButtons(&controller, 1);
+        //Check home popup:
+		if(controller.Buttons & PSP_CTRL_HOME)
+          exitScreen();
+
+        //Tasti di navigazione:
+		if ((controller.Buttons & PSP_CTRL_DOWN) | (controller.Ly > 128 + ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
+			if (selected_entry + 1 < optionsNumber){
+				selected_entry++;
+				if (selected_entry == top_entry + maximum_number_of_rows)
+					top_entry++;
+			}
+		} else if ((controller.Buttons & PSP_CTRL_UP) | (controller.Ly < 128 - ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
+			if (selected_entry){
+				selected_entry--;
+				if (selected_entry == top_entry - 1)
+					top_entry--;
+			}
+
+        //Modifica di una opzione:
+		} else if (controller.Buttons & PSP_CTRL_RIGHT || controller.Buttons & PSP_CTRL_LEFT){
+                int delta = 0;
+                if (controller.Buttons & PSP_CTRL_RIGHT)
+                    delta = 1;
+                else
+                    delta = -1;
+                    
+                switch (selected_entry){
+                    case 0:
+                        userSettings.SCROBBLER = !userSettings.SCROBBLER;
+                        break;
+                    case 1:
+                        userSettings.FADE_OUT = !userSettings.FADE_OUT;
+                        break;
+                    case 2:
+                        userSettings.MUTED_VOLUME += delta * 10;
+                        if (userSettings.MUTED_VOLUME > 8000)
+                            userSettings.MUTED_VOLUME = 8000;
+                        else if (userSettings.MUTED_VOLUME < 0)
+                            userSettings.MUTED_VOLUME = 0;
+                        break;
+                    case 3:
+                        userSettings.BRIGHTNESS_CHECK += delta;
+                        if (userSettings.BRIGHTNESS_CHECK > 2)
+                            userSettings.BRIGHTNESS_CHECK = 2;
+                        else if (userSettings.BRIGHTNESS_CHECK < 0)
+                            userSettings.BRIGHTNESS_CHECK = 0;
+                        break;
+                    case 4:
+                        userSettings.MP3_ME = !userSettings.MP3_ME;
+                        break;
+                    case 5:
+                        if (!strcmp(userSettings.BOOST, "NEW"))
+                            strcpy(userSettings.BOOST, "OLD");
+                        else
+                            strcpy(userSettings.BOOST, "NEW");
+                        break;
+                    case 6:
+                        userSettings.CLOCK_AUTO = !userSettings.CLOCK_AUTO;
+                        break;
+                    case 7:
+                        userSettings.CLOCK_GUI += delta;
+                        if (userSettings.CLOCK_GUI > 222)
+                            userSettings.CLOCK_GUI = 222;
+                        else if (userSettings.CLOCK_GUI < 10)
+                            userSettings.CLOCK_GUI = 10;
+                        break;
+                    case 8:
+                        userSettings.CLOCK_MP3 += delta;
+                        if (userSettings.CLOCK_MP3 > 222)
+                            userSettings.CLOCK_MP3 = 222;
+                        else if (userSettings.CLOCK_MP3 < 10)
+                            userSettings.CLOCK_MP3 = 10;
+                        break;
+                    case 9:
+                        userSettings.CLOCK_MP3ME += delta;
+                        if (userSettings.CLOCK_MP3ME > 222)
+                            userSettings.CLOCK_MP3ME = 222;
+                        else if (userSettings.CLOCK_MP3ME < 10)
+                            userSettings.CLOCK_MP3ME = 10;
+                        break;
+                    case 10:
+                        userSettings.CLOCK_OGG += delta;
+                        if (userSettings.CLOCK_OGG > 222)
+                            userSettings.CLOCK_OGG = 222;
+                        else if (userSettings.CLOCK_OGG < 10)
+                            userSettings.CLOCK_OGG = 10;
+                        break;
+                    case 11:
+                        userSettings.CLOCK_FLAC += delta;
+                        if (userSettings.CLOCK_FLAC > 222)
+                            userSettings.CLOCK_FLAC = 222;
+                        else if (userSettings.CLOCK_FLAC < 10)
+                            userSettings.CLOCK_FLAC = 10;
+                        break;
+                    case 12:
+                        userSettings.CLOCK_AA3 += delta;
+                        if (userSettings.CLOCK_AA3 > 222)
+                            userSettings.CLOCK_AA3 = 222;
+                        else if (userSettings.CLOCK_AA3 < 10)
+                            userSettings.CLOCK_AA3 = 10;
+                        break;
+                }
+                sceKernelDelayThread(200000);
+		} else if (controller.Buttons & PSP_CTRL_LEFT){
+
+
+        //Conferma e default:
+		} else if (controller.Buttons & PSP_CTRL_START){
+            if (confirm("Save options now?", BLACK) == 1)
+                SETTINGS_save(userSettings);
+            sceKernelDelayThread(200000);
+		} else if (controller.Buttons & PSP_CTRL_SELECT){
+            if (confirm("Restore default options?", BLACK) == 1)
+                userSettings = SETTINGS_default();
+            sceKernelDelayThread(200000);
+		}
+		
+		//Tasti di uscita:
+		if (controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER)
+			break;
+		sceKernelDelayThread(100000);
+    }
+	//Controllo input:
+    if (controller.Buttons & PSP_CTRL_RTRIGGER)
+		nextMode();
+	else if (controller.Buttons & PSP_CTRL_LTRIGGER)
+		previousMode();
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Main
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main() {
 	pspDebugScreenInit();
-	SetupCallbacks();
+	//SetupCallbacks();
 
     //Start support prx
 	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
@@ -2619,9 +2826,9 @@ int main() {
         return -1;
 	}
 
-	//openLog("ms0:/lightMP3.log");
+	//openLog("ms0:/lightMP3.log", 0);
     //Directory corrente:
-	getcwd(ebootDirectory, 256);
+	getcwd(ebootDirectory, 262);
 
 	//Nome per settings:
 	strcpy(playlistDir, ebootDirectory);
@@ -2637,6 +2844,8 @@ int main() {
 		strcpy(userSettings.fileName, playlistDir);
     }
 
+    MUTED_VOLUME = userSettings.MUTED_VOLUME;
+    
     //Clock per filetype:
     MP3_defaultCPUClock = userSettings.CLOCK_MP3;
     MP3ME_defaultCPUClock = userSettings.CLOCK_MP3ME;
@@ -2716,7 +2925,14 @@ int main() {
 	//Controllo luminosità:
     int initialBrightness = getBrightness();
 	int initialBrightnessValue = imposeGetBrightness();
-	checkBrightness();
+	
+	if (userSettings.BRIGHTNESS_CHECK == 1)
+    	checkBrightness();
+    else if (userSettings.BRIGHTNESS_CHECK == 2){
+        setBrightness(24);
+    	curBrightness = 24;
+        imposeSetBrightness(0);
+    }
     
 	//Equalizer init:
 	struct equalizer tEQ;
@@ -2738,6 +2954,8 @@ int main() {
 			playlist_menu();
 		}else if (current_mode == 2){
 			playlist_editor();
+		}else if (current_mode == 3){
+			options_menu();
 		}
 	}
 

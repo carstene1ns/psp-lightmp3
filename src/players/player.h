@@ -44,9 +44,9 @@
 #define FLAC_TYPE 3
 #define UNK_TYPE -1
 
-#define MUTED_VOLUME 0x800
 #define FASTFORWARD_VOLUME 0x2200
 
+extern int MUTED_VOLUME;
 extern int currentVolume;
 extern int MAX_VOLUME_BOOST;
 extern int MIN_VOLUME_BOOST;
@@ -142,6 +142,7 @@ extern void unsetAudioFunctions();
 
 short volume_boost(short *Sample, unsigned int *boost);
 unsigned char volume_boost_char(unsigned char *Sample, unsigned int *boost);
+unsigned long volume_boost_long(unsigned long *Sample, unsigned int *boost);
 int setVolume(int channel, int volume);
 int setMute(int channel, int onOff);
 void fadeOut(int channel, float seconds);

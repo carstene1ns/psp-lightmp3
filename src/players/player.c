@@ -30,6 +30,7 @@
 
 
 //shared global vars
+int MUTED_VOLUME = 800;
 int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;
 int MIN_PLAYING_SPEED=0;
@@ -404,15 +405,17 @@ short volume_boost(short *Sample, unsigned int *boost){
     	return intSample;
 }
 
+/*unsigned long volume_boost_long(unsigned long *Sample, unsigned int *boost){
+	long intSample = *Sample * (*boost + 1);
+	if (intSample > 2147483647)
+		return 2147483647;
+	else if (intSample < -2147483648)
+		return -2147483648;
+	else
+    	return intSample;
+}*/
+
 unsigned char volume_boost_char(unsigned char *Sample, unsigned int *boost){
-    /*int intSample = *Sample - 127;
-    intSample = intSample * (*boost + 1);
-    if (intSample>127)
-       return 255;
-    else if (intSample < -127)
-       return 0;
-    else
-       return (unsigned char)(intSample + 127);*/
 	int intSample = (int)*Sample * (*boost + 1);
 	if (intSample > 255)
 		return 255;

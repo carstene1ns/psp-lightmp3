@@ -48,6 +48,6 @@ struct opendir_struct
 void opendir_safe_constructor(struct opendir_struct *p);
 void opendir_close(struct opendir_struct *p);
 char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5], int extNumber, int includeDirs);
-
+void sortDirectory(struct opendir_struct *directory);
 
 #endif
