@@ -28,7 +28,9 @@ struct settings{
 	int VOLUME;
 	int MP3_ME;
 	int FADE_OUT;
-
+    int MUTED_VOLUME;
+    int BRIGHTNESS_CHECK;
+    
 	//CPU clock for filetype:
     int CLOCK_GUI;
     int CLOCK_AUTO;

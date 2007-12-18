@@ -40,7 +40,7 @@ int MP3ME_thid = -1;
 int MP3ME_audio_channel = 0;
 int MP3ME_eof = 0;
 struct fileInfo MP3ME_info;
-int MP3ME_playingSpeed = 0; // 0 = normal
+    int MP3ME_playingSpeed = 0; // 0 = normal
 int MP3ME_volume_boost = 0;
 float MP3ME_playingTime = 0;
 int MP3ME_volume = 0;
@@ -141,7 +141,6 @@ int decodeThread(SceSize args, void *argp){
     int size;
 	int offset = 0;
 	char output2init = 0;
-    int framesSkipped = 0;
 
 	sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another mp3.
 	MP3ME_threadActive = 1;
@@ -234,13 +233,11 @@ int decodeThread(SceSize args, void *argp){
 			{
 				sample_per_frame = 1152;
 				frame_size = 144000*bitrates[bitrate]/samplerate + padding;
-				MP3ME_info.instantBitrate = bitrates[bitrate];
-			}
-			else
-			{
+				MP3ME_info.instantBitrate = bitrates[bitrate] * 1000;
+			}else{
 				sample_per_frame = 576;
 				frame_size = 72000*bitrates_v2[bitrate]/samplerate + padding;
-				MP3ME_info.instantBitrate = bitrates_v2[bitrate];
+				MP3ME_info.instantBitrate = bitrates_v2[bitrate] * 1000;
 			}
 
 			sceIoLseek32(MP3ME_handle, data_start, PSP_SEEK_SET); //seek back
@@ -261,12 +258,11 @@ int decodeThread(SceSize args, void *argp){
                 if (MP3ME_handle < 0){
                     MP3ME_isPlaying = 0;
                     MP3ME_threadActive = 0;
+                    continue;
                 }
                 size = sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_END);
                 sceIoLseek32(MP3ME_handle, offset, PSP_SEEK_SET);
                 data_start = offset;
-				//MP3ME_isPlaying = 0;
-				//MP3ME_threadActive = 0;
 				continue;
 			}
 			data_start += frame_size;
@@ -295,11 +291,8 @@ int decodeThread(SceSize args, void *argp){
 				offset = data_start;
 				continue;
 			}
-            //MP3ME_playingTime += 32.0*36.0/(float)samplerate;
             MP3ME_playingTime += (float)sample_per_frame/(float)samplerate;
 		    MP3ME_info.framesDecoded++;
-
-            framesSkipped = 0;
 
             //Output:
 			memcpy( OutputPtrME, MP3ME_output_buffer, sample_per_frame*4);
@@ -308,8 +301,7 @@ int decodeThread(SceSize args, void *argp){
 			{
 				if (!output2init)
 					sceAudioOutputBlocking(MP3ME_audio_channel, MP3ME_volume, OutputBuffer[OutputBuffer_flip] );
-				else
-				{
+				else{
 					 res = sceAudio_E0727056(MP3ME_volume, OutputBuffer[OutputBuffer_flip]);//sceAudioOutput2OutputBlocking
 					 if (res < 0) //error, re-alloc output2
 						 output2init = 0;
@@ -319,14 +311,16 @@ int decodeThread(SceSize args, void *argp){
 				OutputPtrME = OutputBuffer[OutputBuffer_flip];
 		        //Check for playing speed:
                 if (MP3ME_playingSpeed){
-                    sceIoLseek32(MP3ME_handle, sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_CUR) + frame_size * 3 * MP3ME_playingSpeed, PSP_SEEK_SET);
-                    MP3ME_playingTime += (float)sample_per_frame/(float)samplerate * MP3ME_playingSpeed;
+                    sceIoLseek32(MP3ME_handle, data_start + frame_size * 2 * MP3ME_playingSpeed, PSP_SEEK_SET);
+                    MP3ME_playingTime += (float)sample_per_frame/(float)samplerate * 2.0 * (float)MP3ME_playingSpeed;
                     data_start = SeekNextFrame(MP3ME_handle);
-    				if(data_start < 0)
-    				{
+    				if(data_start < 0){
     					MP3ME_eof = 1;
     					continue;
     				}
+    				offset = data_start;
+    				size += frame_size * 2 * MP3ME_playingSpeed;
+    				MP3ME_setPlayingSpeed(0); //SOLO PER TEST DA TOGLIERE!
                 }
 			}
 		}
@@ -417,6 +411,7 @@ int MP3MEgetInfo(){
     			}
 
     			MP3ME_info.kbit = header.bitrate / 1000;
+    			MP3ME_info.instantBitrate = header.bitrate;
     			MP3ME_info.hz = header.samplerate;
     			switch (header.mode) {
     			case MAD_MODE_SINGLE_CHANNEL:
@@ -594,6 +589,8 @@ void MP3ME_Init(int channel){
     MP3ME_playingTime = 0;
 	MP3ME_volume_boost = 0;
 	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
+    MIN_PLAYING_SPEED=-10;
+    MAX_PLAYING_SPEED=9;
 	initMEAudioModules();
 }
 

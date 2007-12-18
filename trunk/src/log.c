@@ -19,15 +19,18 @@
 #include <string.h>
 #include <pspiofilemgr.h>
 
-char logFile[262];
-int enabled = 0;
-int writing = 0;
+static char logFile[262];
+static int enabled = 0;
+static int writing = 0;
 //Open log: crea il file vuoto
-int openLog(char *fileName){
+int openLog(char *fileName, int append){
 	SceUID logFileO; 
 
 	strcpy(logFile, fileName);
-	logFileO = sceIoOpen(fileName, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
+	if (!append)
+    	logFileO = sceIoOpen(fileName, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
+    else
+        logFileO = sceIoOpen(fileName, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_APPEND, 0777);
 	if (!logFileO)
 	{
 		return(-1);

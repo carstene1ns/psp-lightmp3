@@ -1,5 +1,5 @@
 TARGET = mp3
-OBJS = prx/supportlib.o usb.o audioscrobbler.o settings.o pspequalizer.o equalizer.o log.o m3u.o \
+OBJS = prx/supportlib.o usb.o audioscrobbler.o settings.o equalizer.o log.o m3u.o \
        players/pspaudiolib.o players/id3.o players/mp3player.o players/oggplayer.o \
        players/mp3playerME.o players/aa3playerME.o players/flacplayer.o players/player.o \
        mem64.o opendir.o main.o
@@ -14,7 +14,7 @@ ASFLAGS = $(CFLAGS)
 LIBDIR =
 
 LIBS = -lFLAC -lmad -lvorbisidec -lm \
-       -lpspgu -lpspgum -lpspaudio -lpsppower \
+       -lpspgu -lpspgum -lpsppower \
        -lpsphprm -lpspusb -lpspusbstor -lpspaudio -lpspaudiocodec -lpspkubridge
 LDFLAGS =
 EXTRA_TARGETS = EBOOT.PBP

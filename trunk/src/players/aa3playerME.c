@@ -305,6 +305,18 @@ int AA3MEgetInfo(){
     else
         data_align = (ea3_header[0x23]+1)*8;
 
+    if ( data_align == 0xC0 )
+        AA3ME_info.kbit = 66;
+    else if ( data_align == 0x230 )
+        AA3ME_info.kbit = 96;
+    else if ( data_align == 0x130 )
+        AA3ME_info.kbit = 105;
+    else if ( data_align == 0x180 )
+        AA3ME_info.kbit = 132;
+    else
+        AA3ME_info.kbit = data_align; //Unknown bitrate!
+    AA3ME_info.instantBitrate = AA3ME_info.kbit * 1000;
+    
     if ( at3_type == TYPE_ATRAC3 )
         sample_per_frame = 1024;
     else if ( at3_type == TYPE_ATRAC3PLUS )
