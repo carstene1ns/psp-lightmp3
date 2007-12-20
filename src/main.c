@@ -60,6 +60,8 @@ void readButtons(SceCtrlData *pad_data, int count);
 int imposeGetMute();
 int imposeSetMute(int value);
 int imposeSetHomePopup(int value);
+int getModuleListID(SceUID modid[100], int *modcount);
+int stopUnloadModule(SceUID modID);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constants:
@@ -118,28 +120,29 @@ static int suspended = 0;
 int powerCallback(int unknown, int powerInfo, void *common){
     if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_STANDBY) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
        if (!suspended){
-           //writeLog("Suspend: start\n");
            resuming = 1;                   
            //Suspend
            if (suspendFunct != NULL){
-              //writeLog("Suspend: function\n");
               (*suspendFunct)();
            }
-           pspAudioEnd();
+           //Riattivo il display:
+           if (!displayStatus){
+               displayEnable();
+               setBrightness(curBrightness);
+               displayStatus = 1;
+           }
+           //pspAudioEnd();
            suspended = 1;
-           //writeLog("Suspend: end\n");
        }
     }else if ((powerInfo & PSP_POWER_CB_RESUMING)){
        resuming = 1;
     }else if ((powerInfo & PSP_POWER_CB_RESUME_COMPLETE)){
-       //writeLog("Resume: start\n");
        //Resume
-       pspAudioInit();          
+       //pspAudioInit();
        if (resumeFunct != NULL)
           (*resumeFunct)();
        resuming = 0;       
        suspended = 0;       
-       //writeLog("Resume: end\n");
     }
     return 0;
 }
@@ -147,6 +150,23 @@ int powerCallback(int unknown, int powerInfo, void *common){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Funzioni generiche
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Check running modules:
+int checkModules(){
+    SceUID modid[100];
+    int modcount;
+    getModuleListID(modid, &modcount);
+    SceKernelModuleInfo minfo;
+    int i;
+    for(i = 0; i < modcount; i++){
+        memset(&minfo, 0, sizeof(SceKernelModuleInfo));
+        minfo.size = sizeof(SceKernelModuleInfo);
+        sceKernelQueryModuleInfo(modid[i], &minfo);
+        if (!strcmp(minfo.name, "Music_prx"))
+            stopUnloadModule(modid[i]);
+    }
+    return 0;
+}
+
 //Memoria libera totale:
 typedef struct
 {
@@ -608,14 +628,14 @@ void addFileToPlaylist(char *fileName, int save){
 
 //Aggiungo una directory alla playlist temporanea:
 void addDirectoryToPlaylist(char *dirName){
-	char ext[4][5] = {"MP3", "OGG", "AA3", "FLAC"};
+	char ext[6][5] = {"MP3", "OGG", "AA3", "OMA", "OMG", "FLAC"};
 	char fileToAdd[262] = "";
 	char message[10] = "";
 	int i;
 	float perc;
 	struct opendir_struct dirToAdd;
 
-	char *result = opendir_open(&dirToAdd, dirName, ext, 4, 0);
+	char *result = opendir_open(&dirToAdd, dirName, ext, 6, 0);
 	if (result == 0){
 		for (i = 0; i < dirToAdd.number_of_directory_entries; i++){
 			strcpy(fileToAdd, dirName);
@@ -899,7 +919,7 @@ void screen_init(){
 	pspDebugScreenSetTextColor(WHITE);
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetXY(0, 1);
-	pspDebugScreenPrintf("a light MP3/OGG Player to preserve your battery. ;)");
+	pspDebugScreenPrintf("a light MP3/OGG/FLAC/ATRAC3 Player to preserve your battery. ;)");
 	pspDebugScreenSetXY(0, 33);
 }
 
@@ -1061,6 +1081,9 @@ void screen_fileinfo(struct fileInfo info){
 void screen_options_init(){
 	pspDebugScreenSetBackColor(BLACK);
 	pspDebugScreenSetTextColor(WHITE);
+	pspDebugScreenSetXY(0, 26);
+	pspDebugScreenPrintf("LightMP3 is ditributed under GNU General Public License,\n");
+    pspDebugScreenPrintf("read LICENSE.TXT for details.");
 	pspDebugScreenSetXY(0, 30);
 	pspDebugScreenPrintf("Press LEFT or RIGHT to change current option");
 	pspDebugScreenPrintf("\n");
@@ -1451,12 +1474,12 @@ int playFile(char *filename, char *numbers, char *message) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void playDirectory(char *dirName, char *initialFileName){
 	struct opendir_struct dirToPlay;
-	char ext[4][5] = {"MP3", "OGG", "AA3", "FLAC"};
+	char ext[6][5] = {"MP3", "OGG", "AA3", "OMG", "OMA", "FLAC"};
 	char testo[10] = "";
 	char fileToPlay[262] = "";
 	char message[68] = "";
 
-	char *result = opendir_open(&dirToPlay, dirName, ext, 4, 0);
+	char *result = opendir_open(&dirToPlay, dirName, ext, 6, 0);
 	unsigned int playedTracks[dirToPlay.number_of_directory_entries];
 	unsigned int playedTracksNumber = 0;
 	unsigned int currentTrack = 0;
@@ -1671,17 +1694,17 @@ void fileBrowser_menu(){
 	char curDir[262] = "";
 	char dirToPlay[262] = "";
 	char fileToPlay[262] = "";
-	char ext[5][5] = {"MP3", "M3U", "OGG", "AA3", "FLAC"};
+	char ext[7][5] = {"MP3", "M3U", "OGG", "AA3", "OMG", "OMA", "FLAC"};
 	char *result;
 
 	if (strlen(fileBrowserDir) == 0){
 		//Provo la prima directory:
 		strcpy(curDir, music_directory_1);
-		result = opendir_open(&directory, curDir, ext, 5, 1);
+		result = opendir_open(&directory, curDir, ext, 7, 1);
 		if (result){
 			//Provo la seconda directory:
 			strcpy(curDir, music_directory_2);
-			result = opendir_open(&directory, curDir, ext, 5, 1);
+			result = opendir_open(&directory, curDir, ext, 7, 1);
 			if (result){
 				screen_init();
 				pspDebugScreenSetXY(0, 4);
@@ -1697,7 +1720,7 @@ void fileBrowser_menu(){
 		}
 	}else{
 		strcpy(curDir, fileBrowserDir);
-		result = opendir_open(&directory, curDir, ext, 5, 1);
+		result = opendir_open(&directory, curDir, ext, 7, 1);
 	}
 	sortDirectory(&directory);
 
@@ -1871,7 +1894,7 @@ void fileBrowser_menu(){
 				opendir_close(&directory);
 				selected_entry = 0;
 				top_entry = 0;
-				result = opendir_open(&directory, curDir, ext, 5, 1);
+				result = opendir_open(&directory, curDir, ext, 7, 1);
 				sortDirectory(&directory);
 				sceKernelDelayThread(200000);
 			}
@@ -1883,7 +1906,7 @@ void fileBrowser_menu(){
 					opendir_close(&directory);
 					selected_entry = 0;
 					top_entry = 0;
-					result = opendir_open(&directory, curDir, ext, 5, 1);
+					result = opendir_open(&directory, curDir, ext, 7, 1);
 					sortDirectory(&directory);
                     //Mi riposiziono:
                     for (i = 0; i < directory.number_of_directory_entries; i++){
@@ -1944,7 +1967,7 @@ void fileBrowser_menu(){
 			opendir_close(&directory);
 			selected_entry = 0;
 			top_entry = 0;
-			result = opendir_open(&directory, curDir, ext, 5, 1);
+			result = opendir_open(&directory, curDir, ext, 7, 1);
 			sortDirectory(&directory);
 			sceKernelDelayThread(200000);
 		}
@@ -2844,6 +2867,9 @@ int main() {
 		strcpy(userSettings.fileName, playlistDir);
     }
 
+    //Check for active modules:
+    checkModules();
+    
     MUTED_VOLUME = userSettings.MUTED_VOLUME;
     
     //Clock per filetype:

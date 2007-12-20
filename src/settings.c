@@ -34,6 +34,7 @@ int SETTINGS_load(char *fileName){
 		return(0);
 	}
 
+    SETTINGS_default();
 	while(fgets(lineText, 256, f) != NULL){
 		int element = 0;
 		char parName[10] = "";

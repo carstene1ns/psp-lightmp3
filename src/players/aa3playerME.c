@@ -32,6 +32,7 @@
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int AA3ME_threadActive = 0;
+int AA3ME_threadExited = 0;
 char AA3ME_fileName[262];
 static int AA3ME_isPlaying = 0;
 int AA3ME_thid = -1;
@@ -43,6 +44,8 @@ int AA3ME_volume = 0;
 int AA3ME_playingSpeed = 0; // 0 = normal
 int AA3ME_defaultCPUClock = 20;
 unsigned int AA3ME_volume_boost = 0;
+long AA3ME_suspendPosition = -1;
+long AA3ME_suspendIsPlaying = 0;
 
 unsigned char AA3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
 unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
@@ -60,6 +63,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     int tag_size;
 	int offset = 0;
 	
+	AA3ME_threadExited = 0;
     AA3ME_threadActive = 1;
     openAudio(AA3ME_audio_channel, AT3_OUTPUT_BUFFER_SIZE/4);
     
@@ -227,7 +231,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 
             AA3ME_playingTime += (float)sample_per_frame/(float)samplerate;
 		    AA3ME_info.framesDecoded++;
-		    
+
             //Output:
 			memcpy( AT3_OutputPtr, AA3ME_output_buffer, sample_per_frame*4);
 			AT3_OutputPtr += (sample_per_frame * 4);
@@ -255,6 +259,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 	}
 	sceIoClose(fd);
     sceAudioChRelease(AA3ME_audio_channel);
+    AA3ME_threadExited = 1;
     return 0;
 }
 
@@ -357,6 +362,7 @@ void AA3ME_Init(int channel){
 
 int AA3ME_Load(char *fileName){
     AA3ME_playingSpeed = 0;
+    AA3ME_isPlaying = 0;
     strcpy(AA3ME_fileName, fileName);
     if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;
@@ -387,6 +393,8 @@ void AA3ME_Pause(){
 int AA3ME_Stop(){
     AA3ME_isPlaying = 0;
     AA3ME_threadActive = 0;
+    while (!AA3ME_threadExited)
+        sceKernelDelayThread(100000);
     return 0;
 }
 
@@ -523,10 +531,19 @@ int AA3ME_isFilterSupported(){
 //Manage suspend:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int AA3ME_suspend(){
+    AA3ME_suspendPosition = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    AA3ME_suspendIsPlaying = AA3ME_isPlaying;
+    AA3ME_Stop();
     return 0;
 }
 
 int AA3ME_resume(){
+    AA3ME_Load(AA3ME_fileName);
+    sceKernelDelayThread(20000);
+    if (AA3ME_suspendPosition >= 0)
+        sceIoLseek32(fd, AA3ME_suspendPosition, PSP_SEEK_SET);
+    AA3ME_isPlaying = AA3ME_suspendIsPlaying;
+    AA3ME_suspendPosition = -1;
     return 0;
 }
 
