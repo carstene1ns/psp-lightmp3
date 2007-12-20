@@ -1,9 +1,9 @@
-/////////////////////////////////////////
+//////////////////////////////////////////
 //       LightMP3, 2007 by Sakya       //
 /////////////////////////////////////////
-Homepage: http://sakya.altervista.org/new/index.php?mod=none_lightmp3
+Homepage   : http://sakya.altervista.org/new/index.php?mod=none_lightmp3
 Google Code: http://code.google.com/p/lightmp3/
-Contacts: sakya_tg@yahoo.it
+Contacts   : sakya_tg@yahoo.it
 LightMP3 is ditributed under GNU General Public License, read LICENSE.TXT for details.
 
 
@@ -34,14 +34,14 @@ FEATURES
 -Detailed ID3v1 and file information
 -Works with remote controller
 -Four playing mode: Normal, Repeat, Repeat All and Shuffle
--Boost mp3's volume
--Equalizer presets (only for MP3): Rock, Classical, Pop, Dance, Reaggae, Soft
+-Boost output volume
+-Equalizer presets (only for MP3 libMAD): Rock, Classical, Pop, Dance, Reaggae, Soft
 -Audioscrobbler log (you can upload you log to your last.fm's account with this page http://paulstead.com/scrob/)
 
 
-EQUALIZERS
-----------
-NOTE: Equalizer works only with MP3 file.
+LIBMAD EQUALIZERS
+-----------------
+NOTE: Equalizer works only with MP3 file through libMAD.
 If you want to add your own preset or change the standard ones you have to edit the file equzlizers
 This file contains one row for each preset.
 Every row contains 34 columns separated by ;
@@ -57,12 +57,7 @@ AUDIOSCROBBLER LOG
 ------------------
 LightMP3 can save a .scrobbler.log file that you can then upload to your last.fm account (visit http://www.last.fm).
 This feature is disabled by default.
-To enable scrobbler log launch LightMP3 once (so it writes the default settings).
-Open the file x:/PSP/GAME/LightMP3/settings and change the line
-
-SCROBBLER=0
-to
-SCROBBLER=1
+To enable scrobbler go to the options screen.
 
 You can upload the log through this page (remember to delete the .scrobbler.log file after uploading it):
 http://paulstead.com/scrob/
@@ -73,6 +68,7 @@ DEPENDENCIES
 To compile LightMP3 you need:
 -libMad (add -O3 to CFLAGS in tha makefile)
 -libTremor
+-libFLAC
 
 
 BUGS:
@@ -99,3 +95,4 @@ MANY THANKS TO
 -John_K & adresd (PSPMediaCenter authors)
 -Xart for the ID3v2 tag code.
 -joek2100 for the Media Engine functions (taken from Music prx 0.55 and adapted)
+-JLF65 for the FLAC playback function

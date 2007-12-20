@@ -37,8 +37,8 @@ double OGG_milliSeconds = 0.0;
 int OGG_playingSpeed = 0; // 0 = normal
 int OGG_playingDelta = 0;
 int outputInProgress = 0;
-long suspendPosition = -1;
-long suspendIsPlaying = 0;
+long OGG_suspendPosition = -1;
+long OGG_suspendIsPlaying = 0;
 int OGG_defaultCPUClock = 50;
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -410,20 +410,21 @@ int OGG_isFilterEnabled(){
 //Manage suspend:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
 int OGG_suspend(){
-    suspendPosition = ov_raw_tell(&OGG_VorbisFile);
-    suspendIsPlaying = isPlaying;
-    OGG_End();
+    OGG_suspendPosition = ov_raw_tell(&OGG_VorbisFile);
+    OGG_suspendIsPlaying = isPlaying;
+    OGG_Stop();
+    OGG_FreeTune();
     return 0;
 }         
 
 int OGG_resume(){
-    if (suspendPosition >= 0){
+    if (OGG_suspendPosition >= 0){
        OGG_Load(OGG_fileName);
-       if (ov_raw_seek(&OGG_VorbisFile, suspendPosition)){
-          if (suspendIsPlaying)
+       if (ov_raw_seek(&OGG_VorbisFile, OGG_suspendPosition)){
+          if (OGG_suspendIsPlaying)
              OGG_Play();                                        
        }
-       suspendPosition = -1;       
+       OGG_suspendPosition = -1;
     }
     return 0;
 }         

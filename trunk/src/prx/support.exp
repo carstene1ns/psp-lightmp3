@@ -28,6 +28,9 @@ PSP_EXPORT_FUNC(imposeSetMute)
 PSP_EXPORT_FUNC(imposeSetHomePopup)
 PSP_EXPORT_FUNC(imposeGetEqualizer)
 PSP_EXPORT_FUNC(imposeSetEqualizer)
+
+PSP_EXPORT_FUNC(getModuleListID)
+PSP_EXPORT_FUNC(stopUnloadModule)
 PSP_EXPORT_END
 
 PSP_END_EXPORTS
