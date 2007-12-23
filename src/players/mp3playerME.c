@@ -22,6 +22,7 @@
 //    and the source code of Music prx by joek2100
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <malloc.h>
 
 #include "id3.h"
@@ -140,11 +141,11 @@ int decodeThread(SceSize args, void *argp){
     //float duration;
     int frame_size;
     int size;
+    int total_size;
 	int offset = 0;
 
 	sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another mp3.
 	MP3ME_threadActive = 1;
-	//openAudio(MP3ME_audio_channel, OUTPUT_BUFFER_SIZE/4);
     OutputBuffer_flip = 0;
     OutputPtrME = OutputBuffer[0];
 
@@ -153,7 +154,8 @@ int decodeThread(SceSize args, void *argp){
         MP3ME_threadActive = 0;
 
 	//now search for the first sync byte, tells us where the mp3 stream starts
-	size = sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_END);
+	total_size = sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_END);
+	size = total_size;
 	sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_SET);
 	data_start = SeekNextFrame(MP3ME_handle);
 	if (data_start < 0)
@@ -285,16 +287,22 @@ int decodeThread(SceSize args, void *argp){
 				OutputPtrME = OutputBuffer[OutputBuffer_flip];
 		        //Check for playing speed:
                 if (MP3ME_playingSpeed){
-                    sceIoLseek32(MP3ME_handle, data_start + frame_size * 2 * MP3ME_playingSpeed, PSP_SEEK_SET);
-                    MP3ME_playingTime += (float)sample_per_frame/(float)samplerate * 2.0 * (float)MP3ME_playingSpeed;
+                    long old_start = data_start;
+                    sceIoLseek32(MP3ME_handle, data_start + frame_size * 5 * MP3ME_playingSpeed, PSP_SEEK_SET);
+                    //MP3ME_playingTime += (float)sample_per_frame/(float)samplerate * 5.0 * (float)MP3ME_playingSpeed;
                     data_start = SeekNextFrame(MP3ME_handle);
     				if(data_start < 0){
     					MP3ME_eof = 1;
     					continue;
     				}
+    				float framesSkipped = (float)abs(old_start - data_start) / (float)frame_size;
+    				if (MP3ME_playingSpeed > 0)
+        				MP3ME_playingTime += framesSkipped * (float)sample_per_frame/(float)samplerate;
+                    else
+        				MP3ME_playingTime -= framesSkipped * (float)sample_per_frame/(float)samplerate;
+
     				offset = data_start;
-    				size += frame_size * 2 * MP3ME_playingSpeed;
-    				MP3ME_setPlayingSpeed(0); //SOLO PER TEST DA TOGLIERE!
+    				size = total_size - data_start;
                 }
 			}
 		}
@@ -305,7 +313,6 @@ int decodeThread(SceSize args, void *argp){
 
    if ( MP3ME_handle )
       sceIoClose(MP3ME_handle);
-	//sceAudioChRelease(MP3ME_audio_channel);
     return 0;
 }
 
@@ -626,12 +633,7 @@ struct fileInfo MP3ME_GetInfo(){
 
 
 int MP3ME_GetPercentage(){
-    int perc = 0;
-    if (!MP3ME_info.frames){
-        return 0;
-    }
-    perc = (double)MP3ME_info.framesDecoded / (double)MP3ME_info.frames * 100.0;
-    return perc;
+    return (int)(MP3ME_playingTime/(double)MP3ME_info.length*100.0);
 }
 
 
