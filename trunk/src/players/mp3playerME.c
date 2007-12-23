@@ -30,6 +30,7 @@
 
 #define THREAD_PRIORITY 12
 #define OUTPUT_BUFFER_SIZE	(1152*2*4)
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,11 +141,10 @@ int decodeThread(SceSize args, void *argp){
     int frame_size;
     int size;
 	int offset = 0;
-	char output2init = 0;
 
 	sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another mp3.
 	MP3ME_threadActive = 1;
-	openAudio(MP3ME_audio_channel, OUTPUT_BUFFER_SIZE/4);
+	//openAudio(MP3ME_audio_channel, OUTPUT_BUFFER_SIZE/4);
     OutputBuffer_flip = 0;
     OutputPtrME = OutputBuffer[0];
 
@@ -207,26 +207,6 @@ int decodeThread(SceSize args, void *argp){
 				size -= (data_start - offset); 
 				offset = data_start;
 				continue;
-			}
-
-	//      FIXME, CAUSES PROBLEMS IN GTA:VCS, possibly others 
-			if ((!output2init) && (samplerate != 44100))
-			{
-				sceAudioChRelease(MP3ME_audio_channel);
-
-				res = sceAudio_38553111(OUTPUT_BUFFER_SIZE/4, samplerate, 2);
-
-				if (res >= 0)//sucessfully alloc'd a channel, returns < 0 on resume
-				{
-					output2init = 1;
-					MP3ME_audio_channel = 9;
-				}
-			}
-
-			if (output2init && (samplerate == 44100))//bad mp3,changes samplerate, fix, really should re-encode this song...
-			{
-				openAudio(MP3ME_audio_channel, OUTPUT_BUFFER_SIZE/4);
-				output2init = 0;        
 			}
 
 			if (version == 3) //mpeg-1
@@ -299,13 +279,7 @@ int decodeThread(SceSize args, void *argp){
 			OutputPtrME += (sample_per_frame * 4);
 			if( OutputPtrME + (sample_per_frame * 4) > &OutputBuffer[OutputBuffer_flip][OUTPUT_BUFFER_SIZE])
 			{
-				if (!output2init)
-					sceAudioOutputBlocking(MP3ME_audio_channel, MP3ME_volume, OutputBuffer[OutputBuffer_flip] );
-				else{
-					 res = sceAudio_E0727056(MP3ME_volume, OutputBuffer[OutputBuffer_flip]);//sceAudioOutput2OutputBlocking
-					 if (res < 0) //error, re-alloc output2
-						 output2init = 0;
-				}
+                audioOutput(MP3ME_volume, OutputBuffer[OutputBuffer_flip]);
 
 				OutputBuffer_flip ^= 1;
 				OutputPtrME = OutputBuffer[OutputBuffer_flip];
@@ -331,7 +305,7 @@ int decodeThread(SceSize args, void *argp){
 
    if ( MP3ME_handle )
       sceIoClose(MP3ME_handle);
-	sceAudioChRelease(MP3ME_audio_channel);
+	//sceAudioChRelease(MP3ME_audio_channel);
     return 0;
 }
 
@@ -601,6 +575,13 @@ int MP3ME_Load(char *fileName){
         strcpy(MP3ME_fileName, "");
         return ERROR_OPENING;
     }
+    
+    releaseAudio();
+    if (setAudioFrequency(OUTPUT_BUFFER_SIZE/4, MP3ME_info.hz, 2) < 0){
+        MP3ME_End();
+        return ERROR_INVALID_SAMPLE_RATE;
+    }
+
     MP3ME_thid = -1;
     MP3ME_eof = 0;
     MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);

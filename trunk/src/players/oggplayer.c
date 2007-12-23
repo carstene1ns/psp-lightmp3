@@ -215,6 +215,7 @@ void OGGgetInfo(){
 
 
 void OGG_Init(int channel){
+    initAudioLib();
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
     OGG_audio_channel = channel;
@@ -337,6 +338,7 @@ void OGG_End(){
     OGG_Stop();
 	pspAudioSetChannelCallback(OGG_audio_channel, 0,0);
 	OGG_FreeTune();
+	endAudioLib();
 }
 
 int OGG_setMute(int onOff){

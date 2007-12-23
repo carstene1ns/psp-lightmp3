@@ -78,11 +78,6 @@ int openAudio(int channel, int samplecount);
 SceUID LoadStartAudioModule(char *modname, int partition);
 int initMEAudioModules();
 int GetID3TagSize(char *fname);
-int checkChannel(int channel);
-
-int sceAudio_38553111(int samplecount, int samplerate, int unk);//unk = 2 (only func called by sceAudioOutput2Reserve)
-int sceAudio_E0727056(int vol, void *buf);//sceAudioOutput2OutputBlocking alias, present in 1.5
-int sceAudio_5C37C0AE(void);//sceAudioOutput2Release alias, also present in 1.5
 
 struct fileInfo{
     int fileType;
@@ -146,3 +141,9 @@ unsigned long volume_boost_long(unsigned long *Sample, unsigned int *boost);
 int setVolume(int channel, int volume);
 int setMute(int channel, int onOff);
 void fadeOut(int channel, float seconds);
+
+int setAudioFrequency(unsigned short samples, unsigned short freq, char car);
+int releaseAudio(void);
+int audioOutput(int volume, void *buffer);
+
+

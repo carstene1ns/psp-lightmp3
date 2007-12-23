@@ -367,6 +367,7 @@ int AA3ME_Load(char *fileName){
     if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;
     }
+    
     AA3ME_thid = -1;
     AA3ME_eof = 0;
     AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
