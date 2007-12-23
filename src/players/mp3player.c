@@ -276,6 +276,7 @@ static void MP3Callback(void *_buf2, unsigned int numSamples, void *pdata){
 //Init:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MP3_Init(int channel){
+    initAudioLib();
     myChannel = channel;
     isPlaying = FALSE;
 	MP3_playingSpeed = 0;
@@ -435,6 +436,7 @@ void MP3_End(){
     MP3_Stop();
     pspAudioSetChannelCallback(myChannel, 0,0);
     MP3_FreeTune();
+    endAudioLib();
 }
 
 

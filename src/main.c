@@ -2971,7 +2971,6 @@ int main() {
     currentEQ = tEQ.index;
 
 	srand(time(NULL));
-	pspAudioInit();
 	current_mode = 0;
 	while (current_mode >= 0 && runningFlag){
 		if (current_mode == 0){
@@ -2992,8 +2991,6 @@ int main() {
     tEQ = EQ_getIndex(currentEQ);
     strcpy(userSettings.EQ, tEQ.shortName);
 	SETTINGS_save(userSettings);
-
-	pspAudioEnd();
 
 	//Riporto la luminosità a quella iniziale:
     setBrightness(initialBrightness);

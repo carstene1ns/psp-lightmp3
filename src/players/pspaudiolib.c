@@ -27,7 +27,7 @@ int setFrequency(unsigned short samples, unsigned short freq, char car){
 	return sceAudio_38553111(samples, freq, car);
 }
 
-int releaseAudio(void){
+int pspReleaseAudio(void){
 	while(sceAudioOutput2GetRestSample() > 0);
 	return sceAudio_5C37C0AE();
 }
@@ -127,9 +127,8 @@ int pspAudioSetFrequency(unsigned short freq)
          return -1;
    }
    sceKernelWaitSema(play_sema, 1, 0);
-   releaseAudio();
+   pspReleaseAudio();
    if(setFrequency(PSP_NUM_AUDIO_SAMPLES,freq,2)<0) ret = -1;
-   //setFrequency(PSP_NUM_AUDIO_SAMPLES,freq,2);
    sceKernelSignalSema(play_sema, 1);
    return ret;
 }
@@ -162,7 +161,7 @@ int pspAudioInit()
         if (failed) {
                 for (i=0; i<PSP_NUM_AUDIO_CHANNELS; i++) {
                         if (AudioStatus[i].handle != -1)
-                            releaseAudio();
+                            pspReleaseAudio();
                         AudioStatus[i].handle = -1;
                 }
                 return -1;
@@ -224,7 +223,7 @@ void pspAudioEnd()
 
         for (i=0; i<PSP_NUM_AUDIO_CHANNELS; i++) {
                 if (AudioStatus[i].handle != -1) {
-                        releaseAudio();
+                        pspReleaseAudio();
                         AudioStatus[i].handle = -1;
                 }
         }
