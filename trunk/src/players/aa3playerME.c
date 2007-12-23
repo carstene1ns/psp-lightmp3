@@ -65,7 +65,6 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 	
 	AA3ME_threadExited = 0;
     AA3ME_threadActive = 1;
-    openAudio(AA3ME_audio_channel, AT3_OUTPUT_BUFFER_SIZE/4);
     
 	sceAudiocodecReleaseEDRAM(AA3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another file.
     OutputBuffer_flip = 0;
@@ -244,7 +243,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     					AT3_OutputBuffer[OutputBuffer_flip][i] = volume_boost_char(&AT3_OutputBuffer[OutputBuffer_flip][i], &AA3ME_volume_boost);
                     }
                 }
-				sceAudioOutputBlocking(AA3ME_audio_channel, AA3ME_volume, AT3_OutputBuffer[OutputBuffer_flip] );
+				audioOutput(AA3ME_volume, AT3_OutputBuffer[OutputBuffer_flip]);
 
 				OutputBuffer_flip ^= 1;
 				AT3_OutputPtr = AT3_OutputBuffer[OutputBuffer_flip];
@@ -258,7 +257,6 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 		sceKernelDelayThread(10000);
 	}
 	sceIoClose(fd);
-    sceAudioChRelease(AA3ME_audio_channel);
     AA3ME_threadExited = 1;
     return 0;
 }
@@ -368,6 +366,12 @@ int AA3ME_Load(char *fileName){
         return ERROR_OPENING;
     }
     
+    releaseAudio();
+    if (setAudioFrequency(AT3_OUTPUT_BUFFER_SIZE/4, AA3ME_info.hz, 2) < 0){
+        MP3ME_End();
+        return ERROR_INVALID_SAMPLE_RATE;
+    }
+
     AA3ME_thid = -1;
     AA3ME_eof = 0;
     AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
