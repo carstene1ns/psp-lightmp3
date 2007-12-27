@@ -570,8 +570,10 @@ void MP3ME_Init(int channel){
     MP3ME_playingTime = 0;
 	MP3ME_volume_boost = 0;
 	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    //MIN_PLAYING_SPEED=-10;
+    //MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED = 0;
+    MAX_PLAYING_SPEED = 0;
 	initMEAudioModules();
 }
 
@@ -721,7 +723,8 @@ int MP3ME_resume(){
 
 void MP3ME_setVolumeBoostType(char *boostType){
     //Only old method supported
-    MAX_VOLUME_BOOST = 4;
+    //MAX_VOLUME_BOOST = 4;
+    MAX_VOLUME_BOOST = 0;
     MIN_VOLUME_BOOST = 0;
 }
 

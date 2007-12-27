@@ -142,6 +142,8 @@ int setVolume(int channel, int volume);
 int setMute(int channel, int onOff);
 void fadeOut(int channel, float seconds);
 
+int initAudioLib();
+int endAudioLib();
 int setAudioFrequency(unsigned short samples, unsigned short freq, char car);
 int releaseAudio(void);
 int audioOutput(int volume, void *buffer);

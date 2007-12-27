@@ -601,7 +601,8 @@ int AA3ME_setPlayingSpeed(int playingSpeed){
 
 void AA3ME_setVolumeBoostType(char *boostType){
     //Only old method supported
-    MAX_VOLUME_BOOST = 4;
+    //MAX_VOLUME_BOOST = 4;
+    MAX_VOLUME_BOOST = 0;
     MIN_VOLUME_BOOST = 0;
 }
 
