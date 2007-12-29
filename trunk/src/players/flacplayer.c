@@ -310,6 +310,7 @@ void FLACgetInfo(char *filename){
 
 
 void FLAC_Init(int channel){
+    initAudioLib();
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
 	FLAC_audio_channel = channel;
@@ -422,6 +423,7 @@ void FLAC_End(){
     FLAC_Stop();
 	pspAudioSetChannelCallback(FLAC_audio_channel, 0, 0);
 	FLAC_FreeTune();
+	endAudioLib();
 }
 
 
