@@ -1,8 +1,14 @@
 LightMP3 Changelog
 ------------------
 
+Version 1.7.1 (bugfix release)
+------------------------------
+-Fixed: FLAC was broken in 1.7.0 (sorry, just a stupid mistake). ;)
+-Fixed: you can change options with analog
+
+
 Version 1.7.0
---------------------
+-------------
 -Added: Options screen
 -Added: muted volume in settings file
 -Added: Fadeout when skipping track

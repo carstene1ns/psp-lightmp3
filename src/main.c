@@ -92,7 +92,7 @@ int stopUnloadModule(SceUID modID);
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int current_mode;
-char version[10] = "1.7.0";
+char version[10] = "1.7.1";
 int oldBrightness = 0;
 char ebootDirectory[262] = "";
 char currentPlaylist[262] = "";
@@ -2721,9 +2721,9 @@ void options_menu(){
 			}
 
         //Modifica di una opzione:
-		} else if (controller.Buttons & PSP_CTRL_RIGHT || controller.Buttons & PSP_CTRL_LEFT){
+		} else if (controller.Buttons & PSP_CTRL_RIGHT || controller.Buttons & PSP_CTRL_LEFT || (controller.Lx < 128 - ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD)) || (controller.Lx > 128 + ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
                 int delta = 0;
-                if (controller.Buttons & PSP_CTRL_RIGHT)
+                if (controller.Buttons & PSP_CTRL_RIGHT || controller.Lx > 128 + ANALOG_SENS)
                     delta = 1;
                 else
                     delta = -1;
