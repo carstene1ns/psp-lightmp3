@@ -572,8 +572,8 @@ void MP3ME_Init(int channel){
 	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
     //MIN_PLAYING_SPEED=-10;
     //MAX_PLAYING_SPEED=9;
-    MIN_PLAYING_SPEED = 0;
-    MAX_PLAYING_SPEED = 0;
+    MIN_PLAYING_SPEED=0;
+    MAX_PLAYING_SPEED=0;
 	initMEAudioModules();
 }
 
