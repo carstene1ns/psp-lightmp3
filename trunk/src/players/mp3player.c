@@ -446,7 +446,8 @@ void MP3_End(){
 int MP3_Load(char *filename){
     int fd;
     eos = 0;
-    if ((fd = sceIoOpen(filename, PSP_O_RDONLY, 0777)) > 0) {
+    fd = sceIoOpen(filename, PSP_O_RDONLY, 0777);
+    if (fd >= 0) {
 		//  opened file, so get size now
 		size = sceIoLseek(fd, 0, PSP_SEEK_END);
 		sceIoLseek(fd, 0, PSP_SEEK_SET);

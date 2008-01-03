@@ -32,6 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //Globals
 /////////////////////////////////////////////////////////////////////////////////////////
+int bufferThid = -1;
 int FLAC_audio_channel;
 char FLAC_fileName[262];
 FILE *FLAC_file = 0;
@@ -197,7 +198,7 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
             //Check for playing speed:
             if (FLAC_playingSpeed){
             	FLAC__uint64 sample = (FLAC__uint64)(samples_played + FLAC_playingDelta);
-            	if (!FLAC__stream_decoder_seek_absolute(decoder, sample)) {
+            	if (sample < 0 || !FLAC__stream_decoder_seek_absolute(decoder, sample)) {
                     FLAC_setPlayingSpeed(0);
                 } else {
                 	samples_played += FLAC_playingDelta;
@@ -331,7 +332,7 @@ int FLAC_Load(char *filename){
 	FLACgetInfo(FLAC_fileName);
 
     file = sceIoOpen(FLAC_fileName, PSP_O_RDONLY, 0777);
-	if (file > 0) {
+	if (file >= 0) {
         FLAC_info.fileSize = sceIoLseek(file, 0, PSP_SEEK_END);
         sceIoClose(file);
 	}else{
@@ -339,7 +340,8 @@ int FLAC_Load(char *filename){
 	}
 
 	//Start buffer filling thread:
-	int bufferThid = sceKernelCreateThread("bufferFilling", flacThread, 0x11, 0x10000, PSP_THREAD_ATTR_USER, NULL);
+    bufferThid = -1;
+	bufferThid = sceKernelCreateThread("bufferFilling", flacThread, 0x11, 0x10000, PSP_THREAD_ATTR_USER, NULL);
 	if(bufferThid < 0)
 		return ERROR_OPENING;
 	sceKernelStartThread(bufferThid, 0, NULL);
@@ -369,6 +371,7 @@ int FLAC_Stop(){
 	isPlaying = 0;
     while (outputInProgress == 1)
         sceKernelDelayThread(100000);
+    sceKernelDeleteThread(bufferThid);
 	return 0;
 }
 

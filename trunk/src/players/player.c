@@ -182,7 +182,6 @@ char GetOMGFileType(char *fname)
     sceIoClose(fd);
 
     if (strncmp(ea3_header, "EA3", 3) != 0){
-        sceIoClose(fd);
         return UNK_TYPE;
     }
 
@@ -190,15 +189,12 @@ char GetOMGFileType(char *fname)
     {
         case 1:
         case 3:
-            sceIoClose(fd);
             return AT3_TYPE;
             break;
         case 2:
-            sceIoClose(fd);
             return MP3_TYPE;
             break;
         default:
-            sceIoClose(fd);
             return UNK_TYPE;
             break;
     }

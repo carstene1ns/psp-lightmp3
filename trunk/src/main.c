@@ -45,6 +45,7 @@
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
 PSP_HEAP_SIZE_KB(22000);
+//PSP_HEAP_SIZE_MAX();
 
 // Functions imported from support prx:
 int displayEnable(void);
@@ -92,7 +93,7 @@ int stopUnloadModule(SceUID modID);
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int current_mode;
-char version[10] = "1.7.1";
+char version[10] = "1.7.2";
 int oldBrightness = 0;
 char ebootDirectory[262] = "";
 char currentPlaylist[262] = "";

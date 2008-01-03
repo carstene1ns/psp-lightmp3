@@ -36,6 +36,7 @@
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int MP3ME_threadActive = 0;
+int MP3ME_threadExited = 1;
 char MP3ME_fileName[262];
 static int MP3ME_isPlaying = 0;
 int MP3ME_thid = -1;
@@ -146,6 +147,7 @@ int decodeThread(SceSize args, void *argp){
 
 	sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another mp3.
 	MP3ME_threadActive = 1;
+    MP3ME_threadExited = 0;
     OutputBuffer_flip = 0;
     OutputPtrME = OutputBuffer[0];
 
@@ -234,7 +236,7 @@ int decodeThread(SceSize args, void *argp){
 			// handle has been invalidated by syspend/resume/usb
 			if ( sceIoRead( MP3ME_handle, MP3ME_input_buffer, frame_size ) != frame_size ){
                 //Resume from suspend:
-                if ( MP3ME_handle )
+                if ( MP3ME_handle >= 0 )
                    sceIoClose(MP3ME_handle);
                 MP3ME_handle = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
                 if (MP3ME_handle < 0){
@@ -311,8 +313,9 @@ int decodeThread(SceSize args, void *argp){
     if (getEDRAM)
         sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer);
 
-   if ( MP3ME_handle )
+    if ( MP3ME_handle >= 0)
       sceIoClose(MP3ME_handle);
+    MP3ME_threadExited = 1;
     return 0;
 }
 
@@ -346,7 +349,8 @@ int MP3MEgetInfo(){
 	mad_header_init (&header);
     
     localBuffer = (unsigned char *) malloc(bufferSize + 8);
-    if ((fd = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777)) <= 0)
+    fd = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
+    if (fd < 0)
         return -1;
 	long size = sceIoLseek(fd, 0, PSP_SEEK_END);
     sceIoLseek(fd, 0, PSP_SEEK_SET);
@@ -595,7 +599,7 @@ int MP3ME_Load(char *fileName){
     MP3ME_eof = 0;
     MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
     if(MP3ME_thid < 0)
-        return -1;
+        return ERROR_OPENING;
 
     sceKernelStartThread(MP3ME_thid, 0, NULL);
     return OPENING_OK;
@@ -617,6 +621,9 @@ void MP3ME_Pause(){
 int MP3ME_Stop(){
     MP3ME_isPlaying = 0;
     MP3ME_threadActive = 0;
+    while (!MP3ME_threadExited)
+        sceKernelDelayThread(100000);
+    sceKernelDeleteThread(MP3ME_thid);
     return 0;
 }
 

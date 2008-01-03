@@ -55,11 +55,11 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 	{
 	opendir_safe_constructor(p);
 
-	if (chdir(directory) < 0)
+	/*if (chdir(directory) < 0)
 		{
 		opendir_close(p);
 		return("opendir_open: chdir failed");
-		}
+		}*/
 
 
 
@@ -151,13 +151,14 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 				int extOK = 0;
 				int i, j;
 				char ext[5] = "";
-				if (p->directory_entry[p->number_of_directory_entries].d_name[strlen(p->directory_entry[p->number_of_directory_entries].d_name) - 5] == '.')
-					j = 4;
-				else
+				if (p->directory_entry[p->number_of_directory_entries].d_name[strlen(p->directory_entry[p->number_of_directory_entries].d_name) - 4] == '.')
 					j = 3;
-				for (i = strlen(p->directory_entry[p->number_of_directory_entries].d_name) - j; i < strlen(p->directory_entry[p->number_of_directory_entries].d_name); i++){
+				else if (p->directory_entry[p->number_of_directory_entries].d_name[strlen(p->directory_entry[p->number_of_directory_entries].d_name) - 5] == '.')
+					j = 4;
+                else
+                    j = 0;
+				for (i = strlen(p->directory_entry[p->number_of_directory_entries].d_name) - j; i < strlen(p->directory_entry[p->number_of_directory_entries].d_name); i++)
 					ext[i - strlen(p->directory_entry[p->number_of_directory_entries].d_name) + j] = toupper(p->directory_entry[p->number_of_directory_entries].d_name[i]);
-				}
 
 				extOK = 0;
 				for (i = 0; i < extNumber; i++){
@@ -171,9 +172,8 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 				}
 			}else if (FIO_S_ISDIR(p->directory_entry[p->number_of_directory_entries].d_stat.st_mode)){
 				//Salto le directory se devo:
-				if (includeDirs == 0){
+				if (includeDirs == 0)
 					continue;
-				}
 			}
 			//Elemento ok:
 			p->number_of_directory_entries++;
