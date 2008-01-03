@@ -23,7 +23,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
-//#include "log.h"
 
 #include "player.h"
 #include "aa3playerME.h"
@@ -32,7 +31,7 @@
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int AA3ME_threadActive = 0;
-int AA3ME_threadExited = 0;
+int AA3ME_threadExited = 1;
 char AA3ME_fileName[262];
 static int AA3ME_isPlaying = 0;
 int AA3ME_thid = -1;
@@ -261,6 +260,112 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Get tag info:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void readTagData(FILE *fp, int tagLength, char *tagValue){
+    int i;
+    int count = 0;
+    char carattere[tagLength];
+
+    strcpy(tagValue, "");
+    tagValue[0] = '\0';
+
+    fread(carattere, sizeof(char), tagLength, fp);
+    for (i=0; i<tagLength; i++){
+        if ((int)carattere[i] >= 32){
+            tagValue[count] = carattere[i];
+            count++;
+        }
+    }
+    tagValue[count] = '\0';
+}
+
+int convInt32BigToHost(int arg)
+{
+   int i=0;
+   int checkEndian = 1;
+   if( 1 == *(char *)&checkEndian )
+   {
+      // Intel (little endian)
+      i=arg;
+      i=((i&0xFF000000)>>24)|((i&0x00FF0000)>>8)|((i&0x0000FF00)<<8)|((i&0x000000FF)<<24);
+   }
+   else
+   {
+      // PPC (big endian)
+      i=arg;
+   }
+   return i;
+}
+
+void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
+    FILE *fp = NULL;
+
+    int size;
+    int tag_length;
+    char tag[4];
+
+    size = GetID3TagSize(filename);
+
+    fp = fopen(filename, "rb");
+    if (fp == NULL) return;
+    fseek(fp, 10, SEEK_SET);
+
+    while (size != 0) {
+        fread(tag, sizeof(char), 4, fp);
+        size -= 4;
+
+        /* read 4 byte big endian tag length */
+        fread(&tag_length, sizeof(unsigned int), 1, fp);
+        tag_length = (unsigned int) convInt32BigToHost((int)tag_length);
+        size -= 4;
+
+        fseek(fp, 2, SEEK_CUR);
+        size -= 2;
+
+        /* Perform checks for end of tags and tag length overflow or zero */
+        if(*tag == 0 || tag_length > size || tag_length == 0) break;
+
+        if(!strncmp("TPE1",tag,4)) /* Artist */
+        {
+            readTagData(fp, tag_length, targetInfo->artist);
+        }
+        else if(!strncmp("TIT2",tag,4)) /* Title */
+        {
+            readTagData(fp, tag_length, targetInfo->title);
+        }
+        else if(!strncmp("TALB",tag,4)) /* Album */
+        {
+            readTagData(fp, tag_length, targetInfo->album);
+        }
+        else if(!strncmp("TRCK",tag,4)) /* Track No. */
+        {
+            readTagData(fp, tag_length, targetInfo->trackNumber);
+        }
+        else if(!strncmp("TYER",tag,4)) /* Year */
+        {
+            readTagData(fp, tag_length, targetInfo->year);
+        }
+        else if(!strncmp("TCON",tag,4)) /* Genre */
+        {
+            readTagData(fp, tag_length, targetInfo->genre);
+        }
+        else
+        {
+            fseek(fp, tag_length, SEEK_CUR);
+        }
+        size -= tag_length;
+	}
+	fclose(fp);
+}
+
+struct fileInfo AA3ME_GetTagInfoOnly(char *filename){
+    struct fileInfo tempInfo;
+    getAA3METagInfo(filename, &tempInfo);
+	return tempInfo;
+}
+
 //Get info on file:
 int AA3MEgetInfo(){
     AA3ME_info.fileType = AT3_TYPE;
@@ -272,9 +377,6 @@ int AA3MEgetInfo(){
     int tag_size;
     float totalPlayingTime = 0;
     
-    OutputBuffer_flip = 0;
-    AT3_OutputPtr = AT3_OutputBuffer[0];
-
     tag_size = GetID3TagSize(AA3ME_fileName);
     fd = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
     if (fd < 0)
@@ -342,6 +444,8 @@ int AA3MEgetInfo(){
 	strcpy(AA3ME_info.mode, "joint (MS/intensity) stereo");
 	strcpy(AA3ME_info.emphasis,"no");
 	sceIoClose(fd);
+
+    getAA3METagInfo(AA3ME_fileName, &AA3ME_info);
     return 0;
 }
 
@@ -400,6 +504,7 @@ int AA3ME_Stop(){
     AA3ME_threadActive = 0;
     while (!AA3ME_threadExited)
         sceKernelDelayThread(100000);
+    sceKernelDeleteThread(AA3ME_thid);
     return 0;
 }
 
@@ -421,112 +526,6 @@ int AA3ME_GetPercentage(){
     return (int)(AA3ME_playingTime/(double)AA3ME_info.length*100.0);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Get tag info:
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void readTagData(FILE *fp, int tagLength, char *tagValue){
-    int i;
-    int count = 0;
-    char carattere[tagLength];
-    
-    strcpy(tagValue, "");
-    tagValue[0] = '\0';
-
-    fread(carattere, sizeof(char), tagLength, fp);
-    for (i=0; i<tagLength; i++){
-        if ((int)carattere[i] >= 32){
-            tagValue[count] = carattere[i];
-            count++;
-        }
-    }
-    tagValue[count] = '\0';
-}
-
-int convInt32BigToHost(int arg)
-{
-   int i=0;
-   int checkEndian = 1;
-   if( 1 == *(char *)&checkEndian )
-   {
-      // Intel (little endian)
-      i=arg;
-      i=((i&0xFF000000)>>24)|((i&0x00FF0000)>>8)|((i&0x0000FF00)<<8)|((i&0x000000FF)<<24);
-   }
-   else
-   {
-      // PPC (big endian)
-      i=arg;
-   }
-   return i;
-}
-
-void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
-    FILE *fp = NULL;
-
-    int size;
-    int tag_length;
-    char tag[4];
-    
-    size = GetID3TagSize(filename);
-    
-    fp = fopen(filename, "rb");
-    if (fp == NULL) return;
-    fseek(fp, 10, SEEK_SET);
-
-    while (size != 0) {
-        fread(tag, sizeof(char), 4, fp);
-        size -= 4;
-
-        /* read 4 byte big endian tag length */
-        fread(&tag_length, sizeof(unsigned int), 1, fp);
-        tag_length = (unsigned int) convInt32BigToHost((int)tag_length);
-        size -= 4;
-
-        fseek(fp, 2, SEEK_CUR);
-        size -= 2;
-
-        /* Perform checks for end of tags and tag length overflow or zero */
-        if(*tag == 0 || tag_length > size || tag_length == 0) break;
-        
-        if(!strncmp("TPE1",tag,4)) /* Artist */
-        {
-            readTagData(fp, tag_length, targetInfo->artist);
-        }
-        else if(!strncmp("TIT2",tag,4)) /* Title */
-        {
-            readTagData(fp, tag_length, targetInfo->title);
-        }
-        else if(!strncmp("TALB",tag,4)) /* Album */
-        {
-            readTagData(fp, tag_length, targetInfo->album);
-        }
-        else if(!strncmp("TRCK",tag,4)) /* Track No. */
-        {
-            readTagData(fp, tag_length, targetInfo->trackNumber);
-        }
-        else if(!strncmp("TYER",tag,4)) /* Year */
-        {
-            readTagData(fp, tag_length, targetInfo->year);
-        }
-        else if(!strncmp("TCON",tag,4)) /* Genre */
-        {
-            readTagData(fp, tag_length, targetInfo->genre);
-        }
-        else
-        {
-            fseek(fp, tag_length, SEEK_CUR);
-        }
-        size -= tag_length;
-	}
-	fclose(fp);
-}
-
-struct fileInfo AA3ME_GetTagInfoOnly(char *filename){
-    struct fileInfo tempInfo;
-    getAA3METagInfo(filename, &tempInfo);
-	return tempInfo;
-}
 
 int AA3ME_isFilterSupported(){
 	return 0;

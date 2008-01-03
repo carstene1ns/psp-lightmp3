@@ -31,10 +31,8 @@ int openLog(char *fileName, int append){
     	logFileO = sceIoOpen(fileName, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
     else
         logFileO = sceIoOpen(fileName, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_APPEND, 0777);
-	if (!logFileO)
-	{
+	if (logFileO < 0)
 		return(-1);
-	}
 	sceIoClose(logFileO);
 	enabled = 1;
 	return(0);
@@ -49,11 +47,13 @@ int writeLog(char *text){
 		}
 		writing = 1;
 		SceUID logFileO; 
-		int byteW;
+		int byteW = 0;
 
 		logFileO = sceIoOpen(logFile, PSP_O_WRONLY|PSP_O_APPEND, 0777);
-		byteW = sceIoWrite(logFileO, text, strlen(text));
-		sceIoClose(logFileO);
+		if (logFileO >= 0){
+    		byteW = sceIoWrite(logFileO, text, strlen(text));
+    		sceIoClose(logFileO);
+        }
 		writing = 0;
 		return(byteW);
 	}

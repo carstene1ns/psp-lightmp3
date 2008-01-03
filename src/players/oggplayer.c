@@ -232,7 +232,7 @@ int OGG_Load(char *filename){
 	strcpy(OGG_fileName, filename);
 	//Apro il file OGG:
     OGG_file = sceIoOpen(OGG_fileName, PSP_O_RDONLY, 0777);
-	if (OGG_file > 0) {
+	if (OGG_file >= 0) {
         OGG_info.fileSize = sceIoLseek(OGG_file, 0, PSP_SEEK_END);
         sceIoLseek(OGG_file, 0, PSP_SEEK_SET);
         ov_callbacks ogg_callbacks;
@@ -277,7 +277,7 @@ int OGG_Stop(){
 
 void OGG_FreeTune(){
 	ov_clear(&OGG_VorbisFile);
-    if (OGG_file)
+    if (OGG_file >= 0)
         sceIoClose(OGG_file);   
 }
 
@@ -308,7 +308,7 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
 
 	//Apro il file OGG:
 	tempFile = sceIoOpen(filename, PSP_O_RDONLY, 0777);
-	if (tempFile > 0) {
+	if (tempFile >= 0) {
         sceIoLseek(tempFile, 0, PSP_SEEK_SET);
         ov_callbacks ogg_callbacks;
 
@@ -323,7 +323,7 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
         }
         getOGGTagInfo(vf, &tempInfo);
         ov_clear(&vf);
-        if (tempFile > 0)
+        if (tempFile >= 0)
             sceIoClose(tempFile);
 	}
     return tempInfo;

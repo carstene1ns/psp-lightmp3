@@ -402,11 +402,8 @@ int ParseID3v1(const char *mp3path, struct ID3Tag *id3tag){
     int id3fd; //our local file descriptor
     char id3buffer[512];
     id3fd = sceIoOpen(mp3path, 0x0001, 0777);
-
     if (id3fd < 0)
-    {
         return -1;
-    }
     sceIoLseek(id3fd, -128, SEEK_END);
     sceIoRead(id3fd,id3buffer,128);
 
