@@ -36,6 +36,7 @@ typedef struct {
   int volumeright;
   pspAudioCallback_t callback;
   void *pdata;
+  int threadActive;
 } psp_audio_channelinfo;
 
 typedef int (* pspAudioThreadfunc_t)(int args, void *argp);

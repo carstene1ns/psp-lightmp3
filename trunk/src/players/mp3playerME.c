@@ -599,7 +599,7 @@ int MP3ME_Load(char *fileName){
     MP3ME_eof = 0;
     MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
     if(MP3ME_thid < 0)
-        return ERROR_OPENING;
+        return ERROR_CREATE_THREAD;
 
     sceKernelStartThread(MP3ME_thid, 0, NULL);
     return OPENING_OK;

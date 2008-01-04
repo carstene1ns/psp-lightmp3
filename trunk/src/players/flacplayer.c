@@ -343,7 +343,7 @@ int FLAC_Load(char *filename){
     bufferThid = -1;
 	bufferThid = sceKernelCreateThread("bufferFilling", flacThread, 0x11, 0x10000, PSP_THREAD_ATTR_USER, NULL);
 	if(bufferThid < 0)
-		return ERROR_OPENING;
+		return ERROR_CREATE_THREAD;
 	sceKernelStartThread(bufferThid, 0, NULL);
 
     //Controllo il sample rate:

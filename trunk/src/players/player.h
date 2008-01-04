@@ -37,6 +37,7 @@
 #define ERROR_OPENING -1
 #define ERROR_INVALID_SAMPLE_RATE -2
 #define ERROR_MEMORY -3
+#define ERROR_CREATE_THREAD -4
 
 #define MP3_TYPE 0
 #define OGG_TYPE 1

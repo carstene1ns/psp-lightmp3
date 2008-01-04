@@ -33,6 +33,7 @@
 #include "players/player.h"
 
 //#include "osk.h"
+#include "exception.h"
 #include "usb.h"
 #include "settings.h"
 #include "opendir.h"
@@ -45,7 +46,6 @@
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
 PSP_HEAP_SIZE_KB(22000);
-//PSP_HEAP_SIZE_MAX();
 
 // Functions imported from support prx:
 int displayEnable(void);
@@ -1189,6 +1189,8 @@ int playFile(char *filename, char *numbers, char *message) {
               pspDebugScreenPrintf("Invalid sample rate!");
           }else if (retLoad == ERROR_MEMORY){
               pspDebugScreenPrintf("Memory error!");
+          }else if (retLoad == ERROR_CREATE_THREAD){
+              pspDebugScreenPrintf("Error creating thread!");
           }
 		  unsetAudioFunctions();
 		  sceKernelDelayThread(1000000);
@@ -2838,7 +2840,8 @@ void options_menu(){
 int main() {
 	pspDebugScreenInit();
 	//SetupCallbacks();
-
+    initExceptionHandler();
+    
     //Start support prx
 	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
 	if (modid < 0){
