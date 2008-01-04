@@ -84,6 +84,7 @@ static int AudioChannelThread(int args, void *argp)
         volatile int bufidx=0;
         int channel=*(int *)argp;
 
+        AudioStatus[channel].threadActive = 1;
         while (audio_terminate==0) {
                 void *bufptr=&audio_sndbuf[channel][bufidx];
                 pspAudioCallback_t callback;
@@ -101,6 +102,7 @@ static int AudioChannelThread(int args, void *argp)
                 sceKernelSignalSema(play_sema, 1);
                 bufidx=(bufidx?0:1);
         }
+        AudioStatus[channel].threadActive = 0;
         sceKernelExitThread(0);
         return 0;
 }
@@ -216,6 +218,8 @@ void pspAudioEnd()
         for (i=0; i<PSP_NUM_AUDIO_CHANNELS; i++) {
                 if (AudioStatus[i].threadhandle != -1) {
                         //sceKernelWaitThreadEnd(AudioStatus[i].threadhandle,NULL);
+                        while (AudioStatus[i].threadActive)
+                            sceKernelDelayThread(100000);
                         sceKernelDeleteThread(AudioStatus[i].threadhandle);
                 }
                 AudioStatus[i].threadhandle = -1;
