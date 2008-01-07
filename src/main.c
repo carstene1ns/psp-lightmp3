@@ -32,7 +32,7 @@
 #include "players/pspaudiolib.h"
 #include "players/player.h"
 
-//#include "osk.h"
+#include "osk.h"
 #include "exception.h"
 #include "usb.h"
 #include "settings.h"
@@ -45,7 +45,7 @@
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
-PSP_HEAP_SIZE_KB(22000);
+PSP_HEAP_SIZE_KB(21000);
 
 // Functions imported from support prx:
 int displayEnable(void);
@@ -450,10 +450,10 @@ int askString(char *string){
 	//Salvo il nome:
 	strcpy(oldName, string);
 
-    /*if (userSettings.USE_OSK){
+    if (userSettings.USE_OSK){
         string = requestString(oldName);
         return 0;
-    }*/
+    }
         
 	pspDebugScreenSetBackColor(BLACK);
 	for (i=0; i < 5 ; i++){
@@ -758,8 +758,11 @@ void drawVolumeBar(x, y){
 //Confirm exit:
 int exitScreen(){
     int ret = confirm("Exit LightMP3?", 0x882200);
-    if (ret)
+    if (ret){
+       if (endFunct != NULL)
+          (*endFunct)();
        runningFlag = 0;
+    }
     return ret;
 }
 
@@ -2477,6 +2480,11 @@ void playlist_editor(){
 						pspDebugScreenSetXY(0, 21);
 						pspDebugScreenPrintf("%-20.20s", "");
 					}
+                    if (userSettings.USE_OSK){
+                    	screen_init();
+                    	screen_toolbar();
+                        screen_playlistEditor_init();
+                    }
 				}
 			} else if (controller.Buttons & PSP_CTRL_SELECT && M3U_getSongCount() > 0){
 				if (confirm("Clear the playlist?", BLACK) == 1){
@@ -2591,8 +2599,8 @@ void playlist_editor(){
 //Options menu:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void options_menu(){
-    int optionsNumber = 13;
-    char optionsText[13][51] = {"Audio Scrobbler Log",
+    int optionsNumber = 14;
+    char optionsText[14][51] = {"Audio Scrobbler Log",
                                 "Fadeout when skipping track",
                                 "Muted volume",
                                 "Brightness check",
@@ -2604,7 +2612,8 @@ void options_menu(){
                                 "CPU Clock: MP3 Media Engine",
                                 "CPU Clock: OGG Vorbis",
                                 "CPU Clock: Flac",
-                                "CPU Clock: ATRAC3"
+                                "CPU Clock: ATRAC3",
+                                "Use Sony OSK"
                                };
 	int selected_entry         = 0;
 	int top_entry              = 0;
@@ -2682,6 +2691,9 @@ void options_menu(){
                         break;
                     case 12:
                         sprintf(optionValue, "%i", userSettings.CLOCK_AA3);
+                        break;
+                    case 13:
+                        sprintf(optionValue, "%i", userSettings.USE_OSK);
                         break;
                     default:
                         strcpy(optionValue, "");
@@ -2805,6 +2817,9 @@ void options_menu(){
                             userSettings.CLOCK_AA3 = 222;
                         else if (userSettings.CLOCK_AA3 < 10)
                             userSettings.CLOCK_AA3 = 10;
+                        break;
+                    case 13:
+                        userSettings.USE_OSK= !userSettings.USE_OSK;
                         break;
                 }
                 sceKernelDelayThread(200000);

@@ -3,6 +3,7 @@ LightMP3 Changelog
 
 Version 1.7.2
 -------------
+-Added: Option to use the Sony On Screen Keyboard
 -Fixed: A file named like "dfgeerr...mp3" wasn't recognized as an mp3
 -Fixed: Freeze on "Opening..." or no sound while playing (mostly with MP3/ATRAC3 using Media Engine)
 
