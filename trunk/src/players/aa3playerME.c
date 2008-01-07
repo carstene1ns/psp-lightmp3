@@ -266,14 +266,15 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 void readTagData(FILE *fp, int tagLength, char *tagValue){
     int i;
     int count = 0;
-    char carattere[tagLength];
+    unsigned char carattere[tagLength];
 
     strcpy(tagValue, "");
     tagValue[0] = '\0';
 
     fread(carattere, sizeof(char), tagLength, fp);
     for (i=0; i<tagLength; i++){
-        if ((int)carattere[i] >= 32){
+        if ((carattere[i] >= 0x20) && (carattere[i] <= 0x7f)){
+        //if ((int)carattere[i] >= 32){
             tagValue[count] = carattere[i];
             count++;
         }
