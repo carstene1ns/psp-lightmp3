@@ -182,16 +182,21 @@ int get_text_osk(char *input, unsigned short *intext, unsigned short *desc){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // requestString:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-char *requestString (char *initialStr){
+char *requestString (char *descStr, char *initialStr){
 	int ok, i;
 	static char str[64];
 	unsigned short intext[128]  = { 0 }; // text already in the edit box on start
-	unsigned short desc[128]	= { 'E', 'n', 't', 'e', 'r', ' ', 'S', 't', 'r', 'i', 'n', 'g', 0 }; // description
+	unsigned short desc[128]  = { 0 };
+	//unsigned short desc[128]	= { 'E', 'n', 't', 'e', 'r', ' ', 'S', 't', 'r', 'i', 'n', 'g', 0 }; // description
 
 	if (initialStr[0] != 0)
 		for (i=0; i<=strlen(initialStr); i++)
 			intext[i] = (unsigned short)initialStr[i];
 
+	if (descStr[0] != 0)
+		for (i=0; i<=strlen(descStr); i++)
+			desc[i] = (unsigned short)descStr[i];
+			
 	ok = get_text_osk(str, intext, desc);
 
 	pspDebugScreenInit();

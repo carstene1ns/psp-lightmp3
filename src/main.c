@@ -86,6 +86,10 @@ int stopUnloadModule(SceUID modID);
 #define MODE_REPEAT 2
 #define MODE_SHUFFLE 3
 
+//Costanti per sleep mode:
+#define SLEEP_TRACK 1
+#define SLEEP_PLAYLIST 2
+
 //Sensibilità analogico:
 #define ANALOG_SENS 80
 
@@ -105,6 +109,10 @@ char scrobblerLog[262] = "";
 int playingMode = 0;
 char playingModeDesc[4][13] = {"Normal ", "Repeat all", "Repeat track", "Shuffle"};
 int volumeBoost = 0;
+
+int flagStandby = 0;
+int sleepMode = 0;
+char sleepModeDesc[3][30] = {"", "End of track", "End of directory/playlist"};
 
 int curBrightness = 0;
 int displayStatus = 1;
@@ -451,7 +459,7 @@ int askString(char *string){
 	strcpy(oldName, string);
 
     if (userSettings.USE_OSK){
-        string = requestString(oldName);
+        string = requestString("Insert playlist name", oldName);
         return 0;
     }
         
@@ -1055,9 +1063,9 @@ void screen_player_init(char *filename, struct fileInfo tag, char *numbers){
 	pspDebugScreenSetXY(0, 27);
 	pspDebugScreenPrintf("Press X to pause, press O to stop");
 	pspDebugScreenPrintf("\n");
-	pspDebugScreenPrintf("Press SQUARE to toggle mute, press SELECT to switch mode");
+	pspDebugScreenPrintf("Press SQUARE to toggle mute, press SELECT to switch play mode");
     pspDebugScreenPrintf("\n");
-    pspDebugScreenPrintf("Press L/R to change track");
+    pspDebugScreenPrintf("Press L/R to change track, press TRIANGLE to switch sleep mode");
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press UP/DOWN to change volume boost value");
 	pspDebugScreenPrintf("\n");
@@ -1166,6 +1174,13 @@ int playFile(char *filename, char *numbers, char *message) {
 	  pspDebugScreenSetTextColor(YELLOW);
 	  pspDebugScreenPrintf("Play mode  : %-20.20s", playingModeDesc[playingMode]);
 
+      //Testo del modo di sleep:
+      if (sleepMode){
+      	  pspDebugScreenSetXY(0, 3);
+    	  pspDebugScreenSetBackColor(BLACK);
+    	  pspDebugScreenSetTextColor(RED);
+    	  pspDebugScreenPrintf("Sleep mode : %-40.40s", sleepModeDesc[sleepMode]);
+      }
 	  (*initFunct)(0);
 	  (*setVolumeBoostFunct)(volumeBoost);
 	  setVolume(0,0x8000);
@@ -1249,9 +1264,9 @@ int playFile(char *filename, char *numbers, char *message) {
 					scePowerTick(0);
 				}
 			}
-			if (++updateInfo == 15){
+			if (++updateInfo == 15)
 				updateInfo = 0;
-			}
+
 			readButtons(&pad, 1);
 			sceHprmPeekCurrentKey(&remoteButtons);
 
@@ -1312,7 +1327,6 @@ int playFile(char *filename, char *numbers, char *message) {
 			} else if(pad.Ly > 128 + ANALOG_SENS && !(pad.Buttons & PSP_CTRL_HOLD)) {
 				if (clock >= 10){
 					clock--;
-					//scePowerSetCpuClockFrequency(clock);
                     setCpuClock(clock);
 					screen_sysinfo();
 					sceKernelDelayThread(100000);
@@ -1320,7 +1334,6 @@ int playFile(char *filename, char *numbers, char *message) {
 			} else if(pad.Ly < 128 - ANALOG_SENS && !(pad.Buttons & PSP_CTRL_HOLD)) {
 				if (clock <= 222){
 					clock++;
-					//scePowerSetCpuClockFrequency(clock);
                     setCpuClock(clock);
 					screen_sysinfo();
 					sceKernelDelayThread(100000);
@@ -1384,6 +1397,21 @@ int playFile(char *filename, char *numbers, char *message) {
 					(*setMuteFunct)(muted);
 					sceKernelDelayThread(400000);
 				}
+			} else if(pad.Buttons & PSP_CTRL_TRIANGLE) {
+				//Change sleep mode:
+				if (++sleepMode > SLEEP_PLAYLIST){
+					sleepMode = 0;
+    				pspDebugScreenSetXY(0, 3);
+    				pspDebugScreenSetBackColor(BLACK);
+    				pspDebugScreenSetTextColor(RED);
+    				pspDebugScreenPrintf("%-60.60s", "");
+                }else{
+    				pspDebugScreenSetXY(0, 3);
+    				pspDebugScreenSetBackColor(BLACK);
+    				pspDebugScreenSetTextColor(RED);
+    				pspDebugScreenPrintf("Sleep mode : %-40.40s", sleepModeDesc[sleepMode]);
+                }
+				sceKernelDelayThread(400000);
 			} else if(pad.Buttons & PSP_CTRL_SELECT) {
 				//Change playing mode:
 				if (++playingMode > MODE_SHUFFLE){
@@ -1472,6 +1500,12 @@ int playFile(char *filename, char *numbers, char *message) {
 	  //Imposto il clock:
       if (userSettings.CLOCK_AUTO)
           setCpuClock(userSettings.CLOCK_GUI);
+          
+      //Sleep mode:
+      if (sleepMode == SLEEP_TRACK){
+          runningFlag = 0;
+          flagStandby = 1;
+      }
 	  return(retVal);
 }
 
@@ -1566,10 +1600,6 @@ void playDirectory(char *dirName, char *initialFileName){
 			}else if (playerReturn == -1){
 				//Controllo se sono in shuffle:
 				if (playingMode == MODE_SHUFFLE){
-					/*i = randomTrack(dirToPlay.number_of_directory_entries, playedTracksNumber, playedTracks);
-					if (i == -1){
-						break;
-					}*/
 					if (currentTrack){
 						i = playedTracks[--currentTrack];
 					}
@@ -1590,6 +1620,12 @@ void playDirectory(char *dirName, char *initialFileName){
       displayStatus = 1;
     }
 	opendir_close(&dirToPlay);
+	
+    //Sleep mode:
+    if (sleepMode == SLEEP_PLAYLIST){
+      runningFlag = 0;
+      flagStandby = 1;
+    }
 	return;
 }
 
@@ -1688,6 +1724,11 @@ void playM3U(char *m3uName){
 	  displayEnable();
       setBrightness(curBrightness);
 	}
+    //Sleep mode:
+    if (sleepMode == SLEEP_PLAYLIST){
+      runningFlag = 0;
+      flagStandby = 1;
+    }
 	return;
 }
 
@@ -2917,11 +2958,13 @@ int main() {
     else
         scePowerSetClockFrequency(222, 222, 95);
 
-	//scePowerSetCpuClockFrequency(userSettings.CPU);
-    setCpuClock(userSettings.CPU);
-    if (scePowerGetCpuClockFrequency() < userSettings.CPU){
-        //scePowerSetCpuClockFrequency(++userSettings.CPU);
-        setCpuClock(++userSettings.CPU);
+    //Imposto il clock:
+    if (userSettings.CLOCK_AUTO)
+        setCpuClock(userSettings.CLOCK_GUI);
+    else{
+        setCpuClock(userSettings.CPU);
+        if (scePowerGetCpuClockFrequency() < userSettings.CPU)
+            setCpuClock(++userSettings.CPU);
     }
 
     if (sceKernelDevkitVersion() < 0x03070110){
@@ -3019,7 +3062,9 @@ int main() {
     imposeSetVolume(initialVolume);             
     if (initialMute)
         imposeSetMute(initialMute);
-    
+
+    if (flagStandby)
+        scePowerRequestStandby();
 	sceKernelExitGame();
 	return(0);
 }

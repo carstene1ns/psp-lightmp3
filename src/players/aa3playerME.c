@@ -22,7 +22,6 @@
 //    and the source code of Music prx by joek2100
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
 
 #include "player.h"
 #include "aa3playerME.h"
