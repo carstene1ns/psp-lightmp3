@@ -9,7 +9,7 @@ LightMP3 is ditributed under GNU General Public License, read LICENSE.TXT for de
 
 WHAT'S THAT?
 ------------
-LightMP3 is a basic mp3/ogg Vorbis player designed to drain little energy from your battery.
+LightMP3 is a basic mp3/OGG Vorbis/FLAC/Atrac3+ player designed to drain little energy from your battery.
 Can decode 128kbit (tested also with 160, 193, 320) MP3 at 70mhz CPU and 54mhz BUS.
 Can decode 128kbit (tested also with 160, 193, 320) OGG Vorbis at 60mhz CPU and 54mhz BUS.
 With battery at 100% and display set to minimum brightness it should last 9 hours.
@@ -31,12 +31,15 @@ FEATURES
 -Plays mp3 up to ~22Mb (sorry, no streaming/buffering...sorry: it's my first C program)
 -Plays OGG vorbis with 8khz, 11khz, 12khz, 16khz, 22khz, 24khz, 32khz, 44khz, 48khz sample rate
 -Plays OGG vorbis file without filesize limit
+-Plays FLAC
+-Plays ATRAC3+
 -Detailed ID3v1 and file information
 -Works with remote controller
 -Four playing mode: Normal, Repeat, Repeat All and Shuffle
 -Boost output volume
 -Equalizer presets (only for MP3 libMAD): Rock, Classical, Pop, Dance, Reaggae, Soft
 -Audioscrobbler log (you can upload you log to your last.fm's account with this page http://paulstead.com/scrob/)
+-Sleep mode (the psp will shutdown automatically at the end of a track or directory/playlist)
 
 
 LIBMAD EQUALIZERS
@@ -95,4 +98,4 @@ MANY THANKS TO
 -John_K & adresd (PSPMediaCenter authors)
 -Xart for the ID3v2 tag code.
 -joek2100 for the Media Engine functions (taken from Music prx 0.55 and adapted)
--JLF65 for the FLAC playback function
+-JLF65 for the FLAC playback function and testing
