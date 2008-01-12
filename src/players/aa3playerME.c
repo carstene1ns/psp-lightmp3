@@ -362,6 +362,7 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
 
 struct fileInfo AA3ME_GetTagInfoOnly(char *filename){
     struct fileInfo tempInfo;
+    initFileInfo(&tempInfo);
     getAA3METagInfo(filename, &tempInfo);
 	return tempInfo;
 }
@@ -465,6 +466,7 @@ void AA3ME_Init(int channel){
 int AA3ME_Load(char *fileName){
     AA3ME_playingSpeed = 0;
     AA3ME_isPlaying = 0;
+    initFileInfo(&AA3ME_info);
     strcpy(AA3ME_fileName, fileName);
     if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;

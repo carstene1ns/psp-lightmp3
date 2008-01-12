@@ -43,7 +43,7 @@ int MP3ME_thid = -1;
 int MP3ME_audio_channel = 0;
 int MP3ME_eof = 0;
 struct fileInfo MP3ME_info;
-    int MP3ME_playingSpeed = 0; // 0 = normal
+int MP3ME_playingSpeed = 0; // 0 = normal
 int MP3ME_volume_boost = 0;
 float MP3ME_playingTime = 0;
 int MP3ME_volume = 0;
@@ -232,6 +232,7 @@ int decodeThread(SceSize args, void *argp){
 			   MP3ME_eof = 1;
 			   continue;
 			}
+
 			//since we check for eof above, this can only happen when the file
 			// handle has been invalidated by syspend/resume/usb
 			if ( sceIoRead( MP3ME_handle, MP3ME_input_buffer, frame_size ) != frame_size ){
@@ -583,6 +584,7 @@ void MP3ME_Init(int channel){
 
 
 int MP3ME_Load(char *fileName){
+    initFileInfo(&MP3ME_info);
     strcpy(MP3ME_fileName, fileName);
     if (MP3MEgetInfo() != 0){
         strcpy(MP3ME_fileName, "");
@@ -686,6 +688,7 @@ void MP3ME_GetTimeString(char *dest){
 
 struct fileInfo MP3ME_GetTagInfoOnly(char *filename){
     struct fileInfo tempInfo;
+    initFileInfo(&tempInfo);
     getMP3METagInfo(filename, &tempInfo);
 	return tempInfo;
 }

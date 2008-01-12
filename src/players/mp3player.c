@@ -446,6 +446,7 @@ void MP3_End(){
 int MP3_Load(char *filename){
     int fd;
     eos = 0;
+    initFileInfo(&MP3_info);
     fd = sceIoOpen(filename, PSP_O_RDONLY, 0777);
     if (fd >= 0) {
 		//  opened file, so get size now
@@ -569,6 +570,7 @@ struct fileInfo MP3_GetInfo(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct fileInfo MP3_GetTagInfoOnly(char *filename){
     struct fileInfo tempInfo;
+    initFileInfo(&tempInfo);
     getMP3TagInfo(filename, &tempInfo);
 	return tempInfo;
 }

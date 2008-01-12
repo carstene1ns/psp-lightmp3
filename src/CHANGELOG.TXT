@@ -4,10 +4,12 @@ LightMP3 Changelog
 Version 1.7.2
 -------------
 -Added: Sleep mode (press TRIANGLE while playing a track).
-        The psp will shut down after the track or playlist/directory
+        The psp will shutdown after the track or playlist/directory.
+        @mico: va bene così? ;)
 -Added: Option to use the Sony On Screen Keyboard
 -Fixed: Files named like "dfgeerr...mp3" weren't recognized as mp3
 -Fixed: Freeze on "Opening..." or time stucked at 0 after 20 tracks
+-Fixed: Repeat track mode.
 
 
 Version 1.7.1 (bugfix release)

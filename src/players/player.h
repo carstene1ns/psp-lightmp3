@@ -148,5 +148,4 @@ int endAudioLib();
 int setAudioFrequency(unsigned short samples, unsigned short freq, char car);
 int releaseAudio(void);
 int audioOutput(int volume, void *buffer);
-
-
+void initFileInfo(struct fileInfo *info);
