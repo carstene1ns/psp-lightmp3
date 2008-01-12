@@ -250,13 +250,6 @@ void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 	char value[257];
 	FLAC__StreamMetadata *info = 0;
 
-    strcpy(targetInfo->title, "");
-    strcpy(targetInfo->album, "");
-    strcpy(targetInfo->artist, "");
-	strcpy(targetInfo->genre, "");
-    strcpy(targetInfo->year, "");
-    strcpy(targetInfo->trackNumber, "");
-
 	if (FLAC__metadata_get_tags(filename, &info)) {
 		if(info->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
 			for(i = 0; i < info->data.vorbis_comment.num_comments; ++i) {
@@ -327,6 +320,7 @@ int FLAC_Load(char *filename){
 	isPlaying = 0;
 	FLAC_eos = 0;
     FLAC_playingSpeed = 0;
+    initFileInfo(&FLAC_info);
 	strcpy(FLAC_fileName, filename);
 
 	FLACgetInfo(FLAC_fileName);
@@ -410,9 +404,8 @@ struct fileInfo FLAC_GetInfo(){
 
 struct fileInfo FLAC_GetTagInfoOnly(char *filename){
     struct fileInfo tempInfo;
-
+    initFileInfo(&tempInfo);
     getFLACTagInfo(filename, &tempInfo);
-
     return tempInfo;
 }
 

@@ -155,19 +155,12 @@ void splitComment(char *comment, char *name, char *value){
 }
 
 
-void getOGGTagInfo(OggVorbis_File OGG_VorbisFile, struct fileInfo *targetInfo){
+void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
 	int i;
-	vorbis_comment *comment;
 	char name[31];
 	char value[257];
 
-    strcpy(targetInfo->title, "");
-    strcpy(targetInfo->album, "");
-    strcpy(targetInfo->artist, "");
-    strcpy(targetInfo->genre, "");
-    strcpy(targetInfo->year, "");
-    strcpy(targetInfo->trackNumber, "");
-	comment = ov_comment(&OGG_VorbisFile, -1);
+	vorbis_comment *comment = ov_comment(inVorbisFile, -1);
 	for (i=0;i<comment->comments; i++){
 		splitComment(comment->user_comments[i], name, value);
 		if (!strcmp(name, "TITLE"))
@@ -187,10 +180,11 @@ void getOGGTagInfo(OggVorbis_File OGG_VorbisFile, struct fileInfo *targetInfo){
 
 void OGGgetInfo(){
     //Estraggo le informazioni:
-	vorbis_info *vi = ov_info(&OGG_VorbisFile, -1);
     OGG_info.fileType = OGG_TYPE;
     OGG_info.defaultCPUClock = OGG_defaultCPUClock;
     OGG_info.needsME = 0;
+    
+    vorbis_info *vi = ov_info(&OGG_VorbisFile, -1);
 	OGG_info.kbit = vi->bitrate_nominal/1000;
     OGG_info.instantBitrate = vi->bitrate_nominal;
 	OGG_info.hz = vi->rate;
@@ -210,7 +204,7 @@ void OGGgetInfo(){
 	s = secs - h * 3600 - m * 60;
 	snprintf(OGG_info.strLength, sizeof(OGG_info.strLength), "%2.2i:%2.2i:%2.2i", h, m, s);
 
-    getOGGTagInfo(OGG_VorbisFile, &OGG_info);
+    getOGGTagInfo(&OGG_VorbisFile, &OGG_info);
 }
 
 
@@ -231,6 +225,7 @@ int OGG_Load(char *filename){
     OGG_playingDelta = 0;
 	strcpy(OGG_fileName, filename);
 	//Apro il file OGG:
+	initFileInfo(&OGG_info);
     OGG_file = sceIoOpen(OGG_fileName, PSP_O_RDONLY, 0777);
 	if (OGG_file >= 0) {
         OGG_info.fileSize = sceIoLseek(OGG_file, 0, PSP_SEEK_END);
@@ -306,10 +301,11 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
     OggVorbis_File vf;
     struct fileInfo tempInfo;
 
+    initFileInfo(&tempInfo);
 	//Apro il file OGG:
 	tempFile = sceIoOpen(filename, PSP_O_RDONLY, 0777);
 	if (tempFile >= 0) {
-        sceIoLseek(tempFile, 0, PSP_SEEK_SET);
+        //sceIoLseek(tempFile, 0, PSP_SEEK_SET);
         ov_callbacks ogg_callbacks;
 
         ogg_callbacks.read_func = ogg_callback_read;
@@ -321,7 +317,7 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
             sceIoClose(tempFile);
             return tempInfo;
         }
-        getOGGTagInfo(vf, &tempInfo);
+        getOGGTagInfo(&vf, &tempInfo);
         ov_clear(&vf);
         if (tempFile >= 0)
             sceIoClose(tempFile);

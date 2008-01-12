@@ -483,3 +483,31 @@ int endAudioLib(){
     pspAudioEnd();
     return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Init a file info structure:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void initFileInfo(struct fileInfo *info){
+    info->fileType = 0;
+    info->defaultCPUClock = 0;
+    info->needsME = 0;
+    info->fileSize = 0;
+    strcpy(info->layer, "");
+    info->kbit = 0;
+    info->instantBitrate = 0;
+    info->hz = 0;
+    strcpy(info->mode, "");
+    strcpy(info->emphasis, "");
+    info->length = 0;
+    strcpy(info->strLength, "");
+    info->frames = 0;
+    info->framesDecoded = 0;
+    info->encapsulatedPictureOffset = 0;
+    
+    strcpy(info->album, "");
+    strcpy(info->title, "");
+    strcpy(info->artist, "");
+    strcpy(info->genre, "");
+    strcpy(info->year, "");
+    strcpy(info->trackNumber, "");
+}

@@ -1291,25 +1291,25 @@ int playFile(char *filename, char *numbers, char *message) {
             }
 
             if(pad.Buttons & PSP_CTRL_CIRCLE) {
-					  (*endFunct)();
-					  action = 0;
-					  retVal = 2;
-					  break;
+                (*endFunct)();
+                action = 0;
+                retVal = 2;
+                break;
 			} else if((pad.Buttons & PSP_CTRL_CROSS) | (remoteButtons & PSP_HPRM_PLAYPAUSE)) {
-					  //Azzero la velocità se != 0:
-					  currentSpeed = (*getPlayingSpeedFunct)();
-					  if (currentSpeed){
-					      (*setPlayingSpeedFunct)(0);
-					  }else{
-						  (*pauseFunct)();
-						  if (action != 0){
-							action = 0;
-						  }else{
-							action = 1;
-						  }
-					  }
-					  screen_playerAction(&action);
-					  sceKernelDelayThread(400000);
+                //Azzero la velocità se != 0:
+                currentSpeed = (*getPlayingSpeedFunct)();
+                if (currentSpeed){
+                  (*setPlayingSpeedFunct)(0);
+                }else{
+                  (*pauseFunct)();
+                  if (action != 0){
+                	action = 0;
+                  }else{
+                	action = 1;
+                  }
+                }
+                screen_playerAction(&action);
+                sceKernelDelayThread(400000);
 			} else if(pad.Buttons & PSP_CTRL_UP){
 				//Boost volume up:
 				if (volumeBoost < MAX_VOLUME_BOOST){
@@ -1467,14 +1467,9 @@ int playFile(char *filename, char *numbers, char *message) {
 
 			//Controllo la riproduzione è finita:
 			if ((*endOfStreamFunct)() == 1) {
-				//Controllo il repeat:
-				if (playingMode == MODE_REPEAT){
-					(*playFunct)();
-				}else{
-					(*endFunct)();
-					retVal = 0;
-					break;
-				}
+				(*endFunct)();
+				retVal = 0;
+				break;
 			}
 	  }
 
@@ -1586,13 +1581,15 @@ void playDirectory(char *dirName, char *initialFileName){
 						currentTrack++;
 					}
 				}else{
+                    //Controllo la ripetizione della traccia:
+                    if (playerReturn == 0 && playingMode == MODE_REPEAT){
+                        continue;
 					//Controllo se è finita la directory e non sono in repeat:
-					if ((playerReturn == 0) & (i == dirToPlay.number_of_directory_entries - 1) & (playingMode != MODE_REPEAT_ALL)){
+					}else if ((playerReturn == 0) & (i == dirToPlay.number_of_directory_entries - 1) & (playingMode != MODE_REPEAT_ALL)){
 						break;
 					}
 					//Altrimenti passo al file successivo:
-					i++;
-					if (i > dirToPlay.number_of_directory_entries - 1){
+					if (++i > dirToPlay.number_of_directory_entries - 1){
 						i = 0;
 					}
 					currentTrack = i;
@@ -1847,11 +1844,11 @@ void fileBrowser_menu(){
 			pspDebugScreenSetBackColor(0xaa4400);
 
 			//Segno precedente:
-			if (top_entry > 0){
+			if (top_entry > 0)
 				pspDebugScreenPrintf("%-66.66s", "...");
-			} else{
+			else
 				pspDebugScreenPrintf("%-66.66s", "");
-			}
+				
 			int i = 0;
 			//Elementi della directory:
 			for (; i < maximum_number_of_rows; i++){
@@ -2262,11 +2259,11 @@ void playlist_menu(){
 		pspDebugScreenSetBackColor(0xaa4400);
 
 		//Segno precedente:
-		if (top_entry > 0){
+		if (top_entry > 0)
 			pspDebugScreenPrintf("%-66.66s", "...");
-		} else{
+		else
 			pspDebugScreenPrintf("%-66.66s", "");
-		}
+
 		int i = 0;
 		for (; i < maximum_number_of_rows; i++){
 			int current_entry = top_entry + i;
@@ -2412,9 +2409,8 @@ void playlist_editor(){
                     tagInfo = (*getTagInfoFunct)(song.fileName);
 					sel_updateInfo = 1;
 
-					if (selected_entry == top_entry + maximum_number_of_rows){
+					if (selected_entry == top_entry + maximum_number_of_rows)
 						top_entry++;
-					}
 				}
 			} else if ((controller.Buttons & PSP_CTRL_UP) | (controller.Ly < 128 - ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
 				if (selected_entry){
@@ -2424,9 +2420,8 @@ void playlist_editor(){
                     tagInfo = (*getTagInfoFunct)(song.fileName);
 					sel_updateInfo = 1;
 
-					if (selected_entry == top_entry - 1){
+					if (selected_entry == top_entry - 1)
 						top_entry--;
-					}
 				}
 			} else if ((controller.Buttons & PSP_CTRL_RIGHT) | (controller.Lx > 128 + ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
 				//Pagina giù:
@@ -2466,18 +2461,16 @@ void playlist_editor(){
 				//Sposto giù:
 				if (M3U_moveSongDown(selected_entry) == 0){
 					selected_entry++;
-					if (selected_entry == top_entry + maximum_number_of_rows){
+					if (selected_entry == top_entry + maximum_number_of_rows)
 						top_entry++;
-					}
 					sceKernelDelayThread(100000);
 				}
 			} else if (controller.Buttons & PSP_CTRL_SQUARE && M3U_getSongCount() > 0){
 				//Sposto su:
 				if (M3U_moveSongUp(selected_entry) == 0){
 					selected_entry--;
-					if (selected_entry == top_entry - 1){
+					if (selected_entry == top_entry - 1)
 						top_entry--;
-					}
 					sceKernelDelayThread(100000);
 				}
 			} else if (controller.Buttons & PSP_CTRL_CIRCLE && M3U_getSongCount() > 0){
@@ -2485,9 +2478,8 @@ void playlist_editor(){
 					M3U_removeSong(selected_entry);
 					sceKernelDelayThread(100000);
 					if (M3U_getSongCount() > 0){
-						if (selected_entry >= M3U_getSongCount()){
+						if (selected_entry >= M3U_getSongCount())
 							selected_entry--;
-						}
 						song = M3U_getSong(selected_entry);
                         setAudioFunctions(song.fileName, userSettings.MP3_ME);
                         tagInfo = (*getTagInfoFunct)(song.fileName);
@@ -2556,11 +2548,11 @@ void playlist_editor(){
 			pspDebugScreenSetBackColor(0xaa4400);
 
 			//Segno precedente:
-			if (top_entry > 0){
+			if (top_entry > 0)
 				pspDebugScreenPrintf("%-66.66s", "...");
-			}else{
+			else
 				pspDebugScreenPrintf("%-66.66s", "");
-			}
+
 			int i = 0;
 			for (; i < maximum_number_of_rows; i++){
 				int current_entry = top_entry + i;
@@ -2617,9 +2609,8 @@ void playlist_editor(){
 			}
 
 			//Tasti di uscita:
-			if (controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER){
+			if (controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER)
 				break;
-			}
 			sceKernelDelayThread(100000);
 		}
 		//Salvo lo stato di modifica della playlist:
@@ -2673,11 +2664,11 @@ void options_menu(){
     	pspDebugScreenSetBackColor(0xaa4400);
 
     	//Segno precedente:
-    	if (top_entry > 0){
+    	if (top_entry > 0)
     		pspDebugScreenPrintf("%-66.66s", "...");
-    	}else{
+    	else
     		pspDebugScreenPrintf("%-66.66s", "");
-    	}
+
     	int i = 0;
     	for (; i < maximum_number_of_rows; i++){
     		int current_entry = top_entry + i;
