@@ -232,8 +232,7 @@ int M3U_addSong(char *fileName, int length, char *title){
 		strcpy(newSong.fileName, fileName);
 		newSong.length = length;
 		strcpy(newSong.title, title);
-		lPlayList.songs[lPlayList.songCount] = newSong;
-		lPlayList.songCount++;
+		lPlayList.songs[lPlayList.songCount++] = newSong;
 		return(0);
 	}else{
 		return(-1);

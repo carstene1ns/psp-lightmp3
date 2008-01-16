@@ -159,7 +159,10 @@ int decodeThread(SceSize args, void *argp){
 	total_size = sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_END);
 	size = total_size;
 	sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_SET);
-	data_start = SeekNextFrame(MP3ME_handle);
+	data_start = ID3v2TagSize(MP3ME_fileName);
+	sceIoLseek32(MP3ME_handle, data_start, PSP_SEEK_SET);
+    data_start = SeekNextFrame(MP3ME_handle);
+    
 	if (data_start < 0)
 		MP3ME_threadActive = 0;
 

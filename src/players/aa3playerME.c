@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "player.h"
+#include "id3.h"
 #include "aa3playerME.h"
 #define AT3_THREAD_PRIORITY 12
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,7 +263,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get tag info:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void readTagData(FILE *fp, int tagLength, char *tagValue){
+/*void readTagData(FILE *fp, int tagLength, char *tagValue){
     int i;
     int count = 0;
     unsigned char carattere[tagLength];
@@ -279,7 +280,7 @@ void readTagData(FILE *fp, int tagLength, char *tagValue){
         }
     }
     tagValue[count] = '\0';
-}
+}*/
 
 int convInt32BigToHost(int arg)
 {
@@ -329,27 +330,27 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
 
         if(!strncmp("TPE1",tag,4)) /* Artist */
         {
-            readTagData(fp, tag_length, targetInfo->artist);
+            readTagData(fp, tag_length - 1, targetInfo->artist);
         }
         else if(!strncmp("TIT2",tag,4)) /* Title */
         {
-            readTagData(fp, tag_length, targetInfo->title);
+            readTagData(fp, tag_length - 1, targetInfo->title);
         }
         else if(!strncmp("TALB",tag,4)) /* Album */
         {
-            readTagData(fp, tag_length, targetInfo->album);
+            readTagData(fp, tag_length - 1, targetInfo->album);
         }
         else if(!strncmp("TRCK",tag,4)) /* Track No. */
         {
-            readTagData(fp, tag_length, targetInfo->trackNumber);
+            readTagData(fp, tag_length - 1, targetInfo->trackNumber);
         }
         else if(!strncmp("TYER",tag,4)) /* Year */
         {
-            readTagData(fp, tag_length, targetInfo->year);
+            readTagData(fp, tag_length - 1, targetInfo->year);
         }
         else if(!strncmp("TCON",tag,4)) /* Genre */
         {
-            readTagData(fp, tag_length, targetInfo->genre);
+            readTagData(fp, tag_length - 1, targetInfo->genre);
         }
         else
         {

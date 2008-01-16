@@ -187,7 +187,6 @@ char *requestString (char *descStr, char *initialStr){
 	static char str[64];
 	unsigned short intext[128]  = { 0 }; // text already in the edit box on start
 	unsigned short desc[128]  = { 0 };
-	//unsigned short desc[128]	= { 'E', 'n', 't', 'e', 'r', ' ', 'S', 't', 'r', 'i', 'n', 'g', 0 }; // description
 
 	if (initialStr[0] != 0)
 		for (i=0; i<=strlen(initialStr); i++)
