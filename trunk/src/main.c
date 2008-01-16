@@ -140,14 +140,12 @@ int powerCallback(int unknown, int powerInfo, void *common){
                setBrightness(curBrightness);
                displayStatus = 1;
            }
-           //pspAudioEnd();
            suspended = 1;
        }
     }else if ((powerInfo & PSP_POWER_CB_RESUMING)){
        resuming = 1;
     }else if ((powerInfo & PSP_POWER_CB_RESUME_COMPLETE)){
        //Resume
-       //pspAudioInit();
        if (resumeFunct != NULL)
           (*resumeFunct)();
        resuming = 0;       
@@ -156,6 +154,29 @@ int powerCallback(int unknown, int powerInfo, void *common){
     return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Funzioni gestione BUS & CLOCK
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void setBusClock(int bus){
+    if (bus >= 54 && bus <= 111 && sceKernelDevkitVersion() < 0x03070110)
+        scePowerSetBusClockFrequency(bus);
+}
+
+void setCpuClock(int cpu){
+    if (cpu >= 10 && cpu <= 266){
+        if (sceKernelDevkitVersion() < 0x03070110){
+            scePowerSetCpuClockFrequency(cpu);
+            if (scePowerGetCpuClockFrequency() < cpu)
+                scePowerSetCpuClockFrequency(++cpu);
+        }else{
+            scePowerSetClockFrequency(cpu, cpu, cpu/2);
+            if (scePowerGetCpuClockFrequency() < cpu){
+                cpu++;
+                scePowerSetClockFrequency(cpu, cpu, cpu/2);
+            }
+        }
+    }
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Funzioni generiche
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -459,7 +480,11 @@ int askString(char *string){
 	strcpy(oldName, string);
 
     if (userSettings.USE_OSK){
+        setCpuClock(222);
         string = requestString("Insert playlist name", oldName);
+        setCpuClock(userSettings.CPU);
+        if (!strlen(string))
+            return -1;
         return 0;
     }
         
@@ -628,9 +653,8 @@ void addFileToPlaylist(char *fileName, int save){
 			M3U_addSong(fileName, info.length, onlyName);
 		}
 
-		if (save == 1){
+		if (save == 1)
 			M3U_save(tempM3Ufile);
-		}
 	}
 }
 
@@ -648,9 +672,8 @@ void addDirectoryToPlaylist(char *dirName){
 	if (result == 0){
 		for (i = 0; i < dirToAdd.number_of_directory_entries; i++){
 			strcpy(fileToAdd, dirName);
-			if (fileToAdd[strlen(fileToAdd)-1] != '/'){
+			if (fileToAdd[strlen(fileToAdd)-1] != '/')
 				strcat(fileToAdd, "/");
-			}
 			strcat(fileToAdd, dirToAdd.directory_entry[i].d_name);
 			addFileToPlaylist(fileToAdd, 0);
 			perc = ((float)(i + 1) / (float)dirToAdd.number_of_directory_entries) * 100.0;
@@ -772,30 +795,6 @@ int exitScreen(){
        runningFlag = 0;
     }
     return ret;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Funzioni gestione BUS & CLOCK
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void setBusClock(int bus){
-    if (bus >= 54 && bus <= 111 && sceKernelDevkitVersion() < 0x03070110)
-        scePowerSetBusClockFrequency(bus);
-}
-
-void setCpuClock(int cpu){
-    if (cpu >= 10 && cpu <= 266){
-        if (sceKernelDevkitVersion() < 0x03070110){
-            scePowerSetCpuClockFrequency(cpu);
-            if (scePowerGetCpuClockFrequency() < cpu)
-                scePowerSetCpuClockFrequency(++cpu);
-        }else{
-            scePowerSetClockFrequency(cpu, cpu, cpu/2);
-            if (scePowerGetCpuClockFrequency() < cpu){
-                cpu++;
-                scePowerSetClockFrequency(cpu, cpu, cpu/2);
-            }
-        }
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1071,7 +1070,10 @@ void screen_player_init(char *filename, struct fileInfo tag, char *numbers){
 	pspDebugScreenPrintf("\n");
 	pspDebugScreenPrintf("Press START to turn on/off the display");
 	pspDebugScreenPrintf("\n");
-	pspDebugScreenPrintf("Use analog to change clock (UP/DOWN for cpu, LEFT/RIGHT for bus)");
+	if (sceKernelDevkitVersion() < 0x03070110)
+    	pspDebugScreenPrintf("Use analog to change clock (UP/DOWN for cpu, LEFT/RIGHT for bus)");
+    else
+        pspDebugScreenPrintf("Use analog to change cpu clock (UP/DOWN)");
 }
 
 //Informazioni sul file:
@@ -1776,8 +1778,7 @@ void fileBrowser_menu(){
 	char author[50] = "";
 	char title[100] = "";
 
-	while(runningFlag)
-		{
+	while(runningFlag){
         SceCtrlData controller;
 		screen_init();
 		screen_toolbar();
@@ -1976,10 +1977,12 @@ void fileBrowser_menu(){
 		} else if (controller.Buttons & PSP_CTRL_START){
 			if (FIO_S_ISREG(directory.directory_entry[selected_entry].d_stat.st_mode)){
 				//Aggiungo il file selezionato alla playlist:
-				if (strstr(directory.directory_entry[selected_entry].d_name, ".mp3") != NULL || strstr(directory.directory_entry[selected_entry].d_name, ".MP3") != NULL ||
-                    strstr(directory.directory_entry[selected_entry].d_name, ".ogg") != NULL || strstr(directory.directory_entry[selected_entry].d_name, ".OGG") != NULL){
+                char ext[5];
+                getExtension(directory.directory_entry[selected_entry].d_name, ext, 4);
+				if (!strcmp(ext, "MP3") || !strcmp(ext, "OGG") || !strcmp(ext, "FLAC") ||
+				    !strcmp(ext, "AA3") || !strcmp(ext, "OMA") || !strcmp(ext, "OMG")){
 					waitMessage("");
-					//File mp3:
+					//File audio:
 					strcpy(fileToPlay, curDir);
 					if (curDir[strlen(curDir)-1] != '/'){
 						strcat(fileToPlay, "/");
@@ -2505,7 +2508,7 @@ void playlist_editor(){
 						strcat(newPlaylist, "/");
 						strcat(newPlaylist, currentPlaylist);
 						M3U_save(newPlaylist);
-						strcpy(lastOp, "Palylist saved");
+						strcpy(lastOp, "Playlist saved");
 						pspDebugScreenSetXY(0, 20);
 						pspDebugScreenSetBackColor(BLACK);
 						pspDebugScreenSetTextColor(WHITE);

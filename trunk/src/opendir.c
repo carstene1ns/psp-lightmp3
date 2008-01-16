@@ -149,17 +149,10 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 			//Controllo il filtro sulle estensioni (solo per i files):
 			if (FIO_S_ISREG(p->directory_entry[p->number_of_directory_entries].d_stat.st_mode)){
 				int extOK = 0;
-				int i, j;
+				int i;
 				char ext[5] = "";
-				if (p->directory_entry[p->number_of_directory_entries].d_name[strlen(p->directory_entry[p->number_of_directory_entries].d_name) - 4] == '.')
-					j = 3;
-				else if (p->directory_entry[p->number_of_directory_entries].d_name[strlen(p->directory_entry[p->number_of_directory_entries].d_name) - 5] == '.')
-					j = 4;
-                else
-                    j = 0;
-				for (i = strlen(p->directory_entry[p->number_of_directory_entries].d_name) - j; i < strlen(p->directory_entry[p->number_of_directory_entries].d_name); i++)
-					ext[i - strlen(p->directory_entry[p->number_of_directory_entries].d_name) + j] = toupper(p->directory_entry[p->number_of_directory_entries].d_name[i]);
-
+				
+				getExtension(p->directory_entry[p->number_of_directory_entries].d_name, ext, 4);
 				extOK = 0;
 				for (i = 0; i < extNumber; i++){
 					if (strcmp(ext, extFilter[i]) == 0){
@@ -216,4 +209,24 @@ void sortDirectory(struct opendir_struct *directory){
 		if (i == 0 || strcmp(comp1, comp2) <= 0) i++;
 		else {SceIoDirent tmp = directory->directory_entry[i]; directory->directory_entry[i] = directory->directory_entry[i-1]; directory->directory_entry[--i] = tmp;}
 	}
+}
+
+//Extract extension from a filename:
+void getExtension(char *fileName, char *extension, int extMaxLength){
+    int i = 0;
+    int j = 0;
+    int count = 0;
+    for (i = strlen(fileName) - 1; i >= 0; i--){
+        if (fileName[i] == '.'){
+            if (i == strlen(fileName) - 1)
+                return;
+            for (j = i+1; j < strlen(fileName); j++){
+                extension[count++] = toupper(fileName[j]);
+                if (count > extMaxLength)
+                    return;
+            }
+            extension[count] = '\0';
+            return;
+        }
+    }
 }

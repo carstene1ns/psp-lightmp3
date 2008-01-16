@@ -10,6 +10,8 @@ Version 1.7.2
 -Fixed: Files named like "dfgeerr...mp3" weren't recognized as mp3
 -Fixed: Freeze on "Opening..." or time stucked at 0 after 20 tracks
 -Fixed: Repeat track mode.
+-Fixed: Cracking sound when quitting while playing a track.
+-Fixed: Some mp3 with "strange" ID3 made the app freeze.
 
 
 Version 1.7.1 (bugfix release)

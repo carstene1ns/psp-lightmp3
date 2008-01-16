@@ -13,4 +13,6 @@ struct ID3Tag {
     
 };
 
+int ID3v2TagSize(const char *mp3path);
 struct ID3Tag ParseID3(char *mp3path);
+void readTagData(FILE *fp, int tagLength, char *tagValue);

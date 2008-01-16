@@ -68,6 +68,23 @@ int swapInt32BigToHost(int arg)
    return i;
 }
 
+//Reads tag data purging invalid characters:
+void readTagData(FILE *fp, int tagLength, char *tagValue){
+    int i;
+    int count = 0;
+    unsigned char carattere[tagLength];
+
+    strcpy(tagValue, "");
+    tagValue[0] = '\0';
+
+    fread(carattere, sizeof(char), tagLength, fp);
+    for (i=0; i<tagLength; i++){
+        if ((carattere[i] >= 0x20) && (carattere[i] <= 0x7f))
+            tagValue[count++] = carattere[i];
+    }
+    tagValue[count] = '\0';
+}
+
 int ID3v2TagSize(const char *mp3path)
 {
    FILE *fp;
@@ -148,45 +165,38 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
          if(!strncmp("TP1",tag,3)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Artist, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Artist[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Artist);
          }
          else if(!strncmp("TP2",tag,3)) /* Title */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Title, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Title[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Title);
          }
          else if(!strncmp("TAL",tag,3)) /* Album */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Album, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Album[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Album);
          }
          else if(!strncmp("TRK",tag,3)) /* Track No. */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3TrackText, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3TrackText[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3TrackText);
             id3tag->ID3Track = atoi(id3tag->ID3TrackText);
          }
          else if(!strncmp("TYE",tag,3)) /* Year */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Year, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Year[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
          else if(!strncmp("COM",tag,3)) /* Comment */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Comment, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Comment[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Comment);
          }
          else if(!strncmp("TCO",tag,3)) /* Genre */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3GenreText, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3GenreText[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3GenreText);
          }
          else if(!strncmp("PIC",tag,3)) /* Picture */
          {
@@ -238,41 +248,35 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
          if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Artist, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Artist[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Artist);
          }
          else if(!strncmp("TIT2",tag,4)) /* Title */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Title, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Title[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Title);
          }
          else if(!strncmp("TALB",tag,4)) /* Album */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Album, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Album[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Album);
          }
          else if(!strncmp("TRCK",tag,4)) /* Track No. */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3TrackText, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3TrackText[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3TrackText);
             id3tag->ID3Track = atoi(id3tag->ID3TrackText);
          }
          else if(!strncmp("TYER",tag,4)) /* Year */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Year, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Year[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
          else if(!strncmp("COMM",tag,4)) /* Comment */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Comment, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Comment[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Comment);
          }
-         else if(!strncmp("APIC",tag,4)) /* Comment */
+         else if(!strncmp("APIC",tag,4)) /* Picture */
          {
             fseek(fp, 1, SEEK_CUR);
             fseek(fp, 12, SEEK_CUR);
@@ -322,41 +326,35 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
          if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Artist, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Artist[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Artist);
          }
          else if(!strncmp("TIT2",tag,4)) /* Title */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Title, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Title[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Title);
          }
          else if(!strncmp("TALB",tag,4)) /* Album */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Album, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Album[tag_length - 1] = '\0';            
+            readTagData(fp, tag_length - 1, id3tag->ID3Album);
          }
          else if(!strncmp("TRCK",tag,4)) /* Track No. */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3TrackText, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3TrackText[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3TrackText);
             id3tag->ID3Track = atoi(id3tag->ID3TrackText);
          }
          else if(!strncmp("TYER",tag,4)) /* Year */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Year, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Year[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
          else if(!strncmp("COMM",tag,4)) /* Comment */
          {
             fseek(fp, 1, SEEK_CUR);
-            fread(id3tag->ID3Comment, sizeof(char), tag_length - 1, fp);
-            id3tag->ID3Comment[tag_length - 1] = '\0';
+            readTagData(fp, tag_length - 1, id3tag->ID3Comment);
          }
-         else if(!strncmp("APIC",tag,4)) /* Comment */
+         else if(!strncmp("APIC",tag,4)) /* Picture */
          {
             fseek(fp, 1, SEEK_CUR);
             fseek(fp, 12, SEEK_CUR);
