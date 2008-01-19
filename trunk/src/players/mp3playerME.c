@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 
+#include "clock.h"
 #include "id3.h"
 #include "player.h"
 #include "mp3playerME.h"
@@ -139,7 +140,6 @@ int decodeThread(SceSize args, void *argp){
     int version;
     int bitrate;
     int padding;
-    //float duration;
     int frame_size;
     int size;
     int total_size;
@@ -349,15 +349,23 @@ int MP3MEgetInfo(){
 	struct mad_stream stream;
 	struct mad_header header;
 
+    int oldClock = getCpuClock();
 	mad_stream_init (&stream);
 	mad_header_init (&header);
     
-    localBuffer = (unsigned char *) malloc(bufferSize + 8);
+    localBuffer = (unsigned char *) malloc(bufferSize);
     fd = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
     if (fd < 0)
         return -1;
+
+    setCpuClock(222);
 	long size = sceIoLseek(fd, 0, PSP_SEEK_END);
     sceIoLseek(fd, 0, PSP_SEEK_SET);
+    
+	int startPos = ID3v2TagSize(MP3ME_fileName);
+	sceIoLseek32(fd, startPos, PSP_SEEK_SET);
+    startPos = SeekNextFrame(fd);
+    size -= startPos;
     
     MP3ME_info.fileType = MP3_TYPE;
     MP3ME_info.defaultCPUClock = MP3ME_defaultCPUClock;
@@ -368,9 +376,9 @@ int MP3MEgetInfo(){
 	while (1){
         if (dataRed >= size)
             break;
-        memset(localBuffer, 0, bufferSize + 8);
-        dataRed += sceIoRead(fd, localBuffer, bufferSize + 8);
-    	mad_stream_buffer (&stream, localBuffer, bufferSize + 8);
+        memset(localBuffer, 0, bufferSize);
+        dataRed += sceIoRead(fd, localBuffer, bufferSize);
+    	mad_stream_buffer (&stream, localBuffer, bufferSize);
 
         while (1){
     		if (mad_header_decode (&header, &stream) == -1){
@@ -458,6 +466,7 @@ int MP3MEgetInfo(){
 	mad_timer_string(libMadlength, MP3ME_info.strLength, "%02lu:%02u:%02u", MAD_UNITS_HOURS, MAD_UNITS_MILLISECONDS, 0);
 
     getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
+    setCpuClock(oldClock);
     return 0;
 }
 /*int MP3MEgetInfo(){

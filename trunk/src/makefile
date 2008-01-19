@@ -2,7 +2,7 @@ TARGET = mp3
 OBJS = prx/supportlib.o usb.o audioscrobbler.o settings.o equalizer.o log.o m3u.o \
        players/pspaudiolib.o players/id3.o players/mp3player.o players/oggplayer.o \
        players/mp3playerME.o players/aa3playerME.o players/flacplayer.o players/player.o \
-       osk.o mem64.o opendir.o exception.o main.o
+       clock.o osk.o mem64.o opendir.o exception.o main.o
 
 #To build for custom firmware:
 BUILD_PRX = 1

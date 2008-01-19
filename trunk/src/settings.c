@@ -172,7 +172,7 @@ int SETTINGS_save(struct settings tSettings){
     snprintf(testo, sizeof(testo), "BOOST_VALUE=%i\n\n", tSettings.BOOST_VALUE);
     fwrite(testo, 1, strlen(testo), f);
 
-    fwrite("#Use ME for MP3 0/1):\n", 1, strlen("#Use ME for MP3 0/1):\n"), f);
+    fwrite("#Use ME for MP3 (0/1):\n", 1, strlen("#Use ME for MP3 (0/1):\n"), f);
     snprintf(testo, sizeof(testo), "MP3_ME=%i\n\n", tSettings.MP3_ME);
     fwrite(testo, 1, strlen(testo), f);
 

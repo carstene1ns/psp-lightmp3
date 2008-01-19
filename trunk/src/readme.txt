@@ -4,6 +4,7 @@
 Homepage   : http://sakya.altervista.org/new/index.php?mod=none_lightmp3
 Google Code: http://code.google.com/p/lightmp3/
 Contacts   : sakya_tg@yahoo.it
+To donate  : https://www.paypal.com/xclick/business=sakya_tg@yahoo.it&item_name=lightmp3&item_number=0001&no_note=1&tax=0&currency_code=EUR
 LightMP3 is ditributed under GNU General Public License, read LICENSE.TXT for details.
 
 
@@ -33,7 +34,7 @@ FEATURES
 -Plays OGG vorbis file without filesize limit
 -Plays FLAC
 -Plays ATRAC3+
--Detailed ID3v1 and file information
+-Detailed ID3v1/ID3v2 and file information
 -Works with remote controller
 -Four playing mode: Normal, Repeat, Repeat All and Shuffle
 -Boost output volume
@@ -71,7 +72,7 @@ DEPENDENCIES
 To compile LightMP3 you need:
 -libMad (add -O3 to CFLAGS in tha makefile)
 -libTremor
--libFLAC
+-libFLAC (built without OGG support)
 
 
 BUGS:
@@ -90,11 +91,11 @@ svn checkout http://lightmp3.googlecode.com/svn/trunk/ lightmp3-read-only
 MANY THANKS TO
 --------------
 -jonny for the original menu code
--sturatt for the original ID3 tag code
+-sturatt for the original ID3v1 tag code
 -John_K for mp3player.c and mp3player.h
 -Smerity for his audio tutorial
 -AlphaWeapon for the icon. :)
--crazyc for his usefull patch
+-crazyc for his useful patch
 -John_K & adresd (PSPMediaCenter authors)
 -Xart for the ID3v2 tag code.
 -joek2100 for the Media Engine functions (taken from Music prx 0.55 and adapted)

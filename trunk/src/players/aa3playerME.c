@@ -263,43 +263,6 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get tag info:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*void readTagData(FILE *fp, int tagLength, char *tagValue){
-    int i;
-    int count = 0;
-    unsigned char carattere[tagLength];
-
-    strcpy(tagValue, "");
-    tagValue[0] = '\0';
-
-    fread(carattere, sizeof(char), tagLength, fp);
-    for (i=0; i<tagLength; i++){
-        if ((carattere[i] >= 0x20) && (carattere[i] <= 0x7f)){
-        //if ((int)carattere[i] >= 32){
-            tagValue[count] = carattere[i];
-            count++;
-        }
-    }
-    tagValue[count] = '\0';
-}*/
-
-int convInt32BigToHost(int arg)
-{
-   int i=0;
-   int checkEndian = 1;
-   if( 1 == *(char *)&checkEndian )
-   {
-      // Intel (little endian)
-      i=arg;
-      i=((i&0xFF000000)>>24)|((i&0x00FF0000)>>8)|((i&0x0000FF00)<<8)|((i&0x000000FF)<<24);
-   }
-   else
-   {
-      // PPC (big endian)
-      i=arg;
-   }
-   return i;
-}
-
 void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
     FILE *fp = NULL;
 
@@ -319,7 +282,7 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
 
         /* read 4 byte big endian tag length */
         fread(&tag_length, sizeof(unsigned int), 1, fp);
-        tag_length = (unsigned int) convInt32BigToHost((int)tag_length);
+        tag_length = (unsigned int) swapInt32BigToHost((int)tag_length);
         size -= 4;
 
         fseek(fp, 2, SEEK_CUR);
@@ -330,26 +293,32 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
 
         if(!strncmp("TPE1",tag,4)) /* Artist */
         {
+            fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->artist);
         }
         else if(!strncmp("TIT2",tag,4)) /* Title */
         {
+            fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->title);
         }
         else if(!strncmp("TALB",tag,4)) /* Album */
         {
+            fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->album);
         }
         else if(!strncmp("TRCK",tag,4)) /* Track No. */
         {
+            fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->trackNumber);
         }
         else if(!strncmp("TYER",tag,4)) /* Year */
         {
+            fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->year);
         }
         else if(!strncmp("TCON",tag,4)) /* Genre */
         {
+            fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->genre);
         }
         else
