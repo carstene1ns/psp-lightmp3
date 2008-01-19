@@ -317,7 +317,7 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = AA3ME_suspend;
         resumeFunct = AA3ME_resume;
         fadeOutFunct = AA3ME_fadeOut;
-    } else 	if (!stricmp(ext, ".flac")){
+    } else if (!stricmp(ext, ".flac")){
         //FLAC
 		initFunct = FLAC_Init;
 		loadFunct = FLAC_Load;

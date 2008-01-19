@@ -32,6 +32,7 @@
 #include "players/pspaudiolib.h"
 #include "players/player.h"
 
+#include "clock.h"
 #include "osk.h"
 #include "exception.h"
 #include "usb.h"
@@ -154,29 +155,6 @@ int powerCallback(int unknown, int powerInfo, void *common){
     return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Funzioni gestione BUS & CLOCK
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void setBusClock(int bus){
-    if (bus >= 54 && bus <= 111 && sceKernelDevkitVersion() < 0x03070110)
-        scePowerSetBusClockFrequency(bus);
-}
-
-void setCpuClock(int cpu){
-    if (cpu >= 10 && cpu <= 266){
-        if (sceKernelDevkitVersion() < 0x03070110){
-            scePowerSetCpuClockFrequency(cpu);
-            if (scePowerGetCpuClockFrequency() < cpu)
-                scePowerSetCpuClockFrequency(++cpu);
-        }else{
-            scePowerSetClockFrequency(cpu, cpu, cpu/2);
-            if (scePowerGetCpuClockFrequency() < cpu){
-                cpu++;
-                scePowerSetClockFrequency(cpu, cpu, cpu/2);
-            }
-        }
-    }
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Funzioni generiche
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2051,15 +2029,11 @@ void playlist_menu(){
 	char ext[1][5] = {"M3U"};
 	char *result = opendir_open(&directory, curDir, ext, 1, 0);
 	sortDirectory(&directory);
-	if (result){
-		//current_mode = 0;
-		//return;
-	}else{
+	if (!result){
 		//Carico i dati della prima playlist:
 		strcpy(fileToPlay, curDir);
-		if (fileToPlay[strlen(fileToPlay)-1] != '/'){
+		if (fileToPlay[strlen(fileToPlay)-1] != '/')
 			strcat(fileToPlay, "/");
-		}
 		strcat(fileToPlay, directory.directory_entry[0].d_name);
 		if (M3U_open(fileToPlay) == 0){
 			sel_songCount = M3U_getSongCount();

@@ -15,4 +15,8 @@ struct ID3Tag {
 
 int ID3v2TagSize(const char *mp3path);
 struct ID3Tag ParseID3(char *mp3path);
+
+//Helper functions (used also by aa3mplayerME to read tags):
 void readTagData(FILE *fp, int tagLength, char *tagValue);
+int swapInt32BigToHost(int arg);
+//short int swapInt16BigToHost(short int arg);
