@@ -42,11 +42,11 @@
 #include "players/equalizer.h"
 #include "audioscrobbler.h"
 
-//#include "log.h"
+#include "log.h"
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
-PSP_HEAP_SIZE_KB(21000);
+PSP_HEAP_SIZE_KB(20000);
 
 // Functions imported from support prx:
 int displayEnable(void);
@@ -1037,7 +1037,6 @@ void screen_options_init(){
 	pspDebugScreenPrintf("Press START to save options");
     pspDebugScreenPrintf("\n");
     pspDebugScreenPrintf("Press SELECT to restore default values");
-	pspDebugScreenPrintf("\n");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2844,7 +2843,7 @@ int main() {
         return -1;
 	}
 
-	//openLog("ms0:/lightMP3.log", 0);
+	openLog("ms0:/lightMP3.log", 0);
     //Directory corrente:
 	getcwd(ebootDirectory, 262);
 
@@ -2864,7 +2863,7 @@ int main() {
 
     //Check for active modules:
     checkModules();
-    
+
     MUTED_VOLUME = userSettings.MUTED_VOLUME;
     
     //Clock per filetype:
@@ -2944,7 +2943,7 @@ int main() {
     
     //Disable home button:
     imposeSetHomePopup(0);
-    
+
 	//Controllo luminosità:
     int initialBrightness = getBrightness();
 	int initialBrightnessValue = imposeGetBrightness();
@@ -2956,7 +2955,7 @@ int main() {
     	curBrightness = 24;
         imposeSetBrightness(0);
     }
-    
+
 	//Equalizer init:
 	struct equalizer tEQ;
 	EQ_init();
@@ -2980,7 +2979,6 @@ int main() {
 			options_menu();
 		}
 	}
-
 	//Salvo le opzioni:
     userSettings.CPU = scePowerGetCpuClockFrequency();
     userSettings.BUS = scePowerGetBusClockFrequency();
