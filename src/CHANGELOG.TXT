@@ -1,6 +1,12 @@
 LightMP3 Changelog
 ------------------
 
+Version 1.7.3
+-------------
+-Fixed some bugs in the platlist!
+-Faster mp3 file opening
+
+
 Version 1.7.2
 -------------
 -Added: Sleep mode (press TRIANGLE while playing a track).
