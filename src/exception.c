@@ -7,7 +7,7 @@
 
 PspDebugRegBlock exception_regs;
 
-extern SceModule2 module_info;
+extern SceModule module_info;
 extern int _ftext;
 
 static const char *codeTxt[32] =
