@@ -51,7 +51,7 @@ int kill_flac_thread;
 int bufferLow;
 
 #define MIX_BUF_SIZE (PSP_NUM_AUDIO_SAMPLES * 2)
-short tempmixbuf[MIX_BUF_SIZE * 4] __attribute__ ((aligned(64)));
+short tempmixbuf[MIX_BUF_SIZE * 4]; // __attribute__ ((aligned(64)));
 long tempmixleft = 0;
 long samples_played = 0;
 
@@ -250,6 +250,7 @@ void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 	char value[257];
 	FLAC__StreamMetadata *info = 0;
 
+    strcpy(FLAC_fileName, filename);
 	if (FLAC__metadata_get_tags(filename, &info)) {
 		if(info->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
 			for(i = 0; i < info->data.vorbis_comment.num_comments; ++i) {
@@ -262,10 +263,14 @@ void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 					strcpy(targetInfo->artist, value);
 				else if(!strcmp(name, "GENRE"))
 					strcpy(targetInfo->genre, value);
-				else if(!strcmp(name, "DATE"))
-		            strcpy(targetInfo->year, value);
-				else if(!strcmp(name, "TRACKNUMBER"))
+				else if(!strcmp(name, "DATE")){
+                    strncpy(targetInfo->year, value, 4);
+                    targetInfo->year[4] = '\0';
+				}else if(!strcmp(name, "TRACKNUMBER"))
 		            strcpy(targetInfo->trackNumber, value);
+        		else if(!strcmp(name, "COVERART_UUENCODED")){
+                    //COVER ART
+                }
 			}
 		}
 		FLAC__metadata_object_delete(info);
@@ -308,6 +313,7 @@ void FLAC_Init(int channel){
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
 	FLAC_audio_channel = channel;
+	samples_played = 0;
     bufferLow = sceKernelCreateSema("bufferLow", 0, 1, 1, 0);
     pspAudioSetChannelCallback(FLAC_audio_channel, audioCallback, NULL);
 }
@@ -345,7 +351,6 @@ int FLAC_Load(char *filename){
         FLAC_FreeTune();
         return ERROR_INVALID_SAMPLE_RATE;
     }
-
 	return OPENING_OK;
 }
 
@@ -383,7 +388,9 @@ void FLAC_FreeTune(){
 
 void FLAC_GetTimeString(char *dest){
 	char timeString[9];
-	long secs = samples_played / FLAC_info.hz;
+	long secs = 0;
+	if (FLAC_info.hz)
+    	secs = samples_played / FLAC_info.hz;
 	int h = secs / 3600;
 	int m = (secs - h * 3600) / 60;
 	int s = secs - h * 3600 - m * 60;

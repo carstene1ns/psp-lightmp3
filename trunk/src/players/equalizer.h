@@ -16,7 +16,22 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-void setBusClock(int bus);
-void setCpuClock(int cpu);
-int getCpuClock();
-int getBusClock();
+//Equalizzatori per libMad:
+struct equalizer{
+	char name[20];
+    int index;
+	char shortName[3];
+	double filter[32];
+};
+
+struct equalizersList{
+	char name[20];
+	struct equalizer EQ[10];
+};
+
+
+void EQ_init();
+int EQ_getEqualizersNumber();
+struct equalizer EQ_get(char *name);
+struct equalizer EQ_getShort(char *shortName);
+struct equalizer EQ_getIndex(int index);

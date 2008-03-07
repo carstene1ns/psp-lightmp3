@@ -46,9 +46,9 @@ unsigned int AA3ME_volume_boost = 0;
 long AA3ME_suspendPosition = -1;
 long AA3ME_suspendIsPlaying = 0;
 
-unsigned char AA3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
-unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
-unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
+unsigned char AA3ME_output_buffer[2048*4]; //__attribute__((aligned(64)));//at3+ sample_per_frame*4
+unsigned long AA3ME_codec_buffer[65]; //__attribute__((aligned(64)));
+unsigned char AA3ME_input_buffer[2889]; //__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Private functions:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -270,6 +270,7 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
     int tag_length;
     char tag[4];
 
+    strcpy(AA3ME_fileName, filename);
     size = GetID3TagSize(filename);
 
     fp = fopen(filename, "rb");
@@ -320,6 +321,14 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
         {
             fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->genre);
+        }
+        else if(!strncmp("APIC",tag,4)) /* Picture */
+        {
+            /*fseek(fp, 1, SEEK_CUR);
+            fseek(fp, 13, SEEK_CUR);
+            targetInfo->encapsulatedPictureOffset = ftell(fp);
+            targetInfo->encapsulatedPictureLength = tag_length-14;
+            fseek(fp, tag_length-14, SEEK_CUR);*/
         }
         else
         {
@@ -383,6 +392,8 @@ int AA3MEgetInfo(){
 
     if ( data_align == 0xC0 )
         AA3ME_info.kbit = 66;
+    else if ( data_align == 0x178 )
+        AA3ME_info.kbit = 64;
     else if ( data_align == 0x230 )
         AA3ME_info.kbit = 96;
     else if ( data_align == 0x130 )

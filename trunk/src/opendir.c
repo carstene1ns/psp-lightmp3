@@ -27,120 +27,72 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <ctype.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include "opendir.h"
 
-static SceIoDirent directory_entry;
+static struct dirent *directory_entry;
 
-
-void opendir_safe_constructor(struct opendir_struct *p)
-	{
-	p->directory = -1;
-
+void opendir_safe_constructor(struct opendir_struct *p){
+	p->directory = NULL;
 	p->directory_entry = 0;
-	}
+	p->number_of_directory_entries = 0;
+}
 
 
-void opendir_close(struct opendir_struct *p)
-	{
-	if (!(p->directory < 0)) sceIoDclose(p->directory);
-
+void opendir_close(struct opendir_struct *p){
+	if (!(p->directory != NULL)) closedir(p->directory);
 	if (p->directory_entry) free_64(p->directory_entry);
 
-
 	opendir_safe_constructor(p);
-	}
+}
 
 
 char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5], int extNumber, int includeDirs)
 	{
 	opendir_safe_constructor(p);
 
-	/*if (chdir(directory) < 0)
-		{
+	p->directory = opendir(directory);
+	if (p->directory == NULL){
 		opendir_close(p);
-		return("opendir_open: chdir failed");
-		}*/
-
-
-
-
-	p->directory = sceIoDopen(directory);
-	if (p->directory < 0)
-		{
-		opendir_close(p);
-		return("opendir_open: sceIoDopen failed");
-		}
-
-
-
+		return("opendir_open: opendir failed");
+	}
 
 	unsigned int number_of_directory_entries = 0;
 
+	while (1){
+		memset(&directory_entry, 0, sizeof(struct dirent));
+		directory_entry = readdir(p->directory);
 
-	while (1)
-		{
-		memset(&directory_entry, 0, sizeof(SceIoDirent));
-		int result = sceIoDread(p->directory, &directory_entry);
-
-		if (result == 0)
-			{
+		if (directory_entry == NULL)
 			break;
-			}
-		else if (result > 0)
-			{
-			number_of_directory_entries++;
-			}
 		else
-			{
-			opendir_close(p);
-			return("opendir_open: sceIoDread failed");
-			}
-		}
-
-
-
-
-	sceIoDclose(p->directory);
-	p->directory = -1;
-
-
-
-
-	p->directory = sceIoDopen(directory);
-	if (p->directory < 0)
-		{
+			number_of_directory_entries++;
+    }
+    
+	closedir(p->directory);
+	p->directory = NULL;
+	p->directory = opendir(directory);
+	if (p->directory == NULL){
 		opendir_close(p);
-		return("opendir_open: sceIoDopen failed");
-		}
+		return("opendir_open: opendir failed");
+	}
 
-
-	p->directory_entry = malloc_64(sizeof(SceIoDirent) * number_of_directory_entries);
-	if (p->directory_entry == 0)
-		{
+	p->directory_entry = malloc_64(sizeof(struct dirent) * number_of_directory_entries);
+	if (p->directory_entry == 0){
 		opendir_close(p);
 		return("opendir_open: malloc_64 failed on directory_entry");
-		}
-
-
-
+	}
 
 	p->number_of_directory_entries = 0;
-
-
 	int i = 0;
 
-	for (; i < number_of_directory_entries; i++)
-		{
-		memset(&directory_entry, 0, sizeof(SceIoDirent));
-		int result = sceIoDread(p->directory, &directory_entry);
-
-		if (result == 0)
-			{
+	for (; i < number_of_directory_entries; i++){
+		memset(&directory_entry, 0, sizeof(struct dirent));
+		directory_entry = readdir(p->directory);
+		if (directory_entry == NULL)
 			break;
-			}
-		else if (result > 0)
-			{
-			p->directory_entry[p->number_of_directory_entries] = directory_entry;
+		else{
+			p->directory_entry[p->number_of_directory_entries] = *directory_entry;
 
 			//Filtro le dir "." e "..":
 			if (p->directory_entry[p->number_of_directory_entries].d_name[0] == '.')
@@ -171,29 +123,19 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 			//Elemento ok:
 			p->number_of_directory_entries++;
 			}
-		else
-			{
-			opendir_close(p);
-			return("opendir_open: sceIoDread failed");
-			}
 		}
 
 
-	sceIoDclose(p->directory);
-	p->directory = -1;
+	closedir(p->directory);
+	p->directory = NULL;
 
-
-
-
-	if (p->number_of_directory_entries == 0)
-		{
+	if (p->number_of_directory_entries == 0){
 		opendir_close(p);
 		return("opendir_open: number_of_directory_entries == 0");
-		}
-
+	}
 
 	return(0);
-	}
+}
 
 //Ordinamento dei file di una directory:
 void sortDirectory(struct opendir_struct *directory){
@@ -207,7 +149,7 @@ void sortDirectory(struct opendir_struct *directory){
         sprintf(comp2, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode)?"A":"Z", directory->directory_entry[i].d_name);
 
 		if (i == 0 || strcmp(comp1, comp2) <= 0) i++;
-		else {SceIoDirent tmp = directory->directory_entry[i]; directory->directory_entry[i] = directory->directory_entry[i-1]; directory->directory_entry[--i] = tmp;}
+		else {struct dirent tmp = directory->directory_entry[i]; directory->directory_entry[i] = directory->directory_entry[i-1]; directory->directory_entry[--i] = tmp;}
 	}
 }
 
@@ -229,4 +171,60 @@ void getExtension(char *fileName, char *extension, int extMaxLength){
             return;
         }
     }
+}
+
+//Get directory up one level:
+int directoryUp(char *dirName)
+{
+	if (dirName != "ms0:/"){
+		//Cerco l'ultimo slash:
+		int i = 0;
+		for (i = strlen(dirName) - 1; i >= 0; i--){
+			if ((dirName[i] == '/') & (i != strlen(dirName))){
+				if (i > 4){
+					dirName[i] = '\0';
+				}else{
+					dirName[i+1] = '\0';
+				}
+				break;
+			}
+		}
+		return(0);
+	}else{
+		return(-1);
+	}
+}
+
+//Prendo solo il nome del file/directory:
+void getFileName(char *fileName, char *onlyName){
+	int slash = -1;
+	int retCount;
+
+	strcpy(onlyName, fileName);
+	//Cerco l'ultimo slash:
+	int i = 0;
+	for (i = strlen(fileName) - 1; i >= 0; i--){
+		if ((fileName[i] == '/') & (i != strlen(fileName))){
+			slash = i;
+			break;
+		}
+	}
+	if (slash){
+		retCount = 0;
+		for (i = slash + 1; i < strlen(fileName); i++){
+			onlyName[retCount] = fileName[i];
+			retCount++;
+		}
+		onlyName[retCount] = '\0';
+	}else{
+		strcpy(onlyName, fileName);
+	}
+}
+
+//Check if a file esists (return fileSize if exists, -1 if doesen't exists):
+int fileExists(char *fileName){
+    struct stat stbuf;
+    if(stat(fileName, &stbuf) == -1)
+        return -1;
+    return stbuf.st_size;
 }

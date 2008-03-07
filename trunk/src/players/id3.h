@@ -1,3 +1,6 @@
+#define JPEG_IMAGE 1
+#define PNG_IMAGE 2
+
 struct ID3Tag {
     char   ID3Title[100];
     char   ID3Artist[100];
@@ -9,8 +12,10 @@ struct ID3Tag {
     char   versionfound[10];
     int    ID3Track;    
     char   ID3TrackText[4];
+    int    ID3EncapsulatedPictureType;
     int    ID3EncapsulatedPictureOffset; /* Offset address of an attached picture, NULL if no attached picture exists */
-    
+    int    ID3EncapsulatedPictureLength;
+    int    ID3Length;
 };
 
 int ID3v2TagSize(const char *mp3path);

@@ -24,12 +24,14 @@
 #include <pspkernel.h>
 #include <pspsdk.h>
 #include <string.h>
+#include <stdio.h>
 #include <psputility_avmodules.h>
 #include <pspaudio.h>
 #include "player.h"
-
+#include "../opendir.h"
 
 //shared global vars
+char fileTypeDescription[4][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC"};
 int MUTED_VOLUME = 800;
 int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;
@@ -54,7 +56,7 @@ volatile int OutputBuffer_flip;
 u16 at3_type;
 u8* at3_data_buffer;
 u8 at3_at3plus_flagdata[2];
-unsigned char   AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE]__attribute__((aligned(64))),
+unsigned char   AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE], //__attribute__((aligned(64))),
                 *AT3_OutputPtr=AT3_OutputBuffer[0];
 
 //Pointers for functions:
@@ -488,7 +490,7 @@ int endAudioLib(){
 //Init a file info structure:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void initFileInfo(struct fileInfo *info){
-    info->fileType = 0;
+    info->fileType = -1;
     info->defaultCPUClock = 0;
     info->needsME = 0;
     info->fileSize = 0;
@@ -502,7 +504,9 @@ void initFileInfo(struct fileInfo *info){
     strcpy(info->strLength, "");
     info->frames = 0;
     info->framesDecoded = 0;
+    info->encapsulatedPictureType = 0;
     info->encapsulatedPictureOffset = 0;
+    info->encapsulatedPictureLength = 0;
     
     strcpy(info->album, "");
     strcpy(info->title, "");
@@ -510,4 +514,33 @@ void initFileInfo(struct fileInfo *info){
     strcpy(info->genre, "");
     strcpy(info->year, "");
     strcpy(info->trackNumber, "");
+    strcpy(info->coverArtImageName, "");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Get the cover art image name:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void getCovertArtImageName(char *fileName, struct fileInfo *info){
+    char dirName[262] = "";
+    char buffer[262] = "";
+    
+    strcpy(info->coverArtImageName, "");
+
+    //Look for fileName.jpg in the same directory:
+    sprintf(buffer, "%s.jpg", fileName);
+    int size = fileExists(buffer);
+    if (size > 0 && size <= MAX_IMAGE_DIMENSION){
+        strcpy(info->coverArtImageName, buffer);
+        return;
+    }
+    
+    //Look for cover.jpg in same directory:
+    strcpy(dirName, fileName);
+    directoryUp(dirName);
+    sprintf(buffer, "%s/%s", dirName, "cover.jpg");
+    size = fileExists(buffer);
+    if (size > 0 && size <= MAX_IMAGE_DIMENSION){
+        strcpy(info->coverArtImageName, buffer);
+        return;
+    }
 }

@@ -12,6 +12,7 @@ Version 1.7.2
 -Fixed: Repeat track mode.
 -Fixed: Cracking sound when quitting while playing a track.
 -Fixed: Some mp3 with "strange" ID3 made the app freeze.
+-Fixed: Some mp3 displayed wrong ID3v2 informations.
 
 
 Version 1.7.1 (bugfix release)

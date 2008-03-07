@@ -16,7 +16,32 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-void setBusClock(int bus);
-void setCpuClock(int cpu);
-int getCpuClock();
-int getBusClock();
+//M3U header file
+#define MAX_SONGS 3000
+
+struct M3U_songEntry{
+	char fileName[262];
+	int length;
+	char title[257];
+};
+
+struct M3U_playList{
+	char fileName[262];
+	int songCount;
+	struct M3U_songEntry songs[MAX_SONGS];
+	int modified;
+};
+
+int M3U_open(char *fileName);
+int M3U_save(char *fileName);
+int M3U_getSongCount();
+int M3U_getTotalLength();
+int M3U_moveSongUp();
+int M3U_moveSongDown();
+int M3U_removeSong(int index);
+int M3U_addSong(char *fileName, int length, char *title);
+struct M3U_songEntry M3U_getSong(int index);
+int M3U_isModified();
+int M3U_forceModified(int modified);
+int M3U_clear();
+struct M3U_playList *M3U_getPlaylist();
