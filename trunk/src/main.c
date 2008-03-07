@@ -39,7 +39,7 @@
 #include "settings.h"
 #include "opendir.h"
 #include "players/m3u.h"
-#include "equalizer.h"
+#include "players/equalizer.h"
 #include "audioscrobbler.h"
 
 //#include "log.h"
@@ -98,7 +98,7 @@ int stopUnloadModule(SceUID modID);
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int current_mode;
-char version[10] = "1.7.4";
+char version[10] = "1.7.3";
 int oldBrightness = 0;
 char ebootDirectory[262] = "";
 char currentPlaylist[262] = "";
