@@ -38,7 +38,7 @@
 #include "usb.h"
 #include "settings.h"
 #include "opendir.h"
-#include "m3u.h"
+#include "players/m3u.h"
 #include "equalizer.h"
 #include "audioscrobbler.h"
 
@@ -98,7 +98,7 @@ int stopUnloadModule(SceUID modID);
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int current_mode;
-char version[10] = "1.7.2";
+char version[10] = "1.7.4";
 int oldBrightness = 0;
 char ebootDirectory[262] = "";
 char currentPlaylist[262] = "";
@@ -132,9 +132,8 @@ int powerCallback(int unknown, int powerInfo, void *common){
        if (!suspended){
            resuming = 1;                   
            //Suspend
-           if (suspendFunct != NULL){
+           if (suspendFunct != NULL)
               (*suspendFunct)();
-           }
            //Riattivo il display:
            if (!displayStatus){
                displayEnable();
@@ -229,54 +228,6 @@ void nextMode(){
 void previousMode(){
 	if (--current_mode < 0){
 		current_mode = 3;
-	}
-}
-
-//Prendo solo il nome del file/directory:
-void getFileName(char *fileName, char *onlyName){
-	int slash = -1;
-	int retCount;
-
-	strcpy(onlyName, fileName);
-	//Cerco l'ultimo slash:
-	int i = 0;
-	for (i = strlen(fileName) - 1; i >= 0; i--){
-		if ((fileName[i] == '/') & (i != strlen(fileName))){
-			slash = i;
-			break;
-		}
-	}
-	if (slash){
-		retCount = 0;
-		for (i = slash + 1; i < strlen(fileName); i++){
-			onlyName[retCount] = fileName[i];
-			retCount++;
-		}
-		onlyName[retCount] = '\0';
-	}else{
-		strcpy(onlyName, fileName);
-	}
-}
-
-//Calcolo livello superiore:
-int directoryUp(char *dirName)
-{
-	if (dirName != "ms0:/"){
-		//Cerco l'ultimo slash:
-		int i = 0;
-		for (i = strlen(dirName) - 1; i >= 0; i--){
-			if ((dirName[i] == '/') & (i != strlen(dirName))){
-				if (i > 4){
-					dirName[i] = '\0';
-				}else{
-					dirName[i+1] = '\0';
-				}
-				break;
-			}
-		}
-		return(0);
-	}else{
-		return(-1);
 	}
 }
 
@@ -619,6 +570,9 @@ void addFileToPlaylist(char *fileName, int save){
 	struct fileInfo info;
 	char onlyName[262] = "";
 
+	if (save == 1)
+		M3U_open(tempM3Ufile);
+
     setAudioFunctions(fileName, userSettings.MP3_ME);
 	(*initFunct)(0);
 	if ((*loadFunct)(fileName) == OPENING_OK){
@@ -634,6 +588,7 @@ void addFileToPlaylist(char *fileName, int save){
 		if (save == 1)
 			M3U_save(tempM3Ufile);
 	}
+    unsetAudioFunctions();
 }
 
 
@@ -1115,6 +1070,11 @@ int playFile(char *filename, char *numbers, char *message) {
       struct fileInfo tempInfo;
       int barLength = 22;
 
+      int oldClock = getCpuClock();
+      int oldBus = getBusClock();
+      setCpuClock(222);
+      setBusClock(111);
+
 	  screen_init();
 	  info.kbit = 0;
 	  info.hz = 0;
@@ -1197,6 +1157,9 @@ int playFile(char *filename, char *numbers, char *message) {
 	  info = (*getInfoFunct)();
 	  screen_fileinfo(info);
 	  
+      setBusClock(oldBus);
+      setCpuClock(oldClock);
+    
 	  //Imposto il clock:
       if (userSettings.CLOCK_AUTO){
           clock = info.defaultCPUClock;
@@ -2865,7 +2828,11 @@ int main() {
 	pspDebugScreenInit();
 	//SetupCallbacks();
     initExceptionHandler();
-    
+
+    // Register the power callback.
+     const SceUID powerCallbackID = sceKernelCreateCallback("powerCallback", powerCallback, NULL);
+     scePowerRegisterCallback(0, powerCallbackID); 
+
     //Start support prx
 	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
 	if (modid < 0){

@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-#include "clock.h"
 #include "id3.h"
 #include "player.h"
 #include "mp3playerME.h"
@@ -52,7 +51,7 @@ int MP3ME_defaultCPUClock = 20;
 
 //Globals for decoding:
 SceUID MP3ME_handle;
-unsigned char MP3ME_data_buffer[2889]__attribute__((aligned(64)));
+unsigned char MP3ME_data_buffer[2889]; //__attribute__((aligned(64)));
 
 static int samplerates[4][3] = 
 {
@@ -64,9 +63,9 @@ static int samplerates[4][3] =
 static int bitrates[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320 };
 static int bitrates_v2[] = {0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160 };
 
-unsigned long MP3ME_codec_buffer[65] __attribute__((aligned(64)));
-unsigned char MP3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
-unsigned char MP3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
+unsigned long MP3ME_codec_buffer[65]; // __attribute__((aligned(64)));
+unsigned char MP3ME_input_buffer[2889]; //__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
+unsigned char MP3ME_output_buffer[2048*4]; //__attribute__((aligned(64)));//at3+ sample_per_frame*4
 int MP3ME_output_index = 0;
 unsigned char	OutputBuffer[2][OUTPUT_BUFFER_SIZE],
 				*OutputPtrME=OutputBuffer[0];
@@ -294,7 +293,7 @@ int decodeThread(SceSize args, void *argp){
 		        //Check for playing speed:
                 if (MP3ME_playingSpeed){
                     long old_start = data_start;
-                    sceIoLseek32(MP3ME_handle, data_start + frame_size * 5 * MP3ME_playingSpeed, PSP_SEEK_SET);
+                    sceIoLseek32(MP3ME_handle, frame_size * 5 * MP3ME_playingSpeed, PSP_SEEK_CUR);
                     //MP3ME_playingTime += (float)sample_per_frame/(float)samplerate * 5.0 * (float)MP3ME_playingSpeed;
                     data_start = SeekNextFrame(MP3ME_handle);
     				if(data_start < 0){
@@ -326,6 +325,7 @@ int decodeThread(SceSize args, void *argp){
 void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
     //ID3:
     struct ID3Tag ID3;
+    strcpy(MP3ME_fileName, filename);
     ID3 = ParseID3(filename);
     strcpy(targetInfo->title, ID3.ID3Title);
     strcpy(targetInfo->artist, ID3.ID3Artist);
@@ -333,6 +333,10 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
     strcpy(targetInfo->year, ID3.ID3Year);
     strcpy(targetInfo->genre, ID3.ID3GenreText);
     strcpy(targetInfo->trackNumber, ID3.ID3TrackText);
+    targetInfo->length = ID3.ID3Length / 1000;
+    targetInfo->encapsulatedPictureType = ID3.ID3EncapsulatedPictureType;
+    targetInfo->encapsulatedPictureOffset = ID3.ID3EncapsulatedPictureOffset;
+    targetInfo->encapsulatedPictureLength = ID3.ID3EncapsulatedPictureLength;
 }
 
 //Get info on file:
@@ -342,23 +346,23 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
 int MP3MEgetInfo(){
 	unsigned long FrameCount = 0;
     int fd;
-    int bufferSize = 1024*512;
+    int bufferSize = 1024*500;
     u8 *localBuffer;
-    long dataRed = 0;
-	mad_timer_t libMadlength;
+    long singleDataRed = 0;
 	struct mad_stream stream;
 	struct mad_header header;
+    int timeFromID3 = 0;
+    float mediumBitrate = 0;
+    
+    getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
 
-    int oldClock = getCpuClock();
 	mad_stream_init (&stream);
 	mad_header_init (&header);
     
-    localBuffer = (unsigned char *) malloc(bufferSize);
     fd = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
     if (fd < 0)
         return -1;
 
-    setCpuClock(222);
 	long size = sceIoLseek(fd, 0, PSP_SEEK_END);
     sceIoLseek(fd, 0, PSP_SEEK_SET);
     
@@ -367,18 +371,23 @@ int MP3MEgetInfo(){
     startPos = SeekNextFrame(fd);
     size -= startPos;
     
+    if (size < bufferSize * 3)
+        bufferSize = size;
+    localBuffer = (unsigned char *) malloc(bufferSize);
+
     MP3ME_info.fileType = MP3_TYPE;
     MP3ME_info.defaultCPUClock = MP3ME_defaultCPUClock;
     MP3ME_info.needsME = 1;
 	MP3ME_info.fileSize = size;
     MP3ME_info.framesDecoded = 0;
-	mad_timer_reset(&libMadlength);
-	while (1){
-        if (dataRed >= size)
-            break;
+    
+    double totalBitrate = 0;
+    int i = 0;
+    
+	for (i=0; i<3; i++){
         memset(localBuffer, 0, bufferSize);
-        dataRed += sceIoRead(fd, localBuffer, bufferSize);
-    	mad_stream_buffer (&stream, localBuffer, bufferSize);
+        singleDataRed = sceIoRead(fd, localBuffer, bufferSize);
+    	mad_stream_buffer (&stream, localBuffer, singleDataRed);
 
         while (1){
     		if (mad_header_decode (&header, &stream) == -1){
@@ -391,7 +400,7 @@ int MP3MEgetInfo(){
     			}
     		}
     		//Informazioni solo dal primo frame:
-    	    if (FrameCount == 0){
+    	    if (FrameCount++ == 0){
     			switch (header.layer) {
     			case MAD_LAYER_I:
     				strcpy(MP3ME_info.layer,"I");
@@ -445,14 +454,24 @@ int MP3MEgetInfo(){
     				strcpy(MP3ME_info.emphasis,"unknown");
     				break;
     			}
+    			
+    			//Check if lenght found in tag info:
+                if (MP3ME_info.length > 0){
+                    timeFromID3 = 1;
+                    break;
+                }
             }
     		//Controllo il cambio di sample rate (ma non dovrebbe succedere)
     		if (header.samplerate > MP3ME_info.hz)
       		   MP3ME_info.hz = header.samplerate;
-
-    		//Conteggio frame e durata totale:
-    		FrameCount++;
-    		mad_timer_add (&libMadlength, header.duration);
+      		   
+            totalBitrate += header.bitrate;
+            if (size == bufferSize)
+                break;
+            else if (i==0)
+                sceIoLseek(fd, startPos + size/3, PSP_SEEK_SET);
+            else if (i==1)
+                sceIoLseek(fd, startPos + 2 * size/3, PSP_SEEK_SET);
 		}
 	}
 	mad_header_finish (&header);
@@ -460,13 +479,21 @@ int MP3MEgetInfo(){
 	free(localBuffer);
     sceIoClose(fd);
     
-	MP3ME_info.frames = FrameCount;
+    mediumBitrate = totalBitrate / (float)FrameCount;
+    int secs = 0;
+    if (!MP3ME_info.length){
+        secs = size * 8 / mediumBitrate;
+        MP3ME_info.length = secs;
+    }else{
+        secs = MP3ME_info.length;
+    }
+    
 	//Formatto in stringa la durata totale:
-	MP3ME_info.length = mad_timer_count(libMadlength, MAD_UNITS_SECONDS);
-	mad_timer_string(libMadlength, MP3ME_info.strLength, "%02lu:%02u:%02u", MAD_UNITS_HOURS, MAD_UNITS_MILLISECONDS, 0);
+	int h = secs / 3600;
+	int m = (secs - h * 3600) / 60;
+	int s = secs - h * 3600 - m * 60;
+	snprintf(MP3ME_info.strLength, sizeof(MP3ME_info.strLength), "%2.2i:%2.2i:%2.2i", h, m, s);
 
-    getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
-    setCpuClock(oldClock);
     return 0;
 }
 /*int MP3MEgetInfo(){
@@ -656,7 +683,10 @@ struct fileInfo MP3ME_GetInfo(){
 
 
 int MP3ME_GetPercentage(){
-    return (int)(MP3ME_playingTime/(double)MP3ME_info.length*100.0);
+    int perc = (int)(MP3ME_playingTime/(double)MP3ME_info.length*100.0);
+    if (perc > 100)
+        perc = 100;
+    return perc;
 }
 
 

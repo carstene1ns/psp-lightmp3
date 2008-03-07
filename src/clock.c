@@ -26,6 +26,10 @@ int getCpuClock(){
     return scePowerGetCpuClockFrequency();
 }
 
+int getBusClock(){
+    return scePowerGetBusClockFrequency();
+}
+
 void setBusClock(int bus){
     if (bus >= 54 && bus <= 111 && sceKernelDevkitVersion() < 0x03070110)
         scePowerSetBusClockFrequency(bus);

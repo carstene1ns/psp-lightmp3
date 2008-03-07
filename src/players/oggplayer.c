@@ -46,7 +46,7 @@ int OGG_defaultCPUClock = 50;
 /////////////////////////////////////////////////////////////////////////////////////////
 static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
     short *_buf = (short *)_buf2;
-    static short tempmixbuf[PSP_NUM_AUDIO_SAMPLES * 2 * 2] __attribute__ ((aligned(64)));
+    static short tempmixbuf[PSP_NUM_AUDIO_SAMPLES * 2 * 2]; // __attribute__ ((aligned(64)));
     static unsigned long tempmixleft = 0;
 	int current_section;
 
@@ -131,6 +131,18 @@ int ogg_callback_close(void *datasource)
     return sceIoClose(*(int *) datasource);
 }
 
+void readOggTagData(char *source, char *dest){
+    int count = 0;
+    int i = 0;
+
+    strcpy(dest, "");
+    for (i=0; i<strlen(source); i++){
+        if (source[i] >= 0x20 && count < 256)
+            dest[count++] = source[i];
+    }
+    dest[count] = '\0';
+}
+
 void splitComment(char *comment, char *name, char *value){
 	char *result = NULL;
 	result = strtok(comment, "=");
@@ -144,8 +156,8 @@ void splitComment(char *comment, char *name, char *value){
 					name[30] = '\0';
 					break;
 				case 1:
-					strncpy(value, result, 256);
-					value[256] = '\0';					
+					readOggTagData(result, value);
+					value[256] = '\0';
 					break;
 			}
 			count++;
@@ -153,7 +165,6 @@ void splitComment(char *comment, char *name, char *value){
 		result = strtok(NULL, "=");
 	}
 }
-
 
 void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
 	int i;
@@ -171,10 +182,21 @@ void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
 			strcpy(targetInfo->artist, value);
 		else if(!strcmp(name, "GENRE"))
 			strcpy(targetInfo->genre, value);
-		else if(!strcmp(name, "DATE"))
-            strcpy(targetInfo->year, value);
-		else if(!strcmp(name, "TRACKNUMBER"))
+		else if(!strcmp(name, "DATE")){
+            strncpy(targetInfo->year, value, 4);
+            targetInfo->year[4] = '\0';
+		}else if(!strcmp(name, "TRACKNUMBER"))
             strcpy(targetInfo->trackNumber, value);
+		/*else if(!strcmp(name, "COVERART_UUENCODED")){
+            FILE *out = fopen("ms0:/coverart.jpg", "wb");
+            FILE *outEnc = fopen("ms0:/coverart.txt", "wb");
+            unsigned char base64Buffer[MAX_IMAGE_DIMENSION];
+            fwrite(&comment->user_comments[i][19], 1, comment->comment_lengths[i] - 19, outEnc);
+            int outChars = base64Decode(comment->comment_lengths[i], comment->user_comments[i], MAX_IMAGE_DIMENSION, base64Buffer);
+            fwrite(base64Buffer, 1, outChars, out);
+            fclose(outEnc);
+            fclose(out);
+        }*/
 	}
 }
 
@@ -213,6 +235,7 @@ void OGG_Init(int channel){
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
     OGG_audio_channel = channel;
+    OGG_milliSeconds = 0.0;
     pspAudioSetChannelCallback(OGG_audio_channel, oggDecodeThread, NULL);
 }
 
@@ -301,6 +324,7 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
     OggVorbis_File vf;
     struct fileInfo tempInfo;
 
+    strcpy(OGG_fileName, filename);
     initFileInfo(&tempInfo);
 	//Apro il file OGG:
 	tempFile = sceIoOpen(filename, PSP_O_RDONLY, 0777);

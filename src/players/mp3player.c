@@ -322,6 +322,7 @@ void MP3_FreeTune(){
 void getMP3TagInfo(char *filename, struct fileInfo *targetInfo){
     //ID3:
     struct ID3Tag ID3;
+    strcpy(MP3_fileName, filename);
     ID3 = ParseID3(filename);
     strcpy(targetInfo->title, ID3.ID3Title);
     strcpy(targetInfo->artist, ID3.ID3Artist);
@@ -329,6 +330,9 @@ void getMP3TagInfo(char *filename, struct fileInfo *targetInfo){
     strcpy(targetInfo->year, ID3.ID3Year);
     strcpy(targetInfo->genre, ID3.ID3GenreText);
     strcpy(targetInfo->trackNumber, ID3.ID3TrackText);
+    targetInfo->encapsulatedPictureType = ID3.ID3EncapsulatedPictureType;
+    targetInfo->encapsulatedPictureOffset = ID3.ID3EncapsulatedPictureOffset;
+    targetInfo->encapsulatedPictureLength = ID3.ID3EncapsulatedPictureLength;
 }
 
 void MP3getInfo(){

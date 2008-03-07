@@ -28,27 +28,24 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef opendir_h
 #define opendir_h
 
-
-#include <pspiofilemgr.h>
+#include <dirent.h>
 #include <sys/unistd.h>
 #include <string.h>
 #include "mem64.h"
 
-
-struct opendir_struct
-	{
-	SceUID directory;
-
-	SceIoDirent *directory_entry;
-	
-	unsigned int number_of_directory_entries;
-	};
-
+struct opendir_struct{
+    DIR *directory;
+    struct dirent *directory_entry;
+    unsigned int number_of_directory_entries;
+};
 
 void opendir_safe_constructor(struct opendir_struct *p);
 void opendir_close(struct opendir_struct *p);
 char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5], int extNumber, int includeDirs);
 void sortDirectory(struct opendir_struct *directory);
 void getExtension(char *fileName, char *extension, int extMaxLength);
+void getFileName(char *fileName, char *onlyName);
+int directoryUp(char *dirName);
+int fileExists(char *fileName);
 
 #endif

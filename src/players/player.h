@@ -46,6 +46,9 @@
 #define UNK_TYPE -1
 
 #define FASTFORWARD_VOLUME 0x2200
+#define MAX_IMAGE_DIMENSION 150*1024
+
+extern char fileTypeDescription[4][20];
 
 extern int MUTED_VOLUME;
 extern int currentVolume;
@@ -95,8 +98,11 @@ struct fileInfo{
 	char strLength[10];
 	long frames;
 	long framesDecoded;
+	int  encapsulatedPictureType;
 	int  encapsulatedPictureOffset;
-
+	int  encapsulatedPictureLength;
+	char coverArtImageName[262];
+	
     //Tag/comments:
 	char album[256];
 	char title[256];
@@ -149,3 +155,4 @@ int setAudioFrequency(unsigned short samples, unsigned short freq, char car);
 int releaseAudio(void);
 int audioOutput(int volume, void *buffer);
 void initFileInfo(struct fileInfo *info);
+void getCovertArtImageName(char *fileName, struct fileInfo *info);
