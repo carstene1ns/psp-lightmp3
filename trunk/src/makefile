@@ -1,9 +1,9 @@
 TARGET = mp3
-OBJS = prx/supportlib.o usb.o audioscrobbler.o settings.o log.o \
+OBJS = prx/supportlib.o audioscrobbler.o settings.o system/log.o \
        players/equalizer.o players/m3u.o \
-       players/pspaudiolib.o players/id3.o players/mp3player.o players/oggplayer.o \
+       players/pspaudiolib.o players/id3.o players/mp3player.o players/oggplayer.o players/aacplayer.o \
        players/mp3playerME.o players/aa3playerME.o players/flacplayer.o players/player.o \
-       clock.o osk.o mem64.o opendir.o exception.o main.o
+       system/usb.o system/clock.o system/osk.o system/mem64.o system/opendir.o system/exception.o main.o
 
 #To build for custom firmware:
 BUILD_PRX = 1
@@ -15,7 +15,7 @@ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LIBDIR =
 
-LIBS = -lFLAC -lmad -lvorbisidec -lm \
+LIBS = -laac -lFLAC -lmad -lvorbisidec -lm \
        -lpspgu -lpspgum -lpsppower \
        -lpsphprm -lpspusb -lpspusbstor -lpspaudio -lpspaudiocodec -lpspkubridge
 LDFLAGS =

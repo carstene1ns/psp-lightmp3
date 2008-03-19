@@ -16,34 +16,34 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <string.h>
 #include "equalizer.h"
 
 struct equalizersList list;
 
 //Equalizers value:
-double EQ_None[32]		= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+double EQ_None[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int EQ_NUMBER = 1;
 
 //Read user equalizers from file:
 int initEqualizers(int initFromEQ){
 	FILE *f;
-	char lineText[256]; 
-	
+	char lineText[256];
+    struct equalizer tEQ;
+
 	f = fopen("equalizers", "rt");
 	if (f == NULL){
 		//Error opening file:
 		return(0);
 	}
-	
+
 	while(fgets(lineText, 256, f) != NULL){
 		int element = 0;
 		if (strlen(lineText) > 0){
 			if (lineText[0] != '#'){
 				//Split line:
 				element = 0;
-				struct equalizer tEQ;
 				char *result = NULL;
 				result = strtok(lineText, ";");
 				while(result != NULL){
@@ -61,8 +61,11 @@ int initEqualizers(int initFromEQ){
 				}
 				//If all data OK then add the EQ to the list:
 				if (element == 34){
-                    tEQ.index = EQ_NUMBER;
-					list.EQ[initFromEQ++] = tEQ;
+                    list.EQ[initFromEQ].index = EQ_NUMBER;
+					strcpy(list.EQ[initFromEQ].name, tEQ.name);
+                    strcpy(list.EQ[initFromEQ].shortName, tEQ.shortName);
+                    memcpy(list.EQ[initFromEQ].filter, tEQ.filter, sizeof(list.EQ[initFromEQ].filter));
+                    initFromEQ++;
 					EQ_NUMBER++;
 				}
 			}

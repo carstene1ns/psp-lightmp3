@@ -2,7 +2,7 @@
 
 #include "pspstub.s"
 
-	STUB_START "supportlib",0x40090000,0x00120005
+	STUB_START "supportlib",0x40090000,0x00130005
 	STUB_FUNC  0x19F94895,getBrightness
 	STUB_FUNC  0xB6551455,setBrightness
 	STUB_FUNC  0x1191DE7B,imposeSetBrightness
@@ -19,6 +19,7 @@
 	STUB_FUNC  0xC69E44DE,imposeSetHomePopup
 	STUB_FUNC  0x4F113DD9,imposeGetEqualizer
 	STUB_FUNC  0xB767B17B,imposeSetEqualizer
+	STUB_FUNC  0x21B02AF5,getModelKernel
 	STUB_FUNC  0x57AAF69E,getModuleListID
 	STUB_FUNC  0xC5985F94,stopUnloadModule
 	STUB_END

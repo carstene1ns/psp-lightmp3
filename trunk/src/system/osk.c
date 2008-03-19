@@ -1,5 +1,5 @@
 //    LightMP3
-//    Copyright (C) 2007 Sakya
+//    Copyright (C) 2007, 2008 Sakya
 //    sakya_tg@yahoo.it
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -69,7 +69,7 @@ static void setupGu(void){
 	sceGuDisplay(GU_TRUE);
 }
 
-static void resetGu(void){
+/*static void resetGu(void){
 	sceGuInit();
 	sceGuStart(GU_DIRECT, list);
 	sceGuDrawBuffer(GU_PSM_8888, (void*)0, BUF_WIDTH);
@@ -92,7 +92,7 @@ static void resetGu(void){
 	sceGuSync(0,0);
 	sceDisplayWaitVblankStart();
 	sceGuDisplay(GU_TRUE);
-}
+}*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Get text from OSK:
@@ -122,7 +122,8 @@ int get_text_osk(char *input, unsigned short *intext, unsigned short *desc){
 	osk.base.language = 1;
 	osk.base.buttonSwap = 1;		// X button: 1
 	osk.base.graphicsThread = 17;	// gfx thread pri
-	osk.base.unknown = 19;			// unknown thread pri (?)
+	//osk.base.unknown = 19;			// unknown thread pri (?)
+	osk.base.accessThread = 19;
 	osk.base.fontThread = 18;
 	osk.base.soundThread = 16;
 	osk.unk_48 = 1;
@@ -174,7 +175,7 @@ int get_text_osk(char *input, unsigned short *intext, unsigned short *desc){
 		sceGuSwapBuffers();
 	}
 
-	resetGu();
+	//resetGu();
 
 	return 1;
 }
@@ -195,7 +196,7 @@ char *requestString (char *descStr, char *initialStr){
 	if (descStr[0] != 0)
 		for (i=0; i<=strlen(descStr); i++)
 			desc[i] = (unsigned short)descStr[i];
-			
+
 	ok = get_text_osk(str, intext, desc);
 
 	pspDebugScreenInit();

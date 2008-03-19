@@ -30,30 +30,29 @@
 #include "mp3playerME.h"
 
 #define THREAD_PRIORITY 12
-#define OUTPUT_BUFFER_SIZE	(1152*2*4)
+#define OUTPUT_BUFFER_SIZE	(1152*4)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int MP3ME_threadActive = 0;
 int MP3ME_threadExited = 1;
-char MP3ME_fileName[262];
+char MP3ME_fileName[264];
 static int MP3ME_isPlaying = 0;
 int MP3ME_thid = -1;
 int MP3ME_audio_channel = 0;
 int MP3ME_eof = 0;
 struct fileInfo MP3ME_info;
 int MP3ME_playingSpeed = 0; // 0 = normal
-int MP3ME_volume_boost = 0;
+unsigned int MP3ME_volume_boost = 0;
 float MP3ME_playingTime = 0;
 int MP3ME_volume = 0;
 int MP3ME_defaultCPUClock = 20;
 
 //Globals for decoding:
 SceUID MP3ME_handle;
-unsigned char MP3ME_data_buffer[2889]; //__attribute__((aligned(64)));
 
-static int samplerates[4][3] = 
+static int samplerates[4][3] =
 {
     {11025, 12000, 8000,},//mpeg 2.5
     {0, 0, 0,}, //reserved
@@ -63,74 +62,17 @@ static int samplerates[4][3] =
 static int bitrates[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320 };
 static int bitrates_v2[] = {0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160 };
 
-unsigned long MP3ME_codec_buffer[65]; // __attribute__((aligned(64)));
-unsigned char MP3ME_input_buffer[2889]; //__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
-unsigned char MP3ME_output_buffer[2048*4]; //__attribute__((aligned(64)));//at3+ sample_per_frame*4
+unsigned char MP3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
+unsigned long MP3ME_codec_buffer[65]__attribute__((aligned(64)));
+unsigned char MP3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
+short OutputBuffer[2][OUTPUT_BUFFER_SIZE];
+short *OutputPtrME = OutputBuffer[0];
+
 int MP3ME_output_index = 0;
-unsigned char	OutputBuffer[2][OUTPUT_BUFFER_SIZE],
-				*OutputPtrME=OutputBuffer[0];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Private functions:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Seek next valid frame
-//NOTE: this function comes from Music prx 0.55 source
-//      all credits goes to joek2100.
-int SeekNextFrame(SceUID fd)
-{
-    int offset = 0;
-    unsigned char buf[1024];
-    unsigned char *pBuffer;
-    int i;
-    int size = 0;
-
-    offset = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
-    sceIoRead(fd, buf, sizeof(buf));
-    if (!strncmp((char*)buf, "ID3", 3) || !strncmp((char*)buf, "ea3", 3)) //skip past id3v2 header, which can cause a false sync to be found
-    {
-        //get the real size from the syncsafe int
-        size = buf[6];
-        size = (size<<7) | buf[7];
-        size = (size<<7) | buf[8];
-        size = (size<<7) | buf[9];
-
-        size += 10;
-
-        if (buf[5] & 0x10) //has footer
-            size += 10;
-    }
-
-    sceIoLseek32(fd, offset, PSP_SEEK_SET); //now seek for a sync
-    while(1) 
-    {
-        offset = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
-        size = sceIoRead(fd, buf, sizeof(buf));
-
-        if (size <= 2)//at end of file
-            return -1;
-    
-        if (!strncmp((char*)buf, "EA3", 3))//oma mp3 files have non-safe ints in the EA3 header
-        {
-            sceIoLseek32(fd, (buf[4]<<8)+buf[5], PSP_SEEK_CUR);
-            continue;
-        }
-
-        pBuffer = buf;
-        for( i = 0; i < size; i++)
-        {
-            //if this is a valid frame sync (0xe0 is for mpeg version 2.5,2+1)
-            if ( (pBuffer[i] == 0xff) && ((pBuffer[i+1] & 0xE0) == 0xE0))
-            {
-                offset += i;
-                sceIoLseek32(fd, offset, PSP_SEEK_SET);
-                return offset;
-            }
-        }
-       //go back two bytes to catch any syncs that on the boundary
-        sceIoLseek32(fd, -2, PSP_SEEK_CUR);
-    } 
-}
-
 //Decode thread:
 int decodeThread(SceSize args, void *argp){
     int res;
@@ -160,8 +102,8 @@ int decodeThread(SceSize args, void *argp){
 	sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_SET);
 	data_start = ID3v2TagSize(MP3ME_fileName);
 	sceIoLseek32(MP3ME_handle, data_start, PSP_SEEK_SET);
-    data_start = SeekNextFrame(MP3ME_handle);
-    
+    data_start = SeekNextFrameMP3(MP3ME_handle);
+
 	if (data_start < 0)
 		MP3ME_threadActive = 0;
 
@@ -204,13 +146,13 @@ int decodeThread(SceSize args, void *argp){
 
 			if ((bitrate > 14) || (version == 1) || (samplerate == 0) || (bitrate == 0))//invalid frame, look for the next one
 			{
-				data_start = SeekNextFrame(MP3ME_handle);
+				data_start = SeekNextFrameMP3(MP3ME_handle);
 				if(data_start < 0)
 				{
 					MP3ME_eof = 1;
 					continue;
 				}
-				size -= (data_start - offset); 
+				size -= (data_start - offset);
 				offset = data_start;
 				continue;
 			}
@@ -227,7 +169,7 @@ int decodeThread(SceSize args, void *argp){
 			}
 
 			sceIoLseek32(MP3ME_handle, data_start, PSP_SEEK_SET); //seek back
-					   
+
 			size -= frame_size;
 			if ( size <= 0)
 			{
@@ -239,8 +181,10 @@ int decodeThread(SceSize args, void *argp){
 			// handle has been invalidated by syspend/resume/usb
 			if ( sceIoRead( MP3ME_handle, MP3ME_input_buffer, frame_size ) != frame_size ){
                 //Resume from suspend:
-                if ( MP3ME_handle >= 0 )
+                if ( MP3ME_handle >= 0 ){
                    sceIoClose(MP3ME_handle);
+                   MP3ME_handle = -1;
+                }
                 MP3ME_handle = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
                 if (MP3ME_handle < 0){
                     MP3ME_isPlaying = 0;
@@ -257,7 +201,7 @@ int decodeThread(SceSize args, void *argp){
 
 			MP3ME_codec_buffer[6] = (unsigned long)MP3ME_input_buffer;
 			MP3ME_codec_buffer[8] = (unsigned long)MP3ME_output_buffer;
-				
+
 			MP3ME_codec_buffer[7] = MP3ME_codec_buffer[10] = frame_size;
 			MP3ME_codec_buffer[9] = sample_per_frame * 4;
 
@@ -268,13 +212,13 @@ int decodeThread(SceSize args, void *argp){
 				//instead of quitting see if the next frame can be decoded
 				//helps play files with an invalid frame
 				//we must look for a valid frame, the offset above may be wrong
-				data_start = SeekNextFrame(MP3ME_handle);
+				data_start = SeekNextFrameMP3(MP3ME_handle);
 				if(data_start < 0)
 				{
 					MP3ME_eof = 1;
 					continue;
 				}
-				size -= (data_start - offset); 
+				size -= (data_start - offset);
 				offset = data_start;
 				continue;
 			}
@@ -286,6 +230,14 @@ int decodeThread(SceSize args, void *argp){
 			OutputPtrME += (sample_per_frame * 4);
 			if( OutputPtrME + (sample_per_frame * 4) > &OutputBuffer[OutputBuffer_flip][OUTPUT_BUFFER_SIZE])
 			{
+				//Volume Boost:
+				if (MP3ME_volume_boost){
+                    int i;
+                    for (i=0; i<OUTPUT_BUFFER_SIZE; i++){
+    					OutputBuffer[OutputBuffer_flip][i] = volume_boost(&OutputBuffer[OutputBuffer_flip][i], &MP3ME_volume_boost);
+                    }
+                }
+
                 audioOutput(MP3ME_volume, OutputBuffer[OutputBuffer_flip]);
 
 				OutputBuffer_flip ^= 1;
@@ -293,21 +245,22 @@ int decodeThread(SceSize args, void *argp){
 		        //Check for playing speed:
                 if (MP3ME_playingSpeed){
                     long old_start = data_start;
-                    sceIoLseek32(MP3ME_handle, frame_size * 5 * MP3ME_playingSpeed, PSP_SEEK_CUR);
-                    //MP3ME_playingTime += (float)sample_per_frame/(float)samplerate * 5.0 * (float)MP3ME_playingSpeed;
-                    data_start = SeekNextFrame(MP3ME_handle);
-    				if(data_start < 0){
-    					MP3ME_eof = 1;
-    					continue;
-    				}
-    				float framesSkipped = (float)abs(old_start - data_start) / (float)frame_size;
-    				if (MP3ME_playingSpeed > 0)
-        				MP3ME_playingTime += framesSkipped * (float)sample_per_frame/(float)samplerate;
-                    else
-        				MP3ME_playingTime -= framesSkipped * (float)sample_per_frame/(float)samplerate;
+                    if (sceIoLseek32(MP3ME_handle, frame_size * 6 * MP3ME_playingSpeed, PSP_SEEK_CUR) != old_start){
+                        data_start = SeekNextFrameMP3(MP3ME_handle);
+                        if(data_start < 0){
+                            MP3ME_eof = 1;
+                            continue;
+                        }
+                        float framesSkipped = (float)abs(old_start - data_start) / (float)frame_size;
+                        if (MP3ME_playingSpeed > 0)
+                            MP3ME_playingTime += framesSkipped * (float)sample_per_frame/(float)samplerate;
+                        else
+                            MP3ME_playingTime -= framesSkipped * (float)sample_per_frame/(float)samplerate;
 
-    				offset = data_start;
-    				size = total_size - data_start;
+                        offset = data_start;
+                        size = total_size - data_start;
+                    }else
+                        MP3ME_setPlayingSpeed(0);
                 }
 			}
 		}
@@ -316,8 +269,10 @@ int decodeThread(SceSize args, void *argp){
     if (getEDRAM)
         sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer);
 
-    if ( MP3ME_handle >= 0)
+    if ( MP3ME_handle >= 0){
       sceIoClose(MP3ME_handle);
+      MP3ME_handle = -1;
+    }
     MP3ME_threadExited = 1;
     return 0;
 }
@@ -353,24 +308,24 @@ int MP3MEgetInfo(){
 	struct mad_header header;
     int timeFromID3 = 0;
     float mediumBitrate = 0;
-    
+
     getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
 
 	mad_stream_init (&stream);
 	mad_header_init (&header);
-    
+
     fd = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
     if (fd < 0)
         return -1;
 
 	long size = sceIoLseek(fd, 0, PSP_SEEK_END);
     sceIoLseek(fd, 0, PSP_SEEK_SET);
-    
-	int startPos = ID3v2TagSize(MP3ME_fileName);
+
+	double startPos = ID3v2TagSize(MP3ME_fileName);
 	sceIoLseek32(fd, startPos, PSP_SEEK_SET);
-    startPos = SeekNextFrame(fd);
+    startPos = SeekNextFrameMP3(fd);
     size -= startPos;
-    
+
     if (size < bufferSize * 3)
         bufferSize = size;
     localBuffer = (unsigned char *) malloc(bufferSize);
@@ -380,10 +335,10 @@ int MP3MEgetInfo(){
     MP3ME_info.needsME = 1;
 	MP3ME_info.fileSize = size;
     MP3ME_info.framesDecoded = 0;
-    
+
     double totalBitrate = 0;
     int i = 0;
-    
+
 	for (i=0; i<3; i++){
         memset(localBuffer, 0, bufferSize);
         singleDataRed = sceIoRead(fd, localBuffer, bufferSize);
@@ -454,7 +409,7 @@ int MP3MEgetInfo(){
     				strcpy(MP3ME_info.emphasis,"unknown");
     				break;
     			}
-    			
+
     			//Check if lenght found in tag info:
                 if (MP3ME_info.length > 0){
                     timeFromID3 = 1;
@@ -464,7 +419,7 @@ int MP3MEgetInfo(){
     		//Controllo il cambio di sample rate (ma non dovrebbe succedere)
     		if (header.samplerate > MP3ME_info.hz)
       		   MP3ME_info.hz = header.samplerate;
-      		   
+
             totalBitrate += header.bitrate;
             if (size == bufferSize)
                 break;
@@ -476,9 +431,10 @@ int MP3MEgetInfo(){
 	}
 	mad_header_finish (&header);
 	mad_stream_finish (&stream);
-	free(localBuffer);
+    if (localBuffer)
+    	free(localBuffer);
     sceIoClose(fd);
-    
+
     mediumBitrate = totalBitrate / (float)FrameCount;
     int secs = 0;
     if (!MP3ME_info.length){
@@ -487,7 +443,7 @@ int MP3MEgetInfo(){
     }else{
         secs = MP3ME_info.length;
     }
-    
+
 	//Formatto in stringa la durata totale:
 	int h = secs / 3600;
 	int m = (secs - h * 3600) / 60;
@@ -496,114 +452,7 @@ int MP3MEgetInfo(){
 
     return 0;
 }
-/*int MP3MEgetInfo(){
-    unsigned char MP3ME_header_buf[4];
-    int MP3ME_header;
-    int version;
-    int bitrate;
-    int padding;
-    int frame_size;
-    int size;
-	int offset = 0;
-    float totalLength = 0;
 
-    MP3ME_eof = 0;
-
-    MP3ME_handle = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
-    if (MP3ME_handle < 0)
-        MP3ME_eof = 1;
-
-	//now search for the first sync byte, tells us where the mp3 stream starts
-	size = sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_END);
-    MP3ME_info.fileSize = size;
-
-	sceIoLseek32(MP3ME_handle, 0, PSP_SEEK_SET);
-	data_start = SeekNextFrame(MP3ME_handle);
-	if (data_start < 0)
-		MP3ME_eof = 1;
-
-    size -= data_start;
-
-    MP3ME_info.frames = 0;
-    while( !MP3ME_eof ){
-        if ( sceIoRead( MP3ME_handle, MP3ME_header_buf, 4 ) != 4 ){
-            MP3ME_eof = 1;
-            continue;
-        }
-
-        MP3ME_header = MP3ME_header_buf[0];
-        MP3ME_header = (MP3ME_header<<8) | MP3ME_header_buf[1];
-        MP3ME_header = (MP3ME_header<<8) | MP3ME_header_buf[2];
-        MP3ME_header = (MP3ME_header<<8) | MP3ME_header_buf[3];
-
-        bitrate = (MP3ME_header & 0xf000) >> 12;
-        padding = (MP3ME_header & 0x200) >> 9;
-        version = (MP3ME_header & 0x180000) >> 19;
-        samplerate = samplerates[version][ (MP3ME_header & 0xC00) >> 10 ];
-
-        if ((bitrate > 14) || (version == 1) || (samplerate == 0) || (bitrate == 0))//invalid frame, look for the next one
-        {
-            data_start = SeekNextFrame(MP3ME_handle);
-            if(data_start < 0)
-            {
-                MP3ME_eof = 1;
-                continue;
-            }
-            size -= (data_start - offset);
-            offset = data_start;
-            continue;
-        }
-
-        if (version == 3) //mpeg-1
-        {
-            sample_per_frame = 1152;
-            frame_size = 144000*bitrates[bitrate]/samplerate + padding;
-            MP3ME_info.instantBitrate = bitrates[bitrate];
-        }else{
-            sample_per_frame = 576;
-            frame_size = 72000*bitrates_v2[bitrate]/samplerate + padding;
-            MP3ME_info.instantBitrate = bitrates_v2[bitrate];
-        }
-
-        sceIoLseek32(MP3ME_handle, data_start, PSP_SEEK_SET); //seek back
-
-        size -= frame_size;
-        if ( size <= 0)
-        {
-           MP3ME_eof = 1;
-           continue;
-        }
-
-        if (MP3ME_info.frames == 0){
-            MP3ME_info.hz = samplerate;
-            MP3ME_info.kbit = MP3ME_info.instantBitrate;
-            switch (version){
-                case 1:
-                    strcpy(MP3ME_info.layer,"I");
-                    break;
-                default:
-                    strcpy(MP3ME_info.layer,"III");
-                    break;
-            }
-            strcpy(MP3ME_info.emphasis,"no");
-        }
-        totalLength += 32.0*36.0/(float)samplerate;
-        MP3ME_info.frames++;
-    }
-
-    if ( MP3ME_handle )
-        sceIoClose(MP3ME_handle);
-
-    //Formatto la durata:
-    MP3ME_info.length = (long)totalLength;
-    int secs = (int)MP3ME_info.length;
-    int hh = secs / 3600;
-    int mm = (secs - hh * 3600) / 60;
-    int ss = secs - hh * 3600 - mm * 60;
-    snprintf(MP3ME_info.strLength, sizeof(MP3ME_info.strLength), "%2.2i:%2.2i:%2.2i", hh, mm, ss);
-
-    return 0;
-}*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Public functions:
@@ -614,10 +463,10 @@ void MP3ME_Init(int channel){
     MP3ME_playingTime = 0;
 	MP3ME_volume_boost = 0;
 	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
-    //MIN_PLAYING_SPEED=-10;
-    //MAX_PLAYING_SPEED=9;
-    MIN_PLAYING_SPEED=0;
-    MAX_PLAYING_SPEED=0;
+    MIN_PLAYING_SPEED=-10;
+    MAX_PLAYING_SPEED=9;
+    //MIN_PLAYING_SPEED=0;
+    //MAX_PLAYING_SPEED=0;
 	initMEAudioModules();
 }
 
@@ -629,7 +478,7 @@ int MP3ME_Load(char *fileName){
         strcpy(MP3ME_fileName, "");
         return ERROR_OPENING;
     }
-    
+
     releaseAudio();
     if (setAudioFrequency(OUTPUT_BUFFER_SIZE/4, MP3ME_info.hz, 2) < 0){
         MP3ME_End();
@@ -775,8 +624,8 @@ int MP3ME_resume(){
 
 void MP3ME_setVolumeBoostType(char *boostType){
     //Only old method supported
-    //MAX_VOLUME_BOOST = 4;
-    MAX_VOLUME_BOOST = 0;
+    MAX_VOLUME_BOOST = 4;
+    //MAX_VOLUME_BOOST = 0;
     MIN_VOLUME_BOOST = 0;
 }
 

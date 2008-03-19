@@ -1,5 +1,5 @@
 //    LightMP3
-//    Copyright (C) 2007 Sakya
+//    Copyright (C) 2007, 2008 Sakya
 //    sakya_tg@yahoo.it
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,9 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-int USBinit();
-int USBActivate();
-int USBDeactivate();
-int USBEnd();
+#ifndef __osk_h
+#define __osk_h (1)
+
+char *requestString (char *desc, char *initialStr);
+
+#endif

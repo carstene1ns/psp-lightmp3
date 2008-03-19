@@ -20,13 +20,13 @@
 #define MAX_SONGS 3000
 
 struct M3U_songEntry{
-	char fileName[262];
+	char fileName[264];
 	int length;
-	char title[257];
+	char title[260];
 };
 
 struct M3U_playList{
-	char fileName[262];
+	char fileName[264];
 	int songCount;
 	struct M3U_songEntry songs[MAX_SONGS];
 	int modified;
@@ -40,7 +40,7 @@ int M3U_moveSongUp();
 int M3U_moveSongDown();
 int M3U_removeSong(int index);
 int M3U_addSong(char *fileName, int length, char *title);
-struct M3U_songEntry M3U_getSong(int index);
+struct M3U_songEntry *M3U_getSong(int index);
 int M3U_isModified();
 int M3U_forceModified(int modified);
 int M3U_clear();

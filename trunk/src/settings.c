@@ -16,18 +16,17 @@
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <string.h>
 #include "settings.h"
 
-#include "log.h"
 struct settings localSettings;
 
 //Load settings from file:
 int SETTINGS_load(char *fileName){
 	FILE *f;
-	char lineText[256]; 
-	
+	char lineText[256];
+
 	f = fopen(fileName, "rt");
 	if (f == NULL){
 		//Error opening file:
@@ -203,7 +202,7 @@ int SETTINGS_save(struct settings tSettings){
     fwrite("#CPU clock for GUI (10/222):\n", 1, strlen("#CPU clock for GUI (10/222):\n"), f);
     snprintf(testo, sizeof(testo), "CLOCK_GUI=%i\n\n", tSettings.CLOCK_GUI);
     fwrite(testo, 1, strlen(testo), f);
-    
+
     fwrite("#Clock for filetype (10/222):\n", 1, strlen("#Clock for filetype (10/222):\n"), f);
     snprintf(testo, sizeof(testo), "CLOCK_MP3=%i\n", tSettings.CLOCK_MP3);
     fwrite(testo, 1, strlen(testo), f);

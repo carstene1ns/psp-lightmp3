@@ -34,7 +34,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 int bufferThid = -1;
 int FLAC_audio_channel;
-char FLAC_fileName[262];
+char FLAC_fileName[264];
 FILE *FLAC_file = 0;
 int FLAC_eos = 0;
 struct fileInfo FLAC_info;
@@ -51,8 +51,9 @@ int kill_flac_thread;
 int bufferLow;
 
 #define MIX_BUF_SIZE (PSP_NUM_AUDIO_SAMPLES * 2)
-short tempmixbuf[MIX_BUF_SIZE * 4]; // __attribute__ ((aligned(64)));
-long tempmixleft = 0;
+short FLAC_mixBuffer[MIX_BUF_SIZE * 4]__attribute__ ((aligned(64)));
+
+long FLAC_tempmixleft = 0;
 long samples_played = 0;
 
 FLAC__StreamDecoder *decoder = 0;
@@ -85,7 +86,7 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
 
    (void)decoder, (void)client_data;
 
-   if (tempmixleft + frame->header.blocksize > MIX_BUF_SIZE)
+   if (FLAC_tempmixleft + frame->header.blocksize > MIX_BUF_SIZE)
       sceKernelWaitSema(bufferLow, 1, 0); // wait for buffer to get low
 
    if (kill_flac_thread)
@@ -94,11 +95,11 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
    /* copy decoded PCM samples to buffer */
    for (i=0; i<frame->header.blocksize; i++)
    {
-      int j = (tempmixleft + i)<<1;
-      tempmixbuf[j] = (short)buffer[0][i];
-      tempmixbuf[j + 1] = (short)buffer[1][i];
+      int j = (FLAC_tempmixleft + i)<<1;
+      FLAC_mixBuffer[j] = (short)buffer[0][i];
+      FLAC_mixBuffer[j + 1] = (short)buffer[1][i];
    }
-   tempmixleft += frame->header.blocksize; // increment # samples reported in buffer
+   FLAC_tempmixleft += frame->header.blocksize; // increment # samples reported in buffer
 
    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE; // keep going until buffer is full or get killed
 }
@@ -136,7 +137,7 @@ int flacThread(SceSize args, void *argp)
       sceKernelExitDeleteThread(0);
    }
 
-   tempmixleft = 0;
+   FLAC_tempmixleft = 0;
    FLAC_eos = 0;
    sceKernelSignalSema(bufferLow, 1); // so it fills the buffer to start
 
@@ -161,7 +162,7 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 	if (isPlaying) {	// Playing , so mix up a buffer
         outputInProgress = 1;
 
-		while (tempmixleft < numSamples) {	//  Not enough in buffer, so we must mix more
+		while (FLAC_tempmixleft < numSamples) {	//  Not enough in buffer, so we must mix more
 			sceKernelSignalSema(bufferLow, 1);
 			sceKernelDelayThread(10); // allow buffer filling thread to run
 			if (FLAC_eos) {	//EOF
@@ -171,7 +172,7 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 			}
 		}
         //FLAC_info.instantBitrate = ???;
-		if (tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
+		if (FLAC_tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
 			int count, count2;
 			short *_buf2;
 			for (count = 0; count < numSamples; count++) {
@@ -179,21 +180,21 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 				_buf2 = _buf + count2;
                 //Volume boost:
                 if (FLAC_volume_boost){
-                    *(_buf2) = volume_boost(&tempmixbuf[count2], &FLAC_volume_boost);
-                    *(_buf2 + 1) = volume_boost(&tempmixbuf[count2 + 1], &FLAC_volume_boost);
+                    *(_buf2) = volume_boost(&FLAC_mixBuffer[count2], &FLAC_volume_boost);
+                    *(_buf2 + 1) = volume_boost(&FLAC_mixBuffer[count2 + 1], &FLAC_volume_boost);
                 }else{
-                    *(_buf2) = tempmixbuf[count2];
-                    *(_buf2 + 1) = tempmixbuf[count2 + 1];
+                    *(_buf2) = FLAC_mixBuffer[count2];
+                    *(_buf2 + 1) = FLAC_mixBuffer[count2 + 1];
                 }
 			}
-			
+
 			//  Move the pointers
-			tempmixleft -= numSamples;
+			FLAC_tempmixleft -= numSamples;
 			//  Now shuffle the buffer along
-			for (count = 0; count < tempmixleft; count++) {
+			for (count = 0; count < FLAC_tempmixleft; count++) {
 				int j = count<<1;
-				tempmixbuf[j] = tempmixbuf[(numSamples<<1) + j];
-				tempmixbuf[j + 1] = tempmixbuf[(numSamples<<1) + j + 1];
+				FLAC_mixBuffer[j] = FLAC_mixBuffer[(numSamples<<1) + j];
+				FLAC_mixBuffer[j + 1] = FLAC_mixBuffer[(numSamples<<1) + j + 1];
 			}
             //Check for playing speed:
             if (FLAC_playingSpeed){
@@ -202,7 +203,7 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
                     FLAC_setPlayingSpeed(0);
                 } else {
                 	samples_played += FLAC_playingDelta;
-                	//tempmixleft = 0; // clear buffer of stale samples
+                	//FLAC_tempmixleft = 0; // clear buffer of stale samples
                 }
                 FLAC__stream_decoder_flush(decoder);
             }
@@ -247,7 +248,7 @@ static void splitComment(char *comment, char *name, char *value){
 void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 	int i;
 	char name[31];
-	char value[257];
+	char value[260];
 	FLAC__StreamMetadata *info = 0;
 
     strcpy(FLAC_fileName, filename);
@@ -275,6 +276,8 @@ void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 		}
 		FLAC__metadata_object_delete(info);
 	}
+    if (!strlen(targetInfo->title))
+        strcpy(targetInfo->title, FLAC_fileName);
 }
 
 
@@ -288,6 +291,7 @@ void FLACgetInfo(char *filename){
 	    FLAC_info.instantBitrate = streaminfo.data.stream_info.sample_rate * streaminfo.data.stream_info.bits_per_sample * streaminfo.data.stream_info.channels;
 		FLAC_info.hz = streaminfo.data.stream_info.sample_rate;
 		FLAC_info.length = (long)(streaminfo.data.stream_info.total_samples / streaminfo.data.stream_info.sample_rate);
+        FLAC_info.needsME = 0;
 	    if (streaminfo.data.stream_info.channels == 1)
 	        strcpy(FLAC_info.mode, "single channel");
 	    else if (streaminfo.data.stream_info.channels == 2)
@@ -315,13 +319,14 @@ void FLAC_Init(int channel){
 	FLAC_audio_channel = channel;
 	samples_played = 0;
     bufferLow = sceKernelCreateSema("bufferLow", 0, 1, 1, 0);
+    memset(FLAC_mixBuffer, 0, sizeof(FLAC_mixBuffer));
+    FLAC_tempmixleft = 0;
     pspAudioSetChannelCallback(FLAC_audio_channel, audioCallback, NULL);
 }
 
 
 int FLAC_Load(char *filename){
-	int file;
-
+	int file = -1;
 	samples_played = 0;
 	isPlaying = 0;
 	FLAC_eos = 0;
@@ -380,9 +385,10 @@ void FLAC_FreeTune(){
 	sceKernelSignalSema(bufferLow, 1);
 	sceKernelDelayThread(100*1000);
 	sceKernelDeleteSema(bufferLow);
-
     if (FLAC_file)
         fclose(FLAC_file);
+    memset(FLAC_mixBuffer, 0, sizeof(FLAC_mixBuffer));
+    FLAC_tempmixleft = 0;
 }
 
 

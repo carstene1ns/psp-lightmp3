@@ -21,6 +21,7 @@
 #include <pspimpose_driver.h>
 #include <pspsysreg.h>
 #include <pspctrl.h>
+#include <pspsysmem_kernel.h>
 
 PSP_MODULE_INFO("supportlib", 0x1006, 1, 1);
 PSP_MAIN_THREAD_ATTR(0);
@@ -54,7 +55,7 @@ int getBrightness(){
     if (sceKernelDevkitVersion() < 0x03070110)
         sceDisplayGetBrightness(&currentBrightness, 0);
     else
-        sceDisplayGetBrightness371(&currentBrightness, 0);    
+        sceDisplayGetBrightness371(&currentBrightness, 0);
     pspSdkSetK1(k1);
     return currentBrightness;
 }
@@ -174,7 +175,7 @@ int displayDisable(void){
     if (sceKernelDevkitVersion() < 0x03070110)
         ret = sceDisplayDisable();
     else
-        ret = sceDisplayDisable371();    
+        ret = sceDisplayDisable371();
     pspSdkSetK1(k1);
     return ret;
 }
@@ -257,6 +258,16 @@ int stopUnloadModule(SceUID modID){
     sceKernelUnloadModule(modID);
     pspSdkSetK1(k1);
     return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Get psp model with sceKernelGetModel:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int getModelKernel(){
+    k1 = pspSdkSetK1(0);
+    int retVal = sceKernelGetModel();
+    pspSdkSetK1(k1);
+    return retVal;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

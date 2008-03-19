@@ -25,6 +25,7 @@
 #include "m3u.h"
 
 struct M3U_playList lPlayList;
+struct M3U_songEntry emptySong;
 
 //Split song length and title:
 int splitSongInfo(char *text, char *chrLength, char *title){
@@ -64,7 +65,7 @@ int splitSongInfo(char *text, char *chrLength, char *title){
 //Open and parse a M3U file:
 int M3U_open(char *fileName){
 	FILE *f;
-	char lineText[256]; 
+	char lineText[256];
 	char chrLength[10];
 	char title[256];
 	struct M3U_songEntry singleEntry;
@@ -137,12 +138,11 @@ int M3U_getSongCount(){
 }
 
 //Get a song:
-struct M3U_songEntry M3U_getSong(int index){
+struct M3U_songEntry *M3U_getSong(int index){
 	if (index >= 0 && index < lPlayList.songCount){
-		return lPlayList.songs[index];
+		return &lPlayList.songs[index];
 	}else{
-		struct M3U_songEntry emptySong;
-		return emptySong;
+		return &emptySong;
 	}
 }
 

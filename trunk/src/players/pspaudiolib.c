@@ -18,6 +18,8 @@
 
 #include "pspaudiolib.h"
 
+#define THREAD_STACK_SIZE 128*1024
+
 int sceAudio_38553111(unsigned short samples, unsigned short freq, char);
 int sceAudio_5C37C0AE(void);
 int sceAudio_E0727056(int volume, void *buffer);
@@ -65,6 +67,8 @@ void pspAudioSetChannelCallback(int channel, pspAudioCallback_t callback, void *
     if(channel >= PSP_NUM_AUDIO_CHANNELS)
         return;
     volatile psp_audio_channelinfo *pci = &AudioStatus[channel];
+    //while (pci->threadactive)
+    //    sceKernelDelayThread(100000);
     pci->callback=0;
     pci->pdata=pdata;
     pci->callback=callback;
@@ -144,8 +148,10 @@ int pspAudioInit()
     int failed=0;
     char str[32];
 
+    pspReleaseAudio();
     audio_terminate=0;
     audio_ready=0;
+    memset(audio_sndbuf, 0, sizeof(audio_sndbuf));
 
     play_sema = sceKernelCreateSema("play_sema", 6, 1, 1, 0);
     for (i=0; i<PSP_NUM_AUDIO_CHANNELS; i++) {
@@ -177,7 +183,7 @@ int pspAudioInit()
         str[6]='0'+i;
         //AudioStatus[i].threadhandle = sceKernelCreateThread(str,(void*)&AudioChannelThread,0x12,0x10000,0,NULL);
         //sceAudioSetChannelDataLen(i, PSP_NUM_AUDIO_SAMPLES);
-        AudioStatus[i].threadhandle = sceKernelCreateThread(str,(void*)&AudioChannelThread,0x12,0x10000,PSP_THREAD_ATTR_USER,NULL);
+        AudioStatus[i].threadhandle = sceKernelCreateThread(str,(void*)&AudioChannelThread, 0x12, THREAD_STACK_SIZE, PSP_THREAD_ATTR_USER,NULL);
         if (AudioStatus[i].threadhandle < 0) {
             AudioStatus[i].threadhandle = -1;
             failed=1;
@@ -222,6 +228,7 @@ void pspAudioEnd()
 
     for (i=0; i<PSP_NUM_AUDIO_CHANNELS; i++) {
         if (AudioStatus[i].threadhandle != -1) {
+            pspReleaseAudio();
             //sceKernelWaitThreadEnd(AudioStatus[i].threadhandle,NULL);
             while (AudioStatus[i].threadactive)
                 sceKernelDelayThread(100000);

@@ -1,5 +1,5 @@
 //    LightMP3
-//    Copyright (C) 2007 Sakya
+//    Copyright (C) 2007, 2008 Sakya
 //    sakya_tg@yahoo.it
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -15,8 +15,12 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#define USB_ACTIVATED              0x200
+#define USB_CABLE_CONNECTED        0x020
+#define USB_CONNECTION_ESTABLISHED 0x002
 
-void setBusClock(int bus);
-void setCpuClock(int cpu);
-int getCpuClock();
-int getBusClock();
+int USBInit();
+int USBActivate();
+int USBDeactivate();
+int USBEnd();
+int USBGetState();

@@ -12,7 +12,7 @@ PRX_EXPORTS = support.exp
 #USE_KERNEL_LIBC=1
 USE_KERNEL_LIBS=1
 
-LIBDIR =
+LIBDIR = 
 LDFLAGS = -mno-crt0 -nostartfiles
 LIBS = 
 
