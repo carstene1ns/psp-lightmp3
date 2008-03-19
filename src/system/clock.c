@@ -1,5 +1,5 @@
 //    LightMP3
-//    Copyright (C) 2007 Sakya
+//    Copyright (C) 2007, 2008 Sakya
 //    sakya_tg@yahoo.it
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,11 @@
 #include <pspkernel.h>
 #include <psppower.h>
 #include <pspsdk.h>
+#include <kubridge.h>
+
+#include "clock.h"
+
+int getModelKernel();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Funzioni gestione BUS & CLOCK
@@ -36,7 +41,7 @@ void setBusClock(int bus){
 }
 
 void setCpuClock(int cpu){
-    if (cpu >= 10 && cpu <= 266){
+    if (cpu >= getMinCPUClock() && cpu <= 266){
         if (sceKernelDevkitVersion() < 0x03070110){
             scePowerSetCpuClockFrequency(cpu);
             if (scePowerGetCpuClockFrequency() < cpu)
@@ -49,4 +54,28 @@ void setCpuClock(int cpu){
             }
         }
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Velocità minima di clock in base al modello (FAT/SLIM):
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int getMinCPUClock(){
+    if (getModel() == 1)
+        return 19;
+    else
+        return 10;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Restituisce il modello (FAT = 0/SLIM = 1):
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int getModel(){
+    if (sceKernelDevkitVersion() >= 0x03060010)
+        return kuKernelGetModel();
+    else
+        if (getModelKernel() == 1)
+            return 1;
+        else
+            return 0;
 }

@@ -18,9 +18,9 @@
 
 //Equalizzatori per libMad:
 struct equalizer{
-	char name[20];
+	char name[32];
     int index;
-	char shortName[3];
+	char shortName[4];
 	double filter[32];
 };
 

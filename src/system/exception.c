@@ -42,7 +42,6 @@ void ExceptionHandler(PspDebugRegBlock * regs)
     pspDebugScreenPrintf("Your PSP has just crashed!\n");
     pspDebugScreenPrintf("Exception details:\n\n");
 
-	//pspDebugScreenPrintf(" / %s.text + %X\n", module_info.modname, regs->epc-(int)&_ftext);
     pspDebugScreenPrintf("Exception - %s\n", codeTxt[(regs->cause >> 2) & 31]);
     pspDebugScreenPrintf("EPC       - %08X / %s.text + %08X\n", (int)regs->epc, module_info.modname, (unsigned int)(regs->epc-(int)&_ftext));
     pspDebugScreenPrintf("Cause     - %08X\n", (int)regs->cause);
@@ -83,7 +82,7 @@ void ExceptionHandler(PspDebugRegBlock * regs)
             break;
         }
 		sceKernelDelayThread(100000);
-    }    
+    }
     sceKernelExitGame();
 }
 

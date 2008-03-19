@@ -22,6 +22,7 @@
 #include <pspaudio.h>
 #include <psppower.h>
 #include <pspsdk.h>
+#include <pspsysmem.h>
 
 #include <time.h>
 #include <stdio.h>
@@ -32,21 +33,21 @@
 #include "players/pspaudiolib.h"
 #include "players/player.h"
 
-#include "clock.h"
-#include "osk.h"
-#include "exception.h"
-#include "usb.h"
+#include "system/clock.h"
+#include "system/osk.h"
+#include "system/exception.h"
+#include "system/usb.h"
 #include "settings.h"
-#include "opendir.h"
+#include "system/opendir.h"
 #include "players/m3u.h"
 #include "players/equalizer.h"
 #include "audioscrobbler.h"
 
-#include "log.h"
+#include "system/log.h"
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
-PSP_HEAP_SIZE_KB(20000);
+PSP_HEAP_SIZE_KB(12*1024);
 
 // Functions imported from support prx:
 int displayEnable(void);
@@ -130,7 +131,7 @@ static int suspended = 0;
 int powerCallback(int unknown, int powerInfo, void *common){
     if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_STANDBY) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
        if (!suspended){
-           resuming = 1;                   
+           resuming = 1;
            //Suspend
            if (suspendFunct != NULL)
               (*suspendFunct)();
@@ -148,8 +149,8 @@ int powerCallback(int unknown, int powerInfo, void *common){
        //Resume
        if (resumeFunct != NULL)
           (*resumeFunct)();
-       resuming = 0;       
-       suspended = 0;       
+       resuming = 0;
+       suspended = 0;
     }
     return 0;
 }
@@ -297,7 +298,7 @@ void buildProgressBar(int *barLen, char *pBar, int *percentage){
 }
 
 //Chiedo conferma di una azione:
-int confirm(char *message, u32 backColor){         
+int confirm(char *message, u32 backColor){
 	int i;
 	pspDebugScreenSetBackColor(backColor);
 
@@ -416,7 +417,7 @@ int askString(char *string){
             return -1;
         return 0;
     }
-        
+
 	pspDebugScreenSetBackColor(BLACK);
 	for (i=0; i < 5 ; i++){
 		pspDebugScreenSetXY(11, 10+i);
@@ -668,7 +669,7 @@ int showUSBactivate(){
 	int i;
 
 	//init USB:
-    int retUSB = USBinit();
+    int retUSB = USBInit();
 	if (retUSB){
         pspDebugScreenSetXY(0, 4);
         pspDebugScreenSetTextColor(RED);
@@ -832,7 +833,7 @@ void screen_sysinfo(){
 
 	//Free memory:
 	pspDebugScreenSetTextColor(WHITE);
-	mem = freemem() / 1024;
+	mem =  sceKernelTotalFreeMemSize() / 1024;
 	pspDebugScreenSetXY(0, 33);
 	pspDebugScreenPrintf("Free mem: %i kb   ", mem);
 	//Current time:
@@ -1155,16 +1156,16 @@ int playFile(char *filename, char *numbers, char *message) {
 	  }
 	  info = (*getInfoFunct)();
 	  screen_fileinfo(info);
-	  
+
       setBusClock(oldBus);
       setCpuClock(oldClock);
-    
+
 	  //Imposto il clock:
       if (userSettings.CLOCK_AUTO){
           clock = info.defaultCPUClock;
           setCpuClock(info.defaultCPUClock);
       }
-          
+
 	  (*playFunct)();
 	  action = 1;
 	  screen_playerAction(&action);
@@ -1173,7 +1174,7 @@ int playFile(char *filename, char *numbers, char *message) {
             if (resuming)
                continue;
 		    //Aggiorno info a video:
-			if (!updateInfo){                            
+			if (!updateInfo){
                 if (displayStatus){
                     screen_sysinfo();
                     //Tempo trascorso:
@@ -1218,18 +1219,18 @@ int playFile(char *filename, char *numbers, char *message) {
 					displayEnable();
                     setBrightness(curBrightness);
 					displayStatus = 1;
-                }                                    
+                }
                 exitScreen();
-                pspDebugScreenSetBackColor(BLACK);                
-                int i;                
+                pspDebugScreenSetBackColor(BLACK);
+                int i;
             	for (i = 0; i < 5; i++){
             		pspDebugScreenSetXY(15, 10+i);
             		pspDebugScreenPrintf("%-38.38s", "");
                 }
                 screen_player_tagInfo(tempInfo);
                 lastPercentageDrawn = -5;
-                updateInfo = 1;   
-                sceKernelDelayThread(200000);    
+                updateInfo = 1;
+                sceKernelDelayThread(200000);
             }
 
             if(pad.Buttons & PSP_CTRL_CIRCLE) {
@@ -1437,7 +1438,7 @@ int playFile(char *filename, char *numbers, char *message) {
 	  //Imposto il clock:
       if (userSettings.CLOCK_AUTO)
           setCpuClock(userSettings.CLOCK_GUI);
-          
+
       //Sleep mode:
       if (sleepMode == SLEEP_TRACK){
           runningFlag = 0;
@@ -1559,7 +1560,7 @@ void playDirectory(char *dirName, char *initialFileName){
       displayStatus = 1;
     }
 	opendir_close(&dirToPlay);
-	
+
     //Sleep mode:
     if (sleepMode == SLEEP_PLAYLIST){
       runningFlag = 0;
@@ -1577,7 +1578,7 @@ void playM3U(char *m3uName){
 	char fileToPlay[262] = "";
 	int playerReturn = 0;
 	int i = 0;
-	struct M3U_songEntry song;
+	struct M3U_songEntry *song;
 	char message[60] = "";
 
 	M3U_open(m3uName);
@@ -1600,7 +1601,7 @@ void playM3U(char *m3uName){
 	while(runningFlag){
 		snprintf(testo, sizeof(testo), "%i/%i", i + 1, songCount);
 		song = M3U_getSong(i);
-		strcpy(fileToPlay, song.fileName);
+		strcpy(fileToPlay, song->fileName);
 		playerReturn = playFile(fileToPlay, testo, message);
 		//Played tracks:
 		int found = 0;
@@ -1740,7 +1741,7 @@ void fileBrowser_menu(){
             //Check home popup:
 			if(controller.Buttons & PSP_CTRL_HOME)
                 exitScreen();
-			
+
 			if ((controller.Buttons & PSP_CTRL_DOWN) | (controller.Ly > 128 + ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
 				if (selected_entry + 1 < directory.number_of_directory_entries){
 					selected_entry++;
@@ -1789,7 +1790,7 @@ void fileBrowser_menu(){
 				pspDebugScreenPrintf("%-66.66s", "...");
 			else
 				pspDebugScreenPrintf("%-66.66s", "");
-				
+
 			int i = 0;
 			//Elementi della directory:
 			for (; i < maximum_number_of_rows; i++){
@@ -2022,7 +2023,7 @@ void playlist_menu(){
         //Check home popup:
 		if(controller.Buttons & PSP_CTRL_HOME)
 		    exitScreen();
-		
+
 		if ((controller.Buttons & PSP_CTRL_DOWN) | (controller.Ly > 128 + ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
 			if (selected_entry + 1 < directory.number_of_directory_entries){
 				selected_entry++;
@@ -2293,7 +2294,7 @@ void playlist_editor(){
 	int starting_row           = 4;
 	int updateInfo = 10;
 	struct fileInfo tagInfo;
-	struct M3U_songEntry song;
+	struct M3U_songEntry *song;
 	int sel_updateInfo = 0;
 
 	screen_init();
@@ -2306,8 +2307,8 @@ void playlist_editor(){
 		//Info primo file:
 		if (M3U_getSongCount() > 0){
 			song = M3U_getSong(0);
-            setAudioFunctions(song.fileName, userSettings.MP3_ME);
-			tagInfo = (*getTagInfoFunct)(song.fileName);
+            setAudioFunctions(song->fileName, userSettings.MP3_ME);
+			tagInfo = (*getTagInfoFunct)(song->fileName);
 			sel_updateInfo = 1;
 		}
 
@@ -2338,14 +2339,14 @@ void playlist_editor(){
             //Check home popup:
 			if(controller.Buttons & PSP_CTRL_HOME){
               exitScreen();
-			}                    
-			
+			}
+
 			if ((controller.Buttons & PSP_CTRL_DOWN) | (controller.Ly > 128 + ANALOG_SENS && !(controller.Buttons & PSP_CTRL_HOLD))){
 				if (selected_entry + 1 < M3U_getSongCount()){
 					selected_entry++;
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
-                    tagInfo = (*getTagInfoFunct)(song.fileName);
+                    setAudioFunctions(song->fileName, userSettings.MP3_ME);
+                    tagInfo = (*getTagInfoFunct)(song->fileName);
 					sel_updateInfo = 1;
 
 					if (selected_entry == top_entry + maximum_number_of_rows)
@@ -2355,8 +2356,8 @@ void playlist_editor(){
 				if (selected_entry){
 					selected_entry--;
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
-                    tagInfo = (*getTagInfoFunct)(song.fileName);
+                    setAudioFunctions(song->fileName, userSettings.MP3_ME);
+                    tagInfo = (*getTagInfoFunct)(song->fileName);
 					sel_updateInfo = 1;
 
 					if (selected_entry == top_entry - 1)
@@ -2375,8 +2376,8 @@ void playlist_editor(){
 						selected_entry = M3U_getSongCount() - 1;
 					}
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
-                    tagInfo = (*getTagInfoFunct)(song.fileName);
+                    setAudioFunctions(song->fileName, userSettings.MP3_ME);
+                    tagInfo = (*getTagInfoFunct)(song->fileName);
 					sel_updateInfo = 1;
 					sceKernelDelayThread(100000);
 				}
@@ -2391,8 +2392,8 @@ void playlist_editor(){
 						selected_entry = 0;
 					}
 					song = M3U_getSong(selected_entry);
-                    setAudioFunctions(song.fileName, userSettings.MP3_ME);
-                    tagInfo = (*getTagInfoFunct)(song.fileName);
+                    setAudioFunctions(song->fileName, userSettings.MP3_ME);
+                    tagInfo = (*getTagInfoFunct)(song->fileName);
 					sel_updateInfo = 1;
 					sceKernelDelayThread(100000);
 				}
@@ -2420,8 +2421,8 @@ void playlist_editor(){
 						if (selected_entry >= M3U_getSongCount())
 							selected_entry--;
 						song = M3U_getSong(selected_entry);
-                        setAudioFunctions(song.fileName, userSettings.MP3_ME);
-                        tagInfo = (*getTagInfoFunct)(song.fileName);
+                        setAudioFunctions(song->fileName, userSettings.MP3_ME);
+                        tagInfo = (*getTagInfoFunct)(song->fileName);
 						sel_updateInfo = 1;
 						if (selected_entry == top_entry - 1){
 							top_entry--;
@@ -2505,7 +2506,7 @@ void playlist_editor(){
 						pspDebugScreenSetBackColor(0xcc6600);
 					}
 					pspDebugScreenSetTextColor(YELLOW);
-					pspDebugScreenPrintf("%-66.66s", M3U_getSong(current_entry).title);
+					pspDebugScreenPrintf("%-66.66s", M3U_getSong(current_entry)->title);
 				} else {
 					pspDebugScreenSetTextColor(WHITE);
 					pspDebugScreenSetBackColor(0xaa4400);
@@ -2592,7 +2593,7 @@ void options_menu(){
 	int starting_row           = 4;
 	char optionValue[17];
     SceCtrlData controller;
-    
+
     screen_init();
     screen_options_init();
     screen_toolbar();
@@ -2621,7 +2622,7 @@ void options_menu(){
     				pspDebugScreenSetBackColor(0xcc6600);
     			}
     			pspDebugScreenSetTextColor(YELLOW);
-    			
+
     			//Check for value:
                 switch (current_entry){
                     case 0:
@@ -2669,7 +2670,7 @@ void options_menu(){
                     default:
                         strcpy(optionValue, "");
                 }
-                
+
     			pspDebugScreenPrintf("%-50.50s%-16.16s", optionsText[current_entry], optionValue);
     		} else {
     			pspDebugScreenSetTextColor(WHITE);
@@ -2713,7 +2714,7 @@ void options_menu(){
                     delta = 1;
                 else
                     delta = -1;
-                    
+
                 switch (selected_entry){
                     case 0:
                         userSettings.SCROBBLER = !userSettings.SCROBBLER;
@@ -2807,7 +2808,7 @@ void options_menu(){
                 userSettings = SETTINGS_default();
             sceKernelDelayThread(200000);
 		}
-		
+
 		//Tasti di uscita:
 		if (controller.Buttons & PSP_CTRL_RTRIGGER || controller.Buttons & PSP_CTRL_LTRIGGER)
 			break;
@@ -2830,7 +2831,7 @@ int main() {
 
     // Register the power callback.
      const SceUID powerCallbackID = sceKernelCreateCallback("powerCallback", powerCallback, NULL);
-     scePowerRegisterCallback(0, powerCallbackID); 
+     scePowerRegisterCallback(0, powerCallbackID);
 
     //Start support prx
 	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
@@ -2865,27 +2866,27 @@ int main() {
     checkModules();
 
     MUTED_VOLUME = userSettings.MUTED_VOLUME;
-    
+
     //Clock per filetype:
     MP3_defaultCPUClock = userSettings.CLOCK_MP3;
     MP3ME_defaultCPUClock = userSettings.CLOCK_MP3ME;
     OGG_defaultCPUClock = userSettings.CLOCK_OGG;
     FLAC_defaultCPUClock = userSettings.CLOCK_FLAC;
     AA3ME_defaultCPUClock = userSettings.CLOCK_AA3;
-    
+
     //Disable the ME (su slim freeza al cambio di clock di CPU se lo eseguo):
     //if (sceKernelDevkitVersion() < 0x03070110 && !userSettings.MP3_ME)
     //    MEDisable();
-        
+
     volumeBoost = userSettings.BOOST_VALUE;
-    
+
     //Volume iniziale:
     int initialMute = imposeGetMute();
     if (initialMute)
         imposeSetMute(0);
     int initialVolume = imposeGetVolume();
-    imposeSetVolume(userSettings.VOLUME);             
-    
+    imposeSetVolume(userSettings.VOLUME);
+
     //Velocità di clock:
     if (sceKernelDevkitVersion() < 0x03070110)
     	scePowerSetClockFrequency(222, 222, 111);
@@ -2940,14 +2941,14 @@ int main() {
         fwrite("#EXTM3U\n", 1, strlen("#EXTM3U\n"), f);
         fclose(f);
     }
-    
+
     //Disable home button:
     imposeSetHomePopup(0);
 
 	//Controllo luminosità:
     int initialBrightness = getBrightness();
 	int initialBrightnessValue = imposeGetBrightness();
-	
+
 	if (userSettings.BRIGHTNESS_CHECK == 1)
     	checkBrightness();
     else if (userSettings.BRIGHTNESS_CHECK == 2){
@@ -2992,7 +2993,7 @@ int main() {
     imposeSetBrightness(initialBrightnessValue);
 
     //Riporto il volume al suo valore iniziale:
-    imposeSetVolume(initialVolume);             
+    imposeSetVolume(initialVolume);
     if (initialMute)
         imposeSetMute(initialMute);
 

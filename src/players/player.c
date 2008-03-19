@@ -28,7 +28,7 @@
 #include <psputility_avmodules.h>
 #include <pspaudio.h>
 #include "player.h"
-#include "../opendir.h"
+#include "../system/opendir.h"
 
 //shared global vars
 char fileTypeDescription[4][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC"};
@@ -56,8 +56,8 @@ volatile int OutputBuffer_flip;
 u16 at3_type;
 u8* at3_data_buffer;
 u8 at3_at3plus_flagdata[2];
-unsigned char   AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE], //__attribute__((aligned(64))),
-                *AT3_OutputPtr=AT3_OutputBuffer[0];
+short  AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE]__attribute__((aligned(64))),
+      *AT3_OutputPtr=AT3_OutputBuffer[0];
 
 //Pointers for functions:
 void (*initFunct)(int);
@@ -202,6 +202,65 @@ char GetOMGFileType(char *fname)
     }
 }
 
+
+//Seek next valid frame
+//NOTE: this function comes from Music prx 0.55 source
+//      all credits goes to joek2100.
+int SeekNextFrameMP3(SceUID fd)
+{
+    int offset = 0;
+    unsigned char buf[1024];
+    unsigned char *pBuffer;
+    int i;
+    int size = 0;
+
+    offset = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    sceIoRead(fd, buf, sizeof(buf));
+    if (!strncmp((char*)buf, "ID3", 3) || !strncmp((char*)buf, "ea3", 3)) //skip past id3v2 header, which can cause a false sync to be found
+    {
+        //get the real size from the syncsafe int
+        size = buf[6];
+        size = (size<<7) | buf[7];
+        size = (size<<7) | buf[8];
+        size = (size<<7) | buf[9];
+
+        size += 10;
+
+        if (buf[5] & 0x10) //has footer
+            size += 10;
+    }
+
+    sceIoLseek32(fd, offset, PSP_SEEK_SET); //now seek for a sync
+    while(1)
+    {
+        offset = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+        size = sceIoRead(fd, buf, sizeof(buf));
+
+        if (size <= 2)//at end of file
+            return -1;
+
+        if (!strncmp((char*)buf, "EA3", 3))//oma mp3 files have non-safe ints in the EA3 header
+        {
+            sceIoLseek32(fd, (buf[4]<<8)+buf[5], PSP_SEEK_CUR);
+            continue;
+        }
+
+        pBuffer = buf;
+        for( i = 0; i < size; i++)
+        {
+            //if this is a valid frame sync (0xe0 is for mpeg version 2.5,2+1)
+            if ( (pBuffer[i] == 0xff) && ((pBuffer[i+1] & 0xE0) == 0xE0))
+            {
+                offset += i;
+                sceIoLseek32(fd, offset, PSP_SEEK_SET);
+                return offset;
+            }
+        }
+       //go back two bytes to catch any syncs that on the boundary
+        sceIoLseek32(fd, -2, PSP_SEEK_CUR);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set pointer to audio functions based on filename:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,7 +327,7 @@ void setAudioFunctions(char *filename, int useME_MP3){
     } else if (!stricmp(ext, ".mp3")){
         //MP3 via LibMad
 		initFunct = MP3_Init;
-		loadFunct = MP3_Load;		 
+		loadFunct = MP3_Load;
 		playFunct = MP3_Play;
 		pauseFunct = MP3_Pause;
 		endFunct = MP3_End;
@@ -290,7 +349,7 @@ void setAudioFunctions(char *filename, int useME_MP3){
         isFilterSupportedFunct = MP3_isFilterSupported;
 
         suspendFunct = MP3_suspend;
-        resumeFunct = MP3_resume;        
+        resumeFunct = MP3_resume;
         fadeOutFunct = MP3_fadeOut;
     } else if (!stricmp(ext, ".aa3") || !stricmp(ext, ".oma") || !stricmp(ext, ".omg")){
         //AA3
@@ -346,6 +405,33 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = FLAC_suspend;
         resumeFunct = FLAC_resume;
         fadeOutFunct = FLAC_fadeOut;
+    } else if (!stricmp(ext, ".aac")){
+        //AAC e AAC+ software
+		initFunct = AAC_Init;
+		loadFunct = AAC_Load;
+		playFunct = AAC_Play;
+		pauseFunct = AAC_Pause;
+		endFunct = AAC_End;
+        setVolumeBoostTypeFunct = AAC_setVolumeBoostType;
+        setVolumeBoostFunct = AAC_setVolumeBoost;
+        getInfoFunct = AAC_GetInfo;
+        getTagInfoFunct = AAC_GetTagInfoOnly;
+        getTimeStringFunct = AAC_GetTimeString;
+        getPercentageFunct = AAC_GetPercentage;
+        getPlayingSpeedFunct = AAC_getPlayingSpeed;
+        setPlayingSpeedFunct = AAC_setPlayingSpeed;
+        endOfStreamFunct = AAC_EndOfStream;
+
+        setMuteFunct = AAC_setMute;
+        setFilterFunct = AAC_setFilter;
+        enableFilterFunct = AAC_enableFilter;
+        disableFilterFunct = AAC_disableFilter;
+        isFilterEnabledFunct = AAC_isFilterEnabled;
+        isFilterSupportedFunct = AAC_isFilterSupported;
+
+        suspendFunct = AAC_suspend;
+        resumeFunct = AAC_resume;
+        fadeOutFunct = AAC_fadeOut;
     }
 }
 
@@ -367,14 +453,14 @@ void unsetAudioFunctions(){
     getPlayingSpeedFunct = NULL;
     setPlayingSpeedFunct = NULL;
     endOfStreamFunct = NULL;
-    
+
     setMuteFunct = NULL;
     setFilterFunct = NULL;
     enableFilterFunct = NULL;
     disableFilterFunct = NULL;
     isFilterEnabledFunct = NULL;
     isFilterSupportedFunct = NULL;
-    
+
     suspendFunct = NULL;
     resumeFunct = NULL;
 }
@@ -507,7 +593,7 @@ void initFileInfo(struct fileInfo *info){
     info->encapsulatedPictureType = 0;
     info->encapsulatedPictureOffset = 0;
     info->encapsulatedPictureLength = 0;
-    
+
     strcpy(info->album, "");
     strcpy(info->title, "");
     strcpy(info->artist, "");
@@ -517,26 +603,44 @@ void initFileInfo(struct fileInfo *info){
     strcpy(info->coverArtImageName, "");
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get the cover art image name:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void getCovertArtImageName(char *fileName, struct fileInfo *info){
-    char dirName[262] = "";
-    char buffer[262] = "";
-    
+    char dirName[264] = "";
+    char buffer[264] = "";
+    int size = 0;
+
     strcpy(info->coverArtImageName, "");
+    strcpy(dirName, fileName);
+    directoryUp(dirName);
 
     //Look for fileName.jpg in the same directory:
     sprintf(buffer, "%s.jpg", fileName);
-    int size = fileExists(buffer);
+    size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){
         strcpy(info->coverArtImageName, buffer);
         return;
     }
-    
+
+    //Look for albumName.jpg in the same directory:
+    sprintf(buffer, "%s/%s.jpg", dirName, info->album);
+    size = fileExists(buffer);
+    if (size > 0 && size <= MAX_IMAGE_DIMENSION){
+        strcpy(info->coverArtImageName, buffer);
+        return;
+    }
+
+    //Look for folder.jpg in the same directory:
+    sprintf(buffer, "%s/%s.jpg", dirName, "folder.jpg");
+    size = fileExists(buffer);
+    if (size > 0 && size <= MAX_IMAGE_DIMENSION){
+        strcpy(info->coverArtImageName, buffer);
+        return;
+    }
+
     //Look for cover.jpg in same directory:
-    strcpy(dirName, fileName);
-    directoryUp(dirName);
     sprintf(buffer, "%s/%s", dirName, "cover.jpg");
     size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){

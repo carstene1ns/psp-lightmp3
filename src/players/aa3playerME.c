@@ -32,7 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int AA3ME_threadActive = 0;
 int AA3ME_threadExited = 1;
-char AA3ME_fileName[262];
+char AA3ME_fileName[264];
 static int AA3ME_isPlaying = 0;
 int AA3ME_thid = -1;
 int AA3ME_audio_channel = 0;
@@ -46,9 +46,10 @@ unsigned int AA3ME_volume_boost = 0;
 long AA3ME_suspendPosition = -1;
 long AA3ME_suspendIsPlaying = 0;
 
-unsigned char AA3ME_output_buffer[2048*4]; //__attribute__((aligned(64)));//at3+ sample_per_frame*4
-unsigned long AA3ME_codec_buffer[65]; //__attribute__((aligned(64)));
-unsigned char AA3ME_input_buffer[2889]; //__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
+unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
+unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
+short AA3ME_output_buffer[2048*2]__attribute__((aligned(64)));//at3+ sample_per_frame*4
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Private functions:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,32 +62,32 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     unsigned long decode_type;
     int tag_size;
 	int offset = 0;
-	
+
 	AA3ME_threadExited = 0;
     AA3ME_threadActive = 1;
-    
+
 	sceAudiocodecReleaseEDRAM(AA3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another file.
     OutputBuffer_flip = 0;
     AT3_OutputPtr = AT3_OutputBuffer[0];
-    
+
     tag_size = GetID3TagSize(AA3ME_fileName);
     fd = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
     if (fd < 0)
         AA3ME_threadActive = 0;
-    
+
     sceIoLseek32(fd, tag_size, PSP_SEEK_SET);//not all omg files have a fixed header
-    
+
     if ( sceIoRead( fd, ea3_header, 0x60 ) != 0x60 )
         AA3ME_threadActive = 0;
-    
+
     if ( ea3_header[0] != 0x45 || ea3_header[1] != 0x41 || ea3_header[2] != 0x33 )
         AA3ME_threadActive = 0;
-    
+
     at3_at3plus_flagdata[0] = ea3_header[0x22];
     at3_at3plus_flagdata[1] = ea3_header[0x23];
-       
+
     at3_type = (ea3_header[0x22] == 0x20) ? TYPE_ATRAC3 : ((ea3_header[0x22] == 0x28) ? TYPE_ATRAC3PLUS : 0x0);
-    
+
     if ( at3_type != TYPE_ATRAC3 && at3_type != TYPE_ATRAC3PLUS )
         AA3ME_threadActive = 0;
 
@@ -101,7 +102,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     sceIoLseek32(fd, data_start, PSP_SEEK_SET);
 
     memset(AA3ME_codec_buffer, 0, sizeof(AA3ME_codec_buffer));
-   
+
     if ( at3_type == TYPE_ATRAC3 )
     {
         channel_mode = 0x0;
@@ -154,7 +155,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     else
         AA3ME_threadActive = 0;
     samplerate = 44100;
-   
+
 	while (AA3ME_threadActive){
 		while( !AA3ME_eof && AA3ME_isPlaying )
 		{
@@ -219,7 +220,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 
 			AA3ME_codec_buffer[6] = (unsigned long)AA3ME_input_buffer;
 			AA3ME_codec_buffer[8] = (unsigned long)AA3ME_output_buffer;
-	   
+
 			res = sceAudiocodecDecode(AA3ME_codec_buffer, decode_type);
 			if ( res < 0 )
 			{
@@ -239,7 +240,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				if (AA3ME_volume_boost){
                     int i;
                     for (i=0; i<AT3_OUTPUT_BUFFER_SIZE; i++){
-    					AT3_OutputBuffer[OutputBuffer_flip][i] = volume_boost_char(&AT3_OutputBuffer[OutputBuffer_flip][i], &AA3ME_volume_boost);
+    					AT3_OutputBuffer[OutputBuffer_flip][i] = volume_boost(&AT3_OutputBuffer[OutputBuffer_flip][i], &AA3ME_volume_boost);
                     }
                 }
 				audioOutput(AA3ME_volume, AT3_OutputBuffer[OutputBuffer_flip]);
@@ -256,6 +257,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 		sceKernelDelayThread(10000);
 	}
 	sceIoClose(fd);
+    fd = -1;
     AA3ME_threadExited = 1;
     return 0;
 }
@@ -336,6 +338,8 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
         }
         size -= tag_length;
 	}
+    if (!strlen(targetInfo->title))
+        strcpy(targetInfo->title, AA3ME_fileName);
 	fclose(fp);
 }
 
@@ -356,22 +360,24 @@ int AA3MEgetInfo(){
     u8 ea3_header[0x60];
     int tag_size;
     float totalPlayingTime = 0;
-    
+
     tag_size = GetID3TagSize(AA3ME_fileName);
     fd = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
     if (fd < 0)
         return -1;
-    long fileSize = sceIoLseek(fd, 0, PSP_SEEK_END);
+    double fileSize = sceIoLseek(fd, 0, PSP_SEEK_END);
 	sceIoLseek(fd, 0, PSP_SEEK_SET);
     sceIoLseek32(fd, tag_size, PSP_SEEK_SET);
 
     if ( sceIoRead( fd, ea3_header, 0x60 ) != 0x60 ){
         sceIoClose(fd);
+        fd = -1;
         return -1;
     }
 
     if ( ea3_header[0] != 0x45 || ea3_header[1] != 0x41 || ea3_header[2] != 0x33 ){
         sceIoClose(fd);
+        fd = -1;
         return -1;
     }
 
@@ -382,6 +388,7 @@ int AA3MEgetInfo(){
 
     if ( at3_type != TYPE_ATRAC3 && at3_type != TYPE_ATRAC3PLUS ){
         sceIoClose(fd);
+        fd = -1;
         return -1;
     }
 
@@ -403,19 +410,20 @@ int AA3MEgetInfo(){
     else
         AA3ME_info.kbit = data_align; //Unknown bitrate!
     AA3ME_info.instantBitrate = AA3ME_info.kbit * 1000;
-    
+
     if ( at3_type == TYPE_ATRAC3 )
         sample_per_frame = 1024;
     else if ( at3_type == TYPE_ATRAC3PLUS )
         sample_per_frame = 2048;
     else{
         sceIoClose(fd);
+        fd = -1;
         return -1;
     }
     samplerate = 44100;
-    
+
     totalPlayingTime = (float)fileSize / (float)data_align * (float)sample_per_frame/(float)samplerate;
-    
+
 	AA3ME_info.hz = samplerate;
 	AA3ME_info.length = totalPlayingTime;
 	long secs = AA3ME_info.length;
@@ -426,6 +434,7 @@ int AA3MEgetInfo(){
 	strcpy(AA3ME_info.mode, "joint (MS/intensity) stereo");
 	strcpy(AA3ME_info.emphasis,"no");
 	sceIoClose(fd);
+    fd = -1;
 
     getAA3METagInfo(AA3ME_fileName, &AA3ME_info);
     return 0;
@@ -452,9 +461,9 @@ int AA3ME_Load(char *fileName){
     if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;
     }
-    
+
     releaseAudio();
-    if (setAudioFrequency(AT3_OUTPUT_BUFFER_SIZE/4, AA3ME_info.hz, 2) < 0){
+    if (setAudioFrequency(AT3_OUTPUT_BUFFER_SIZE/2, AA3ME_info.hz, 2) < 0){
         MP3ME_End();
         return ERROR_INVALID_SAMPLE_RATE;
     }
@@ -583,8 +592,7 @@ int AA3ME_setPlayingSpeed(int playingSpeed){
 
 void AA3ME_setVolumeBoostType(char *boostType){
     //Only old method supported
-    //MAX_VOLUME_BOOST = 4;
-    MAX_VOLUME_BOOST = 0;
+    MAX_VOLUME_BOOST = 4;
     MIN_VOLUME_BOOST = 0;
 }
 

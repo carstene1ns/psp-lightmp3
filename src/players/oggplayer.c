@@ -17,8 +17,10 @@
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string.h>
 
-#include "tremor/ivorbiscodec.h"
-#include "tremor/ivorbisfile.h"
+#include "tremor/ivorbiscodec.h" //libtremor
+#include "tremor/ivorbisfile.h"  //libtremor
+//#include <vorbis/codec.h>      //ogg-vorbis
+//#include <vorbis/vorbisfile.h> //ogg-vorbis
 #include "player.h"
 #include "oggplayer.h"
 
@@ -26,12 +28,12 @@
 //Globals
 /////////////////////////////////////////////////////////////////////////////////////////
 int OGG_audio_channel;
-char OGG_fileName[262];
-int OGG_file = 0;
+char OGG_fileName[264];
+int OGG_file = -1;
 OggVorbis_File OGG_VorbisFile;
 int OGG_eos = 0;
 struct fileInfo OGG_info;
-int isPlaying = 0;
+int OGG_isPlaying = 0;
 unsigned int OGG_volume_boost = 0.0;
 double OGG_milliSeconds = 0.0;
 int OGG_playingSpeed = 0; // 0 = normal
@@ -40,35 +42,38 @@ int outputInProgress = 0;
 long OGG_suspendPosition = -1;
 long OGG_suspendIsPlaying = 0;
 int OGG_defaultCPUClock = 50;
+short OGG_mixBuffer[PSP_NUM_AUDIO_SAMPLES * 2 * 2]__attribute__ ((aligned(64)));
+unsigned long OGG_tempmixleft = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Audio callback
 /////////////////////////////////////////////////////////////////////////////////////////
 static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
     short *_buf = (short *)_buf2;
-    static short tempmixbuf[PSP_NUM_AUDIO_SAMPLES * 2 * 2]; // __attribute__ ((aligned(64)));
-    static unsigned long tempmixleft = 0;
+    //static short OGG_mixBuffer[PSP_NUM_AUDIO_SAMPLES * 2 * 2]__attribute__ ((aligned(64)));
+    //static unsigned long OGG_tempmixleft = 0;
 	int current_section;
 
-	if (isPlaying) {	// Playing , so mix up a buffer
+	if (OGG_isPlaying) {	// Playing , so mix up a buffer
         outputInProgress = 1;
-		while (tempmixleft < numSamples) {	//  Not enough in buffer, so we must mix more
-			unsigned long bytesRequired = (numSamples - tempmixleft) * 4;	// 2channels, 16bit = 4 bytes per sample
-			unsigned long ret = ov_read(&OGG_VorbisFile, (char *) &tempmixbuf[tempmixleft * 2], bytesRequired, &current_section);
+		while (OGG_tempmixleft < numSamples) {	//  Not enough in buffer, so we must mix more
+			unsigned long bytesRequired = (numSamples - OGG_tempmixleft) * 4;	// 2channels, 16bit = 4 bytes per sample
+			unsigned long ret = ov_read(&OGG_VorbisFile, (char *) &OGG_mixBuffer[OGG_tempmixleft * 2], bytesRequired, &current_section); //libtremor
+            //unsigned long ret = ov_read(&OGG_VorbisFile, (char *) &OGG_mixBuffer[OGG_tempmixleft * 2], bytesRequired, 0, 2, 1, &current_section); //ogg-vorbis
 			if (!ret) {	//EOF
-                isPlaying = 0;
+                OGG_isPlaying = 0;
 				OGG_eos = 1;
                 outputInProgress = 0;
-				return;		
+				return;
 			} else if (ret < 0) {
 				if (ret == OV_HOLE)
 					continue;
-                isPlaying = 0;
+                OGG_isPlaying = 0;
 				OGG_eos = 1;
                 outputInProgress = 0;
 				return;
 			}
-			tempmixleft += ret / 4;	// back down to sample num
+			OGG_tempmixleft += ret / 4;	// back down to sample num
 		}
         OGG_info.instantBitrate = ov_bitrate_instant(&OGG_VorbisFile);
 		OGG_milliSeconds = ov_time_tell(&OGG_VorbisFile);
@@ -79,7 +84,7 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
                 OGG_setPlayingSpeed(0);
         }
 
-		if (tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
+		if (OGG_tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
 			int count, count2;
 			short *_buf2;
 			for (count = 0; count < numSamples; count++) {
@@ -87,20 +92,20 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
 				_buf2 = _buf + count2;
                 //Volume boost:
                 if (OGG_volume_boost){
-                    *(_buf2) = volume_boost(&tempmixbuf[count2], &OGG_volume_boost);
-                    *(_buf2 + 1) = volume_boost(&tempmixbuf[count2 + 1], &OGG_volume_boost);
+                    *(_buf2) = volume_boost(&OGG_mixBuffer[count2], &OGG_volume_boost);
+                    *(_buf2 + 1) = volume_boost(&OGG_mixBuffer[count2 + 1], &OGG_volume_boost);
                 }else{
                     // Double up for stereo
-                    *(_buf2) = tempmixbuf[count2];
-                    *(_buf2 + 1) = tempmixbuf[count2 + 1];
+                    *(_buf2) = OGG_mixBuffer[count2];
+                    *(_buf2 + 1) = OGG_mixBuffer[count2 + 1];
                 }
 			}
 			//  Move the pointers
-			tempmixleft -= numSamples;
+			OGG_tempmixleft -= numSamples;
 			//  Now shuffle the buffer along
-			for (count = 0; count < tempmixleft; count++)
-				tempmixbuf[count] = tempmixbuf[numSamples + count];
-            
+			for (count = 0; count < OGG_tempmixleft * 2; count++)
+			    OGG_mixBuffer[count] = OGG_mixBuffer[numSamples * 2 + count];
+
 		}
         outputInProgress = 0;
     } else {			//  Not Playing , so clear buffer
@@ -137,8 +142,11 @@ void readOggTagData(char *source, char *dest){
 
     strcpy(dest, "");
     for (i=0; i<strlen(source); i++){
-        if (source[i] >= 0x20 && count < 256)
-            dest[count++] = source[i];
+        if ((unsigned char)source[i] >= 0x20 && (unsigned char)source[i] <= 0xfd){
+            dest[count] = source[i];
+            if (++count >= 256)
+                break;
+        }
     }
     dest[count] = '\0';
 }
@@ -198,6 +206,8 @@ void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
             fclose(out);
         }*/
 	}
+    if (!strlen(targetInfo->title))
+        strcpy(targetInfo->title, OGG_fileName);
 }
 
 void OGGgetInfo(){
@@ -205,7 +215,7 @@ void OGGgetInfo(){
     OGG_info.fileType = OGG_TYPE;
     OGG_info.defaultCPUClock = OGG_defaultCPUClock;
     OGG_info.needsME = 0;
-    
+
     vorbis_info *vi = ov_info(&OGG_VorbisFile, -1);
 	OGG_info.kbit = vi->bitrate_nominal/1000;
     OGG_info.instantBitrate = vi->bitrate_nominal;
@@ -236,12 +246,14 @@ void OGG_Init(int channel){
     MAX_PLAYING_SPEED=9;
     OGG_audio_channel = channel;
     OGG_milliSeconds = 0.0;
+    OGG_tempmixleft = 0;
+    memset(OGG_mixBuffer, 0, sizeof(OGG_mixBuffer));
     pspAudioSetChannelCallback(OGG_audio_channel, oggDecodeThread, NULL);
 }
 
 
 int OGG_Load(char *filename){
-	isPlaying = 0;
+	OGG_isPlaying = 0;
 	OGG_milliSeconds = 0;
 	OGG_eos = 0;
     OGG_playingSpeed = 0;
@@ -261,6 +273,7 @@ int OGG_Load(char *filename){
         ogg_callbacks.tell_func = ogg_callback_tell;
 		if (ov_open_callbacks(&OGG_file, &OGG_VorbisFile, NULL, 0, ogg_callbacks) < 0){
             sceIoClose(OGG_file);
+            OGG_file = -1;
             return ERROR_OPENING;
         }
 	}else{
@@ -277,16 +290,16 @@ int OGG_Load(char *filename){
 }
 
 int OGG_Play(){
-	isPlaying = 1;
+	OGG_isPlaying = 1;
 	return 0;
 }
 
 void OGG_Pause(){
-	isPlaying = !isPlaying;
+	OGG_isPlaying = !OGG_isPlaying;
 }
 
 int OGG_Stop(){
-	isPlaying = 0;
+	OGG_isPlaying = 0;
     //This is to be sure that oggDecodeThread isn't messing with &OGG_VorbisFile
     while (outputInProgress == 1)
         sceKernelDelayThread(100000);
@@ -296,7 +309,10 @@ int OGG_Stop(){
 void OGG_FreeTune(){
 	ov_clear(&OGG_VorbisFile);
     if (OGG_file >= 0)
-        sceIoClose(OGG_file);   
+        sceIoClose(OGG_file);
+    OGG_file = -1;
+    OGG_tempmixleft = 0;
+    memset(OGG_mixBuffer, 0, sizeof(OGG_mixBuffer));
 }
 
 void OGG_GetTimeString(char *dest){
@@ -305,7 +321,7 @@ void OGG_GetTimeString(char *dest){
 	int h = secs / 3600;
 	int m = (secs - h * 3600) / 60;
 	int s = secs - h * 3600 - m * 60;
-	snprintf(timeString, sizeof(timeString), "%2.2i:%2.2i:%2.2i", h, m, s);	
+	snprintf(timeString, sizeof(timeString), "%2.2i:%2.2i:%2.2i", h, m, s);
 	strcpy(dest, timeString);
 }
 
@@ -411,7 +427,7 @@ void OGG_setVolumeBoostType(char *boostType){
 }
 
 
-//Functions for filter (equalizer):	
+//Functions for filter (equalizer):
 int OGG_setFilter(double tFilter[32], int copyFilter){
 	return 0;
 }
@@ -430,23 +446,23 @@ int OGG_isFilterEnabled(){
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Manage suspend:
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int OGG_suspend(){
     OGG_suspendPosition = ov_raw_tell(&OGG_VorbisFile);
-    OGG_suspendIsPlaying = isPlaying;
+    OGG_suspendIsPlaying = OGG_isPlaying;
     OGG_Stop();
     OGG_FreeTune();
     return 0;
-}         
+}
 
 int OGG_resume(){
     if (OGG_suspendPosition >= 0){
        OGG_Load(OGG_fileName);
        if (ov_raw_seek(&OGG_VorbisFile, OGG_suspendPosition)){
           if (OGG_suspendIsPlaying)
-             OGG_Play();                                        
+             OGG_Play();
        }
        OGG_suspendPosition = -1;
     }
     return 0;
-}         
+}

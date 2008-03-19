@@ -7,10 +7,10 @@
 struct genre
 {
 	int code;
-	char *text;
+	char text[112];
 };
 
-struct genre genreList[] = 
+struct genre genreList[] =
 {
    {0 , "Blues"}, {1 , "Classic Rock"}, {2 , "Country"}, {3 , "Dance"}, {4 , "Disco"}, {5 , "Funk"}, {6 , "Grunge"}, {7 , "Hip-Hop"}, {8 , "Jazz"}, {9 , "Metal"}, {10 , "New Age"},
    {11 , "Oldies"}, {12 , "Other"}, {13 , "Pop"}, {14 , "R&B"}, {15 , "Rap"}, {16 , "Reggae"}, {17 , "Rock"}, {18 , "Techno"}, {19 , "Industrial"}, {20 , "Alternative"},
@@ -37,7 +37,7 @@ int searchJPGstart(FILE *fp, int delta){
     int retValue = -1;
     int i = 0;
     unsigned char threeChar[3];
-    
+
     int startPos = ftell(fp);
     for (i=0; i<delta; i++){
         fread(threeChar, sizeof(unsigned char), 3, fp);
@@ -62,7 +62,7 @@ int searchPNGstart(FILE *fp, int delta){
     unsigned char pngChar[16] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
                                  0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52};
     int startPos = ftell(fp);
-    
+
     for (i=0; i<delta; i++){
         fread(testChar, sizeof(unsigned char), 16, fp);
         testResult = 1;
@@ -87,7 +87,7 @@ int searchPNGstart(FILE *fp, int delta){
 short int swapInt16BigToHost(short int arg)
 {
    short int i=0;
-   int checkEndian = 1;  
+   int checkEndian = 1;
    if( 1 == *(char *)&checkEndian )
    {
       // Intel (little endian)
@@ -105,7 +105,7 @@ short int swapInt16BigToHost(short int arg)
 int swapInt32BigToHost(int arg)
 {
    int i=0;
-   int checkEndian = 1;  
+   int checkEndian = 1;
    if( 1 == *(char *)&checkEndian )
    {
       // Intel (little endian)
@@ -142,16 +142,16 @@ int ID3v2TagSize(const char *mp3path)
    FILE *fp;
    int size;
    char sig[3];
-   
+
    fp = fopen(mp3path, "rb");
    if (fp == NULL) return 0;
-   
+
    fread(sig, sizeof(char), 3, fp);
    if (strncmp("ID3",sig,3) != 0) {
       fclose(fp);
       return 0;
-   } 
-   
+   }
+
    fseek(fp, 6, SEEK_SET);
    fread(&size, sizeof(unsigned int), 1, fp);
    /*
@@ -170,10 +170,10 @@ int ID3v2(const char *mp3path)
 {
    char sig[3];
    unsigned short int version;
-   
+
    FILE *fp = fopen(mp3path, "rb");
    if (fp == NULL) return 0;
-   
+
    fread(sig, sizeof(char), 3, fp);
    if (!strncmp("ID3",sig,3)) {
       fread(&version, sizeof(unsigned short int), 1, fp);
@@ -181,25 +181,25 @@ int ID3v2(const char *mp3path)
       version /= 256;
    }
    fclose(fp);
-   
+
    return (int)version;
 }
 
 void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
-{  
+{
    FILE *fp = NULL;
-   
-   int size; 
+
+   int size;
    int tag_length;
    char tag[3];
    char buffer[20];
-      
+
    if(ID3v2(mp3path) == 2) {
       size = ID3v2TagSize(mp3path);
-      fp = fopen(mp3path, "rb");    
+      fp = fopen(mp3path, "rb");
       if (fp == NULL) return;
       fseek(fp, 10, SEEK_SET);
-      
+
       while (size != 0) {
          fread(tag, sizeof(char), 3, fp);
          size -= 3;
@@ -207,14 +207,14 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
          /* read 3 byte big endian tag length */
          fread(&tag_length, sizeof(unsigned int), 1, fp);
          fseek(fp, -1, SEEK_CUR);
-         
+
          tag_length = (unsigned int) swapInt32BigToHost((int)tag_length);
          tag_length = (tag_length / 256);
          size -= 3;
-         
+
          /* Perform checks for end of tags and tag length overflow or zero */
          if(*tag == 0 || tag_length > size || tag_length == 0) break;
-         
+
          if(!strncmp("TP1",tag,3)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
@@ -263,7 +263,7 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
             fseek(fp, 5, SEEK_CUR);
             id3tag->ID3EncapsulatedPictureOffset = ftell(fp);
             id3tag->ID3EncapsulatedPictureLength = tag_length-6;
-            fseek(fp, tag_length - 6, SEEK_CUR); 
+            fseek(fp, tag_length - 6, SEEK_CUR);
          }
          else
          {
@@ -277,20 +277,20 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
 }
 
 void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
-{  
+{
    FILE *fp = NULL;
-   
-   int size; 
+
+   int size;
    int tag_length;
    char tag[4];
    char buffer[20];
-   
+
    if(ID3v2(mp3path) == 3) {
       size = ID3v2TagSize(mp3path);
-      fp = fopen(mp3path, "rb");     
+      fp = fopen(mp3path, "rb");
       if (fp == NULL) return;
       fseek(fp, 10, SEEK_SET);
-      
+
       while (size != 0) {
          fread(tag, sizeof(char), 4, fp);
          size -= 4;
@@ -299,13 +299,13 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
          fread(&tag_length, sizeof(unsigned int), 1, fp);
          tag_length = (unsigned int) swapInt32BigToHost((int)tag_length);
          size -= 4;
-         
+
          fseek(fp, 2, SEEK_CUR);
          size -= 2;
-         
+
          /* Perform checks for end of tags and tag length overflow or zero */
          if(*tag == 0 || tag_length > size || tag_length == 0) break;
-         
+
          if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
@@ -373,20 +373,20 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
 }
 
 void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
-{  
+{
    FILE *fp = NULL;
-   
-   int size; 
+
+   int size;
    int tag_length;
    char tag[4];
    char buffer[20];
-   
+
    if(ID3v2(mp3path) == 4) {
       size = ID3v2TagSize(mp3path);
-      fp = fopen(mp3path, "rb");   
+      fp = fopen(mp3path, "rb");
       if (fp == NULL) return;
-      fseek(fp, 10, SEEK_SET);      
-     
+      fseek(fp, 10, SEEK_SET);
+
       while (size != 0) {
          fread(tag, sizeof(char), 4, fp);
          size -= 4;
@@ -395,13 +395,13 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
          fread(&tag_length, sizeof(unsigned int), 1, fp);
          tag_length = (unsigned int) swapInt32BigToHost((int)tag_length);
          size -= 4;
-         
+
          fseek(fp, 2, SEEK_CUR);
          size -= 2;
-         
+
          /* Perform checks for end of tags and tag length overflow or zero */
          if(*tag == 0 || tag_length > size || tag_length == 0) break;
-         
+
          if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             fseek(fp, 1, SEEK_CUR);
@@ -483,7 +483,7 @@ int ParseID3v2(const char *mp3path, struct ID3Tag *id3tag)
       default:
          return -1;
    }
-   
+
    /* If no Title is found, uses filename - extension for Title. */
    if(*id3tag->ID3Title == 0) {
       strcpy(id3tag->ID3Title,strrchr(mp3path,'/') + 1);
@@ -505,23 +505,23 @@ int ParseID3v1(const char *mp3path, struct ID3Tag *id3tag){
         sceIoLseek(id3fd, -125, SEEK_END);
         sceIoRead(id3fd,id3tag->ID3Title,30);
     	id3tag->ID3Title[30] = '\0';
-    
+
         sceIoLseek(id3fd, -95, SEEK_END);
         sceIoRead(id3fd,id3tag->ID3Artist,30);
     	id3tag->ID3Artist[30] = '\0';
-    
+
         sceIoLseek(id3fd, -65, SEEK_END);
         sceIoRead(id3fd,id3tag->ID3Album,30);
     	id3tag->ID3Album[30] = '\0';
-    
+
         sceIoLseek(id3fd, -35, SEEK_END);
         sceIoRead(id3fd,id3tag->ID3Year,4);
     	id3tag->ID3Year[4] = '\0';
-    
+
         sceIoLseek(id3fd, -31, SEEK_END);
         sceIoRead(id3fd,id3tag->ID3Comment,30);
     	id3tag->ID3Comment[30] = '\0';
-    
+
         sceIoLseek(id3fd, -1, SEEK_END);
         sceIoRead(id3fd,id3tag->ID3GenreCode,1);
     	id3tag->ID3GenreCode[1] = '\0';
@@ -533,8 +533,8 @@ int ParseID3v1(const char *mp3path, struct ID3Tag *id3tag){
         } else {
            id3tag->ID3Track = 1;
            strcpy(id3tag->versionfound, "1.0");
-        }    
-        
+        }
+
     	if (((int)id3tag->ID3GenreCode[0] >= 0) & ((int)id3tag->ID3GenreCode[0] < genreNumber)){
     		strcpy(id3tag->ID3GenreText, genreList[(int)id3tag->ID3GenreCode[0]].text);
     	}
@@ -542,11 +542,11 @@ int ParseID3v1(const char *mp3path, struct ID3Tag *id3tag){
     		strcpy(id3tag->ID3GenreText, "");
     	}
     	id3tag->ID3GenreText[30] = '\0';
-    
-        sceIoClose(id3fd);    
+
+        sceIoClose(id3fd);
         return 0;
      }else{
-        sceIoClose(id3fd);               
+        sceIoClose(id3fd);
         return -1;
      }
      sceIoClose(id3fd);
@@ -568,8 +568,10 @@ struct ID3Tag ParseID3(char *mp3path)
     TmpID3.ID3EncapsulatedPictureOffset = 0;
     TmpID3.ID3EncapsulatedPictureLength = 0;
     TmpID3.ID3Length = 0;
-    
+
     ParseID3v1(mp3path, &TmpID3);
     ParseID3v2(mp3path, &TmpID3);
+    if (!strlen(TmpID3.ID3Title))
+        strcpy(TmpID3.ID3Title, mp3path);
     return TmpID3;
 }

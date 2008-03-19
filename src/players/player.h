@@ -32,6 +32,7 @@
 #include "aa3playerME.h"
 #include "oggplayer.h"
 #include "flacplayer.h"
+#include "aacplayer.h"
 
 #define OPENING_OK 0
 #define ERROR_OPENING -1
@@ -72,44 +73,45 @@ extern SceUID data_memid;
 extern volatile int OutputBuffer_flip;
 
 //shared between at3+aa3
-#define AT3_OUTPUT_BUFFER_SIZE	(2048*2*4)
+#define AT3_OUTPUT_BUFFER_SIZE	(2048*2)
 extern u16 at3_type;
 extern u8 at3_at3plus_flagdata[2];
-extern unsigned char AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE];
-extern unsigned char *AT3_OutputPtr;
+short AT3_OutputBuffer[2][AT3_OUTPUT_BUFFER_SIZE];
+short *AT3_OutputPtr;
 
 int openAudio(int channel, int samplecount);
 SceUID LoadStartAudioModule(char *modname, int partition);
 int initMEAudioModules();
 int GetID3TagSize(char *fname);
+int SeekNextFrameMP3(SceUID fd);
 
 struct fileInfo{
     int fileType;
     int defaultCPUClock;
     int needsME;
-	int fileSize;
-	char layer[10];
+	double fileSize;
+	char layer[12];
 	int kbit;
 	long instantBitrate;
 	long hz;
-	char mode[50];
-	char emphasis[10];
+	char mode[52];
+	char emphasis[20];
 	long length;
-	char strLength[10];
+	char strLength[12];
 	long frames;
 	long framesDecoded;
 	int  encapsulatedPictureType;
 	int  encapsulatedPictureOffset;
 	int  encapsulatedPictureLength;
-	char coverArtImageName[262];
-	
+	char coverArtImageName[264];
+
     //Tag/comments:
-	char album[256];
-	char title[256];
-	char artist[256];
-	char genre[256];
-    char year[5];
-    char trackNumber[5];
+	char album[260];
+	char title[260];
+	char artist[260];
+	char genre[260];
+    char year[8];
+    char trackNumber[8];
 };
 
 
