@@ -23,7 +23,7 @@
 struct settings localSettings;
 
 //Read a RGB color from settings (rrr,ggg,bbb,aaaa)
-int readRGBA(int RGBA[], char *string){
+int readRGBA(int *RGBA, char *string){
     char *result = NULL;
     int count = 0;
 
@@ -130,139 +130,6 @@ int SETTINGS_load(char *fileName){
 	return 0;
 }
 
-//Load settings from file:
-int SETTINGS_loadSkin(char *fileName){
-	FILE *f;
-	char lineText[256];
-
-	f = fopen(fileName, "rt");
-	if (f == NULL){
-		//Error opening file:
-		return -1;
-	}
-
-	while(fgets(lineText, 256, f) != NULL){
-		int element = 0;
-		char parName[10] = "";
-		if (strlen(lineText) > 0){
-			if (lineText[0] != '#'){
-                //Tolgo caratteri di termine riga:
-                if ((int)lineText[strlen(lineText) - 1] == 10 || (int)lineText[strlen(lineText) - 1] == 13)
-                    lineText[strlen(lineText) - 1] = '\0';
-                if ((int)lineText[strlen(lineText) - 1] == 10 || (int)lineText[strlen(lineText) - 1] == 13)
-                    lineText[strlen(lineText) - 1] = '\0';
-
-				//Split line:
-				element = 0;
-				char *result = NULL;
-				result = strtok(lineText, "=");
-				while(result != NULL){
-					if (strlen(result) > 0){
-						if (element == 0){
-							strcpy(parName, result);
-						}else if (element == 1){
-                            if (strcmp(parName, "FILE_INFO_X") == 0){
-								localSettings.fileInfoX = atoi(result);
-                            }else if (strcmp(parName, "FILE_INFO_Y") == 0){
-								localSettings.fileInfoY = atoi(result);
-                            }else if (strcmp(parName, "FILE_SPECS_X") == 0){
-								localSettings.fileSpecsX = atoi(result);
-                            }else if (strcmp(parName, "FILE_SPECS_Y") == 0){
-								localSettings.fileSpecsY = atoi(result);
-                            }else if (strcmp(parName, "COVERART_X") == 0){
-								localSettings.coverArtX = atoi(result);
-                            }else if (strcmp(parName, "COVERART_Y") == 0){
-								localSettings.coverArtY = atoi(result);
-                            }else if (strcmp(parName, "PROGRESS_X") == 0){
-								localSettings.progressX = atoi(result);
-                            }else if (strcmp(parName, "PROGRESS_Y") == 0){
-								localSettings.progressY = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_1_X") == 0){
-								localSettings.buttonsX[0] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_2_X") == 0){
-								localSettings.buttonsX[1] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_3_X") == 0){
-								localSettings.buttonsX[2] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_4_X") == 0){
-								localSettings.buttonsX[3] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_5_X") == 0){
-								localSettings.buttonsX[4] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_1_Y") == 0){
-								localSettings.buttonsY[0] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_2_Y") == 0){
-								localSettings.buttonsY[1] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_3_Y") == 0){
-								localSettings.buttonsY[2] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_4_Y") == 0){
-								localSettings.buttonsY[3] = atoi(result);
-                            }else if (strcmp(parName, "BUTTON_5_Y") == 0){
-								localSettings.buttonsY[4] = atoi(result);
-                            }else if (strcmp(parName, "PLAYER_STATUS_X") == 0){
-								localSettings.playerStatusX = atoi(result);
-                            }else if (strcmp(parName, "PLAYER_STATUS_Y") == 0){
-								localSettings.playerStatusY = atoi(result);
-                            }else if (strcmp(parName, "FILE_BROWSER_X") == 0){
-								localSettings.fileBrowserX = atoi(result);
-                            }else if (strcmp(parName, "FILE_BROWSER_Y") == 0){
-								localSettings.fileBrowserY = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_BROWSER_X") == 0){
-								localSettings.playlistBrowserX = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_BROWSER_Y") == 0){
-								localSettings.playlistBrowserY = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_BROWSER_INFO_X") == 0){
-								localSettings.playlistInfoX = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_BROWSER_INFO_Y") == 0){
-								localSettings.playlistInfoY = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_EDITOR_X") == 0){
-								localSettings.playlistEditorX = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_EDITOR_Y") == 0){
-								localSettings.playlistEditorY = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_EDITOR_TRACK_INFO_X") == 0){
-								localSettings.playlistTrackInfoX = atoi(result);
-                            }else if (strcmp(parName, "PLAYLIST_EDITOR_TRACK_INFO_Y") == 0){
-								localSettings.playlistTrackInfoY = atoi(result);
-                            }else if (strcmp(parName, "SETTINGS_X") == 0){
-								localSettings.settingsX = atoi(result);
-                            }else if (strcmp(parName, "SETTINGS_Y") == 0){
-								localSettings.settingsY = atoi(result);
-                            }else if (strcmp(parName, "MEDIALIBRARY_X") == 0){
-								localSettings.medialibraryX = atoi(result);
-                            }else if (strcmp(parName, "MEDIALIBRARY_Y") == 0){
-								localSettings.medialibraryY = atoi(result);
-                            }else if (strcmp(parName, "TOOLBAR_FG_COLOR") == 0){
-								readRGBA(localSettings.colorToolbar, result);
-                            }else if (strcmp(parName, "BUTTONBAR_FG_COLOR") == 0){
-								readRGBA(localSettings.colorButtonbar, result);
-                            }else if (strcmp(parName, "BUTTONBAR_SELECTED_FG_COLOR") == 0){
-								readRGBA(localSettings.colorButtonbarSelected, result);
-                            }else if (strcmp(parName, "POPUP_TITLE_FG_COLOR") == 0){
-								readRGBA(localSettings.colorPopupTitle, result);
-                            }else if (strcmp(parName, "POPUP_MESSAGE_FG_COLOR") == 0){
-								readRGBA(localSettings.colorPopupMessage, result);
-                            }else if (strcmp(parName, "MENU_TEXT_FG_COLOR") == 0){
-								readRGBA(localSettings.colorMenu, result);
-                            }else if (strcmp(parName, "MENU_SELECTED_TEXT_FG_COLOR") == 0){
-								readRGBA(localSettings.colorMenuSelected, result);
-                            }else if (strcmp(parName, "LABEL_FG_COLOR") == 0){
-								readRGBA(localSettings.colorLabel, result);
-                            }else if (strcmp(parName, "TEXT_FG_COLOR") == 0){
-								readRGBA(localSettings.colorText, result);
-                            }else if (strcmp(parName, "HELP_TITLE_FG_COLOR") == 0){
-								readRGBA(localSettings.colorHelpTitle, result);
-                            }else if (strcmp(parName, "HELP_FG_COLOR") == 0){
-								readRGBA(localSettings.colorHelp, result);
-							}
-						}
-						element++;
-					}
-					result = strtok(NULL, "=");
-				}
-			}
-		}
-	}
-	fclose(f);
-	return 0;
-}
 
 //Get actual settings:
 struct settings *SETTINGS_get(){
@@ -297,20 +164,6 @@ struct settings *SETTINGS_default(){
 
 	//Skin's settings:
     strcpy(localSettings.skinName, "default");
-
-    //Colors:
-    int black[4] = {0,0,0,255};
-    memcpy(localSettings.colorButtonbar, black, sizeof(black));
-    memcpy(localSettings.colorPopupMessage, black, sizeof(black));
-    memcpy(localSettings.colorPopupTitle, black, sizeof(black));
-    memcpy(localSettings.colorToolbar, black, sizeof(black));
-    memcpy(localSettings.colorLabel, black, sizeof(black));
-    memcpy(localSettings.colorMenu, black, sizeof(black));
-    memcpy(localSettings.colorMenuSelected, black, sizeof(black));
-    memcpy(localSettings.colorText, black, sizeof(black));
-    memcpy(localSettings.colorLabel, black, sizeof(black));
-    memcpy(localSettings.colorHelpTitle, black, sizeof(black));
-    memcpy(localSettings.colorHelp, black, sizeof(black));
 
     //Player's settings:
     localSettings.displayStatus = 1;

@@ -14,7 +14,7 @@ LightMP3 is a MP3/OGG Vorbis/FLAC/Atrac3+ player designed to drain little energy
 Can decode MP3 and ATRAC3+ via Media Engine with CPU set at 20Mhz, OGG Vorbis with CPU set at 50Mhz, MP3 via libMAD
 with CPU set at 70Mhz, FLAC with CPU set at 100Mhz.
 With battery at 100% and display set to minimum brightness it should last 9 hours.
-With battery at 100% and display turned off (press the brightness button for a couple of seconds) it should last more than 11
+With battery at 100% and display turned off (press START while playing a track) it should last more than 11
 hours.
 
 
@@ -26,6 +26,7 @@ The src directory contains source code: you don't need it to run the application
 
 FEATURES
 --------
+-Skinnable and multilanguage
 -Support for kernel 3.x and Slim&Light
 -Support for MP3, OGG Vorbis, ATRAC3+ (*.aa3, *.omg, *.oma), FLAC
 -File browser
@@ -77,6 +78,23 @@ Media Library:
 	CIRCLE  = Exit selection
 	SQUARE  = Play selection
 	START   = Add selection to current playlist
+
+
+Player:
+    CROSS               = Pause/Resume
+    CIRLCE              = Stop
+    R                   = Next track
+    L                   = Previous track
+    TRIANGLE            = Change sleep mode
+    START               = Toggle economy mode
+    SELECT              = Change play mode
+    DPAD UP             = Raise volume boost
+    DPAD DOWN           = Lower volume boost
+    ANALOG UP           = Raise CPU clock
+    ANALOG DOWN         = Lower CPU clock
+    NOTE                = Change equalizer (if supported)
+    CROSS + DPAD UP     = Raise track rating
+    CROSS + DPAD DOWN   = Lower track rating
 
 
 LIBMAD EQUALIZERS

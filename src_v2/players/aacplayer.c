@@ -120,6 +120,7 @@ static void AACDecodeThread(void *buffer, unsigned int samplesToWrite, void *pda
                 continue;
             } else if (ret == ERR_AAC_NONE){
                 AACGetLastFrameInfo(hAACDecoder, &aacFrameInfo);
+                AAC_info.instantBitrate = aacFrameInfo.bitRate;
                 pspDebugScreenSetXY(0, 20);
                 pspDebugScreenPrintf("Frame's info: bitrate=%i nChans=%i sampRateOut=%i profile=%i\n", aacFrameInfo.bitRate, aacFrameInfo.nChans, aacFrameInfo.sampRateOut, aacFrameInfo.profile);
             }else{

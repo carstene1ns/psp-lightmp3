@@ -27,6 +27,7 @@
 #include "common.h"
 #include "languages.h"
 #include "settings.h"
+#include "skinsettings.h"
 #include "../system/opendir.h"
 #include "../system/clock.h"
 #include "../players/player.h"
@@ -73,41 +74,59 @@ struct equalizer tEQ;
 // Draws a file's info
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *trackMessage){
-    int startX = userSettings->fileInfoX;
-    int startY = userSettings->fileInfoY;
     char timestring[20] = "";
     OSL_FONT *font = fontNormal;
 
-    oslDrawImageXY(fileInfoBkg, startX, startY);
+    skinGetPosition("POS_FILE_INFO_BKG", tempPos);
+    oslDrawImageXY(fileInfoBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
-    oslSetTextColor(RGBA(userSettings->colorLabel[0], userSettings->colorLabel[1], userSettings->colorLabel[2], userSettings->colorLabel[3]));
-    oslDrawString(startX + 2, startY + 5, langGetString("TITLE"));
-    oslDrawString(startX + 2, startY + 20, langGetString("ARTIST"));
-    oslDrawString(startX + 2, startY + 35, langGetString("ALBUM"));
-    oslDrawString(startX + 2, startY + 50, langGetString("GENRE"));
-    oslDrawString(startX + 240, startY + 50, langGetString("RATING"));
-    oslDrawString(startX + 2, startY + 65, langGetString("YEAR"));
-    oslDrawString(startX + 240, startY + 65, langGetString("PLAYED"));
-    oslDrawString(startX + 2, startY + 80, langGetString("TIME"));
-    oslDrawString(startX + 240, startY + 80, langGetString("TRACK"));
+    skinGetColor("RGBA_LABEL_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_TITLE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("TITLE"));
+    skinGetPosition("POS_ARTIST_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("ARTIST"));
+    skinGetPosition("POS_ALBUM_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("ALBUM"));
+    skinGetPosition("POS_GENRE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("GENRE"));
+    skinGetPosition("POS_RATING_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("RATING"));
+    skinGetPosition("POS_YEAR_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("YEAR"));
+    skinGetPosition("POS_PLAYED_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("PLAYED"));
+    skinGetPosition("POS_TIME_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("TIME"));
+    skinGetPosition("POS_TRACK_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("TRACK"));
 
-    oslSetTextColor(RGBA(userSettings->colorText[0], userSettings->colorText[1], userSettings->colorText[2], userSettings->colorText[3]));
-    oslDrawString(startX + 60, startY + 5, info->title);
-    oslDrawString(startX + 60, startY + 20, info->artist);
-    oslDrawString(startX + 60, startY + 35, info->album);
-    oslDrawString(startX + 60, startY + 50, info->genre);
-    oslDrawString(startX + 60, startY + 65, info->year);
+    skinGetColor("RGBA_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_TITLE_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->title);
+    skinGetPosition("POS_ARTIST_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->artist);
+    skinGetPosition("POS_ALBUM_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->album);
+    skinGetPosition("POS_GENRE_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->genre);
+    skinGetPosition("POS_YEAR_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->year);
+    skinGetPosition("POS_PLAYED_VALUE", tempPos);
     sprintf(buffer, "%i", libEntry->played);
-    oslDrawString(startX + 330, startY + 65, buffer);
-
-    drawRating(startX + 300, startY + 50, libEntry->rating);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
+    skinGetPosition("POS_RATING_VALUE", tempPos);
+    drawRating(tempPos[0], tempPos[1], libEntry->rating);
 
     (*getTimeStringFunct)(timestring);
     if (!strlen(info->strLength))
         strcpy(info->strLength, "00:00:00");
     sprintf(buffer, "%s / %s", timestring, info->strLength);
-    oslDrawString(startX + 60, startY + 80, buffer);
-    oslDrawString(startX + 330, startY + 80, trackMessage);
+    skinGetPosition("POS_TIME_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
+    skinGetPosition("POS_TRACK_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], trackMessage);
     return 0;
 }
 
@@ -115,10 +134,11 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
 // Draws cover art:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawCoverArt(){
+    skinGetPosition("POS_COVERART", tempPos);
     if (coverArt)
-        oslDrawImageXY(coverArt, userSettings->coverArtX , userSettings->coverArtY);
+        oslDrawImageXY(coverArt, tempPos[0], tempPos[1]);
     else
-        oslDrawImageXY(noCoverArt, userSettings->coverArtX , userSettings->coverArtY);
+        oslDrawImageXY(noCoverArt, tempPos[0], tempPos[1]);
     return 0;
 }
 
@@ -126,31 +146,42 @@ int drawCoverArt(){
 // Draws a file's specs
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawFileSpecs(struct fileInfo *info){
-    int startX = userSettings->fileSpecsX;
-    int startY = userSettings->fileSpecsY;
     OSL_FONT *font = fontNormal;
 
-    oslDrawImageXY(fileSpecsBkg, startX, startY);
+    skinGetPosition("POS_FILE_SPECS_BKG", tempPos);
+    oslDrawImageXY(fileSpecsBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
-    oslSetTextColor(RGBA(userSettings->colorLabel[0], userSettings->colorLabel[1], userSettings->colorLabel[2], userSettings->colorLabel[3]));
-    oslDrawString(startX + 2, startY + 5, langGetString("MODE"));
-    oslDrawString(startX + 2, startY + 20, langGetString("BITRATE"));
-    oslDrawString(startX + 2, startY + 35, langGetString("SAMPLERATE"));
-    oslDrawString(startX + 2, startY + 50, langGetString("FILE_FORMAT"));
-    oslDrawString(startX + 2, startY + 65, langGetString("EMPHASIS"));
+    skinGetColor("RGBA_LABEL_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_MODE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("MODE"));
+    skinGetPosition("POS_BITRATE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("BITRATE"));
+    skinGetPosition("POS_SAMPLERATE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("SAMPLERATE"));
+    skinGetPosition("POS_FILE_FORMAT_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("FILE_FORMAT"));
+    skinGetPosition("POS_EMPHASIS_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("EMPHASIS"));
 
-    oslSetTextColor(RGBA(userSettings->colorText[0], userSettings->colorText[1], userSettings->colorText[2], userSettings->colorText[3]));
-    oslDrawString(startX + 70, startY + 5, info->mode);
+    skinGetColor("RGBA_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_MODE_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->mode);
+    skinGetPosition("POS_BITRATE_VALUE", tempPos);
     sprintf(buffer, "%3.3i [%3.3i] kbit", info->kbit, (int)(info->instantBitrate / 1000));
-    oslDrawString(startX + 70, startY + 20, buffer);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
+    skinGetPosition("POS_SAMPLERATE_VALUE", tempPos);
     sprintf(buffer, "%li Hz", info->hz);
-    oslDrawString(startX + 70, startY + 35, buffer);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
+    skinGetPosition("POS_FILE_FORMAT_VALUE", tempPos);
     if (info->fileType == MP3_TYPE)
         sprintf(buffer, "%s %s %s", fileTypeDescription[info->fileType], langGetString("LAYER"), info->layer);
     else if (info->fileType >= 0)
         sprintf(buffer, "%s", fileTypeDescription[info->fileType]);
-    oslDrawString(startX + 70, startY + 50, buffer);
-    oslDrawString(startX + 70, startY + 65, info->emphasis);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
+    skinGetPosition("POS_EMPHASIS_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->emphasis);
     return 0;
 }
 
@@ -158,44 +189,55 @@ int drawFileSpecs(struct fileInfo *info){
 // Draws players's status
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawPlayerStatus(){
-    int startX = userSettings->playerStatusX;
-    int startY = userSettings->playerStatusY;
     OSL_FONT *font = fontNormal;
 
-    oslDrawImageXY(playerStatusBkg, startX, startY);
+    skinGetPosition("POS_PLAYER_STATUS_BKG", tempPos);
+    oslDrawImageXY(playerStatusBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
-    oslSetTextColor(RGBA(userSettings->colorLabel[0], userSettings->colorLabel[1], userSettings->colorLabel[2], userSettings->colorLabel[3]));
-    oslDrawString(startX + 2, startY + 5, langGetString("SLEEP_MODE"));
-    oslDrawString(startX + 2, startY + 20, langGetString("PLAY_MODE"));
-    oslDrawString(startX + 2, startY + 35, langGetString("STATUS"));
-    oslDrawString(startX + 2, startY + 50, langGetString("VOLUME_BOOST"));
-    oslDrawString(startX + 2, startY + 65, langGetString("EQUALIZER"));
+    skinGetColor("RGBA_LABEL_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_SLEEP_MODE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("SLEEP_MODE"));
+    skinGetPosition("POS_PLAY_MODE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("PLAY_MODE"));
+    skinGetPosition("POS_STATUS_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("STATUS"));
+    skinGetPosition("POS_VOLUME_BOOST_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("VOLUME_BOOST"));
+    skinGetPosition("POS_EQUALIZER_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("EQUALIZER"));
 
-    oslSetTextColor(RGBA(userSettings->colorText[0], userSettings->colorText[1], userSettings->colorText[2], userSettings->colorText[3]));
-    oslDrawString(startX + 90, startY + 5, sleepModeDesc[userSettings->sleepMode]);
-    oslDrawString(startX + 90, startY + 20, playModeDesc[userSettings->playMode]);
+    skinGetColor("RGBA_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_SLEEP_MODE_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], sleepModeDesc[userSettings->sleepMode]);
+    skinGetPosition("POS_PLAY_MODE_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], playModeDesc[userSettings->playMode]);
+    skinGetPosition("POS_STATUS_VALUE", tempPos);
     int currentSpeed = (*getPlayingSpeedFunct)();
     if (!currentSpeed)
-        oslDrawString(startX + 90, startY + 35, playerStatusDesc[playerStatus+1]);
+        oslDrawString(tempPos[0], tempPos[1], playerStatusDesc[playerStatus+1]);
     else{
         if (currentSpeed > 0)
             sprintf(buffer, "%s %ix", playerStatusDesc[playerStatus+1], currentSpeed + 1);
         else
             sprintf(buffer, "%s %ix", playerStatusDesc[playerStatus+1], currentSpeed - 1);
-        oslDrawString(startX + 90, startY + 35, buffer);
+        oslDrawString(tempPos[0], tempPos[1], buffer);
     }
 
+    skinGetPosition("POS_VOLUME_BOOST_VALUE", tempPos);
     if (!MAX_VOLUME_BOOST)
-        oslDrawString(startX + 90, startY + 50, langGetString("NOT_SUPPORTED"));
+        oslDrawString(tempPos[0], tempPos[1], langGetString("NOT_SUPPORTED"));
     else{
         sprintf(buffer, "%i", userSettings->volumeBoost);
-        oslDrawString(startX + 90, startY + 50, buffer);
+        oslDrawString(tempPos[0], tempPos[1], buffer);
     }
 
+    skinGetPosition("POS_EQUALIZER_VALUE", tempPos);
     if (!(*isFilterSupportedFunct)())
-        oslDrawString(startX + 90, startY + 65, langGetString("NOT_SUPPORTED"));
+        oslDrawString(tempPos[0], tempPos[1], langGetString("NOT_SUPPORTED"));
     else
-        oslDrawString(startX + 90, startY + 65, tEQ.name);
+        oslDrawString(tempPos[0], tempPos[1], tEQ.name);
     return 0;
 }
 
@@ -204,9 +246,10 @@ int drawPlayerStatus(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawProgressBar(){
     int perc = (*getPercentageFunct)();
-    oslDrawImageXY(progressBkg, userSettings->progressX, userSettings->progressY);
+    skinGetPosition("POS_PROGRESS", tempPos);
+    oslDrawImageXY(progressBkg, tempPos[0], tempPos[1]);
     progress->stretchX = (int)((float)progress->sizeX / 100.00 * (float)perc);
-    oslDrawImageXY(progress, userSettings->progressX, userSettings->progressY + 2);
+    oslDrawImageXY(progress, tempPos[0], tempPos[1] + 2);
     return 0;
 }
 
@@ -321,8 +364,8 @@ int playFile(char *fileName, char *trackMessage){
         coverArt = oslLoadImageFileJPG(info.coverArtImageName, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 
     if (coverArt){
-        coverArt->stretchX = 90;
-        coverArt->stretchY = 90;
+        coverArt->stretchX = skinGetParam("COVERART_WIDTH");
+        coverArt->stretchY = skinGetParam("COVERART_HEIGHT");
     }
 
     playerStatus = -1;
@@ -813,7 +856,7 @@ int gui_player(){
         getExtension(userSettings->selectedBrowserItem, ext, 4);
         if (!strcmp(ext, "M3U")){
             M3U_open(userSettings->selectedBrowserItem);
-            playPlaylist(M3U_getPlaylist(), -1);
+            playPlaylist(M3U_getPlaylist(), userSettings->playlistStartIndex);
         }else{
             strcpy(dir, userSettings->selectedBrowserItem);
             directoryUp(dir);

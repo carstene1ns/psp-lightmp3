@@ -26,9 +26,11 @@
 #include "common.h"
 #include "languages.h"
 #include "settings.h"
+#include "skinsettings.h"
 #include "menu.h"
 #include "system/clock.h"
 #include "players/player.h"
+#include "../others/audioscrobbler.h"
 
 #define STATUS_CONFIRM_NONE 0
 #define STATUS_CONFIRM_APPLY 1
@@ -77,7 +79,8 @@ int getSettingVal(int index, char *value){
             sprintf(value, "%s", yesNo[userSettings->MP3_ME]);
             break;
         case 7:
-            sprintf(value, "%s", userSettings->BOOST);
+            sprintf(buffer, "BOOST_%s", userSettings->BOOST);
+            sprintf(value, "%s", langGetString(buffer));
             break;
         case 8:
             sprintf(value, "%s", yesNo[userSettings->CLOCK_AUTO]);
@@ -176,6 +179,11 @@ int changeSettingVal(int index, int delta){
             break;
         case 2:
             userSettings->SCROBBLER = !userSettings->SCROBBLER;
+            //AudioScrobbler:
+            if (userSettings->SCROBBLER){
+                sprintf(buffer, "%s%s", userSettings->ebootPath, ".scrobbler.log");
+                SCROBBLER_init(buffer);
+            }
             break;
         case 3:
             userSettings->FADE_OUT = !userSettings->FADE_OUT;
@@ -256,8 +264,9 @@ int gui_settings(){
     //Build menu:
     commonMenu.first = 0;
     commonMenu.selected = 0;
-    commonMenu.yPos = userSettings->settingsY;
-    commonMenu.xPos = userSettings->settingsX;
+    skinGetPosition("POS_SETTINGS", tempPos);
+    commonMenu.yPos = tempPos[1];
+    commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 0;
     commonMenu.align = ALIGN_LEFT;
     loadMenuImages();
@@ -268,8 +277,8 @@ int gui_settings(){
     commonMenu.cancelFunction = NULL;
 
     //Values menu:
-    commonSubMenu.yPos = userSettings->settingsY;
-    commonSubMenu.xPos = userSettings->settingsX + 350;
+    commonSubMenu.yPos = tempPos[1];
+    commonSubMenu.xPos = tempPos[0] + 350;
     commonSubMenu.align = ALIGN_RIGHT;
     commonSubMenu.fastScrolling = 0;
     commonSubMenu.background = NULL;
@@ -299,7 +308,7 @@ int gui_settings(){
                 if(osl_keys->released.cross){
                     SETTINGS_save(userSettings);
                     sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
-                    SETTINGS_loadSkin(buffer);
+                    skinLoad(buffer);
                     sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
 
                     unLoadCommonGraphics();

@@ -20,7 +20,7 @@
 
 #include "others/medialibrary.h"
 
-#define VERSION "2.0.0b1"
+#define VERSION "2.0.0b2"
 
 #define KEY_AUTOREPEAT_GUI 5
 #define KEY_AUTOREPEAT_PLAYER 10
@@ -42,5 +42,7 @@ extern char MLtempM3Ufile[264];
 extern struct libraryEntry MLresult[ML_BUFFERSIZE];
 extern struct menuElements commonMenu;
 extern struct menuElements commonSubMenu;
+extern int tempPos[2];
+extern int tempColor[4];
 
 #endif

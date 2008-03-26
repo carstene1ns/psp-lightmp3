@@ -63,7 +63,7 @@ int langLoad(char *fileName){
 	FILE *f;
 	char lineText[256];
     int rightToLeft = 0;
-    
+
     langClear();
 	f = fopen(fileName, "rt");
 	if (f == NULL){
@@ -74,7 +74,7 @@ int langLoad(char *fileName){
 	while(fgets(lineText, 256, f) != NULL){
 		int element = 0;
 		struct strLangString string;
-		
+
 		if (strlen(lineText) > 0){
 			if (lineText[0] != '#'){
                 //Tolgo caratteri di termine riga:
@@ -82,11 +82,11 @@ int langLoad(char *fileName){
                     lineText[strlen(lineText) - 1] = '\0';
                 if ((int)lineText[strlen(lineText) - 1] == 10 || (int)lineText[strlen(lineText) - 1] == 13)
                     lineText[strlen(lineText) - 1] = '\0';
-                
+
                 //Check options:
                 if (!strcmp(lineText, "@RIGHTTOLEFT") || !strcmp(lineText, "TFELOTTHGIR@"))
                     rightToLeft = 1;
-                    
+
 				//Split line:
 				element = 0;
 				char *result = NULL;
@@ -110,6 +110,13 @@ int langLoad(char *fileName){
 		}
 	}
 	fclose(f);
+
+    int i = 0;
+    int n = langStrings.stringsCount;
+	while (i < n){
+		if (i == 0 || strcmp(langStrings.strings[i-1].name, langStrings.strings[i].name) <= 0) i++;
+		else {struct strLangString tmp = langStrings.strings[i]; langStrings.strings[i] = langStrings.strings[i-1]; langStrings.strings[--i] = tmp;}
+	}
 	return 0;
 }
 
@@ -117,10 +124,17 @@ int langLoad(char *fileName){
 //Get a language string:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 char *langGetString(char *stringName){
-    int i;
-    for (i=0; i<langStrings.stringsCount; i++){
-        if (!strcmp(langStrings.strings[i].name, stringName))
-            return langStrings.strings[i].value;
+    int p,u,m;
+    p = 0;
+    u = langStrings.stringsCount - 1;
+    while(p <= u) {
+       m = (p + u) / 2;
+       if(!strcmp(langStrings.strings[m].name, stringName))
+           return langStrings.strings[m].value;
+       if(strcmp(langStrings.strings[m].name, stringName) < 0)
+           p = m + 1;
+       else
+           u = m - 1;
     }
     return "";
 }
@@ -134,7 +148,7 @@ void langLoadList(char *dirName){
     for (i=0; i<languagesCount; i++)
         strcpy(languagesList[i], "");
     languagesCount = 0;
-    
+
     char *result = opendir_open(&dhDir, dirName, NULL, 1, 1);
 	if (result == 0){
         sortDirectory(&dhDir);

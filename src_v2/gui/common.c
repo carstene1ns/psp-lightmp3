@@ -33,6 +33,7 @@
 #include "../system/opendir.h"
 #include "../others/medialibrary.h"
 #include "settings.h"
+#include "skinsettings.h"
 
 // Functions imported from support prx:
 int imposeGetVolume();
@@ -184,8 +185,10 @@ int drawToolbars(){
     int m, h, btrh, btrm, btr, rh, battPerc;
     char remote[3] = "";
 
-    oslDrawImageXY(commonTopToolbar, 0, 0);
-    oslDrawImageXY(commonBottomToolbar, 0, 272 - commonBottomToolbar->sizeY);
+    skinGetPosition("POS_TOOLBAR_1", tempPos);
+    oslDrawImageXY(commonTopToolbar, tempPos[0], tempPos[1]);
+    skinGetPosition("POS_TOOLBAR_2", tempPos);
+    oslDrawImageXY(commonBottomToolbar, tempPos[0], tempPos[1]);
 
 	btr = scePowerGetBatteryLifeTime();
     h = 60;
@@ -207,50 +210,59 @@ int drawToolbars(){
         strcpy(remote, "RM");
 
 	//Current time:
-	/*struct tm * ptm;
-	time_t mytime;
-	time(&mytime);
-	ptm = localtime(&mytime);*/
     pspTime currTime;
     sceRtcGetCurrentClockLocalTime(&currTime);
 
     oslSetFont(fontNormal);
-    oslSetTextColor(RGBA(userSettings->colorToolbar[0], userSettings->colorToolbar[1], userSettings->colorToolbar[2], userSettings->colorToolbar[3]));
+    skinGetColor("RGBA_TOOLBAR_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
 
     sprintf(buffer, "LightMP3 v. %s by Sakya", VERSION);
-    oslDrawString(2, 1, buffer);
+    skinGetPosition("POS_APP_NAME_TEXT", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
 
     //Battery:
+    skinGetPosition("POS_BATTERY_ICON", tempPos);
     if (scePowerIsPowerOnline())
-        oslDrawImageXY(commonBatteryCharging, 370, 1);
+        oslDrawImageXY(commonBatteryCharging, tempPos[0], tempPos[1]);
     else if (battPerc > 10)
-        oslDrawImageXY(commonBattery, 370, 1);
+        oslDrawImageXY(commonBattery, tempPos[0], tempPos[1]);
     else
-        oslDrawImageXY(commonBatteryLow, 370, 1);
+        oslDrawImageXY(commonBatteryLow, tempPos[0], tempPos[1]);
     sprintf(buffer, "%i%% - %2.2i:%2.2i", battPerc, btrh, btrm);
-    oslDrawString(410, 1, buffer);
+    skinGetPosition("POS_BATTERY_TEXT", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
 
     //Volume:
 	int percentage = (int)((double)imposeGetVolume() / 30.0 * 100.0);
-    oslDrawImageXY(commonVolume, 225, 256);
+    skinGetPosition("POS_VOLUME_ICON", tempPos);
+    oslDrawImageXY(commonVolume, tempPos[0], tempPos[1]);
     sprintf(buffer, "%i%%", percentage);
-    oslDrawString(245, 272 - 2 - fontNormal->charHeight, buffer);
+    skinGetPosition("POS_VOLUME_TEXT", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
 
     //Headphones:
-    if (sceHprmIsHeadphoneExist())
-        oslDrawImageXY(commonHeadphone, 350, 1);
+    if (sceHprmIsHeadphoneExist()){
+        skinGetPosition("POS_HEADPHONES_ICON", tempPos);
+        oslDrawImageXY(commonHeadphone, tempPos[0], tempPos[1]);
+    }
 
     //Clock:
-    oslDrawImageXY(commonCPU, 230, 1);
+    skinGetPosition("POS_CPU_ICON", tempPos);
+    oslDrawImageXY(commonCPU, tempPos[0], tempPos[1]);
     sprintf(buffer, "%i / %i", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency());
-    oslDrawString(248, 1, buffer);
+    skinGetPosition("POS_CPU_TEXT", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
 
-    //sprintf(buffer, "%s %i kb (%i kb)  ", langGetString("FREE_MEMORY"), freemem() / 1024, sceKernelTotalFreeMemSize() / 1024);
-    sprintf(buffer, "%s %i kb", langGetString("FREE_MEMORY"), sceKernelTotalFreeMemSize() / 1024);
-    oslDrawString(2, 272 - 2 - fontNormal->charHeight, buffer);
+    skinGetPosition("POS_FREE_MEMORY_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("FREE_MEMORY"));
+    sprintf(buffer, "%i kb", sceKernelTotalFreeMemSize() / 1024);
+    skinGetPosition("POS_FREE_MEMORY_TEXT", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
 
 	sprintf(buffer, "%2.2d/%2.2d/%4.4d %2.2d:%2.2d",currTime.day, currTime.month, currTime.year, currTime.hour, currTime.minutes);
-    oslDrawString(480 - 2 - oslGetStringWidth(buffer), 272 - 2 - fontNormal->charHeight, buffer);
+    skinGetPosition("POS_CLOCK_TEXT", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], buffer);
 
     return 0;
 }
@@ -270,20 +282,25 @@ int drawCommonGraphics(){
 int drawButtonBar(int selectedButton){
     int i = 0;
     char langString[20] = "";
+    char posName[52] = "";
 
     oslSetFont(fontNormal);
     for (i=0; i<5; i++){
         sprintf(langString, "BUTTON_%i", i + 1);
-        int stringX = userSettings->buttonsX[i] + (commonButtons[i]->sizeX - oslGetStringWidth(langGetString(langString))) / 2.0;
+        sprintf(posName, "POS_BUTTON_%i", i + 1);
+        skinGetPosition(posName, tempPos);
+        int stringX = tempPos[0] + (commonButtons[i]->sizeX - oslGetStringWidth(langGetString(langString))) / 2.0;
 
         if (i == selectedButton){
-            oslDrawImageXY(commonButtonsSel[i], userSettings->buttonsX[i], userSettings->buttonsY[i]);
-            oslSetTextColor(RGBA(userSettings->colorButtonbarSelected[0], userSettings->colorButtonbarSelected[1], userSettings->colorButtonbarSelected[2], userSettings->colorButtonbarSelected[3]));
+            oslDrawImageXY(commonButtonsSel[i], tempPos[0], tempPos[1]);
+            skinGetColor("RGBA_BUTTONBAR_SELECTED_TEXT", tempColor);
+            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }else{
-            oslDrawImageXY(commonButtons[i], userSettings->buttonsX[i], userSettings->buttonsY[i]);
-            oslSetTextColor(RGBA(userSettings->colorButtonbar[0], userSettings->colorButtonbar[1], userSettings->colorButtonbar[2], userSettings->colorButtonbar[3]));
+            oslDrawImageXY(commonButtons[i], tempPos[0], tempPos[1]);
+            skinGetColor("RGBA_BUTTONBAR_TEXT", tempColor);
+            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
-        oslDrawString(stringX, userSettings->buttonsY[i], langGetString(langString));
+        oslDrawString(stringX, tempPos[1], langGetString(langString));
     }
     return 0;
 }
@@ -354,9 +371,11 @@ int drawConfirm(char *title, char *message){
 
     oslSetFont(fontNormal);
     oslDrawImageXY(popupBkg, startX, startY);
-    oslSetTextColor(RGBA(userSettings->colorPopupTitle[0], userSettings->colorPopupTitle[1], userSettings->colorPopupTitle[2], userSettings->colorPopupTitle[3]));
+    skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(title)) / 2, startY + 3, title);
-    oslSetTextColor(RGBA(userSettings->colorPopupMessage[0], userSettings->colorPopupMessage[1], userSettings->colorPopupMessage[2], userSettings->colorPopupMessage[3]));
+    skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(message)) / 2, startY + 30, message);
     oslDrawString((480 - oslGetStringWidth(langGetString("CONFIRM_MESSAGE"))) / 2, startY + 60, langGetString("CONFIRM_MESSAGE"));
     return 0;
@@ -371,9 +390,11 @@ int drawWait(char *title, char *message){
 
     oslSetFont(fontNormal);
     oslDrawImageXY(popupBkg, startX, startY);
-    oslSetTextColor(RGBA(userSettings->colorPopupTitle[0], userSettings->colorPopupTitle[1], userSettings->colorPopupTitle[2], userSettings->colorPopupTitle[3]));
+    skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(title)) / 2, startY + 3, title);
-    oslSetTextColor(RGBA(userSettings->colorPopupMessage[0], userSettings->colorPopupMessage[1], userSettings->colorPopupMessage[2], userSettings->colorPopupMessage[3]));
+    skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(message)) / 2, startY + 30, message);
     return 0;
 }
@@ -387,9 +408,11 @@ int drawMessageBox(char *title, char *message){
 
     oslSetFont(fontNormal);
     oslDrawImageXY(popupBkg, startX, startY);
-    oslSetTextColor(RGBA(userSettings->colorPopupTitle[0], userSettings->colorPopupTitle[1], userSettings->colorPopupTitle[2], userSettings->colorPopupTitle[3]));
+    skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(title)) / 2, startY + 3, title);
-    oslSetTextColor(RGBA(userSettings->colorPopupMessage[0], userSettings->colorPopupMessage[1], userSettings->colorPopupMessage[2], userSettings->colorPopupMessage[3]));
+    skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(message)) / 2, startY + 30, message);
     oslDrawString((480 - oslGetStringWidth(langGetString("MESSAGEBOX_CONTINUE"))) / 2, startY + 60, langGetString("MESSAGEBOX_CONTINUE"));
     return 0;
@@ -426,11 +449,12 @@ int drawHelp(char *help){
 
     oslSetFont(fontNormal);
     oslDrawImageXY(helpBkg, startX, startY);
-    oslSetTextColor(RGBA(userSettings->colorHelpTitle[0], userSettings->colorHelpTitle[1], userSettings->colorHelpTitle[2], userSettings->colorHelpTitle[3]));
+    skinGetColor("RGBA_HELP_TITLE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     sprintf(buffer, "HELP_%s_TITLE", help);
     oslDrawString((480 - oslGetStringWidth(langGetString(buffer))) / 2, startY + 3, langGetString(buffer));
-
-    oslSetTextColor(RGBA(userSettings->colorHelp[0], userSettings->colorHelp[1], userSettings->colorHelp[2], userSettings->colorHelp[3]));
+    skinGetColor("RGBA_HELP_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     for (i=1; i<11; i++){
         sprintf(buffer, "HELP_%s_%2.2i", help, i);
         oslDrawString(startX + 2, startY + 3 + i * 15, langGetString(buffer));

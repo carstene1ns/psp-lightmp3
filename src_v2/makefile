@@ -5,7 +5,7 @@ OBJS = prx/supportlib.o \
        system/clock.o system/freeMem.o system/mem64.o system/opendir.o \
        system/exception.o system/usb.o system/osk.o \
        others/audioscrobbler.o others/medialibrary.o others/log.o others/strreplace.o \
-       gui/settings.o gui/languages.o gui/menu.o gui/common.o \
+       gui/settings.o gui/skinsettings.o gui/languages.o gui/menu.o gui/common.o \
        gui/gui_fileBrowser.o gui/gui_player.o gui/gui_playlistsBrowser.o \
        gui/gui_playlistEditor.o gui/gui_settings.o gui/gui_mediaLibrary.o \
        main.o
@@ -15,8 +15,7 @@ BUILD_PRX = 1
 PSP_FW_VERSION=371
 
 #To debug -g
-CFLAGS = -O3 -frename-registers -ffast-math -fomit-frame-pointer -G0 -Wall
-#CFLAGS = -O3 -g -Wall
+CFLAGS = -O3 -frename-registers -ffast-math -fomit-frame-pointer -g -G0 -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LIBDIR =

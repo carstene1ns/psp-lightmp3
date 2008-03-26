@@ -52,45 +52,6 @@ struct settings{
 	//Skin's settings:
     char skinName[52];
     char skinImagesPath[264];
-    int coverArtX;
-    int coverArtY;
-    int fileInfoX;
-    int fileInfoY;
-    int fileSpecsX;
-    int fileSpecsY;
-    int progressX;
-    int progressY;
-    int playerStatusX;
-    int playerStatusY;
-    int buttonsX[5];
-    int buttonsY[5];
-    int fileBrowserX;
-    int fileBrowserY;
-    int playlistBrowserX;
-    int playlistBrowserY;
-    int playlistInfoX;
-    int playlistInfoY;
-    int playlistEditorX;
-    int playlistEditorY;
-    int playlistTrackInfoX;
-    int playlistTrackInfoY;
-    int settingsX;
-    int settingsY;
-    int medialibraryX;
-    int medialibraryY;
-
-    //Colors:
-    int colorToolbar[4];
-    int colorButtonbar[4];
-    int colorButtonbarSelected[4];
-    int colorPopupTitle[4];
-    int colorPopupMessage[4];
-    int colorMenu[4];
-    int colorMenuSelected[4];
-    int colorLabel[4];
-    int colorText[4];
-    int colorHelpTitle[4];
-    int colorHelp[4];
 
     //Player Settings:
     int displayStatus;
@@ -107,10 +68,10 @@ struct settings{
     char selectedBrowserItem[264];
     int previousMode;
     char currentPlaylistName[264];
+    int playlistStartIndex;
 };
 
 int SETTINGS_load(char *fileName);
-int SETTINGS_loadSkin(char *fileName);
 struct settings *SETTINGS_get();
 struct settings *SETTINGS_default();
 int SETTINGS_save();
