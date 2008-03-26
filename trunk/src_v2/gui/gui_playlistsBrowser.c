@@ -26,6 +26,7 @@
 #include "common.h"
 #include "languages.h"
 #include "settings.h"
+#include "skinsettings.h"
 #include "menu.h"
 #include "../system/opendir.h"
 #include "../players/m3u.h"
@@ -45,26 +46,32 @@ OSL_IMAGE *playlistInfoBkg;
 // Draw playlist's info:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawPlaylistInfo(){
-    int startX = userSettings->playlistInfoX;
-    int startY = userSettings->playlistInfoY;
     OSL_FONT *font = fontNormal;
     char tBuffer[264] = "";
 
-    oslDrawImageXY(playlistInfoBkg, startX, startY);
+    skinGetPosition("POS_PLAYLIST_BROWSER_INFO_BKG", tempPos);
+    oslDrawImageXY(playlistInfoBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
 
-    oslSetTextColor(RGBA(userSettings->colorLabel[0], userSettings->colorLabel[1], userSettings->colorLabel[2], userSettings->colorLabel[3]));
-    oslDrawString(startX + 2, startY + 5, langGetString("PLAYLIST_NAME"));
-    oslDrawString(startX + 2, startY + 20, langGetString("TOTAL_TRACKS"));
+    skinGetColor("RGBA_LABEL_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_PLAYLIST_NAME_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("PLAYLIST_NAME"));
+    skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("TOTAL_TRACKS"));
 
     if (commonMenu.numberOfElements){
-        oslSetTextColor(RGBA(userSettings->colorText[0], userSettings->colorText[1], userSettings->colorText[2], userSettings->colorText[3]));
-        oslDrawString(startX + 80, startY + 5, commonMenu.elements[commonMenu.selected].text);
+        skinGetColor("RGBA_TEXT", tempColor);
+        oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+        skinGetPosition("POS_PLAYLIST_NAME_VALUE", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], commonMenu.elements[commonMenu.selected].text);
+        skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_VALUE", tempPos);
         sprintf(tBuffer, "%i", M3U_getSongCount());
-        oslDrawString(startX + 80, startY + 20, tBuffer);
+        oslDrawString(tempPos[0], tempPos[1], tBuffer);
 
         formatHHMMSS(M3U_getTotalLength(), tBuffer);
-        oslDrawString(startX + 120, startY + 20, tBuffer);
+        skinGetPosition("POS_PLAYLIST_TOTAL_TIME_VALUE", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], tBuffer);
     }
     return 0;
 }
@@ -91,8 +98,9 @@ int gui_playlistsBrowser(){
         errorLoadImage(buffer);
 
     //Build menu:
-    commonMenu.yPos = userSettings->playlistBrowserY;
-    commonMenu.xPos = userSettings->playlistBrowserX;
+    skinGetPosition("POS_PLAYLIST_BROWSER", tempPos);
+    commonMenu.xPos = tempPos[0];
+    commonMenu.yPos = tempPos[1];
     commonMenu.fastScrolling = 1;
     sprintf(buffer, "%s/menuplaylistbkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
@@ -144,6 +152,7 @@ int gui_playlistsBrowser(){
             if (!confirmStatus){
                 if(osl_keys->released.cross && commonMenu.numberOfElements){
                     sprintf(userSettings->selectedBrowserItem, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                    userSettings->playlistStartIndex = -1;
                     playlistsBrowserRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_PLAYLISTS;
                     exitFlagPlaylistsBrowser = 1;

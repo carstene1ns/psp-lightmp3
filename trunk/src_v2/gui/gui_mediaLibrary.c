@@ -26,6 +26,7 @@
 #include "common.h"
 #include "languages.h"
 #include "settings.h"
+#include "skinsettings.h"
 #include "menu.h"
 #include "../others/strreplace.h"
 #include "../others/medialibrary.h"
@@ -67,6 +68,8 @@ OSL_IMAGE *infoBkg;
 
 char currentSql[ML_SQLMAXLENGTH] = "";
 char previousSql[ML_SQLMAXLENGTH] = "";
+char currentWhere[ML_SQLMAXLENGTH] = "";
+char previousWhere[ML_SQLMAXLENGTH] = "";
 char tempSql[ML_SQLMAXLENGTH] = "";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,9 +160,11 @@ int checkFileCallback(char *fileName){
     int startX = (480 - scanBkg->sizeX) / 2;
     int startY = (272 - scanBkg->sizeY) / 2;
     oslDrawImageXY(scanBkg, startX, startY);
-    oslSetTextColor(RGBA(userSettings->colorPopupTitle[0], userSettings->colorPopupTitle[1], userSettings->colorPopupTitle[2], userSettings->colorPopupTitle[3]));
+    skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("CHECKING_FILE"))) / 2, startY + 3, langGetString("CHECKING_FILE"));
-    oslSetTextColor(RGBA(userSettings->colorPopupMessage[0], userSettings->colorPopupMessage[1], userSettings->colorPopupMessage[2], userSettings->colorPopupMessage[3]));
+    skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     getFileName(fileName, buffer);
     if (strlen(buffer) > 70)
        buffer[70] = '\0';
@@ -179,9 +184,11 @@ int scanDirCallback(char *dirName){
     int startX = (480 - scanBkg->sizeX) / 2;
     int startY = (272 - scanBkg->sizeY) / 2;
     oslDrawImageXY(scanBkg, startX, startY);
-    oslSetTextColor(RGBA(userSettings->colorPopupTitle[0], userSettings->colorPopupTitle[1], userSettings->colorPopupTitle[2], userSettings->colorPopupTitle[3]));
+    skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("SCANNING"))) / 2, startY + 3, langGetString("SCANNING"));
-    oslSetTextColor(RGBA(userSettings->colorPopupMessage[0], userSettings->colorPopupMessage[1], userSettings->colorPopupMessage[2], userSettings->colorPopupMessage[3]));
+    skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     getFileName(dirName, buffer);
     if (strlen(buffer) > 70)
        buffer[70] = '\0';
@@ -249,40 +256,54 @@ void drawQueryRunning(){
 // Draw info on selected item:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void drawMLinfo(){
-    int startX = userSettings->playlistInfoX;
-    int startY = userSettings->playlistInfoY;
     OSL_FONT *font = fontNormal;
 
     if (mediaLibraryStatus != STATUS_QUERYMENU)
         return;
 
-    oslDrawImageXY(infoBkg, startX, startY);
+    skinGetPosition("POS_MEDIALIBRARY_INFO_BKG", tempPos);
+    oslDrawImageXY(infoBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
-    oslSetTextColor(RGBA(userSettings->colorLabel[0], userSettings->colorLabel[1], userSettings->colorLabel[2], userSettings->colorLabel[3]));
+    skinGetColor("RGBA_LABEL_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
 
     if (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING){
-        oslDrawString(startX + 2, startY + 5, langGetString("TOTAL_TRACKS"));
-        oslDrawString(startX + 2, startY + 20, langGetString("TOTAL_TIME"));
-        oslSetTextColor(RGBA(userSettings->colorText[0], userSettings->colorText[1], userSettings->colorText[2], userSettings->colorText[3]));
+        skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_LABEL", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], langGetString("TOTAL_TRACKS"));
+        skinGetPosition("POS_MEDIALIBRARY_TOTAL_TIME_LABEL", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], langGetString("TOTAL_TIME"));
+        skinGetColor("RGBA_TEXT", tempColor);
+        oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         sprintf(buffer, "%.f", MLresult[commonMenu.selected - mlBufferPosition].intField01);
-        oslDrawString(startX + 80, startY + 5, buffer);
+        skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_VALUE", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], buffer);
 
         formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].intField02, buffer);
-        oslDrawString(startX + 80, startY + 20, buffer);
+        skinGetPosition("POS_MEDIALIBRARY_TOTAL_TIME_VALUE", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], buffer);
     }else if (mlQueryType == QUERY_SINGLE_ENTRY){
-        oslDrawString(startX + 2, startY + 5, langGetString("GENRE"));
-        oslDrawString(startX + 2, startY + 20, langGetString("YEAR"));
-        oslDrawString(startX + 200, startY + 20, langGetString("TIME"));
-        oslDrawString(startX + 2, startY + 35, langGetString("RATING"));
+        skinGetPosition("POS_MEDIALIBRARY_GENRE_LABEL", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], langGetString("GENRE"));
+        skinGetPosition("POS_MEDIALIBRARY_YEAR_LABEL", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], langGetString("YEAR"));
+        skinGetPosition("POS_MEDIALIBRARY_TIME_LABEL", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], langGetString("TIME"));
+        skinGetPosition("POS_MEDIALIBRARY_RATING_LABEL", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], langGetString("RATING"));
 
-        oslSetTextColor(RGBA(userSettings->colorText[0], userSettings->colorText[1], userSettings->colorText[2], userSettings->colorText[3]));
-        oslDrawString(startX + 80, startY + 5, MLresult[commonMenu.selected - mlBufferPosition].genre);
-        oslDrawString(startX + 80, startY + 20, MLresult[commonMenu.selected - mlBufferPosition].year);
+        skinGetColor("RGBA_TEXT", tempColor);
+        oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+        skinGetPosition("POS_MEDIALIBRARY_GENRE_VALUE", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].genre);
+        skinGetPosition("POS_MEDIALIBRARY_YEAR_VALUE", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].year);
 
         formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].seconds, buffer);
-        oslDrawString(startX + 250, startY + 20, buffer);
+        skinGetPosition("POS_MEDIALIBRARY_TIME_VALUE", tempPos);
+        oslDrawString(tempPos[0], tempPos[1], buffer);
 
-        drawRating(startX + 80, startY + 33, MLresult[commonMenu.selected - mlBufferPosition].rating);
+        skinGetPosition("POS_MEDIALIBRARY_RATING_VALUE", tempPos);
+        drawRating(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].rating);
     }
 }
 
@@ -293,6 +314,7 @@ void drawMLinfo(){
 int exitSelection(){
     strcpy(tempSql, previousSql);
     buildQueryMenu(tempSql, backToMainMenu);
+    strcpy(currentWhere, previousWhere);
     mlQueryType = mlPrevQueryType;
     return 0;
 }
@@ -308,9 +330,12 @@ int enterSelection(){
                       Where %s \
                       Order by title ", commonMenu.elements[commonMenu.selected].data);
     strcpy(previousSql, currentSql);
+    strcpy(previousWhere, currentWhere);
     buildQueryMenu(tempSql, exitSelection);
+    strcpy(currentWhere, commonMenu.elements[commonMenu.selected].data);
     mlPrevQueryType = mlQueryType;
     mlQueryType = QUERY_SINGLE_ENTRY;
+    oslReadKeys(); //To avoid reread the CROSS button after entering selection
     return 0;
 }
 
@@ -346,10 +371,13 @@ void queryDataFeed(int index, struct menuElement *element){
         drawRating(commonMenu.xPos + 4, commonMenu.yPos + (fontNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
         sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
         oslSetFont(fontNormal);
-        if (index == commonMenu.selected)
-            oslSetTextColor(RGBA(userSettings->colorMenuSelected[0], userSettings->colorMenuSelected[1], userSettings->colorMenuSelected[2], userSettings->colorMenuSelected[3]));
-        else
-            oslSetTextColor(RGBA(userSettings->colorMenu[0], userSettings->colorMenu[1], userSettings->colorMenu[2], userSettings->colorMenu[3]));
+        if (index == commonMenu.selected){
+            skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
+            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+        }else{
+            skinGetColor("RGBA_MENU_TEXT", tempColor);
+            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+        }
         oslDrawString(commonMenu.xPos + star->sizeX*ML_MAX_RATING + 8, commonMenu.yPos + (fontNormal->charHeight * index + commonMenu.interline * index), buffer);
         strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
         element->triggerFunction = enterSelection;
@@ -373,8 +401,9 @@ int buildQueryMenu(char *select, int (*cancelFunction)()){
     commonMenu.numberOfElements = mlQueryCount;
     commonMenu.first = 0;
     commonMenu.selected = 0;
-    commonMenu.yPos = userSettings->playlistBrowserY;
-    commonMenu.xPos = userSettings->playlistBrowserX;
+    skinGetPosition("POS_MEDIALIBRARY_QUERY", tempPos);
+    commonMenu.xPos = tempPos[0];
+    commonMenu.yPos = tempPos[1];
     commonMenu.fastScrolling = 1;
     sprintf(buffer, "%s/medialibraryquerybkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
@@ -481,8 +510,9 @@ int search(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int buildMainMenu(){
     mediaLibraryStatus = STATUS_MAINMENU;
-    commonMenu.yPos = userSettings->medialibraryY;
-    commonMenu.xPos = userSettings->medialibraryX;
+    skinGetPosition("POS_MEDIALIBRARY", tempPos);
+    commonMenu.yPos = tempPos[1];
+    commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 0;
     commonMenu.align = ALIGN_CENTER;
     sprintf(buffer, "%s/medialibrarybkg.png", userSettings->skinImagesPath);
@@ -529,7 +559,7 @@ int buildMainMenu(){
 // Media Library:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int gui_mediaLibrary(){
-    //int ratingChangedUpDown = 0;
+    int ratingChangedUpDown = 0;
 
     //Load images:
     sprintf(buffer, "%s/medialibraryscanbkg.png", userSettings->skinImagesPath);
@@ -559,10 +589,6 @@ int gui_mediaLibrary(){
 
         oslReadKeys();
         if (!osl_keys->pressed.hold){
-            /*if (ratingChangedUpDown)
-                ratingChangedUpDown = 0;
-            else*/
-            processMenuKeys(&commonMenu);
 
             if (confirmStatus == STATUS_CONFIRM_SCAN){
                 if(osl_keys->released.cross){
@@ -571,19 +597,32 @@ int gui_mediaLibrary(){
                 }else if(osl_keys->pressed.circle)
                     confirmStatus = STATUS_CONFIRM_NONE;
             }else{
+                if (ratingChangedUpDown && (osl_keys->released.cross || osl_keys->released.up || osl_keys->released.down))
+                    ratingChangedUpDown = 0;
+
                 if(mediaLibraryStatus == STATUS_MAINMENU && osl_keys->released.cross && commonMenu.selected == 5){
                     confirmStatus = STATUS_CONFIRM_SCAN;
                 }else if(osl_keys->released.start && mediaLibraryStatus == STATUS_QUERYMENU){
                     addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, 0, tempM3Ufile);
+                }else if(!ratingChangedUpDown && osl_keys->released.cross && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+                    M3U_clear();
+                    M3U_save(MLtempM3Ufile);
+                    addSelectionToPlaylist(currentWhere, 1, MLtempM3Ufile);
+                    sprintf(userSettings->selectedBrowserItem, "%s", MLtempM3Ufile);
+                    userSettings->playlistStartIndex = commonMenu.selected;
+                    mediaLibraryRetValue = MODE_PLAYER;
+                    userSettings->previousMode = MODE_MEDIA_LIBRARY;
+                    exitFlagMediaLibrary = 1;
                 }else if(osl_keys->released.square && mediaLibraryStatus == STATUS_QUERYMENU && (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING)){
                     M3U_clear();
                     M3U_save(MLtempM3Ufile);
                     addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, 1, MLtempM3Ufile);
                     sprintf(userSettings->selectedBrowserItem, "%s", MLtempM3Ufile);
+                    userSettings->playlistStartIndex = -1;
                     mediaLibraryRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_MEDIA_LIBRARY;
                     exitFlagMediaLibrary = 1;
-               /* }else if (osl_keys->held.cross && osl_keys->held.up && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+                }else if (osl_keys->held.cross && osl_keys->held.up && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                     if (++MLresult[commonMenu.selected - mlBufferPosition].rating > ML_MAX_RATING)
                         MLresult[commonMenu.selected - mlBufferPosition].rating = ML_MAX_RATING;
                     ratingChangedUpDown = 1;
@@ -594,7 +633,7 @@ int gui_mediaLibrary(){
                         MLresult[commonMenu.selected - mlBufferPosition].rating = 0;
                     ratingChangedUpDown = 1;
                     ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
-                    sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);*/
+                    sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
                 }else if(osl_keys->released.R){
                     mediaLibraryRetValue = nextAppMode(MODE_MEDIA_LIBRARY);
                     exitFlagMediaLibrary = 1;
@@ -602,6 +641,9 @@ int gui_mediaLibrary(){
                     mediaLibraryRetValue = previousAppMode(MODE_MEDIA_LIBRARY);
                     exitFlagMediaLibrary = 1;
                 }
+
+                if (!ratingChangedUpDown)
+                    processMenuKeys(&commonMenu);
             }
         }
     	oslEndDrawing();

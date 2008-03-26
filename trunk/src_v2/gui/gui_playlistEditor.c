@@ -30,6 +30,7 @@
 #include "common.h"
 #include "languages.h"
 #include "settings.h"
+#include "skinsettings.h"
 #include "menu.h"
 
 #define STATUS_CONFIRM_NONE 0
@@ -73,22 +74,29 @@ int buildMenuFromPlaylist(struct menuElements *menu){
 // Draw file info:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawTrackInfo(struct fileInfo *info){
-    int startX = userSettings->playlistTrackInfoX;
-    int startY = userSettings->playlistTrackInfoY;
     OSL_FONT *font = fontNormal;
 
-    oslDrawImageXY(trackInfoBkg, startX, startY);
+    skinGetPosition("POS_PLAYLIST_EDITOR_TRACK_INFO_BKG", tempPos);
+    oslDrawImageXY(trackInfoBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
 
-    oslSetTextColor(RGBA(userSettings->colorLabel[0], userSettings->colorLabel[1], userSettings->colorLabel[2], userSettings->colorLabel[3]));
-    oslDrawString(startX + 2, startY + 5, langGetString("TITLE"));
-    oslDrawString(startX + 2, startY + 20, langGetString("ARTIST"));
-    oslDrawString(startX + 2, startY + 35, langGetString("ALBUM"));
+    skinGetColor("RGBA_LABEL_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_PLAYLIST_TITLE_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("TITLE"));
+    skinGetPosition("POS_PLAYLIST_ARTIST_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("ARTIST"));
+    skinGetPosition("POS_PLAYLIST_ALBUM_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("ALBUM"));
 
-    oslSetTextColor(RGBA(userSettings->colorText[0], userSettings->colorText[1], userSettings->colorText[2], userSettings->colorText[3]));
-    oslDrawString(startX + 80, startY + 5, info->title);
-    oslDrawString(startX + 80, startY + 20, info->artist);
-    oslDrawString(startX + 80, startY + 35, info->album);
+    skinGetColor("RGBA_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetPosition("POS_PLAYLIST_TITLE_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->title);
+    skinGetPosition("POS_PLAYLIST_ARTIST_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->artist);
+    skinGetPosition("POS_PLAYLIST_ALBUM_VALUE", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], info->album);
 
     return 0;
 }
@@ -125,8 +133,9 @@ int gui_playlistEditor(){
 
 
     //Build menu:
-    commonMenu.yPos = userSettings->playlistEditorY;
-    commonMenu.xPos = userSettings->playlistEditorX;
+    skinGetPosition("POS_PLAYLIST_EDITOR", tempPos);
+    commonMenu.yPos = tempPos[1];
+    commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 1;
     sprintf(buffer, "%s/menuplaylistbkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
@@ -203,6 +212,7 @@ int gui_playlistEditor(){
 
                 if(pad.Buttons & PSP_CTRL_NOTE){
 					sprintf(userSettings->selectedBrowserItem, "%s", tempM3Ufile);
+                    userSettings->playlistStartIndex = -1;
                     playlistEditorRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_PLAYLIST_EDITOR;
                     exitFlagPlaylistEditor = 1;

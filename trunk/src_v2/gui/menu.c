@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <oslib/oslib.h>
 #include "common.h"
+#include "skinsettings.h"
 #include "main.h"
 #include "menu.h"
 
@@ -100,12 +101,14 @@ int drawMenu(struct menuElements *menu){
         yPos = startY + fontNormal->charHeight * count + menu->interline * count;
         if (i == menu->selected){
             oslSetFont(fontSelected);
-            oslSetTextColor(RGBA(userSettings->colorMenuSelected[0], userSettings->colorMenuSelected[1], userSettings->colorMenuSelected[2], userSettings->colorMenuSelected[3]));
+            skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
+            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
             if (menu->highlight != NULL)
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
         }else{
             oslSetFont(fontNormal);
-            oslSetTextColor(RGBA(userSettings->colorMenu[0], userSettings->colorMenu[1], userSettings->colorMenu[2], userSettings->colorMenu[3]));
+            skinGetColor("RGBA_MENU_TEXT", tempColor);
+            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
 
         if (menu->dataFeedFunction != NULL)
@@ -135,7 +138,7 @@ int drawMenu(struct menuElements *menu){
 int processMenuKeys(struct menuElements *menu){
     struct menuElement selected;
 
-    if (osl_keys->pressed.down || osl_keys->analogY > ANALOG_SENS){
+    if (menu->numberOfElements && (osl_keys->pressed.down || osl_keys->analogY > ANALOG_SENS)){
         if (menu->selected < menu->numberOfElements - 1){
             menu->selected++;
             if (menu->selected >= menu->first + menu->maxNumberVisible)
@@ -148,7 +151,7 @@ int processMenuKeys(struct menuElements *menu){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (osl_keys->pressed.up || osl_keys->analogY < -ANALOG_SENS){
+    }else if (menu->numberOfElements && (osl_keys->pressed.up || osl_keys->analogY < -ANALOG_SENS)){
         if (menu->selected > 0){
             menu->selected--;
             if (menu->selected < menu->first)
@@ -163,7 +166,7 @@ int processMenuKeys(struct menuElements *menu){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (menu->fastScrolling && (osl_keys->pressed.right || osl_keys->analogX > ANALOG_SENS)){
+    }else if (menu->numberOfElements && menu->fastScrolling && (osl_keys->pressed.right || osl_keys->analogX > ANALOG_SENS)){
     	if (menu->first + menu->maxNumberVisible < menu->numberOfElements){
     		menu->first = menu->first + menu->maxNumberVisible;
     		menu->selected += menu->maxNumberVisible;
@@ -177,7 +180,7 @@ int processMenuKeys(struct menuElements *menu){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (menu->fastScrolling && (osl_keys->pressed.left || osl_keys->analogX < -ANALOG_SENS)){
+    }else if (menu->numberOfElements && menu->fastScrolling && (osl_keys->pressed.left || osl_keys->analogX < -ANALOG_SENS)){
     	if (menu->first - menu->maxNumberVisible >= 0){
     		menu->first = menu->first - menu->maxNumberVisible;
     		menu->selected -= menu->maxNumberVisible;
@@ -189,7 +192,7 @@ int processMenuKeys(struct menuElements *menu){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (osl_keys->pressed.cross){
+    }else if (menu->numberOfElements && osl_keys->pressed.cross){
         selected = menu->elements[menu->selected];
         if (selected.triggerFunction != NULL)
             selected.triggerFunction();

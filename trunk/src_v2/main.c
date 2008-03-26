@@ -26,6 +26,7 @@
 #include "gui/common.h"
 #include "gui/languages.h"
 #include "gui/menu.h"
+#include "gui/skinsettings.h"
 #include "gui/gui_fileBrowser.h"
 #include "gui/gui_playlistsBrowser.h"
 #include "gui/gui_playlistEditor.h"
@@ -62,6 +63,8 @@ char MLtempM3Ufile[264] = "";
 struct libraryEntry MLresult[ML_BUFFERSIZE];
 struct menuElements commonMenu;
 struct menuElements commonSubMenu;
+int tempPos[2];
+int tempColor[4];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions imported from prx:
@@ -171,9 +174,9 @@ int setInitialClock(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int splashThread(SceSize args, void *argp){
     sceIoChdir(ebootDirectory);
-    /*oslShowSplashScreen(1);
-    sceKernelExitDeleteThread(0);*/
-    OSL_IMAGE *splash;
+    oslShowSplashScreen(1);
+    sceKernelExitDeleteThread(0);
+    /*OSL_IMAGE *splash;
     splash = oslLoadImageFilePNG("logo/neoflash.png", OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (splash){
         oslStartDrawing();
@@ -184,7 +187,7 @@ int splashThread(SceSize args, void *argp){
         sceKernelDelayThread(3000000);
         oslDeleteImage(splash);
     }
-    sceKernelExitDeleteThread(0);
+    sceKernelExitDeleteThread(0);*/
     return 0;
 }
 
@@ -317,7 +320,7 @@ int main(){
     sprintf(buffer, "%sskins/", userSettings->ebootPath);
     getSkinsList(buffer);
     sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
-    SETTINGS_loadSkin(buffer);
+    skinLoad(buffer);
 
     //Skin's s images path:
     sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);

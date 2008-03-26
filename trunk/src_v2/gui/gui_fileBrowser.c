@@ -26,6 +26,7 @@
 #include "common.h"
 #include "languages.h"
 #include "settings.h"
+#include "skinsettings.h"
 #include "menu.h"
 #include "../system/opendir.h"
 #include "../system/usb.h"
@@ -51,13 +52,12 @@ int drawUSBmessage(){
 
     oslDrawImageXY(popupBkg, (480 - popupBkg->sizeX) / 2, (272 - popupBkg->sizeY) / 2);
     oslSetFont(font);
-    oslSetTextColor(RGBA(userSettings->colorPopupTitle[0], userSettings->colorPopupTitle[1], userSettings->colorPopupTitle[2], userSettings->colorPopupTitle[3]));
+    skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("USB_ACTIVE"))) / 2, (272 - popupBkg->sizeY) / 2 + 3, langGetString("USB_ACTIVE"));
-    oslSetTextColor(RGBA(userSettings->colorPopupMessage[0], userSettings->colorPopupMessage[1], userSettings->colorPopupMessage[2], userSettings->colorPopupMessage[3]));
+    skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
+    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("USB_MESSAGE"))) / 2, (272 - popupBkg->sizeY) / 2 + 40, langGetString("USB_MESSAGE"));
-    /*int UsbState = USBGetState();
-    sprintf(buffer, "0x%08X", UsbState);
-    oslDrawString((480 - oslGetStringWidth(buffer)) / 2, (272 - popupBkg->sizeY) / 2 + 55, buffer);*/
     return 0;
 }
 
@@ -143,8 +143,9 @@ int gui_fileBrowser(){
     fileBrowserRetValue = -1;
 
     //Build menu:
-    commonMenu.yPos = userSettings->fileBrowserY;
-    commonMenu.xPos = userSettings->fileBrowserX;
+    skinGetPosition("POS_FILE_BROWSER", tempPos);
+    commonMenu.yPos = tempPos[1];
+    commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 1;
     sprintf(buffer, "%s/menubkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);

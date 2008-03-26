@@ -23,7 +23,7 @@
 #define ML_ERROR_SQL    -3
 
 #define ML_SQLMAXLENGTH 1024*2
-#define ML_BUFFERSIZE 50
+#define ML_BUFFERSIZE 100
 #define ML_MAX_RATING 5
 
 struct libraryEntry{
