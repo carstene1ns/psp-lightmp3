@@ -418,26 +418,6 @@ int drawMessageBox(char *title, char *message){
     return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Load available skins list:
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int skinsCount;
-char skinsList[100][100];
-
-void getSkinsList(char *dirName){
-    int i;
-	struct opendir_struct dhDir;
-    for (i=0; i<skinsCount; i++)
-        strcpy(skinsList[i], "");
-    skinsCount = 0;
-
-    char *result = opendir_open(&dhDir, dirName, NULL, 1, 1);
-	if (result == 0){
-        sortDirectory(&dhDir);
-        for (i = 0; i < dhDir.number_of_directory_entries; i++)
-            strcpy(skinsList[i], dhDir.directory_entry[skinsCount++].d_name);
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw help screen:

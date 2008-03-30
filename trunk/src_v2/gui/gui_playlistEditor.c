@@ -171,18 +171,18 @@ int gui_playlistEditor(){
 
         oslReadKeys();
         readButtons(&pad, 1);
-        if (!osl_keys->pressed.hold){
+        if (!osl_pad.pressed.hold){
             if (confirmStatus == STATUS_CONFIRM_CLEAR){
-                if(osl_keys->released.cross){
+                if(osl_pad.released.cross){
                     M3U_clear();
                     strcpy(userSettings->currentPlaylistName, "");
                     buildMenuFromPlaylist(&commonMenu);
                     confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_keys->pressed.circle){
+                }else if(osl_pad.pressed.circle){
                     confirmStatus = STATUS_CONFIRM_NONE;
                 }
             }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
-                if(osl_keys->released.cross){
+                if(osl_pad.released.cross){
                     M3U_removeSong(commonMenu.selected);
                     oldSelected = commonMenu.selected;
                     oldFirst = commonMenu.first;
@@ -196,7 +196,7 @@ int gui_playlistEditor(){
                     else
         				commonMenu.first = oldFirst - 1;
                     confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_keys->released.circle){
+                }else if(osl_pad.released.circle){
                     confirmStatus = STATUS_CONFIRM_NONE;
                 }
             }else{
@@ -216,7 +216,7 @@ int gui_playlistEditor(){
                     playlistEditorRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_PLAYLIST_EDITOR;
                     exitFlagPlaylistEditor = 1;
-                }else if(osl_keys->pressed.square){
+                }else if(osl_pad.pressed.square){
         			if (M3U_moveSongUp(commonMenu.selected) == 0){
                         oldSelected = commonMenu.selected;
                         oldFirst = commonMenu.first;
@@ -226,7 +226,7 @@ int gui_playlistEditor(){
         				if (commonMenu.selected == oldFirst - 1)
         					commonMenu.first--;
         			}
-                }else if(osl_keys->pressed.cross){
+                }else if(osl_pad.pressed.cross){
         			if (M3U_moveSongDown(commonMenu.selected) == 0){
                         oldSelected = commonMenu.selected;
                         oldFirst = commonMenu.first;
@@ -236,11 +236,12 @@ int gui_playlistEditor(){
         				if (commonMenu.selected == oldFirst + commonMenu.maxNumberVisible)
         					commonMenu.first++;
         			}
-                }else if(osl_keys->released.circle && M3U_getSongCount()){
+                }else if(osl_pad.released.circle && M3U_getSongCount()){
                     confirmStatus = STATUS_CONFIRM_REMOVE;
-                }else if(osl_keys->released.start && M3U_getSongCount()){
+                }else if(osl_pad.released.start && M3U_getSongCount()){
                     char onlyName[264] = "";
                 	oslEndDrawing();
+                    oslEndFrame();
                 	oslSyncFrame();
                 	setCpuClock(222);
                 	getFileName(userSettings->currentPlaylistName, onlyName);
@@ -258,18 +259,19 @@ int gui_playlistEditor(){
                         M3U_save(userSettings->currentPlaylistName);
                     }
                     continue;
-                }else if(osl_keys->released.select){
+                }else if(osl_pad.released.select){
                     confirmStatus = STATUS_CONFIRM_CLEAR;
-                }else if(osl_keys->released.R){
+                }else if(osl_pad.released.R){
                     playlistEditorRetValue = nextAppMode(MODE_PLAYLIST_EDITOR);
                     exitFlagPlaylistEditor = 1;
-                }else if(osl_keys->released.L){
+                }else if(osl_pad.released.L){
                     playlistEditorRetValue = previousAppMode(MODE_PLAYLIST_EDITOR);
                     exitFlagPlaylistEditor = 1;
                 }
             }
         }
     	oslEndDrawing();
+        oslEndFrame();
     	oslSyncFrame();
     }
 

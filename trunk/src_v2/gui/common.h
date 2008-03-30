@@ -41,10 +41,6 @@ extern OSL_IMAGE *blankStar;
 
 extern OSL_FONT *fontNormal;
 
-extern int skinsCount;
-extern char skinsList[100][100];
-
-void getSkinsList(char *dirName);
 int loadCommonGraphics();
 int unLoadCommonGraphics();
 int drawCommonGraphics();

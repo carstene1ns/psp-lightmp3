@@ -68,7 +68,7 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 		else
 			number_of_directory_entries++;
     }
-    
+
 	closedir(p->directory);
 	p->directory = NULL;
 	p->directory = opendir(directory);
@@ -103,7 +103,7 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 				int extOK = 0;
 				int i;
 				char ext[5] = "";
-				
+
 				getExtension(p->directory_entry[p->number_of_directory_entries].d_name, ext, 4);
 				extOK = 0;
 				for (i = 0; i < extNumber; i++){
@@ -143,7 +143,7 @@ void sortDirectory(struct opendir_struct *directory){
 	int i = 0;
     char comp1[263];
     char comp2[263];
-    
+
 	while (i < n){
         sprintf(comp1, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i-1].d_stat.st_mode)?"A":"Z", directory->directory_entry[i-1].d_name);
         sprintf(comp2, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode)?"A":"Z", directory->directory_entry[i].d_name);

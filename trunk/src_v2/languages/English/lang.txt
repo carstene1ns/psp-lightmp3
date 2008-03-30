@@ -1,0 +1,131 @@
+#Language   : English
+#By         : Sakya
+#Contacts   : sakya_tg@yahoo.it
+
+YES=Yes
+NO=No
+WAIT=Please wait...
+CHECK_BRIGHTNESS_TITLE=Brightness warning
+CHECK_BRIGHTNESS=Lower display brightness?
+BRIGHTNESS_NO=No
+BRIGHTNESS_YES_WARNING=Yes, with warning
+BRIGHTNESS_YES=Yes, without warning
+FREE_MEMORY=Free mem:
+
+USB_ACTIVE=USB active
+USB_MESSAGE=Press SELECT to deactivate USB.
+TITLE=Title
+ARTIST=Artist
+ALBUM=Album
+GENRE=Genre
+YEAR=Year
+TIME=Time
+TRACK=Track
+ADDING_PLAYLIST=Adding tracks to playlist
+RATING=Rating
+PLAYED=Played
+NOT_SUPPORTED=Not supported
+
+MODE=Mode
+BITRATE=Bitrate
+SAMPLERATE=Samplerate
+LAYER=Layer
+FILE_FORMAT=Format
+EMPHASIS=Emphasis
+SLEEP_MODE=Sleep mode
+PLAY_MODE=Play mode
+STATUS=Status
+VOLUME_BOOST=Volume boost
+EQUALIZER=Equalizer
+NOCOVER=No cover art
+BUTTON_1=File Browser
+BUTTON_2=Playlists
+BUTTON_3=Playlist Editor
+BUTTON_4=Media Library
+BUTTON_5=Settings
+
+SLEEP_MODE_0=Off
+SLEEP_MODE_1=End of track
+SLEEP_MODE_2=End of directory/playlist
+
+PLAY_MODE_0=Normal
+PLAY_MODE_1=Repeat all
+PLAY_MODE_2=Repeat track
+PLAY_MODE_3=Shuffle
+PLAY_MODE_4=Shuffle/repeat
+
+PLAYER_STATUS_0=Opening file
+PLAYER_STATUS_1=Paused
+PLAYER_STATUS_2=Playing
+
+CONFIRM_MESSAGE=Press X to confirm, O to cancel
+CONFIRM_LOAD_TITLE=Confirm
+CONFIRM_LOAD=Load selected playlist?
+
+CONFIRM_REMOVE_TITLE=Confirm
+CONFIRM_REMOVE=Remove selected playlist?
+ASK_PLAYLIST_NAME=Insert playlist name
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=Confirm
+CONFIRM_CLEAR_PLAYLIST=Clear this playlist?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Confirm
+CONFIRM_REMOVE_FROM_PLAYLIST=Remove selected track from playlist?
+PLAYLIST_NAME=Name
+TOTAL_TRACKS=Total tracks
+
+SETTINGS_01=Skin
+SETTINGS_02=Language
+SETTINGS_03=Write audio Scrobbler Log
+SETTINGS_04=Fadeout when skipping track
+SETTINGS_05=Muted volume
+SETTINGS_06=Brightness check
+SETTINGS_07=Play MP3 using Media Engine
+SETTINGS_08=Boost type for MP3 using libMAD
+SETTINGS_09=Automatic CPU Clock
+SETTINGS_10=CPU Clock: GUI
+SETTINGS_11=CPU Clock: MP3 libMAD
+SETTINGS_12=CPU Clock: MP3 Media Engine
+SETTINGS_13=CPU Clock: OGG Vorbis
+SETTINGS_14=CPU Clock: Flac
+SETTINGS_15=CPU Clock: ATRAC3
+CONFIRM_APPLY_SETTINGS_TITLE=Confirm
+CONFIRM_APPLY_SETTINGS=Apply the settings now?
+
+HELP_PLAYER_TITLE=Player help
+HELP_PLAYER_01=Press R for next track
+HELP_PLAYER_02=Press L for previous track
+HELP_PLAYER_03=Press CROSS to pause/play
+HELP_PLAYER_04=Press CIRCLE to stop
+HELP_PLAYER_05=Press SQUARE to switch MUTE on/off
+HELP_PLAYER_06=Press TRIANGLE to switch sleep mode
+HELP_PLAYER_07=Press SELECT to switch play mode
+HELP_PLAYER_08=Press START to activate economy mode
+HELP_PLAYER_09=Press CROSS + UP/DOWN to rate the track
+
+BROWSE_ARTIST=Browse by Artist
+BROWSE_ALBUM=Browse by Album
+BROWSE_GENRE=Browse by Genre
+BROWSE_RATING=Browse by Rating
+SEARCH=Search
+SCAN_MS=Scan MS for media
+
+CONFIRM_SCAN_MS_TITLE=Confirm
+CONFIRM_SCAN_MS=Scan the Memory Stick for media?
+CHECKING_FILE=Checking files on Memory Stick
+SCANNING=Scanning Memory Stick for media
+MESSAGEBOX_CONTINUE=Press X to continue
+SCAN_FINISHED=Memory stick scanned
+MEDIA_FOUND=Found XX media files.
+ASK_SEARCH_STRING=Insert search string
+QUERY_RUNNING_TITLE=Please wait
+QUERY_RUNNING=Query running
+TOTAL_TIME=Total time
+WORKING=Working
+
+#This is used for the message "xx% done"
+DONE=done
+
+#2.0.0 BETA2
+ALL=All
+BOOST_NEW=New
+BOOST_OLD=Old

@@ -303,9 +303,9 @@ int gui_settings(){
             drawConfirm(langGetString("CONFIRM_APPLY_SETTINGS_TITLE"), langGetString("CONFIRM_APPLY_SETTINGS"));
 
         oslReadKeys();
-        if (!osl_keys->pressed.hold){
+        if (!osl_pad.pressed.hold){
             if (confirmStatus == STATUS_CONFIRM_APPLY){
-                if(osl_keys->released.cross){
+                if(osl_pad.released.cross){
                     SETTINGS_save(userSettings);
                     sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
                     skinLoad(buffer);
@@ -319,7 +319,7 @@ int gui_settings(){
                         oslDeleteImage(commonMenu.highlight);
                     loadMenuImages();
                     confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_keys->pressed.circle){
+                }else if(osl_pad.pressed.circle){
                     confirmStatus = STATUS_CONFIRM_NONE;
                 }
             }else{
@@ -327,26 +327,27 @@ int gui_settings(){
                 commonSubMenu.selected = commonMenu.selected;
                 commonSubMenu.first = commonMenu.first;
 
-                if (osl_keys->pressed.right || osl_keys->analogX > ANALOG_SENS){
+                if (osl_pad.pressed.right || osl_pad.analogX > ANALOG_SENS){
                     changeSettingVal(commonMenu.selected, +1);
                     buildSettingsMenu(&commonMenu, &commonSubMenu);
                     sceKernelDelayThread(100000);
-                }else if (osl_keys->pressed.left || osl_keys->analogX < -ANALOG_SENS){
+                }else if (osl_pad.pressed.left || osl_pad.analogX < -ANALOG_SENS){
                     changeSettingVal(commonMenu.selected, -1);
                     buildSettingsMenu(&commonMenu, &commonSubMenu);
                     sceKernelDelayThread(100000);
-                }else if(osl_keys->released.start){
+                }else if(osl_pad.released.start){
                     confirmStatus = STATUS_CONFIRM_APPLY;
-                }else if(osl_keys->released.R){
+                }else if(osl_pad.released.R){
                     settingsRetValue = nextAppMode(MODE_SETTINGS);
                     exitFlagSettings = 1;
-                }else if(osl_keys->released.L){
+                }else if(osl_pad.released.L){
                     settingsRetValue = previousAppMode(MODE_SETTINGS);
                     exitFlagSettings = 1;
                 }
             }
         }
     	oslEndDrawing();
+        oslEndFrame();
     	oslSyncFrame();
     }
     //unLoad images:

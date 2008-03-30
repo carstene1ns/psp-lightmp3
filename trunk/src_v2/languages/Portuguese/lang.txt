@@ -1,0 +1,125 @@
+#Translated by fabiom (fabiom2@gmail.com). English to Brazilian Portuguese - Version 1.0
+#Traduzido por fabiom (fabiom2@gmail.com). Ingles para o Portugues Brasileiro - Versao 1.0
+
+YES=Sim
+NO=Nao
+WAIT=Por favor aguarde...
+CHECK_BRIGHTNESS_TITLE=Aviso de brilho
+CHECK_BRIGHTNESS=Exibir brilho fraco?
+BRIGHTNESS_NO=Nao
+BRIGHTNESS_YES_WARNING=Sim, com aviso
+BRIGHTNESS_YES=Sim, sem aviso
+FREE_MEMORY=Mem livre:
+
+USB_ACTIVE=USB ativo
+USB_MESSAGE=Pressione SELECT para desativar USB.
+TITLE=Titulo
+ARTIST=Artista
+ALBUM=Album
+GENRE=Genero
+YEAR=Ano
+TIME=Tempo
+TRACK=Faixa
+ADDING_PLAYLIST=Adicionando faixas a lista
+RATING=Avaliacao
+PLAYED=Reproduzida
+NOT_SUPPORTED=Nao suportada
+
+MODE=Modo
+BITRATE=Taxa de bits
+SAMPLERATE=Amostragem
+LAYER=Layer
+FILE_FORMAT=Formato
+EMPHASIS=Enfase
+SLEEP_MODE=Modo sleep
+PLAY_MODE=Modo de reprod.
+STATUS=Status
+VOLUME_BOOST=Ganho no volume
+EQUALIZER=Equalizador
+NOCOVER=Sem capa
+BUTTON_1=Navegador
+BUTTON_2=Listas
+BUTTON_3=Editor de listas
+BUTTON_4=Biblioteca
+BUTTON_5=Ajustes
+
+SLEEP_MODE_0=Desligado
+SLEEP_MODE_1=Final da faixa
+SLEEP_MODE_2=Final do diretorio/lista
+
+PLAY_MODE_0=Normal
+PLAY_MODE_1=Repetir todas
+PLAY_MODE_2=Repetir faixa
+PLAY_MODE_3=Aleatorio
+PLAY_MODE_4=Aleatorio/repetir
+
+PLAYER_STATUS_0=Abriando arquivo
+PLAYER_STATUS_1=Pausado
+PLAYER_STATUS_2=Reproduzindo
+
+CONFIRM_MESSAGE=Pressione X para confirmar, O para cancelar
+CONFIRM_LOAD_TITLE=Confirmar
+CONFIRM_LOAD=Carregar lista selecionada?
+
+CONFIRM_REMOVE_TITLE=Confirmar
+CONFIRM_REMOVE=Remover lista selecionada?
+ASK_PLAYLIST_NAME=Digite o nome da lista
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=Confirmar
+CONFIRM_CLEAR_PLAYLIST=Limpar esta lista?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Confirmar
+CONFIRM_REMOVE_FROM_PLAYLIST=Remover faixa selecionada da lista?
+PLAYLIST_NAME=Nome
+TOTAL_TRACKS=Total de faixas
+
+SETTINGS_01=Aparencia
+SETTINGS_02=Idioma
+SETTINGS_03=Gravar log do audio Scrobbler
+SETTINGS_04=Fadeout quando pular a faixa
+SETTINGS_05=Mudo
+SETTINGS_06=Checar brilho
+SETTINGS_07=Reproduzir MP3 usando Media Engine
+SETTINGS_08=Tipo de ganho no MP3 utilizando libMAD
+SETTINGS_09=Clock da CPU automatico
+SETTINGS_10=Clock da CPU: Interface
+SETTINGS_11=Clock da CPU: MP3 libMAD
+SETTINGS_12=Clock da CPU: MP3 Media Engine
+SETTINGS_13=Clock da CPU: OGG Vorbis
+SETTINGS_14=Clock da CPU: Flac
+SETTINGS_15=Clock da CPU: ATRAC3
+CONFIRM_APPLY_SETTINGS_TITLE=Confirmar
+CONFIRM_APPLY_SETTINGS=Aplicar estes ajustes agora?
+
+HELP_PLAYER_TITLE=Ajuda do reprodutor
+HELP_PLAYER_01=Pressione R para avancar faixa
+HELP_PLAYER_02=Pressione L para retroceder faixa
+HELP_PLAYER_03=Pressione X para pausar/reproduzir
+HELP_PLAYER_04=Pressione CIRCULO to parar
+HELP_PLAYER_05=Pressione QUADRADO para ajustar modo mudo
+HELP_PLAYER_06=Pressione TRIANGULO para ajustar modo sleep
+HELP_PLAYER_07=Pressione SELECT para ajustar modo de reprod.
+HELP_PLAYER_08=Pressione START para ativar o modo economico
+HELP_PLAYER_09=Pressione X + CIMA/BAIXO para avaliar a faixa
+
+BROWSE_ARTIST=Navegar por artista
+BROWSE_ALBUM=Navegar por album
+BROWSE_GENRE=Navegar por genero
+BROWSE_RATING=Navegar por avaliacao
+SEARCH=Procurar
+SCAN_MS=Procurar for midia no MS
+
+CONFIRM_SCAN_MS_TITLE=Confirmar
+CONFIRM_SCAN_MS=Procurar midia no Memory Stick?
+CHECKING_FILE=Checando arquivos no Memory Stick
+SCANNING=Procurando midia no Memory Stick
+MESSAGEBOX_CONTINUE=Pressione X para continuar
+SCAN_FINISHED=Memory stick checado
+MEDIA_FOUND=Encontrado XX arquivo(s) de midia.
+ASK_SEARCH_STRING=Digite a string de procura
+QUERY_RUNNING_TITLE=Por favor aguarde
+QUERY_RUNNING=Rodando pesquisa
+TOTAL_TIME=Tempo total
+WORKING=Funcionando
+
+#This is used for the message "xx% done"
+DONE=concluido

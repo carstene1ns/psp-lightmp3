@@ -115,8 +115,6 @@ int drawMenu(struct menuElements *menu){
             menu->dataFeedFunction(i, &menu->elements[i]);
 
         oslSetBkColor(RGBA(0, 0, 0, 0));
-        if (i>menu->numberOfElements-1)
-            break;
         oslSetFont(fontNormal);
         if (menu->align == ALIGN_LEFT)
             xPos = menu->xPos + 4;
@@ -138,7 +136,7 @@ int drawMenu(struct menuElements *menu){
 int processMenuKeys(struct menuElements *menu){
     struct menuElement selected;
 
-    if (menu->numberOfElements && (osl_keys->pressed.down || osl_keys->analogY > ANALOG_SENS)){
+    if (menu->numberOfElements && (osl_pad.pressed.down || osl_pad.analogY > ANALOG_SENS)){
         if (menu->selected < menu->numberOfElements - 1){
             menu->selected++;
             if (menu->selected >= menu->first + menu->maxNumberVisible)
@@ -147,11 +145,11 @@ int processMenuKeys(struct menuElements *menu){
             menu->selected = 0;
             menu->first = 0;
         }
-        if (osl_keys->analogY > ANALOG_SENS){
+        if (osl_pad.analogY > ANALOG_SENS){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (menu->numberOfElements && (osl_keys->pressed.up || osl_keys->analogY < -ANALOG_SENS)){
+    }else if (menu->numberOfElements && (osl_pad.pressed.up || osl_pad.analogY < -ANALOG_SENS)){
         if (menu->selected > 0){
             menu->selected--;
             if (menu->selected < menu->first)
@@ -162,11 +160,11 @@ int processMenuKeys(struct menuElements *menu){
             if (menu->first < 0)
                 menu->first = 0;
         }
-        if (osl_keys->analogY < -ANALOG_SENS){
+        if (osl_pad.analogY < -ANALOG_SENS){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (menu->numberOfElements && menu->fastScrolling && (osl_keys->pressed.right || osl_keys->analogX > ANALOG_SENS)){
+    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.right || osl_pad.analogX > ANALOG_SENS)){
     	if (menu->first + menu->maxNumberVisible < menu->numberOfElements){
     		menu->first = menu->first + menu->maxNumberVisible;
     		menu->selected += menu->maxNumberVisible;
@@ -176,11 +174,11 @@ int processMenuKeys(struct menuElements *menu){
     	} else {
     		menu->selected = menu->numberOfElements - 1;
     	}
-        if (osl_keys->analogX > ANALOG_SENS){
+        if (osl_pad.analogX > ANALOG_SENS){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (menu->numberOfElements && menu->fastScrolling && (osl_keys->pressed.left || osl_keys->analogX < -ANALOG_SENS)){
+    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.left || osl_pad.analogX < -ANALOG_SENS)){
     	if (menu->first - menu->maxNumberVisible >= 0){
     		menu->first = menu->first - menu->maxNumberVisible;
     		menu->selected -= menu->maxNumberVisible;
@@ -188,15 +186,15 @@ int processMenuKeys(struct menuElements *menu){
     		menu->first = 0;
     		menu->selected = 0;
     	}
-        if (osl_keys->analogX < -ANALOG_SENS){
+        if (osl_pad.analogX < -ANALOG_SENS){
             scePowerTick(0);
             sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
         }
-    }else if (menu->numberOfElements && osl_keys->pressed.cross){
+    }else if (menu->numberOfElements && osl_pad.pressed.cross){
         selected = menu->elements[menu->selected];
         if (selected.triggerFunction != NULL)
             selected.triggerFunction();
-    }else if (osl_keys->pressed.circle){
+    }else if (osl_pad.pressed.circle){
         if (menu->cancelFunction != NULL)
             menu->cancelFunction();
     }

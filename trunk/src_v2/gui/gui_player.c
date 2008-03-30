@@ -287,6 +287,7 @@ int playFile(char *fileName, char *trackMessage){
         oslStartDrawing();
         drawCommonGraphics();
     	oslEndDrawing();
+        oslEndFrame();
     	oslSyncFrame();
     }
 
@@ -377,6 +378,7 @@ int playFile(char *fileName, char *trackMessage){
         drawPlayerStatus();
         drawCoverArt();
     	oslEndDrawing();
+        oslEndFrame();
     	oslSyncFrame();
     }
 
@@ -447,37 +449,37 @@ int playFile(char *fileName, char *trackMessage){
         sceHprmPeekCurrentKey(&remoteButtons);
 
         if (status == STATUS_HELP){
-            if (osl_keys->released.cross || osl_keys->released.circle)
+            if (osl_pad.released.cross || osl_pad.released.circle)
                 status = STATUS_NORMAL;
         }else{
-            if (osl_keys->held.L && osl_keys->held.R){
+            if (osl_pad.held.L && osl_pad.held.R){
                 if (userSettings->displayStatus){
                     helpShown = 1;
                     status = STATUS_HELP;
                 }
-            }else if (osl_keys->held.cross && osl_keys->held.up){
+            }else if (osl_pad.held.cross && osl_pad.held.up){
                 if (++libEntry.rating > ML_MAX_RATING)
                     libEntry.rating = ML_MAX_RATING;
                 ratingChangedUpDown = 1;
                 ratingChangedCross= 1;
                 sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
-            }else if (osl_keys->held.cross && osl_keys->held.down){
+            }else if (osl_pad.held.cross && osl_pad.held.down){
                 if (--libEntry.rating < 0)
                     libEntry.rating = 0;
                 ratingChangedUpDown = 1;
                 ratingChangedCross= 1;
                 sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
-            }else if (osl_keys->released.circle){
+            }else if (osl_pad.released.circle){
                 (*endFunct)();
                 playerStatus = 0;
                 retValue = 2;
                 flagExit = 1;
-            }else if (osl_keys->released.square){
+            }else if (osl_pad.released.square){
         		if (playerStatus == 1){
                     userSettings->muted = !userSettings->muted;
         			(*setMuteFunct)(userSettings->muted);
                 }
-            }else if (osl_keys->released.R || (remoteButtons & PSP_HPRM_FORWARD)){
+            }else if (osl_pad.released.R || (remoteButtons & PSP_HPRM_FORWARD)){
                 if (helpShown)
                     helpShown = 0;
                 else{
@@ -487,7 +489,7 @@ int playFile(char *fileName, char *trackMessage){
                     retValue = 1;
                     flagExit = 1;
                 }
-            }else if (osl_keys->released.L || (remoteButtons & PSP_HPRM_BACK)){
+            }else if (osl_pad.released.L || (remoteButtons & PSP_HPRM_BACK)){
                 if (helpShown)
                     helpShown = 0;
                 else{
@@ -497,7 +499,7 @@ int playFile(char *fileName, char *trackMessage){
                     retValue = -1;
                     flagExit = 1;
                 }
-            }else if (osl_keys->released.cross || (remoteButtons & PSP_HPRM_PLAYPAUSE)){
+            }else if (osl_pad.released.cross || (remoteButtons & PSP_HPRM_PLAYPAUSE)){
                 if (ratingChangedCross)
                     ratingChangedCross = 0;
                 else{
@@ -508,36 +510,38 @@ int playFile(char *fileName, char *trackMessage){
                         (*pauseFunct)();
                         playerStatus = !playerStatus;
                     }
+                    if (remoteButtons & PSP_HPRM_PLAYPAUSE)
+                        sceKernelDelayThread(100000);
                 }
-            }else if (osl_keys->released.up){
+            }else if (osl_pad.released.up){
                 if (ratingChangedUpDown)
                     ratingChangedUpDown = 0;
                 else
             		if (userSettings->volumeBoost < MAX_VOLUME_BOOST)
             			(*setVolumeBoostFunct)(++userSettings->volumeBoost);
-            }else if (osl_keys->released.down){
+            }else if (osl_pad.released.down){
                 if (ratingChangedUpDown)
                     ratingChangedUpDown = 0;
                 else
             		if (userSettings->volumeBoost > MIN_VOLUME_BOOST)
             			(*setVolumeBoostFunct)(--userSettings->volumeBoost);
-            }else if (osl_keys->released.right && playerStatus == 1){
+            }else if (osl_pad.released.right && playerStatus == 1){
                 currentSpeed = (*getPlayingSpeedFunct)();
                 if (currentSpeed < MAX_PLAYING_SPEED)
                 	(*setPlayingSpeedFunct)(++currentSpeed);
-            }else if (osl_keys->released.left && playerStatus == 1){
+            }else if (osl_pad.released.left && playerStatus == 1){
                 currentSpeed = (*getPlayingSpeedFunct)();
                 if (currentSpeed > MIN_PLAYING_SPEED)
                     (*setPlayingSpeedFunct)(--currentSpeed);
-            }else if (osl_keys->analogY < -ANALOG_SENS && !osl_keys->pressed.hold){
+            }else if (osl_pad.analogY < -ANALOG_SENS && !osl_pad.pressed.hold){
                 if (clock < 222)
                     setCpuClock(++clock);
                 sceKernelDelayThread(100000);
-            }else if (osl_keys->analogY > ANALOG_SENS && !osl_keys->pressed.hold){
+            }else if (osl_pad.analogY > ANALOG_SENS && !osl_pad.pressed.hold){
                 if (clock > getMinCPUClock())
                     setCpuClock(--clock);
                 sceKernelDelayThread(100000);
-            }else if (osl_keys->released.triangle){
+            }else if (osl_pad.released.triangle){
         		//Change sleep mode:
         		if (++userSettings->sleepMode > SLEEP_PLAYLIST)
         			userSettings->sleepMode = 0;
@@ -553,11 +557,11 @@ int playFile(char *fileName, char *trackMessage){
                     (*setFilterFunct)(tEQ.filter, 1);
                     sceKernelDelayThread(400000);
                 }
-            }else if (osl_keys->released.select){
+            }else if (osl_pad.released.select){
     				//Change playing mode:
     				if (++userSettings->playMode > MODE_SHUFFLE_REPEAT)
     					userSettings->playMode = MODE_NORMAL;
-            }else if (osl_keys->released.start){
+            }else if (osl_pad.released.start){
         		if (userSettings->displayStatus){
                     oslEndDrawing();
         			//Spengo il display:
@@ -587,6 +591,7 @@ int playFile(char *fileName, char *trackMessage){
 
         if (userSettings->displayStatus)
         	oslEndDrawing();
+        oslEndFrame();
     	oslSyncFrame();
 
         //Controllo se la riproduzione è finita:
