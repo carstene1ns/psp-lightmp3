@@ -131,6 +131,7 @@ int addSelectionToPlaylist(char *where, int fastMode, char *m3uName){
                 M3U_addSong(localResult[i - offset].path, 0, onlyName);
             }
         	oslEndDrawing();
+            oslEndFrame();
         	oslSyncFrame();
         }
         M3U_save(m3uName);
@@ -172,6 +173,7 @@ int checkFileCallback(char *fileName){
 
     oslReadKeys();
     oslEndDrawing();
+    oslEndFrame();
     oslSyncFrame();
     return 0;
 }
@@ -196,6 +198,7 @@ int scanDirCallback(char *dirName){
 
     oslReadKeys();
     oslEndDrawing();
+    oslEndFrame();
     oslSyncFrame();
     return 0;
 }
@@ -223,15 +226,17 @@ int scanMS(){
         drawMessageBox(langGetString("SCAN_FINISHED"), scannedMsg);
 
         oslReadKeys();
-        if (!osl_keys->pressed.hold){
-            if(osl_keys->released.cross){
+        if (!osl_pad.pressed.hold){
+            if(osl_pad.released.cross){
                 oslEndDrawing();
+                oslEndFrame();
                 oslSyncFrame();
                 break;
             }
         }
 
         oslEndDrawing();
+        oslEndFrame();
         oslSyncFrame();
     }
     return 0;
@@ -248,6 +253,7 @@ void drawQueryRunning(){
     drawMLinfo();
     drawWait(langGetString("QUERY_RUNNING_TITLE"), langGetString("QUERY_RUNNING"));
     oslEndDrawing();
+    oslEndFrame();
     oslSyncFrame();
 }
 
@@ -475,6 +481,7 @@ int browseByRating(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int search(){
 	oslEndDrawing();
+    oslEndFrame();
 	oslSyncFrame();
 	setCpuClock(222);
     char *searchString = requestString(langGetString("ASK_SEARCH_STRING"), "");
@@ -588,23 +595,23 @@ int gui_mediaLibrary(){
             drawConfirm(langGetString("CONFIRM_SCAN_MS_TITLE"), langGetString("CONFIRM_SCAN_MS"));
 
         oslReadKeys();
-        if (!osl_keys->pressed.hold){
+        if (!osl_pad.pressed.hold){
 
             if (confirmStatus == STATUS_CONFIRM_SCAN){
-                if(osl_keys->released.cross){
+                if(osl_pad.released.cross){
                     confirmStatus = STATUS_CONFIRM_NONE;
                     scanMS();
-                }else if(osl_keys->pressed.circle)
+                }else if(osl_pad.pressed.circle)
                     confirmStatus = STATUS_CONFIRM_NONE;
             }else{
-                if (ratingChangedUpDown && (osl_keys->released.cross || osl_keys->released.up || osl_keys->released.down))
+                if (ratingChangedUpDown && (osl_pad.released.cross || osl_pad.released.up || osl_pad.released.down))
                     ratingChangedUpDown = 0;
 
-                if(mediaLibraryStatus == STATUS_MAINMENU && osl_keys->released.cross && commonMenu.selected == 5){
+                if(mediaLibraryStatus == STATUS_MAINMENU && osl_pad.released.cross && commonMenu.selected == 5){
                     confirmStatus = STATUS_CONFIRM_SCAN;
-                }else if(osl_keys->released.start && mediaLibraryStatus == STATUS_QUERYMENU){
+                }else if(osl_pad.released.start && mediaLibraryStatus == STATUS_QUERYMENU){
                     addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, 0, tempM3Ufile);
-                }else if(!ratingChangedUpDown && osl_keys->released.cross && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+                }else if(!ratingChangedUpDown && osl_pad.released.cross && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                     M3U_clear();
                     M3U_save(MLtempM3Ufile);
                     addSelectionToPlaylist(currentWhere, 1, MLtempM3Ufile);
@@ -613,7 +620,7 @@ int gui_mediaLibrary(){
                     mediaLibraryRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_MEDIA_LIBRARY;
                     exitFlagMediaLibrary = 1;
-                }else if(osl_keys->released.square && mediaLibraryStatus == STATUS_QUERYMENU && (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING)){
+                }else if(osl_pad.released.square && mediaLibraryStatus == STATUS_QUERYMENU && (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING)){
                     M3U_clear();
                     M3U_save(MLtempM3Ufile);
                     addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, 1, MLtempM3Ufile);
@@ -622,22 +629,22 @@ int gui_mediaLibrary(){
                     mediaLibraryRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_MEDIA_LIBRARY;
                     exitFlagMediaLibrary = 1;
-                }else if (osl_keys->held.cross && osl_keys->held.up && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+                }else if (osl_pad.held.cross && osl_pad.held.up && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                     if (++MLresult[commonMenu.selected - mlBufferPosition].rating > ML_MAX_RATING)
                         MLresult[commonMenu.selected - mlBufferPosition].rating = ML_MAX_RATING;
                     ratingChangedUpDown = 1;
                     ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
                     sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
-                }else if (osl_keys->held.cross && osl_keys->held.down  && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+                }else if (osl_pad.held.cross && osl_pad.held.down  && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                     if (--MLresult[commonMenu.selected - mlBufferPosition].rating < 0)
                         MLresult[commonMenu.selected - mlBufferPosition].rating = 0;
                     ratingChangedUpDown = 1;
                     ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
                     sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
-                }else if(osl_keys->released.R){
+                }else if(osl_pad.released.R){
                     mediaLibraryRetValue = nextAppMode(MODE_MEDIA_LIBRARY);
                     exitFlagMediaLibrary = 1;
-                }else if(osl_keys->released.L){
+                }else if(osl_pad.released.L){
                     mediaLibraryRetValue = previousAppMode(MODE_MEDIA_LIBRARY);
                     exitFlagMediaLibrary = 1;
                 }
@@ -647,6 +654,7 @@ int gui_mediaLibrary(){
             }
         }
     	oslEndDrawing();
+        oslEndFrame();
     	oslSyncFrame();
     }
 

@@ -1,0 +1,81 @@
+YES=Si
+NO=No
+WAIT=Attendere...
+CHECK_BRIGHTNESS_TITLE=Controllo luminosità
+CHECK_BRIGHTNESS=Abbassare la luminosità?
+BRIGHTNESS_NO=No
+BRIGHTNESS_YES_WARNING=Si, con avviso
+BRIGHTNESS_YES=Si, senza avviso
+
+USB_ACTIVE=USB attivato
+USB_MESSAGE=Premere SELECT per disattivare l'USB.
+TITLE=Titolo
+ARTIST=Artista
+ALBUM=Album
+GENRE=Genere
+YEAR=Anno
+TIME=Durata
+TRACK=Traccia
+ADDING_PLAYLIST=Aggiunta traccia nella playlist in corso...
+RATING=Voto
+PLAYED=Avviata v.
+MODE=Modalità
+BITRATE=Bitrate
+SAMPLERATE=Frequenza
+LAYER=Layer
+FILE_FORMAT=Formato
+EMPHASIS=Emhasis
+SLEEP_MODE=Sleep mode
+PLAY_MODE=Play mode
+STATUS=Stato
+VOLUME_BOOST=Volume boost
+EQUALIZER=Equalizzatore
+BUTTON_1=File Browser
+BUTTON_2=Playlists
+BUTTON_3=Modifica playlists
+BUTTON_4=Media Library
+BUTTON_5=Impostazioni
+
+SLEEP_MODE_0=Off
+SLEEP_MODE_1=Fine brano
+SLEEP_MODE_2=Fine cartella/playlist
+
+PLAY_MODE_0=Normale
+PLAY_MODE_1=Ripeti tutte
+PLAY_MODE_2=Repeti traccia
+PLAY_MODE_3=Shuffle
+
+PLAYER_STATUS_0=Apertura file
+PLAYER_STATUS_1=In pausa
+PLAYER_STATUS_2=In esecuzione
+
+CONFIRM_MESSAGE=X per confermare, O per annullare
+CONFIRM_LOAD_TITLE=Conferma
+CONFIRM_LOAD=Caricare la playlist selezionata?
+
+CONFIRM_REMOVE_TITLE=Conferma
+CONFIRM_REMOVE=Eliminare la playlist selezionata?
+ASK_PLAYLIST_NAME=Inserisci un nome per la playlist
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=Conferma
+CONFIRM_CLEAR_PLAYLIST=Azzerare questa playlist?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Conferma
+CONFIRM_REMOVE_FROM_PLAYLIST=Eliminare la seguente traccia dalla playlist?
+PLAYLIST_NAME=Nome
+TOTAL_TRACKS=Traccie totali
+
+SETTINGS_01=Skin
+SETTINGS_02=Lingua
+SETTINGS_03=Scrivere audio Scrobbler Log
+SETTINGS_04=Diminuzione graduale quando si salta una traccia
+SETTINGS_05=Volume muto
+SETTINGS_06=Controllo luminosità
+SETTINGS_07=Esegui MP3 utilizzando il Media Engine
+SETTINGS_08=Tipo di boost per MP3 utilizzando libMAD
+SETTINGS_09=Frequenza CPU automatica
+SETTINGS_10=Frequenza CPU: GUI
+SETTINGS_11=Frequenza CPU: MP3 libMAD
+SETTINGS_12=Frequenza CPU: MP3 Media Engine
+SETTINGS_13=Frequenza CPU: OGG Vorbis
+SETTINGS_14=Frequenza CPU: Flac
+SETTINGS_15=Frequenza CPU: ATRAC3

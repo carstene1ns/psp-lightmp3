@@ -26,7 +26,7 @@ The src directory contains source code: you don't need it to run the application
 
 FEATURES
 --------
--Skinnable and multilanguage
+-Skinnable and multilanguage (english, italian, portuguese, french, polish, german)
 -Support for kernel 3.x and Slim&Light
 -Support for MP3, OGG Vorbis, ATRAC3+ (*.aa3, *.omg, *.oma), FLAC
 -File browser

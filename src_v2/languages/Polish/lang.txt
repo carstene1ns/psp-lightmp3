@@ -1,0 +1,122 @@
+YES=TAK
+NO=NIE
+WAIT=Czekaj...
+CHECK_BRIGHTNESS_TITLE=Ostrzezenie Jasnosci
+CHECK_BRIGHTNESS=Zmniejszyc Jasnosc?
+BRIGHTNESS_NO=Nie
+BRIGHTNESS_YES_WARNING=TAK, z ostrzezeniem
+BRIGHTNESS_YES=Tak, bez ostrzezenia
+FREE_MEMORY=Wolna Pamiec:
+
+USB_ACTIVE=POLACZENIE USB
+USB_MESSAGE=Wcisnij SELECT by Wylaczyc
+TITLE=Tytul
+ARTIST=Artysta
+ALBUM=Album
+GENRE=Gatunek
+YEAR=Rok
+TIME=Czas
+TRACK=Utwor
+ADDING_PLAYLIST=Dodaj utwor do playlisty
+RATING=Ocena
+PLAYED=Grane
+NOT_SUPPORTED=Nie Obslugiwane
+
+MODE=Tryb
+BITRATE=Bitrate
+SAMPLERATE=Samplerate
+LAYER=Layer
+FILE_FORMAT=Format
+EMPHASIS=Emphasis
+SLEEP_MODE=Tryb Spiocha
+PLAY_MODE=Tryb Odtw.
+STATUS=Status
+VOLUME_BOOST=Boost Glos.
+EQUALIZER=Equalizer
+NOCOVER=Nie ma okladki
+BUTTON_1=Przeglad Plikow
+BUTTON_2=Playlisty
+BUTTON_3=Edytor Playlist
+BUTTON_4=Media Library
+BUTTON_5=Ustawienia
+
+SLEEP_MODE_0=Wylaczone
+SLEEP_MODE_1=Koniec Utworu
+SLEEP_MODE_2=Koniec Folderu/playlisty
+
+PLAY_MODE_0=Normalny
+PLAY_MODE_1=Powtarzaj Wszystko
+PLAY_MODE_2=Powtarzaj Utwor
+PLAY_MODE_3=Losowo
+PLAY_MODE_4=Losowo/Powtarzaj
+
+PLAYER_STATUS_0=Otwieranie pliku
+PLAYER_STATUS_1=Pauza
+PLAYER_STATUS_2=Odtwarza
+
+CONFIRM_MESSAGE=Wcisnij - X ackeptacja, O anuluj
+CONFIRM_LOAD_TITLE=Akceptuj
+CONFIRM_LOAD=Wgrac Wybrana playliste?
+
+CONFIRM_REMOVE_TITLE=Akceptuj
+CONFIRM_REMOVE=Usunac wybrana playliste?
+ASK_PLAYLIST_NAME=Nadaj Nazwe Playslisty
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=Akcpetuj
+CONFIRM_CLEAR_PLAYLIST=Wyczyscic ta playliste?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Akceptuj
+CONFIRM_REMOVE_FROM_PLAYLIST=Usunac wybrany utwor z playlisty?
+PLAYLIST_NAME=Nazwa Playlisty
+TOTAL_TRACKS=Ilosc Nut
+
+SETTINGS_01=Skin
+SETTINGS_02=Jezyk
+SETTINGS_03=Zapisz audio Scrobbler Log
+SETTINGS_04=Sciszaj Kiedy Omijasz Utwor
+SETTINGS_05=Stopien Wyciszenia Glosnosci
+SETTINGS_06=Opcja Sprawdzania Jasnosci
+SETTINGS_07=Graj MP3 uzywajac Media Engine
+SETTINGS_08=Boost dla MP3 uzywajac libMAD
+SETTINGS_09=Automatyczny Zegar CPU 
+SETTINGS_10=CPU Clock: GUI
+SETTINGS_11=CPU Clock: MP3 libMAD
+SETTINGS_12=CPU Clock: MP3 Media Engine
+SETTINGS_13=CPU Clock: OGG Vorbis
+SETTINGS_14=CPU Clock: Flac
+SETTINGS_15=CPU Clock: ATRAC3
+CONFIRM_APPLY_SETTINGS_TITLE=Akceptuj
+CONFIRM_APPLY_SETTINGS=Zapisac ustawienia teraz?
+
+HELP_PLAYER_TITLE=Pomoc
+HELP_PLAYER_01=R nastepny utwor
+HELP_PLAYER_02=L poprzedni utwor
+HELP_PLAYER_03=KRZYZYK pauza/odtwarzanie
+HELP_PLAYER_04=KOLKO stop
+HELP_PLAYER_05=KWADRAT tryb wyciszenia wl/wyl
+HELP_PLAYER_06=TROJKAT tryb spiocha
+HELP_PLAYER_07=SELECT przel. trybu odtw.
+HELP_PLAYER_08=START tryb oscz. energii
+HELP_PLAYER_09=X + Gora/Dol by oceniac utw.
+
+BROWSE_ARTIST=Szukaj przez Artyste
+BROWSE_ALBUM=Szukaj przez Album
+BROWSE_GENRE=Szukaj przez Gatunek
+BROWSE_RATING=Szukaj przez Ocene
+SEARCH=Szukaj
+SCAN_MS=Wyszukaj Pliki Muzyczne na MS
+
+CONFIRM_SCAN_MS_TITLE=Akceptuj
+CONFIRM_SCAN_MS=Wyszukac Pliki Muzyczne?
+CHECKING_FILE=Sprawdzanie Plikow na Memory Stick
+SCANNING=Skanowanie Memory Stick
+MESSAGEBOX_CONTINUE=Wcisnij X by kontynuowac
+SCAN_FINISHED=Memory stick zeskanowana
+MEDIA_FOUND=Znaleziono XX plikow muzycznych
+ASK_SEARCH_STRING=Wpisz by Wyszukac
+QUERY_RUNNING_TITLE=Czekaj
+QUERY_RUNNING=Sprawdzam
+TOTAL_TIME=Ogolny Czas
+WORKING=Dziala
+
+#This is used for the message "xx% done"
+DONE=Zrobione

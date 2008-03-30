@@ -182,6 +182,7 @@ int splashThread(SceSize args, void *argp){
         oslStartDrawing();
         oslDrawImageXY(splash, 0, 0);
         oslEndDrawing();
+        oslEndFrame();
         oslSyncFrame();
 
         sceKernelDelayThread(3000000);
@@ -230,19 +231,19 @@ int checkBrightness(){
             drawConfirm(langGetString("CHECK_BRIGHTNESS_TITLE"), langGetString("CHECK_BRIGHTNESS"));
 
             oslReadKeys();
-            if(osl_keys->pressed.cross){
+            if(osl_pad.released.cross){
                 setBrightness(24);
             	userSettings->curBrightness = 24;
                 imposeSetBrightness(0);
                 done = 1;
-            }else if(osl_keys->pressed.circle){
+            }else if(osl_pad.released.circle){
                 done = 1;
             }
         	oslEndDrawing();
+            oslEndFrame();
         	oslSyncFrame();
         }
     }
-    oslReadKeys();
     return 0;
 }
 
@@ -318,7 +319,7 @@ int main(){
     }
 
     sprintf(buffer, "%sskins/", userSettings->ebootPath);
-    getSkinsList(buffer);
+    skinLoadList(buffer);
     sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
     skinLoad(buffer);
 

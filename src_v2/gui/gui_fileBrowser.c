@@ -115,6 +115,7 @@ void addDirectoryToPlaylist(char *dirName){
             drawMenu(&commonMenu);
 			drawWait(langGetString("ADDING_PLAYLIST"), message);
         	oslEndDrawing();
+            oslEndFrame();
         	oslSyncFrame();
 
 			strcpy(fileToAdd, dirName);
@@ -195,11 +196,11 @@ int gui_fileBrowser(){
             drawUSBmessage();
 
         oslReadKeys();
-        if (!osl_keys->pressed.hold){
+        if (!osl_pad.pressed.hold){
             if (!USBactive)
                 processMenuKeys(&commonMenu);
 
-            if (!USBactive && osl_keys->released.cross){
+            if (!USBactive && osl_pad.released.cross){
     			if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     //Enter directory:
     				if (curDir[strlen(curDir)-1] != '/')
@@ -220,7 +221,7 @@ int gui_fileBrowser(){
                     userSettings->previousMode = MODE_FILEBROWSER;
                     exitFlagFileBrowser = 1;
                 }
-            }else if (!USBactive && osl_keys->released.start){
+            }else if (!USBactive && osl_pad.released.start){
     			if (curDir[strlen(curDir)-1] != '/')
                     sprintf(buffer, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
                 else
@@ -231,10 +232,11 @@ int gui_fileBrowser(){
     			}else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
                     drawWait(langGetString("ADDING_PLAYLIST"), langGetString("WAIT"));
                 	oslEndDrawing();
+                    oslEndFrame();
                 	oslSyncFrame();
                     addFileToPlaylist(buffer, 1);
                     continue;
-            }else if(!USBactive && osl_keys->released.square){
+            }else if(!USBactive && osl_pad.released.square){
                 //Play directory:
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     if (curDir[strlen(curDir)-1] != '/')
@@ -245,7 +247,7 @@ int gui_fileBrowser(){
                     userSettings->previousMode = MODE_FILEBROWSER;
                     exitFlagFileBrowser = 1;
                 }
-            }else if(!USBactive && osl_keys->released.circle){
+            }else if(!USBactive && osl_pad.released.circle){
                 //Up one level:
                 char tempDir[264] = "";
                 strcpy(tempDir, curDir);
@@ -265,7 +267,7 @@ int gui_fileBrowser(){
                     }
         		}
         		sceKernelDelayThread(200000);
-            }else if(osl_keys->released.select){
+            }else if(osl_pad.released.select){
                 //USB activate/deactivate:
                 USBactive = !USBactive;
                 if (USBactive){
@@ -285,15 +287,16 @@ int gui_fileBrowser(){
                     USBEnd();
                 }
                 sceKernelDelayThread(200000);
-            }else if(!USBactive && osl_keys->released.R){
+            }else if(!USBactive && osl_pad.released.R){
                 fileBrowserRetValue = nextAppMode(MODE_FILEBROWSER);
                 exitFlagFileBrowser = 1;
-            }else if(!USBactive && osl_keys->released.L){
+            }else if(!USBactive && osl_pad.released.L){
                 fileBrowserRetValue = previousAppMode(MODE_FILEBROWSER);
                 exitFlagFileBrowser = 1;
             }
         }
     	oslEndDrawing();
+        oslEndFrame();
     	oslSyncFrame();
     }
     opendir_close(&directory);
