@@ -1,0 +1,131 @@
+#Language   : Russian
+#By         : coach777
+
+YES=Да
+NO=Нет
+WAIT=ПОЖАЛУЙСТА ПОДОЖДИТЕ...
+CHECK_BRIGHTNESS_TITLE=КОНТРОЛЬ ЯРКОСТИ
+CHECK_BRIGHTNESS=ПОНИЗИТЬ ЯРКОСТЬ?
+BRIGHTNESS_NO=Нет
+BRIGHTNESS_YES_WARNING=Да (с запросом)
+BRIGHTNESS_YES=Да (без запроса)
+FREE_MEMORY=Свободная память:
+
+USB_ACTIVE=АКТИВАЦИЯ USB
+USB_MESSAGE=SELECT для деактивации USB.
+TITLE=Композиция
+ARTIST=Исполнитель
+ALBUM=Альбом
+GENRE=Жанр
+YEAR=Год
+TIME=Время
+TRACK=Трек
+ADDING_PLAYLIST=ДОБАВЛЕНИЕ ТРЕКА В ПЛЕЙЛИСТ
+RATING=Рейтинг
+PLAYED=Проигрывался
+NOT_SUPPORTED=Не поддерживается
+
+MODE=Режим
+BITRATE=Качество
+SAMPLERATE=Частота
+LAYER=Уровень
+FILE_FORMAT=Формат
+EMPHASIS=Эмфаза
+SLEEP_MODE=Спящий режим
+PLAY_MODE=Проигрывание
+STATUS=Статус
+VOLUME_BOOST=Усиление звука
+EQUALIZER=Эквалайзер
+NOCOVER=Нет обложки
+
+BUTTON_1=Список файлов
+BUTTON_2=Плейлист
+BUTTON_3=Редактор плейлиста
+BUTTON_4=Медиа библиотека
+BUTTON_5=Настройки
+
+SLEEP_MODE_0=Выкл.
+SLEEP_MODE_1=По окончании трека
+SLEEP_MODE_2=По окончании директории
+
+PLAY_MODE_0=Норма
+PLAY_MODE_1=Повтор всех
+PLAY_MODE_2=Повтор трека
+PLAY_MODE_3=В случайном порядке
+PLAY_MODE_4=В сл.порядке / повтор
+
+PLAYER_STATUS_0=Открытие файла
+PLAYER_STATUS_1=Пауза
+PLAYER_STATUS_2=Проигрывание
+
+CONFIRM_MESSAGE=X для подтверждения, O для отмены
+CONFIRM_LOAD_TITLE=ПОДТВЕРДИТЕ
+CONFIRM_LOAD=ЗАГРУЗИТЬ ЭТОТ ПЛЕЙЛИСТ?
+
+CONFIRM_REMOVE_TITLE=ПОДТВЕРДИТЕ
+CONFIRM_REMOVE=УДАЛИТЬ ЭТОТ ПЛЕЙЛИСТ?
+ASK_PLAYLIST_NAME=ВВЕДИТЕ ИМЯ ПЛЕЙЛИСТА
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=ПОДТВЕРДИТЕ
+CONFIRM_CLEAR_PLAYLIST=ОЧИСТИТЬ ЭТОТ ПЛЕЙЛИСТ?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=ПОДТВЕРДИТЕ 
+CONFIRM_REMOVE_FROM_PLAYLIST=УДАЛИТЬ ВЫБРАННЫЙ ТРЕК ИЗ ПЛЕЙЛИСТА?
+PLAYLIST_NAME=Наименование
+TOTAL_TRACKS=Всего треков
+
+SETTINGS_01=ТЕМА
+SETTINGS_02=ЯЗЫК
+SETTINGS_03=ВЕСТИ ФАЙЛ МУЗЫКАЛЬНЫХ ПРЕДПОЧТЕНИЙ
+SETTINGS_04=ЗАТУХАНИЕ ЗВУКА ПРИ ПРОПУСКЕ ТРЕКА
+SETTINGS_05=ПРИГЛУШЕННЫЙ ЗВУК
+SETTINGS_06=КОНТРОЛЬ ЯРКОСТИ
+SETTINGS_07=РЕЖИМ ВОСПРОИЗВЕДЕНИЯ (MEDIA ENGINE)
+SETTINGS_08=РЕЖИМ УСИЛЕНИЯ ЗВУКА (LIBMAD)
+SETTINGS_09=АВТОМАТИЧЕСКАЯ ЧАСТОТА ПРОЦЕССОРА
+SETTINGS_10=ЧАСТОТА ПРОЦЕССОРА: GUI
+SETTINGS_11=ЧАСТОТА ПРОЦЕССОРА: MP3 LIBMAD
+SETTINGS_12=ЧАСТОТА ПРОЦЕССОРА: MP3 MEDIA ENGINE
+SETTINGS_13=ЧАСТОТА ПРОЦЕССОРА: OGG VORBIS
+SETTINGS_14=ЧАСТОТА ПРОЦЕССОРА: FLAC
+SETTINGS_15=ЧАСТОТА ПРОЦЕССОРА: ATRAC3
+CONFIRM_APPLY_SETTINGS_TITLE= ПОДТВЕРДИТЕ
+CONFIRM_APPLY_SETTINGS=СОХРАНИТЬ НАСТРОЙКИ?
+
+HELP_PLAYER_TITLE=ПОМОЩЬ
+HELP_PLAYER_01=R для следующего трека
+HELP_PLAYER_02=L для предыдущего трека
+HELP_PLAYER_03=X для паузы/воспроизведения
+HELP_PLAYER_04=O для остановки
+HELP_PLAYER_05=квадрат для приглушения звука вкл/откл
+HELP_PLAYER_06=треугольник для выбора спящего режима
+HELP_PLAYER_07=SELECT для переключения режима воспроизведения
+HELP_PLAYER_08=START для активации экономичного режима
+HELP_PLAYER_09=X + вверх/вниз для оценки трека
+
+BROWSE_ARTIST=ПОИСК ПО ИСПОЛНИТЕЛЮ
+BROWSE_ALBUM=ПОИСК ПО АЛЬБОМУ
+BROWSE_GENRE=ПОИСК ПО ЖАНРУ
+BROWSE_RATING=ПОИСК ПО РЕЙТИНГУ
+SEARCH=ПОИСК ПО НАИМЕНОВАНИЮ
+SCAN_MS=ПОИСК МЕДИАФАЙЛОВ НА КАРТЕ
+
+CONFIRM_SCAN_MS_TITLE=ПОДТВЕРДИТЕ 
+CONFIRM_SCAN_MS=СКАНИРОВАТЬ КАРТУ НА МЕДИАФАЙЛЫ?
+CHECKING_FILE=ПРОВЕРКА ФАЙЛОВ НА КАРТЕ ПАМЯТИ
+SCANNING=ИДЕТ ПОИСК МЕДИАФАЙЛОВ
+MESSAGEBOX_CONTINUE=НАЖМИТЕ X ДЛЯ ПРОДОЛЖЕНИЯ
+SCAN_FINISHED=СКАНИРОВАНИЕ ЗАВЕРШЕНО
+MEDIA_FOUND=НАЙДЕНО XX МЕДИАФАЙЛОВ
+ASK_SEARCH_STRING=ВВЕДИТЕ СТРОКУ ПОИСКА
+QUERY_RUNNING_TITLE=ПОЖАЛУЙСТА ПОДОЖДИТЕ
+QUERY_RUNNING=ВЫПОЛНЯЕТСЯ ЗАПРОС
+TOTAL_TIME=Общее время
+WORKING=ВЫПОЛНЯЕТСЯ...
+
+#THIS IS USED FOR THE MESSAGE "XX% DONE"
+DONE=
+
+#2.0.0 BETA2
+ALL=ВСЕ
+BOOST_NEW=Новый
+BOOST_OLD=Старый
