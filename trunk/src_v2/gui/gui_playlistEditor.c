@@ -36,6 +36,7 @@
 #define STATUS_CONFIRM_NONE 0
 #define STATUS_CONFIRM_CLEAR 1
 #define STATUS_CONFIRM_REMOVE 2
+#define STATUS_HELP 3
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions imported from prx:
@@ -167,6 +168,9 @@ int gui_playlistEditor(){
             case STATUS_CONFIRM_REMOVE:
                 drawConfirm(langGetString("CONFIRM_REMOVE_FROM_PLAYLIST_TITLE"), langGetString("CONFIRM_REMOVE_FROM_PLAYLIST"));
                 break;
+            case STATUS_HELP:
+                drawHelp("PLAYLIST_EDITOR");
+                break;
         }
 
         oslReadKeys();
@@ -199,6 +203,9 @@ int gui_playlistEditor(){
                 }else if(osl_pad.released.circle){
                     confirmStatus = STATUS_CONFIRM_NONE;
                 }
+            }else if (confirmStatus == STATUS_HELP){
+                if (osl_pad.released.cross || osl_pad.released.circle)
+                    confirmStatus = STATUS_CONFIRM_NONE;
             }else{
                 oldSelected = commonMenu.selected;
                 processMenuKeys(&commonMenu);
@@ -210,13 +217,15 @@ int gui_playlistEditor(){
                     unsetAudioFunctions();
                 }
 
-                if(pad.Buttons & PSP_CTRL_NOTE){
+                if (osl_pad.held.L && osl_pad.held.R){
+                    confirmStatus = STATUS_HELP;
+                }else if((pad.Buttons & PSP_CTRL_NOTE) && M3U_getSongCount()){
 					sprintf(userSettings->selectedBrowserItem, "%s", tempM3Ufile);
                     userSettings->playlistStartIndex = -1;
                     playlistEditorRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_PLAYLIST_EDITOR;
                     exitFlagPlaylistEditor = 1;
-                }else if(osl_pad.pressed.square){
+                }else if(osl_pad.pressed.square && M3U_getSongCount()){
         			if (M3U_moveSongUp(commonMenu.selected) == 0){
                         oldSelected = commonMenu.selected;
                         oldFirst = commonMenu.first;
@@ -226,7 +235,7 @@ int gui_playlistEditor(){
         				if (commonMenu.selected == oldFirst - 1)
         					commonMenu.first--;
         			}
-                }else if(osl_pad.pressed.cross){
+                }else if(osl_pad.pressed.cross && M3U_getSongCount()){
         			if (M3U_moveSongDown(commonMenu.selected) == 0){
                         oldSelected = commonMenu.selected;
                         oldFirst = commonMenu.first;
@@ -259,7 +268,7 @@ int gui_playlistEditor(){
                         M3U_save(userSettings->currentPlaylistName);
                     }
                     continue;
-                }else if(osl_pad.released.select){
+                }else if(osl_pad.released.select && M3U_getSongCount()){
                     confirmStatus = STATUS_CONFIRM_CLEAR;
                 }else if(osl_pad.released.R){
                     playlistEditorRetValue = nextAppMode(MODE_PLAYLIST_EDITOR);

@@ -92,15 +92,15 @@ CONFIRM_APPLY_SETTINGS_TITLE=Confirm
 CONFIRM_APPLY_SETTINGS=Apply the settings now?
 
 HELP_PLAYER_TITLE=Player help
-HELP_PLAYER_01=Press R for next track
-HELP_PLAYER_02=Press L for previous track
-HELP_PLAYER_03=Press CROSS to pause/play
-HELP_PLAYER_04=Press CIRCLE to stop
-HELP_PLAYER_05=Press SQUARE to switch MUTE on/off
-HELP_PLAYER_06=Press TRIANGLE to switch sleep mode
-HELP_PLAYER_07=Press SELECT to switch play mode
-HELP_PLAYER_08=Press START to activate economy mode
-HELP_PLAYER_09=Press CROSS + UP/DOWN to rate the track
+HELP_PLAYER_01=R for next track
+HELP_PLAYER_02=L for previous track
+HELP_PLAYER_03=Cross to pause/play
+HELP_PLAYER_04=Circle to stop
+HELP_PLAYER_05=Square to switch MUTE on/off
+HELP_PLAYER_06=Triangle to switch sleep mode
+HELP_PLAYER_07=Select to switch play mode
+HELP_PLAYER_08=Start to activate economy mode
+HELP_PLAYER_09=Cross + Up/Down to rate the track
 
 BROWSE_ARTIST=Browse by Artist
 BROWSE_ALBUM=Browse by Album
@@ -125,7 +125,40 @@ WORKING=Working
 #This is used for the message "xx% done"
 DONE=done
 
+################################################################################
 #2.0.0 BETA2
+################################################################################
 ALL=All
 BOOST_NEW=New
 BOOST_OLD=Old
+
+HELP_FILE_BROWSER_TITLE=File browser help
+HELP_FILE_BROWSER_01=Cross to enter directory/play file
+HELP_FILE_BROWSER_02=Circle to go up one level
+HELP_FILE_BROWSER_03=Square to play directory
+HELP_FILE_BROWSER_04=Start to add directory/file to playlist
+HELP_FILE_BROWSER_05=Select to toggle USB mode
+
+HELP_PLAYLIST_BROWSER_TITLE=Playlist browser help
+HELP_PLAYLIST_BROWSER_01=Cross to play playlist
+HELP_PLAYLIST_BROWSER_02=Circle to remove playlist
+HELP_PLAYLIST_BROWSER_03=Square to load playlist in the editor
+HELP_PLAYLIST_BROWSER_04=Start to add playlist to the editor
+
+CONFIRM_ADD_PLAYLIST_TITLE=Confirm
+CONFIRM_ADD_PLAYLIST=Add selected playlist to the current one?
+
+HELP_PLAYLIST_EDITOR_TITLE=Playlist editor help
+HELP_PLAYLIST_EDITOR_01=Square to move track up
+HELP_PLAYLIST_EDITOR_02=Cross to move track down
+HELP_PLAYLIST_EDITOR_03=Circle to remove track from playlist
+HELP_PLAYLIST_EDITOR_04=Start to save playlist
+HELP_PLAYLIST_EDITOR_05=Select to clear playlist
+HELP_PLAYLIST_EDITOR_06=Note to play playlist
+
+HELP_MEDIALIBRARY_TITLE=Media Library help
+HELP_MEDIALIBRARY_01=Cross to enter selection/play track
+HELP_MEDIALIBRARY_02=Circle to go up one level
+HELP_MEDIALIBRARY_03=Square to play selection
+HELP_MEDIALIBRARY_04=Start to add selection/track to playlist
+HELP_MEDIALIBRARY_05=Cross + Up/Down to rate the track

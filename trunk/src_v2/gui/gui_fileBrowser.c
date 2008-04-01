@@ -37,11 +37,15 @@
 #define music_directory_1 "ms0:/MUSIC"
 #define music_directory_2 "ms0:/PSP/MUSIC"
 
+#define STATUS_NORMAL 0
+#define STATUS_HELP 1
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int fileBrowserRetValue = 0;
 static int exitFlagFileBrowser = 0;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw USB message:
@@ -140,6 +144,7 @@ int gui_fileBrowser(){
     struct opendir_struct directory;
     char *result;
     int USBactive = 0;
+    int status = STATUS_NORMAL;
 
     fileBrowserRetValue = -1;
 
@@ -191,108 +196,117 @@ int gui_fileBrowser(){
         drawCommonGraphics();
         drawButtonBar(MODE_FILEBROWSER);
         drawMenu(&commonMenu);
+        if (status == STATUS_HELP)
+            drawHelp("FILE_BROWSER");
 
         if (USBactive)
             drawUSBmessage();
 
         oslReadKeys();
         if (!osl_pad.pressed.hold){
-            if (!USBactive)
-                processMenuKeys(&commonMenu);
+            if (status == STATUS_HELP){
+                if (osl_pad.released.cross || osl_pad.released.circle)
+                    status = STATUS_NORMAL;
+            }else{
+                if (!USBactive)
+                    processMenuKeys(&commonMenu);
 
-            if (!USBactive && osl_pad.released.cross){
-    			if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
-                    //Enter directory:
-    				if (curDir[strlen(curDir)-1] != '/')
-    					strcat(curDir, "/");
-    				strcat(curDir, directory.directory_entry[commonMenu.selected].d_name);
-    				opendir_close(&directory);
-    				result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
-    				sortDirectory(&directory);
-    				buildMenuFromDirectory(&commonMenu, &directory, "");
-    				sceKernelDelayThread(200000);
-    			}else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
-                    //Play file:
+                if (!USBactive && osl_pad.held.L && osl_pad.held.R){
+                    status = STATUS_HELP;
+                }else if (!USBactive && osl_pad.released.cross){
+                    if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
+                        //Enter directory:
+                        if (curDir[strlen(curDir)-1] != '/')
+                            strcat(curDir, "/");
+                        strcat(curDir, directory.directory_entry[commonMenu.selected].d_name);
+                        opendir_close(&directory);
+                        result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
+                        sortDirectory(&directory);
+                        buildMenuFromDirectory(&commonMenu, &directory, "");
+                        sceKernelDelayThread(200000);
+                    }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
+                        //Play file:
+                        if (curDir[strlen(curDir)-1] != '/')
+                            sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                        else
+                            sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                        fileBrowserRetValue = MODE_PLAYER;
+                        userSettings->previousMode = MODE_FILEBROWSER;
+                        exitFlagFileBrowser = 1;
+                    }
+                }else if (!USBactive && osl_pad.released.start){
                     if (curDir[strlen(curDir)-1] != '/')
-                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                        sprintf(buffer, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
                     else
-                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-                    fileBrowserRetValue = MODE_PLAYER;
-                    userSettings->previousMode = MODE_FILEBROWSER;
-                    exitFlagFileBrowser = 1;
-                }
-            }else if (!USBactive && osl_pad.released.start){
-    			if (curDir[strlen(curDir)-1] != '/')
-                    sprintf(buffer, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-                else
-                    sprintf(buffer, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-    			if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
-                    addDirectoryToPlaylist(buffer);
-                    continue;
-    			}else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
-                    drawWait(langGetString("ADDING_PLAYLIST"), langGetString("WAIT"));
-                	oslEndDrawing();
-                    oslEndFrame();
-                	oslSyncFrame();
-                    addFileToPlaylist(buffer, 1);
-                    continue;
-            }else if(!USBactive && osl_pad.released.square){
-                //Play directory:
-                if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
-                    if (curDir[strlen(curDir)-1] != '/')
-                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-                    else
-                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-                    fileBrowserRetValue = MODE_PLAYER;
-                    userSettings->previousMode = MODE_FILEBROWSER;
-                    exitFlagFileBrowser = 1;
-                }
-            }else if(!USBactive && osl_pad.released.circle){
-                //Up one level:
-                char tempDir[264] = "";
-                strcpy(tempDir, curDir);
-        		if (directoryUp(curDir) == 0){
-                    int i;
-        			opendir_close(&directory);
-        			result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
-        			sortDirectory(&directory);
-                    buildMenuFromDirectory(&commonMenu, &directory, "");
-                    //Mi riposiziono:
-                    for (i = 0; i < directory.number_of_directory_entries; i++){
-                        if (strstr(tempDir, directory.directory_entry[i].d_name) != NULL){
-                            commonMenu.first = i;
-                            commonMenu.selected = i;
-                            break;
+                        sprintf(buffer, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                    if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
+                        addDirectoryToPlaylist(buffer);
+                        continue;
+                    }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
+                        drawWait(langGetString("ADDING_PLAYLIST"), langGetString("WAIT"));
+                        oslEndDrawing();
+                        oslEndFrame();
+                        oslSyncFrame();
+                        addFileToPlaylist(buffer, 1);
+                        continue;
+                }else if(!USBactive && osl_pad.released.square){
+                    //Play directory:
+                    if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
+                        if (curDir[strlen(curDir)-1] != '/')
+                            sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                        else
+                            sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                        fileBrowserRetValue = MODE_PLAYER;
+                        userSettings->previousMode = MODE_FILEBROWSER;
+                        exitFlagFileBrowser = 1;
+                    }
+                }else if(!USBactive && osl_pad.released.circle){
+                    //Up one level:
+                    char tempDir[264] = "";
+                    strcpy(tempDir, curDir);
+                    if (directoryUp(curDir) == 0){
+                        int i;
+                        opendir_close(&directory);
+                        result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
+                        sortDirectory(&directory);
+                        buildMenuFromDirectory(&commonMenu, &directory, "");
+                        //Mi riposiziono:
+                        for (i = 0; i < directory.number_of_directory_entries; i++){
+                            if (strstr(tempDir, directory.directory_entry[i].d_name) != NULL){
+                                commonMenu.first = i;
+                                commonMenu.selected = i;
+                                break;
+                            }
                         }
                     }
-        		}
-        		sceKernelDelayThread(200000);
-            }else if(osl_pad.released.select){
-                //USB activate/deactivate:
-                USBactive = !USBactive;
-                if (USBactive){
-                    int retVal = USBInit();
-                    if (retVal){
-                        sprintf(buffer, "Error USBInit: %i", retVal);
-                        debugMessageBox(buffer);
-                    }else{
-                        retVal = USBActivate();
+                    sceKernelDelayThread(200000);
+                }else if(osl_pad.released.select){
+                    //USB activate/deactivate:
+                    USBactive = !USBactive;
+                    if (USBactive){
+                        int retVal = USBInit();
                         if (retVal){
-                            sprintf(buffer, "Error USBActivate: %i", retVal);
+                            sprintf(buffer, "Error USBInit: %i", retVal);
                             debugMessageBox(buffer);
+                        }else{
+                            retVal = USBActivate();
+                            if (retVal){
+                                sprintf(buffer, "Error USBActivate: %i", retVal);
+                                debugMessageBox(buffer);
+                            }
                         }
+                    }else{
+                        USBDeactivate();
+                        USBEnd();
                     }
-                }else{
-                    USBDeactivate();
-                    USBEnd();
+                    sceKernelDelayThread(200000);
+                }else if(!USBactive && osl_pad.released.R){
+                    fileBrowserRetValue = nextAppMode(MODE_FILEBROWSER);
+                    exitFlagFileBrowser = 1;
+                }else if(!USBactive && osl_pad.released.L){
+                    fileBrowserRetValue = previousAppMode(MODE_FILEBROWSER);
+                    exitFlagFileBrowser = 1;
                 }
-                sceKernelDelayThread(200000);
-            }else if(!USBactive && osl_pad.released.R){
-                fileBrowserRetValue = nextAppMode(MODE_FILEBROWSER);
-                exitFlagFileBrowser = 1;
-            }else if(!USBactive && osl_pad.released.L){
-                fileBrowserRetValue = previousAppMode(MODE_FILEBROWSER);
-                exitFlagFileBrowser = 1;
             }
         }
     	oslEndDrawing();

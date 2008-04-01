@@ -6,7 +6,10 @@ Version 2.0.0 BETA2
 -New skin system (now all the elements can be moved, see skin.cfg)
 -In the Media Library you can play a track pressing CROSS (like in the file browser)
 -You can rate your tracks in the Media Library (CROSS + DPAD UP/DOWN)
--Fixed crash in playlist editor when press UP or RIGHT on an empty list
+-Fixed crash in playlist editor when press UP, RIGHT or NOTE on an empty list
+-Added italian, french, german, polish, portuguese, russian language
+-Added help (press L+R)
+-Added: you can add selected playlist to the current one (press START in the playlist browser)
 
 
 Version 2.0.0 BETA1

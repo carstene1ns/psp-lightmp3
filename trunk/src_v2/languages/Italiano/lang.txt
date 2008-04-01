@@ -6,6 +6,7 @@ CHECK_BRIGHTNESS=Abbassare la luminosità?
 BRIGHTNESS_NO=No
 BRIGHTNESS_YES_WARNING=Si, con avviso
 BRIGHTNESS_YES=Si, senza avviso
+FREE_MEMORY=Memoria libera:
 
 USB_ACTIVE=USB attivato
 USB_MESSAGE=Premere SELECT per disattivare l'USB.
@@ -16,20 +17,23 @@ GENRE=Genere
 YEAR=Anno
 TIME=Durata
 TRACK=Traccia
-ADDING_PLAYLIST=Aggiunta traccia nella playlist in corso...
+ADDING_PLAYLIST=Traccia aggiunta nella playlist
 RATING=Voto
 PLAYED=Avviata v.
+NOT_SUPPORTED=Non supportato
+
 MODE=Modalità
 BITRATE=Bitrate
 SAMPLERATE=Frequenza
 LAYER=Layer
 FILE_FORMAT=Formato
-EMPHASIS=Emhasis
+EMPHASIS=Emphasis
 SLEEP_MODE=Sleep mode
 PLAY_MODE=Play mode
 STATUS=Stato
 VOLUME_BOOST=Volume boost
 EQUALIZER=Equalizzatore
+NOCOVER=Nessuna cover
 BUTTON_1=File Browser
 BUTTON_2=Playlists
 BUTTON_3=Modifica playlists
@@ -42,8 +46,9 @@ SLEEP_MODE_2=Fine cartella/playlist
 
 PLAY_MODE_0=Normale
 PLAY_MODE_1=Ripeti tutte
-PLAY_MODE_2=Repeti traccia
+PLAY_MODE_2=Ripeti traccia
 PLAY_MODE_3=Shuffle
+PLAY_MODE_4=Shuffle/ripeti
 
 PLAYER_STATUS_0=Apertura file
 PLAYER_STATUS_1=In pausa
@@ -60,15 +65,15 @@ ASK_PLAYLIST_NAME=Inserisci un nome per la playlist
 CONFIRM_CLEAR_PLAYLIST_TITLE=Conferma
 CONFIRM_CLEAR_PLAYLIST=Azzerare questa playlist?
 CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Conferma
-CONFIRM_REMOVE_FROM_PLAYLIST=Eliminare la seguente traccia dalla playlist?
+CONFIRM_REMOVE_FROM_PLAYLIST=Eliminare questa traccia dalla playlist?
 PLAYLIST_NAME=Nome
 TOTAL_TRACKS=Traccie totali
 
-SETTINGS_01=Skin
+SETTINGS_01=Tema
 SETTINGS_02=Lingua
 SETTINGS_03=Scrivere audio Scrobbler Log
 SETTINGS_04=Diminuzione graduale quando si salta una traccia
-SETTINGS_05=Volume muto
+SETTINGS_05=Abbassamento volume
 SETTINGS_06=Controllo luminosità
 SETTINGS_07=Esegui MP3 utilizzando il Media Engine
 SETTINGS_08=Tipo di boost per MP3 utilizzando libMAD
@@ -79,3 +84,39 @@ SETTINGS_12=Frequenza CPU: MP3 Media Engine
 SETTINGS_13=Frequenza CPU: OGG Vorbis
 SETTINGS_14=Frequenza CPU: Flac
 SETTINGS_15=Frequenza CPU: ATRAC3
+CONFIRM_APPLY_SETTINGS_TITLE=Conferma
+CONFIRM_APPLY_SETTINGS=Applicare queste impostazioni?
+
+HELP_PLAYER_TITLE=Aiuto player
+HELP_PLAYER_01=Premi R per la traccia successiva
+HELP_PLAYER_02=Premi L per la traccia precedente
+HELP_PLAYER_03=Premi X per mettere in pausa/riprodurre
+HELP_PLAYER_04=Premi O per stoppare
+HELP_PLAYER_05=Premi [] per attivare/disattivare il volume muto
+HELP_PLAYER_06=Premi /\ per passare allo sleep mode
+HELP_PLAYER_07=Premi SELECT per passare al play mode
+HELP_PLAYER_08=Premi START per spegnere l'LCD
+HELP_PLAYER_09=Premi X + SU/GIU per valutare la traccia
+
+BROWSE_ARTIST=Ordina per Artista
+BROWSE_ALBUM=Ordina per Album
+BROWSE_GENRE=Ordina per Genere
+BROWSE_RATING=Ordina per valutazione
+SEARCH=Cerca
+SCAN_MS=Ricerca brani nella MS
+
+CONFIRM_SCAN_MS_TITLE=Conferma
+CONFIRM_SCAN_MS=Ricercare brani nella MS?
+CHECKING_FILE=Controllo files nella MS
+SCANNING=Ricercare brani nella MS
+MESSAGEBOX_CONTINUE=Premi X per continuare
+SCAN_FINISHED=Ricerca completata
+MEDIA_FOUND=Trovati XX brani.
+ASK_SEARCH_STRING=Inserire testo da ricercare
+QUERY_RUNNING_TITLE=Attendere...
+QUERY_RUNNING=In esecuzione
+TOTAL_TIME=Tempo totale
+WORKING=Elaborazione
+
+#This is used for the message "xx% done"
+DONE=OK

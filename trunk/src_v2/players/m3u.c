@@ -69,7 +69,7 @@ int M3U_open(char *fileName){
 	char chrLength[10];
 	char title[256];
 	struct M3U_songEntry singleEntry;
-	int playListCount = 0;
+	int playListCount = lPlayList.songCount;
 
 	f = fopen(fileName, "rt");
 	if (f == NULL){

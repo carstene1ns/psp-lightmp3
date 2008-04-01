@@ -40,6 +40,7 @@
 
 #define STATUS_CONFIRM_NONE 0
 #define STATUS_CONFIRM_SCAN 1
+#define STATUS_HELP 3
 
 #define QUERY_SINGLE_ENTRY 0
 #define QUERY_COUNT 1
@@ -591,8 +592,14 @@ int gui_mediaLibrary(){
         if (mediaLibraryStatus == STATUS_QUERYMENU)
             drawMLinfo();
 
-        if (confirmStatus == STATUS_CONFIRM_SCAN)
-            drawConfirm(langGetString("CONFIRM_SCAN_MS_TITLE"), langGetString("CONFIRM_SCAN_MS"));
+        switch (confirmStatus){
+            case STATUS_CONFIRM_SCAN:
+                drawConfirm(langGetString("CONFIRM_SCAN_MS_TITLE"), langGetString("CONFIRM_SCAN_MS"));
+                break;
+            case STATUS_HELP:
+                drawHelp("MEDIALIBRARY");
+                break;
+        }
 
         oslReadKeys();
         if (!osl_pad.pressed.hold){
@@ -603,11 +610,16 @@ int gui_mediaLibrary(){
                     scanMS();
                 }else if(osl_pad.pressed.circle)
                     confirmStatus = STATUS_CONFIRM_NONE;
+            }else if (confirmStatus == STATUS_HELP){
+                if (osl_pad.released.cross || osl_pad.released.circle)
+                    confirmStatus = STATUS_CONFIRM_NONE;
             }else{
                 if (ratingChangedUpDown && (osl_pad.released.cross || osl_pad.released.up || osl_pad.released.down))
                     ratingChangedUpDown = 0;
 
-                if(mediaLibraryStatus == STATUS_MAINMENU && osl_pad.released.cross && commonMenu.selected == 5){
+                if (osl_pad.held.L && osl_pad.held.R){
+                    confirmStatus = STATUS_HELP;
+                }else if(mediaLibraryStatus == STATUS_MAINMENU && osl_pad.released.cross && commonMenu.selected == 5){
                     confirmStatus = STATUS_CONFIRM_SCAN;
                 }else if(osl_pad.released.start && mediaLibraryStatus == STATUS_QUERYMENU){
                     addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, 0, tempM3Ufile);

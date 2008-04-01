@@ -385,7 +385,7 @@ int playFile(char *fileName, char *trackMessage){
     //Apro il file:
     int retLoad = (*loadFunct)(fileName);
     if (retLoad != OPENING_OK){
-        sprintf(buffer, "Error opening file: %i", retLoad);
+        sprintf(buffer, "Error %i opening file:\n%s", retLoad, fileName);
         debugMessageBox(buffer);
         (*endFunct)();
         unsetAudioFunctions();
@@ -860,6 +860,7 @@ int gui_player(){
     if (FIO_S_ISREG(stat.st_mode)){
         getExtension(userSettings->selectedBrowserItem, ext, 4);
         if (!strcmp(ext, "M3U")){
+            M3U_clear();
             M3U_open(userSettings->selectedBrowserItem);
             playPlaylist(M3U_getPlaylist(), userSettings->playlistStartIndex);
         }else{
