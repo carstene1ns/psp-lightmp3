@@ -344,16 +344,17 @@ int previousAppMode(int currentMode){
 // Build menu (directory):
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *directory, char *selected){
-    struct menuElement tMenuEl;
     int i = 0;
 
     menu->first = 0;
     menu->selected = 0;
     for (i=0; i<directory->number_of_directory_entries; i++){
-        strcpy(tMenuEl.text, directory->directory_entry[i].d_name);
-        tMenuEl.triggerFunction = NULL;
-        menu->elements[i] = tMenuEl;
-        if (!strcmp(selected, tMenuEl.text)){
+        if (FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode))
+            sprintf(menu->elements[i].text, "/%s", directory->directory_entry[i].d_name);
+        else
+            strcpy(menu->elements[i].text, directory->directory_entry[i].d_name);
+        menu->elements[i].triggerFunction = NULL;
+        if (!strcmp(selected, menu->elements[i].text)){
             menu->first = i;
             menu->selected = i;
         }
