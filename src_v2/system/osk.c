@@ -97,7 +97,7 @@ static void setupGu(void){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Get text from OSK:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int get_text_osk(char *input, unsigned short *intext, unsigned short *desc){
+int get_text_osk(int language, char *input, unsigned short *intext, unsigned short *desc){
 	int done=0;
 	unsigned short outtext[128] = { 0 }; // text after input
 
@@ -119,10 +119,9 @@ int get_text_osk(char *input, unsigned short *intext, unsigned short *desc){
 	osk.base.size = sizeof(osk);
 	// dialog language: 0=Japanese, 1=English, 2=French, 3=Spanish, 4=German,
 	// 5=Italian, 6=Dutch, 7=Portuguese, 8=Russian, 9=Korean, 10-11=Chinese, 12+=default
-	osk.base.language = 1;
+	osk.base.language = language;
 	osk.base.buttonSwap = 1;		// X button: 1
 	osk.base.graphicsThread = 17;	// gfx thread pri
-	//osk.base.unknown = 19;			// unknown thread pri (?)
 	osk.base.accessThread = 19;
 	osk.base.fontThread = 18;
 	osk.base.soundThread = 16;
@@ -183,7 +182,7 @@ int get_text_osk(char *input, unsigned short *intext, unsigned short *desc){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // requestString:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-char *requestString (char *descStr, char *initialStr){
+char *requestString (int language, char *descStr, char *initialStr){
 	int ok, i;
 	static char str[64];
 	unsigned short intext[128]  = { 0 }; // text already in the edit box on start
@@ -197,7 +196,7 @@ char *requestString (char *descStr, char *initialStr){
 		for (i=0; i<=strlen(descStr); i++)
 			desc[i] = (unsigned short)descStr[i];
 
-	ok = get_text_osk(str, intext, desc);
+	ok = get_text_osk(language, str, intext, desc);
 
 	pspDebugScreenInit();
 	pspDebugScreenSetBackColor(0xFF000000);

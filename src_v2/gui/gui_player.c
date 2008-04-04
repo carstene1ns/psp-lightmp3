@@ -37,6 +37,12 @@
 #include "../others/audioscrobbler.h"
 #include "../others/medialibrary.h"
 
+#define PLAYER_STOP 2
+#define PLAYER_NEXT 1
+#define PLAYER_END 0
+#define PLAYER_PREVIOUS -1
+
+
 #define STATUS_NORMAL 0
 #define STATUS_HELP 1
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,7 +267,7 @@ int drawProgressBar(){
 //				 2 if user pressed STOP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int playFile(char *fileName, char *trackMessage){
-    int retValue = 0;
+    int retValue = PLAYER_END;
     struct fileInfo info;
     struct libraryEntry libEntry;
     int currentSpeed = 0;
@@ -472,7 +478,7 @@ int playFile(char *fileName, char *trackMessage){
             }else if (osl_pad.released.circle){
                 (*endFunct)();
                 playerStatus = 0;
-                retValue = 2;
+                retValue = PLAYER_STOP;
                 flagExit = 1;
             }else if (osl_pad.released.square){
         		if (playerStatus == 1){
@@ -486,7 +492,7 @@ int playFile(char *fileName, char *trackMessage){
                     if (userSettings->FADE_OUT)
                         (*fadeOutFunct)(0.3);
                     (*endFunct)();
-                    retValue = 1;
+                    retValue = PLAYER_NEXT;
                     flagExit = 1;
                 }
             }else if (osl_pad.released.L || (remoteButtons & PSP_HPRM_BACK)){
@@ -496,7 +502,7 @@ int playFile(char *fileName, char *trackMessage){
                     if (userSettings->FADE_OUT)
                         (*fadeOutFunct)(0.3);
                     (*endFunct)();
-                    retValue = -1;
+                    retValue = PLAYER_PREVIOUS;
                     flagExit = 1;
                 }
             }else if (osl_pad.released.cross || (remoteButtons & PSP_HPRM_PLAYPAUSE)){
@@ -595,9 +601,9 @@ int playFile(char *fileName, char *trackMessage){
     	oslSyncFrame();
 
         //Controllo se la riproduzione è finita:
-        if ((*endOfStreamFunct)() == 1) {
+        if (!flagExit && (*endOfStreamFunct)() == 1) {
             (*endFunct)();
-            retValue = 0;
+            retValue = PLAYER_END;
             flagExit = 1;
         }
     }
@@ -606,11 +612,10 @@ int playFile(char *fileName, char *trackMessage){
     if (userSettings->SCROBBLER && strlen(info.title)){
         time_t mytime;
         time(&mytime);
-        if (lastPercentage >= 50){
+        if (lastPercentage >= 50)
             SCROBBLER_addTrack(info, info.length, "L", mytime);
-        }else{
+        else
         	SCROBBLER_addTrack(info, info.length, "S", mytime);
-        }
     }
 
     unsetAudioFunctions();
@@ -699,15 +704,15 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 			playedTracks[playedTracksNumber] = i;
 			playedTracksNumber++;
 		}
-		if (playerReturn == 2){
+		if (playerReturn == PLAYER_STOP){
 			break;
-		}else if ((playerReturn == 1) | (playerReturn == 0)){
+		}else if ((playerReturn == PLAYER_NEXT) | (playerReturn == PLAYER_END)){
             //Controllo la ripetizione della traccia:
-            if (playerReturn == 0 && userSettings->playMode == MODE_REPEAT)
+            if (playerReturn == PLAYER_END && userSettings->playMode == MODE_REPEAT)
                 continue;
 			//Controllo se sono in shuffle:
 			if (userSettings->playMode == MODE_SHUFFLE || userSettings->playMode == MODE_SHUFFLE_REPEAT){
-				if (currentTrack < playedTracksNumber - 1 && playerReturn == 1){
+				if (currentTrack < playedTracksNumber - 1 && playerReturn == PLAYER_NEXT){
 					i = playedTracks[++currentTrack];
 				}else{
 					i = randomTrack(songCount, playedTracksNumber, playedTracks);
@@ -723,7 +728,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 				}
 			}else{
 				//Controllo se è finita la playlist e non sono in repeat:
-				if ((playerReturn == 0) & (i == songCount - 1) & (userSettings->playMode != MODE_REPEAT_ALL)){
+				if ((playerReturn == PLAYER_END) & (i == songCount - 1) & (userSettings->playMode != MODE_REPEAT_ALL)){
 					break;
 				}
 				//Altrimenti passo al file successivo:
@@ -733,7 +738,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 				}
 				currentTrack = i;
 			}
-		}else if (playerReturn == -1){
+		}else if (playerReturn == PLAYER_PREVIOUS){
 			//Controllo se sono in shuffle:
 			if (userSettings->playMode == MODE_SHUFFLE || userSettings->playMode == MODE_SHUFFLE_REPEAT){
 				if (currentTrack){
@@ -752,6 +757,8 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
         oslStartDrawing();
         oslClearScreen(RGBA(0, 0, 0, 255));
     	oslEndDrawing();
+        oslEndFrame();
+    	oslSyncFrame();
     	displayEnable();
     	oslSetFrameskip(0);
     	imposeSetHomePopup(1);

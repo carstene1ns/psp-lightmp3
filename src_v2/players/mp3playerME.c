@@ -421,8 +421,8 @@ int MP3MEgetInfo(){
                 }
             }
     		//Controllo il cambio di sample rate (ma non dovrebbe succedere)
-    		if (header.samplerate > MP3ME_info.hz)
-      		   MP3ME_info.hz = header.samplerate;
+    		//if (header.samplerate > MP3ME_info.hz)
+      		//   MP3ME_info.hz = header.samplerate;
 
             totalBitrate += header.bitrate;
             if (size == bufferSize)

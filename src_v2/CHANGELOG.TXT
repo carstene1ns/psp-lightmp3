@@ -7,7 +7,7 @@ Version 2.0.0 BETA2
 -In the Media Library you can play a track pressing CROSS (like in the file browser)
 -You can rate your tracks in the Media Library (CROSS + DPAD UP/DOWN)
 -Fixed crash in playlist editor when press UP, RIGHT or NOTE on an empty list
--Added italian, french, german, polish, portuguese, russian language
+-Added italian, french, dutch, polish, portuguese, russian language
  Many thanks to fabiom, borgqueenx, Mizou93, G-King, coach777, Magic_PSP
 -Added help (press L + R)
 -Added: you can add selected playlist to the current one (press START in the playlist browser)

@@ -64,7 +64,10 @@ int buildMenuFromPlaylist(struct menuElements *menu){
     menu->numberOfElements = M3U_getSongCount();
     for (i=0; i<menu->numberOfElements; i++){
         entry = M3U_getSong(i);
-        strcpy(tMenuEl.text, entry->title);
+        //if (fileExists(entry->fileName) >= 0)
+            strcpy(tMenuEl.text, entry->title);
+        //else
+        //    sprintf(tMenuEl.text, "**%s", entry->title);
         tMenuEl.triggerFunction = NULL;
         menu->elements[i] = tMenuEl;
     }
@@ -142,10 +145,7 @@ int gui_playlistEditor(){
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
-    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
-    commonMenu.highlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-    if (!commonMenu.highlight)
-        errorLoadImage(buffer);
+    commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
     commonMenu.interline = 1;
@@ -180,6 +180,7 @@ int gui_playlistEditor(){
                 if(osl_pad.released.cross){
                     M3U_clear();
                     strcpy(userSettings->currentPlaylistName, "");
+                    memset(&tagInfo, 0, sizeof(tagInfo));
                     buildMenuFromPlaylist(&commonMenu);
                     confirmStatus = STATUS_CONFIRM_NONE;
                 }else if(osl_pad.pressed.circle){
@@ -254,7 +255,7 @@ int gui_playlistEditor(){
                 	oslSyncFrame();
                 	setCpuClock(222);
                 	getFileName(userSettings->currentPlaylistName, onlyName);
-                    char *newName = requestString(langGetString("ASK_PLAYLIST_NAME"), onlyName);
+                    char *newName = requestString(atoi(langGetString("OSK_LANGUAGE")), langGetString("ASK_PLAYLIST_NAME"), onlyName);
                     char ext[4] = "";
                     getExtension(newName, ext, 3);
                     oslInitGfx(OSL_PF_8888, 1); //Re-init OSLib to avoid gaphics corruption!

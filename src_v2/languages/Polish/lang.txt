@@ -1,12 +1,16 @@
-YES=TAK
-NO=NIE
+#Language   : Polish
+#By         : G-King
+
+
+YES=Tak
+NO=Nie
 WAIT=Czekaj...
 CHECK_BRIGHTNESS_TITLE=Ostrzezenie Jasnosci
 CHECK_BRIGHTNESS=Zmniejszyc Jasnosc?
 BRIGHTNESS_NO=Nie
-BRIGHTNESS_YES_WARNING=TAK, z ostrzezeniem
+BRIGHTNESS_YES_WARNING=Tak, z ostrzezeniem
 BRIGHTNESS_YES=Tak, bez ostrzezenia
-FREE_MEMORY=Wolna Pamiec:
+FREE_MEMORY=Wolna Pam.:
 
 USB_ACTIVE=POLACZENIE USB
 USB_MESSAGE=Wcisnij SELECT by Wylaczyc
@@ -17,7 +21,7 @@ GENRE=Gatunek
 YEAR=Rok
 TIME=Czas
 TRACK=Utwor
-ADDING_PLAYLIST=Dodaj utwor do playlisty
+ADDING_PLAYLIST=Tworzenie Playlisty
 RATING=Ocena
 PLAYED=Grane
 NOT_SUPPORTED=Nie Obslugiwane
@@ -37,7 +41,7 @@ NOCOVER=Nie ma okladki
 BUTTON_1=Przeglad Plikow
 BUTTON_2=Playlisty
 BUTTON_3=Edytor Playlist
-BUTTON_4=Media Library
+BUTTON_4=Biblioteka Mediow
 BUTTON_5=Ustawienia
 
 SLEEP_MODE_0=Wylaczone
@@ -88,15 +92,15 @@ CONFIRM_APPLY_SETTINGS_TITLE=Akceptuj
 CONFIRM_APPLY_SETTINGS=Zapisac ustawienia teraz?
 
 HELP_PLAYER_TITLE=Pomoc
-HELP_PLAYER_01=R nastepny utwor
-HELP_PLAYER_02=L poprzedni utwor
-HELP_PLAYER_03=KRZYZYK pauza/odtwarzanie
-HELP_PLAYER_04=KOLKO stop
-HELP_PLAYER_05=KWADRAT tryb wyciszenia wl/wyl
-HELP_PLAYER_06=TROJKAT tryb spiocha
-HELP_PLAYER_07=SELECT przel. trybu odtw.
-HELP_PLAYER_08=START tryb oscz. energii
-HELP_PLAYER_09=X + Gora/Dol by oceniac utw.
+HELP_PLAYER_01=R : Nastepny utwor
+HELP_PLAYER_02=L : Poprzedni utwor
+HELP_PLAYER_03=KRZYZYK : Pauza/Odtwarzanie
+HELP_PLAYER_04=KOLKO : Stop
+HELP_PLAYER_05=KWADRAT : Tryb wyciszenia wl/wyl
+HELP_PLAYER_06=TROJKAT : Tryb spiocha
+HELP_PLAYER_07=SELECT : Przelaczenie trybu odtwarzania
+HELP_PLAYER_08=START : Tryb osczedzania energii
+HELP_PLAYER_09=X : + Gora/Dol by oceniac utwor
 
 BROWSE_ARTIST=Szukaj przez Artyste
 BROWSE_ALBUM=Szukaj przez Album
@@ -119,4 +123,42 @@ TOTAL_TIME=Ogolny Czas
 WORKING=Dziala
 
 #This is used for the message "xx% done"
-DONE=Zrobione
+DONE=/100%
+
+################################################################################
+#2.0.0 BETA2
+################################################################################
+ALL=Wszystkie
+BOOST_NEW=Nowy
+BOOST_OLD=Stary
+
+HELP_FILE_BROWSER_TITLE=POMOC do Przegladarki Plikow
+HELP_FILE_BROWSER_01=Krzyzyk : Wejscie do folderu/Uruchomienie pliku
+HELP_FILE_BROWSER_02=Kolko : Cofa do poprzedniego folderu
+HELP_FILE_BROWSER_03=Kwadrat : Odtwarzanie folderu
+HELP_FILE_BROWSER_04=Start : Dodanie folderu/pliku do playlisty
+HELP_FILE_BROWSER_05=Select : Uruchamia USB
+
+HELP_PLAYLIST_BROWSER_TITLE=POMOC do Przegladarki Playlist
+HELP_PLAYLIST_BROWSER_01=Krzyzyk : Odtwarza playliste
+HELP_PLAYLIST_BROWSER_02=Kolko : Usuwa playliste
+HELP_PLAYLIST_BROWSER_03=Kwadrat : Wgrywa playliste w edytorze
+HELP_PLAYLIST_BROWSER_04=Start : Dodaje playliste do edytora
+
+CONFIRM_ADD_PLAYLIST_TITLE=Akceptuj
+CONFIRM_ADD_PLAYLIST=Dodac wybrana playliste do aktualnej?
+
+HELP_PLAYLIST_EDITOR_TITLE=POMOC do Edytora Playlist
+HELP_PLAYLIST_EDITOR_01=Kwadrat : Przesuwa utwor do gory
+HELP_PLAYLIST_EDITOR_02=Krzyzyk : Przesuwa utwor w dol
+HELP_PLAYLIST_EDITOR_03=Kolko : Usuwa utwor z playlisty
+HELP_PLAYLIST_EDITOR_04=Start : Zapisuje playliste
+HELP_PLAYLIST_EDITOR_05=Select : Czysci playliste
+HELP_PLAYLIST_EDITOR_06=Nutka : Odtwarza playliste
+
+HELP_MEDIALIBRARY_TITLE=POMOC do Biblioteki Mediow
+HELP_MEDIALIBRARY_01=Krzyzyk : Otwiera wybrane/odpala utwor
+HELP_MEDIALIBRARY_02=Kolko : Cofa do poprzedniego folderu
+HELP_MEDIALIBRARY_03=Kwadrat : Odtwarza wybrane
+HELP_MEDIALIBRARY_04=Start : Dodaje wybrane/utwor do playlisty
+HELP_MEDIALIBRARY_05=Krzyzyk : + Gora/Dol ocenia utwor

@@ -88,6 +88,7 @@ int addSelectionToPlaylist(char *where, int fastMode, char *m3uName){
     if (count){
         setCpuClock(222);
         setBusClock(111);
+        M3U_clear();
         M3U_open(m3uName);
         ML_queryDB(where, "title", offset, ML_BUFFERSIZE, localResult);
         for (i=0; i<count; i++){
@@ -416,10 +417,7 @@ int buildQueryMenu(char *select, int (*cancelFunction)()){
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
-    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
-    commonMenu.highlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-    if (!commonMenu.highlight)
-        errorLoadImage(buffer);
+    commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
     commonMenu.dataFeedFunction = queryDataFeed;
@@ -485,7 +483,7 @@ int search(){
     oslEndFrame();
 	oslSyncFrame();
 	setCpuClock(222);
-    char *searchString = requestString(langGetString("ASK_SEARCH_STRING"), "");
+    char *searchString = requestString(atoi(langGetString("OSK_LANGUAGE")), langGetString("ASK_SEARCH_STRING"), "");
     oslInitGfx(OSL_PF_8888, 1); //Re-init OSLib to avoid gaphics corruption!
 
     oslStartDrawing();
@@ -527,10 +525,7 @@ int buildMainMenu(){
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
-    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
-    commonMenu.highlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-    if (!commonMenu.highlight)
-        errorLoadImage(buffer);
+    commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
     commonMenu.interline = 1;

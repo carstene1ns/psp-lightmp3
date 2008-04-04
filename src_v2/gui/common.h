@@ -38,6 +38,7 @@ extern OSL_IMAGE *commonCPU;
 extern OSL_IMAGE *popupBkg;
 extern OSL_IMAGE *star;
 extern OSL_IMAGE *blankStar;
+extern OSL_IMAGE *commonMenuHighlight;
 
 extern OSL_FONT *fontNormal;
 
