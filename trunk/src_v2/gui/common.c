@@ -57,6 +57,7 @@ OSL_IMAGE *helpBkg;
 OSL_IMAGE *commonVolume;
 OSL_IMAGE *commonHeadphone;
 OSL_IMAGE *commonCPU;
+OSL_IMAGE *commonMenuHighlight;
 
 OSL_FONT *fontNormal;
 
@@ -143,6 +144,11 @@ int loadCommonGraphics(){
     if (!helpBkg)
         errorLoadImage(buffer);
 
+    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
+    commonMenuHighlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+    if (!commonMenuHighlight)
+        errorLoadImage(buffer);
+
     sprintf(buffer, "%s/fontNormal.oft", userSettings->skinImagesPath);
     fontNormal = oslLoadFontFile(buffer);
     if (!fontNormal)
@@ -174,6 +180,7 @@ int unLoadCommonGraphics(){
     oslDeleteImage(star);
     oslDeleteImage(blankStar);
     oslDeleteImage(helpBkg);
+    oslDeleteImage(commonMenuHighlight);
     oslDeleteFont(fontNormal);
     return 0;
 }
@@ -367,8 +374,9 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
 // Draw a confirm box:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawConfirm(char *title, char *message){
-    int startX = (480 - popupBkg->sizeX) / 2;
-    int startY = (272 - popupBkg->sizeY) / 2;
+    skinGetPosition("POS_POPUP", tempPos);
+    int startX = tempPos[0];
+    int startY = tempPos[1];
 
     oslSetFont(fontNormal);
     oslDrawImageXY(popupBkg, startX, startY);
@@ -386,8 +394,9 @@ int drawConfirm(char *title, char *message){
 // Draw a wait message
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawWait(char *title, char *message){
-    int startX = (480 - popupBkg->sizeX) / 2;
-    int startY = (272 - popupBkg->sizeY) / 2;
+    skinGetPosition("POS_POPUP", tempPos);
+    int startX = tempPos[0];
+    int startY = tempPos[1];
 
     oslSetFont(fontNormal);
     oslDrawImageXY(popupBkg, startX, startY);
@@ -404,8 +413,9 @@ int drawWait(char *title, char *message){
 // Draw a message box
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawMessageBox(char *title, char *message){
-    int startX = (480 - popupBkg->sizeX) / 2;
-    int startY = (272 - popupBkg->sizeY) / 2;
+    skinGetPosition("POS_POPUP", tempPos);
+    int startX = tempPos[0];
+    int startY = tempPos[1];
 
     oslSetFont(fontNormal);
     oslDrawImageXY(popupBkg, startX, startY);
@@ -424,8 +434,9 @@ int drawMessageBox(char *title, char *message){
 // Draw help screen:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawHelp(char *help){
-    int startX = (480 - helpBkg->sizeX) / 2;
-    int startY = (272 - helpBkg->sizeY) / 2;
+    skinGetPosition("POS_HELP", tempPos);
+    int startX = tempPos[0];
+    int startY = tempPos[1];
     int i = 0;
 
     oslSetFont(fontNormal);

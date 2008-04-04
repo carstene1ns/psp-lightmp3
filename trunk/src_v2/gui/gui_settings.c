@@ -33,7 +33,8 @@
 #include "../others/audioscrobbler.h"
 
 #define STATUS_CONFIRM_NONE 0
-#define STATUS_CONFIRM_APPLY 1
+#define STATUS_CONFIRM_SAVE 1
+#define STATUS_HELP 2
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -109,6 +110,45 @@ int getSettingVal(int index, char *value){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Init settings menu:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int initSettingsMenu(){
+    //Build menu:
+    commonMenu.first = 0;
+    commonMenu.selected = 0;
+    skinGetPosition("POS_SETTINGS", tempPos);
+    commonMenu.yPos = tempPos[1];
+    commonMenu.xPos = tempPos[0];
+    commonMenu.fastScrolling = 0;
+    commonMenu.align = ALIGN_LEFT;
+    sprintf(buffer, "%s/menubkg.png", userSettings->skinImagesPath);
+    commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+    if (!commonMenu.background)
+        errorLoadImage(buffer);
+    commonMenu.highlight = commonMenuHighlight;
+    commonMenu.width = commonMenu.background->sizeX;
+    commonMenu.height = commonMenu.background->sizeY;
+    commonMenu.interline = 1;
+    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
+    commonMenu.cancelFunction = NULL;
+
+    //Values menu:
+    commonSubMenu.yPos = tempPos[1];
+    commonSubMenu.xPos = tempPos[0] + 350;
+    commonSubMenu.align = ALIGN_RIGHT;
+    commonSubMenu.fastScrolling = 0;
+    commonSubMenu.background = NULL;
+    commonSubMenu.highlight = NULL;
+    commonSubMenu.width = commonMenu.width - 350;
+    commonSubMenu.height = commonMenu.height;
+    commonSubMenu.interline = commonMenu.interline;
+    commonSubMenu.maxNumberVisible = commonMenu.maxNumberVisible;
+    commonSubMenu.cancelFunction = NULL;
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Build settings menu:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
@@ -151,11 +191,19 @@ int changeSettingVal(int index, int delta){
                 }
             }
             if (current + delta < skinsCount && current + delta >= 0){
+                drawWait(langGetString("LOADING_SKIN_TITLE"), langGetString("LOADING_SKIN"));
+                oslEndDrawing();
+                oslEndFrame();
+                oslSyncFrame();
                 current += delta;
                 strcpy(userSettings->skinName, skinsList[current]);
+                sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
+                skinLoad(buffer);
                 sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
                 unLoadCommonGraphics();
                 loadCommonGraphics();
+                initSettingsMenu();
+                oslStartDrawing();
             }
             break;
         case 1:
@@ -241,54 +289,14 @@ int changeSettingVal(int index, int delta){
     return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Load menu images:
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int loadMenuImages(){
-    sprintf(buffer, "%s/menubkg.png", userSettings->skinImagesPath);
-    commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-    if (!commonMenu.background)
-        errorLoadImage(buffer);
-    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
-    commonMenu.highlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-    if (!commonMenu.highlight)
-        errorLoadImage(buffer);
-    return 0;
-}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Settings:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int gui_settings(){
     int confirmStatus = STATUS_CONFIRM_NONE;
 
-    //Build menu:
-    commonMenu.first = 0;
-    commonMenu.selected = 0;
-    skinGetPosition("POS_SETTINGS", tempPos);
-    commonMenu.yPos = tempPos[1];
-    commonMenu.xPos = tempPos[0];
-    commonMenu.fastScrolling = 0;
-    commonMenu.align = ALIGN_LEFT;
-    loadMenuImages();
-    commonMenu.width = commonMenu.background->sizeX;
-    commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 1;
-    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
-    commonMenu.cancelFunction = NULL;
-
-    //Values menu:
-    commonSubMenu.yPos = tempPos[1];
-    commonSubMenu.xPos = tempPos[0] + 350;
-    commonSubMenu.align = ALIGN_RIGHT;
-    commonSubMenu.fastScrolling = 0;
-    commonSubMenu.background = NULL;
-    commonSubMenu.highlight = NULL;
-    commonSubMenu.width = commonMenu.width - 350;
-    commonSubMenu.height = commonMenu.height;
-    commonSubMenu.interline = commonMenu.interline;
-    commonSubMenu.maxNumberVisible = commonMenu.maxNumberVisible;
-    commonSubMenu.cancelFunction = NULL;
-
+    initSettingsMenu();
     buildSettingsMenu(&commonMenu, &commonSubMenu);
 
     exitFlagSettings = 0;
@@ -299,35 +307,35 @@ int gui_settings(){
         drawMenu(&commonMenu);
         drawMenu(&commonSubMenu);
 
-        if (confirmStatus == STATUS_CONFIRM_APPLY)
-            drawConfirm(langGetString("CONFIRM_APPLY_SETTINGS_TITLE"), langGetString("CONFIRM_APPLY_SETTINGS"));
+        switch (confirmStatus){
+            case STATUS_CONFIRM_SAVE:
+                drawConfirm(langGetString("CONFIRM_SAVE_SETTINGS_TITLE"), langGetString("CONFIRM_SAVE_SETTINGS"));
+                break;
+            case STATUS_HELP:
+                drawHelp("SETTINGS");
+                break;
+        }
 
         oslReadKeys();
         if (!osl_pad.pressed.hold){
-            if (confirmStatus == STATUS_CONFIRM_APPLY){
+            if (confirmStatus == STATUS_CONFIRM_SAVE){
                 if(osl_pad.released.cross){
                     SETTINGS_save(userSettings);
-                    sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
-                    skinLoad(buffer);
-                    sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
-
-                    unLoadCommonGraphics();
-                    loadCommonGraphics();
-                    if (commonMenu.background)
-                        oslDeleteImage(commonMenu.background);
-                    if (commonMenu.highlight)
-                        oslDeleteImage(commonMenu.highlight);
-                    loadMenuImages();
                     confirmStatus = STATUS_CONFIRM_NONE;
                 }else if(osl_pad.pressed.circle){
                     confirmStatus = STATUS_CONFIRM_NONE;
                 }
+            }else if (confirmStatus == STATUS_HELP){
+                if (osl_pad.released.cross || osl_pad.released.circle)
+                    confirmStatus = STATUS_CONFIRM_NONE;
             }else{
                 processMenuKeys(&commonMenu);
                 commonSubMenu.selected = commonMenu.selected;
                 commonSubMenu.first = commonMenu.first;
 
-                if (osl_pad.pressed.right || osl_pad.analogX > ANALOG_SENS){
+                if (osl_pad.held.L && osl_pad.held.R){
+                    confirmStatus = STATUS_HELP;
+                }else if (osl_pad.pressed.right || osl_pad.analogX > ANALOG_SENS){
                     changeSettingVal(commonMenu.selected, +1);
                     buildSettingsMenu(&commonMenu, &commonSubMenu);
                     sceKernelDelayThread(100000);
@@ -336,7 +344,7 @@ int gui_settings(){
                     buildSettingsMenu(&commonMenu, &commonSubMenu);
                     sceKernelDelayThread(100000);
                 }else if(osl_pad.released.start){
-                    confirmStatus = STATUS_CONFIRM_APPLY;
+                    confirmStatus = STATUS_CONFIRM_SAVE;
                 }else if(osl_pad.released.R){
                     settingsRetValue = nextAppMode(MODE_SETTINGS);
                     exitFlagSettings = 1;

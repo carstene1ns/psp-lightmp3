@@ -64,7 +64,7 @@ int clearMenu(struct menuElements *menu){
     menu->height =  0;
     if (menu->background)
         oslDeleteImage(menu->background);
-    if (menu->highlight)
+    if (menu->highlight && menu->highlight != commonMenuHighlight)
         oslDeleteImage(menu->highlight);
     for (i=0; i < menu->numberOfElements; i++){
         strcpy(menu->elements[i].text, "");

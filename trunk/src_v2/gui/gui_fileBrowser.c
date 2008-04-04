@@ -157,10 +157,7 @@ int gui_fileBrowser(){
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
-    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
-    commonMenu.highlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-    if (!commonMenu.highlight)
-        errorLoadImage(buffer);
+    commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
     commonMenu.interline = 1;

@@ -23,6 +23,7 @@
 //#include <vorbis/vorbisfile.h> //ogg-vorbis
 #include "player.h"
 #include "oggplayer.h"
+#include "../system/opendir.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Globals
@@ -207,7 +208,7 @@ void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
         }*/
 	}
     if (!strlen(targetInfo->title))
-        strcpy(targetInfo->title, OGG_fileName);
+        getFileName(OGG_fileName, targetInfo->title);
 }
 
 void OGGgetInfo(){

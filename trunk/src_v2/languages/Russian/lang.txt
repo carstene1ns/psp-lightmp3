@@ -32,7 +32,7 @@ LAYER=Уровень
 FILE_FORMAT=Формат
 EMPHASIS=Эмфаза
 SLEEP_MODE=Спящий режим
-PLAY_MODE=Проигрывание
+PLAY_MODE=Воспроизведение
 STATUS=Статус
 VOLUME_BOOST=Усиление звука
 EQUALIZER=Эквалайзер
@@ -56,7 +56,7 @@ PLAY_MODE_4=В сл.порядке / повтор
 
 PLAYER_STATUS_0=Открытие файла
 PLAYER_STATUS_1=Пауза
-PLAYER_STATUS_2=Проигрывание
+PLAYER_STATUS_2=Воспроизведение
 
 CONFIRM_MESSAGE=X для подтверждения, O для отмены
 CONFIRM_LOAD_TITLE=ПОДТВЕРДИТЕ
@@ -97,8 +97,8 @@ HELP_PLAYER_02=L для предыдущего трека
 HELP_PLAYER_03=X для паузы/воспроизведения
 HELP_PLAYER_04=O для остановки
 HELP_PLAYER_05=квадрат для приглушения звука вкл/откл
-HELP_PLAYER_06=треугольник для выбора спящего режима
-HELP_PLAYER_07=SELECT для переключения режима воспроизведения
+HELP_PLAYER_06=треугольник смены спящего режима
+HELP_PLAYER_07=SELECT смены режима воспроизведения
 HELP_PLAYER_08=START для активации экономичного режима
 HELP_PLAYER_09=X + вверх/вниз для оценки трека
 
@@ -129,3 +129,36 @@ DONE=
 ALL=ВСЕ
 BOOST_NEW=Новый
 BOOST_OLD=Старый
+OSK_LANGUAGE=8
+
+HELP_FILE_BROWSER_TITLE=СПИСОК ФАЙЛОВ (ПОМОЩЬ)
+HELP_FILE_BROWSER_01=X ДЛЯ ОТРЫТИЯ ДИРЕКТОРИИ / ВОСПРОИЗВЕДЕНИЯ ФАЙЛА
+HELP_FILE_BROWSER_02=O ДЛЯ ПЕРЕМЕЩЕНИЯ НА УРОВЕНЬ ВЫШЕ
+HELP_FILE_BROWSER_03=КВАДРАТ ДЛЯ ВОСПРОИЗВЕДЕНИЯ ДИРЕКТОРИИ
+HELP_FILE_BROWSER_04=START ДЛЯ ДОБАВЛЕНИЯ ДИРЕКТОРИИ /ФАЙЛА В ПЛЕЙЛИСТ
+HELP_FILE_BROWSER_05=SELECT ДЛЯ АКТИВАЦИИ РЕЖИМА USB
+
+HELP_PLAYLIST_BROWSER_TITLE=ПЛЕЙЛИСТ (ПОМОЩЬ)
+HELP_PLAYLIST_BROWSER_01=X ДЛЯ ВОСПРОИЗВЕДЕНИЯ ПЛЕЙЛИСТА
+HELP_PLAYLIST_BROWSER_02=O ДЛЯ УДАЛЕНИЯ ПЛЕЙЛИСТА
+HELP_PLAYLIST_BROWSER_03=КВАДРАТ ДЛЯ ЗАГРУЗКИ ПЛЕЙЛИСТА В РЕДАКТОР
+HELP_PLAYLIST_BROWSER_04=START ДЛЯ ДОБАВЛЕНИЯ ПЛЕЙЛИСТА В РЕДАКТОР
+
+CONFIRM_ADD_PLAYLIST_TITLE=ПОДТВЕРДИТЕ
+CONFIRM_ADD_PLAYLIST=ДОБАВИТЬ ВЫБРАННЫЙ ПЛЕЙЛИСТ В ТЕКУЩИЙ?
+
+HELP_PLAYLIST_EDITOR_TITLE=РЕДАКТОР ПЛЕЙЛИСТА (ПОМОЩЬ)
+HELP_PLAYLIST_EDITOR_01=КВАДРАТ ДЛЯ ПЕРЕМЕЩЕНИЯ ТРЕКА ВВЕРХ
+HELP_PLAYLIST_EDITOR_02=X ДЛЯ ПЕРЕМЕЩЕНИЯ ТРЕКА ВНИЗ
+HELP_PLAYLIST_EDITOR_03=O ДЛЯ УДАЛЕНИЯ ТРЕКА ИЗ ПЛЕЙЛИСТА
+HELP_PLAYLIST_EDITOR_04=START ДЛЯ СОХРАНЕНИЯ ПЛЕЙЛИСТА
+HELP_PLAYLIST_EDITOR_05=SELECT – ОЧИСТИТЬ ПЛЕЙЛИСТ
+HELP_PLAYLIST_EDITOR_06=НОТА ДЛЯ ВОСПРОИЗВЕДЕНИЯ ПЛЕЙЛИСТА
+
+HELP_MEDIALIBRARY_TITLE=МЕДИА БИБЛИОТЕКА (ПОМОЩЬ)
+HELP_MEDIALIBRARY_01=X ДЛЯ ВХОДА В ДИРЕКТОРИЮ / ВОСПРОИЗВЕДЕНИЕ ТРЕКА
+HELP_MEDIALIBRARY_02=O ДЛЯ ПЕРЕМЕЩЕНИЯ НА УРОВЕНЬ ВЫШЕ 
+HELP_MEDIALIBRARY_03=КВАДРАТ ДЛЯ ВОСПРОИЗВЕДЕНИЯ ВЫБРАННОГО
+HELP_MEDIALIBRARY_04=START ДЛЯ ДОБАВЛЕНИЯ ДИРЕКТОРИИ / ТРЕКА В ПЛЕЙЛИСТ
+HELP_MEDIALIBRARY_05=X + ВВЕРХ/ВНИЗ ДЛЯ ОЦЕНКИ ТРЕКА
+

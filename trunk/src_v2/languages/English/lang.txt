@@ -88,8 +88,8 @@ SETTINGS_12=CPU Clock: MP3 Media Engine
 SETTINGS_13=CPU Clock: OGG Vorbis
 SETTINGS_14=CPU Clock: Flac
 SETTINGS_15=CPU Clock: ATRAC3
-CONFIRM_APPLY_SETTINGS_TITLE=Confirm
-CONFIRM_APPLY_SETTINGS=Apply the settings now?
+CONFIRM_SAVE_SETTINGS_TITLE=Confirm
+CONFIRM_SAVE_SETTINGS=Save settings now?
 
 HELP_PLAYER_TITLE=Player help
 HELP_PLAYER_01=R for next track
@@ -162,3 +162,13 @@ HELP_MEDIALIBRARY_02=Circle to go up one level
 HELP_MEDIALIBRARY_03=Square to play selection
 HELP_MEDIALIBRARY_04=Start to add selection/track to playlist
 HELP_MEDIALIBRARY_05=Cross + Up/Down to rate the track
+
+HELP_SETTINGS_TITLE=Settings help
+HELP_SETTINGS_01=Left/Right to cange setting
+HELP_SETTINGS_02=Start to save settings
+
+#0=Japanese, 1=English, 2=French, 3=Spanish, 4=German, 5=Italian, 6=Dutch, 7=Portuguese, 8=Russian, 9=Korean, 10-11=Chinese
+OSK_LANGUAGE=1
+
+LOADING_SKIN_TITLE=Please Wait
+LOADING_SKIN=Loading new skin

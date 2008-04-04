@@ -109,10 +109,7 @@ int gui_playlistsBrowser(){
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
-    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
-    commonMenu.highlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-    if (!commonMenu.highlight)
-        errorLoadImage(buffer);
+    commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
     commonMenu.interline = 1;
@@ -130,6 +127,7 @@ int gui_playlistsBrowser(){
 
         if (commonMenu.selected >= 0 && strcmp(buffer, commonMenu.elements[commonMenu.selected].text)){
             sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+            M3U_clear();
 			M3U_open(buffer);
 			strcpy(buffer, commonMenu.elements[commonMenu.selected].text);
         }
@@ -196,6 +194,7 @@ int gui_playlistsBrowser(){
                 }
             }else if (confirmStatus == STATUS_CONFIRM_ADD){
                 if(osl_pad.released.cross){
+                    M3U_clear();
                     M3U_open(tempM3Ufile);
                     sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                     M3U_open(buffer);

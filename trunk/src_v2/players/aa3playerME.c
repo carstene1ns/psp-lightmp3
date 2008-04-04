@@ -26,6 +26,8 @@
 #include "player.h"
 #include "id3.h"
 #include "aa3playerME.h"
+#include "../system/opendir.h"
+
 #define AT3_THREAD_PRIORITY 12
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
@@ -341,7 +343,7 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
         size -= tag_length;
 	}
     if (!strlen(targetInfo->title))
-        strcpy(targetInfo->title, AA3ME_fileName);
+        getFileName(AA3ME_fileName, targetInfo->title);
 	fclose(fp);
 }
 

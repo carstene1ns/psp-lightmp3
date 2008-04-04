@@ -2,6 +2,7 @@
 #include <string.h>
 #include <pspkernel.h>
 #include <stdlib.h>
+#include "../system/opendir.h"
 
 #include "id3.h"
 struct genre
@@ -574,6 +575,6 @@ struct ID3Tag ParseID3(char *mp3path)
     ParseID3v1(mp3path, &TmpID3);
     ParseID3v2(mp3path, &TmpID3);
     if (!strlen(TmpID3.ID3Title))
-        strcpy(TmpID3.ID3Title, mp3path);
+        getFileName(mp3path, TmpID3.ID3Title);
     return TmpID3;
 }

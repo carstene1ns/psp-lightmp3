@@ -86,7 +86,8 @@ void setBrightness(int brightness);
 // Power Callback:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int powerCallback(int unknown, int powerInfo, void *common){
-    if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_STANDBY) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
+    //if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_STANDBY) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
+    if (powerInfo & PSP_POWER_CB_SUSPENDING){
        if (!suspended){
            resuming = 1;
            //Suspend
@@ -100,9 +101,9 @@ int powerCallback(int unknown, int powerInfo, void *common){
            }
            suspended = 1;
        }
-    }else if ((powerInfo & PSP_POWER_CB_RESUMING)){
+    }else if (powerInfo & PSP_POWER_CB_RESUMING){
        resuming = 1;
-    }else if ((powerInfo & PSP_POWER_CB_RESUME_COMPLETE)){
+    }else if (powerInfo & PSP_POWER_CB_RESUME_COMPLETE){
        //Resume
        if (resumeFunct != NULL)
           (*resumeFunct)();

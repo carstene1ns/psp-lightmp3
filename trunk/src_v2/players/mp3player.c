@@ -28,6 +28,7 @@
 #include "mp3player.h"
 #include "pspaudiolib.h"
 #include "pspaudio_kernel.h"
+#include "../system/opendir.h"
 
 #define FALSE 0
 #define TRUE !FALSE
@@ -53,6 +54,7 @@ struct mad_frame Frame;
 struct mad_synth Synth;
 mad_timer_t Timer;
 int i;
+int MP3_outputInProgress = 0;
 
 // The following variables are maintained and updated by the tracker during playback
 static int MP3_isPlaying;		// Set to true when a mod is being played
@@ -205,6 +207,7 @@ static void MP3Callback(void *buffer, unsigned int samplesToWrite, void *pdata){
     Sample *destination = (Sample*)buffer;
 
     if (MP3_isPlaying == TRUE) {	//  Playing , so mix up a buffer
+        MP3_outputInProgress = 1;
     	while (samplesToWrite > 0) 	{
             const unsigned int samplesAvailable = Synth.pcm.length - samplesRead;
             if (samplesAvailable > samplesToWrite) {
@@ -233,6 +236,7 @@ static void MP3Callback(void *buffer, unsigned int samplesToWrite, void *pdata){
                 samplesToWrite -= samplesAvailable;
             }
         }
+        MP3_outputInProgress = 0;
     } else {			//  Not Playing , so clear buffer
 		int count;
 		for (count = 0; count < samplesToWrite; count++){
@@ -422,8 +426,8 @@ int MP3getInfo(){
                 }
             }
     		//Controllo il cambio di sample rate (ma non dovrebbe succedere)
-    		if (header.samplerate > MP3_info.hz)
-      		   MP3_info.hz = header.samplerate;
+    		//if (header.samplerate > MP3_info.hz)
+      		//   MP3_info.hz = header.samplerate;
 
             totalBitrate += header.bitrate;
             if (size == bufferSize)
@@ -538,6 +542,8 @@ void MP3_Pause(){
 int MP3_Stop(){
     //stop playing
     MP3_isPlaying = FALSE;
+    while (MP3_outputInProgress == 1)
+        sceKernelDelayThread(100000);
 
     return TRUE;
 }

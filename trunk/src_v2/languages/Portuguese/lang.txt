@@ -1,5 +1,6 @@
-#Translated by fabiom (fabiom2@gmail.com). English to Brazilian Portuguese - Version 1.0
-#Traduzido por fabiom (fabiom2@gmail.com). Ingles para o Portugues Brasileiro - Versao 1.0
+#Language   : Portuguese (brazilian)
+#By         : fabiom
+#Contacts   : fabiom2@gmail.com
 
 YES=Sim
 NO=Nao
@@ -53,7 +54,7 @@ PLAY_MODE_2=Repetir faixa
 PLAY_MODE_3=Aleatorio
 PLAY_MODE_4=Aleatorio/repetir
 
-PLAYER_STATUS_0=Abriando arquivo
+PLAYER_STATUS_0=Abrindo arquivo
 PLAYER_STATUS_1=Pausado
 PLAYER_STATUS_2=Reproduzindo
 
@@ -106,7 +107,7 @@ BROWSE_ALBUM=Navegar por album
 BROWSE_GENRE=Navegar por genero
 BROWSE_RATING=Navegar por avaliacao
 SEARCH=Procurar
-SCAN_MS=Procurar for midia no MS
+SCAN_MS=Procurar por midia no MS
 
 CONFIRM_SCAN_MS_TITLE=Confirmar
 CONFIRM_SCAN_MS=Procurar midia no Memory Stick?
@@ -123,3 +124,40 @@ WORKING=Funcionando
 
 #This is used for the message "xx% done"
 DONE=concluido
+
+################################################################################
+#2.0.0 BETA2
+################################################################################
+ALL=Todos
+BOOST_NEW=Novo
+BOOST_OLD=Antigo
+
+HELP_FILE_BROWSER_TITLE=Ajuda do navegador
+HELP_FILE_BROWSER_01=X para acessar diretorio/reproduzir arquivo
+HELP_FILE_BROWSER_02=CIRCULO para ir um nivel acima
+HELP_FILE_BROWSER_03=QUADRADO para reproduzir o diretorio
+HELP_FILE_BROWSER_04=START para adicionar diretorio/arquivo na lista
+HELP_FILE_BROWSER_05=SELECT para alterar o modo USB
+
+HELP_PLAYLIST_BROWSER_TITLE=Ajuda da lista
+HELP_PLAYLIST_BROWSER_01=X para reproduzir lista
+HELP_PLAYLIST_BROWSER_02=CIRCULO para remover lista
+HELP_PLAYLIST_BROWSER_03=QUADRADO para carregar lista no editor
+HELP_PLAYLIST_BROWSER_04=START para adicionar lista no editor
+
+CONFIRM_ADD_PLAYLIST_TITLE=Confirmar
+CONFIRM_ADD_PLAYLIST=Adicionar lista selecionada na atual?
+
+HELP_PLAYLIST_EDITOR_TITLE=Ajuda do editor de lista
+HELP_PLAYLIST_EDITOR_01=QUADRADO para subir a faixa
+HELP_PLAYLIST_EDITOR_02=X para descer a faixa
+HELP_PLAYLIST_EDITOR_03=CIRCULO para remover a faixa da lista
+HELP_PLAYLIST_EDITOR_04=START para salvar a lista
+HELP_PLAYLIST_EDITOR_05=SELECT para limpar a lista
+HELP_PLAYLIST_EDITOR_06=NOTA MUSICAL para reproduzir a lista
+HELP_MEDIALIBRARY_TITLE=Ajuda da biblioteca
+HELP_MEDIALIBRARY_01=X para selecionar/reproduzir faixa
+HELP_MEDIALIBRARY_02=CIRCULO para ir um nivel acima
+HELP_MEDIALIBRARY_03=QUADRADO para reproduzir a selecao
+HELP_MEDIALIBRARY_04=START para adicionar selecao/faixa na lista
+HELP_MEDIALIBRARY_05=X + CIMA/BAIXO para classificar a faixa

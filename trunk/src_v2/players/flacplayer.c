@@ -28,6 +28,7 @@
 #include <FLAC/metadata.h>
 #include "player.h"
 #include "flacplayer.h"
+#include "../system/opendir.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Globals
@@ -278,7 +279,7 @@ void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 		FLAC__metadata_object_delete(info);
 	}
     if (!strlen(targetInfo->title))
-        strcpy(targetInfo->title, FLAC_fileName);
+        getFileName(FLAC_fileName, targetInfo->title);
 }
 
 
