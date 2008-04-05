@@ -17,6 +17,7 @@
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pspkernel.h>
 #include <pspsdk.h>
+#include <psprtc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <oslib/oslib.h>
@@ -104,6 +105,9 @@ int getSettingVal(int index, char *value){
         case 14:
             sprintf(value, "%i", userSettings->CLOCK_AA3);
             break;
+        case 15:
+            sprintf(value, "%i", userSettings->KEY_AUTOREPEAT_GUI);
+            break;
     }
 
     return 0;
@@ -157,7 +161,7 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     char settingVal[10] = "";
     struct menuElement tMenuEl;
 
-    menu->numberOfElements = 15;
+    menu->numberOfElements = 16;
 
     values->first = menu->first;
     values->selected = menu->selected;
@@ -285,6 +289,12 @@ int changeSettingVal(int index, int delta){
                 userSettings->CLOCK_AA3 += delta;
                 AA3ME_defaultCPUClock = userSettings->CLOCK_AA3;
             break;
+        case 15:
+            if (userSettings->KEY_AUTOREPEAT_GUI + delta <= 30 && userSettings->KEY_AUTOREPEAT_GUI + delta >= 1){
+                userSettings->KEY_AUTOREPEAT_GUI += delta;
+                oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
+            }
+            break;
     }
     return 0;
 }
@@ -295,6 +305,8 @@ int changeSettingVal(int index, int delta){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int gui_settings(){
     int confirmStatus = STATUS_CONFIRM_NONE;
+    u64 lastAnalogTick = 0;
+    u64 currentTick = 0;
 
     initSettingsMenu();
     buildSettingsMenu(&commonMenu, &commonSubMenu);
@@ -317,6 +329,9 @@ int gui_settings(){
         }
 
         oslReadKeys();
+        sceRtcGetCurrentTick(&currentTick);
+        float fromLastKeys = (float)(currentTick - lastAnalogTick) / (float)sceRtcGetTickResolution();
+
         if (!osl_pad.pressed.hold){
             if (confirmStatus == STATUS_CONFIRM_SAVE){
                 if(osl_pad.released.cross){
@@ -335,14 +350,16 @@ int gui_settings(){
 
                 if (osl_pad.held.L && osl_pad.held.R){
                     confirmStatus = STATUS_HELP;
-                }else if (osl_pad.pressed.right || osl_pad.analogX > ANALOG_SENS){
+                }else if (osl_pad.pressed.right || (osl_pad.analogX > ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0)){
                     changeSettingVal(commonMenu.selected, +1);
                     buildSettingsMenu(&commonMenu, &commonSubMenu);
-                    sceKernelDelayThread(100000);
-                }else if (osl_pad.pressed.left || osl_pad.analogX < -ANALOG_SENS){
+                    if (osl_pad.analogX > ANALOG_SENS)
+                        sceRtcGetCurrentTick(&lastAnalogTick);
+                }else if (osl_pad.pressed.left || (osl_pad.analogX < -ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0)){
                     changeSettingVal(commonMenu.selected, -1);
                     buildSettingsMenu(&commonMenu, &commonSubMenu);
-                    sceKernelDelayThread(100000);
+                    if (osl_pad.analogX < -ANALOG_SENS)
+                        sceRtcGetCurrentTick(&lastAnalogTick);
                 }else if(osl_pad.released.start){
                     confirmStatus = STATUS_CONFIRM_SAVE;
                 }else if(osl_pad.released.R){

@@ -152,9 +152,10 @@ HELP_PLAYLIST_EDITOR_TITLE=Playlist editor help
 HELP_PLAYLIST_EDITOR_01=Square to move track up
 HELP_PLAYLIST_EDITOR_02=Cross to move track down
 HELP_PLAYLIST_EDITOR_03=Circle to remove track from playlist
-HELP_PLAYLIST_EDITOR_04=Start to save playlist
-HELP_PLAYLIST_EDITOR_05=Select to clear playlist
-HELP_PLAYLIST_EDITOR_06=Note to play playlist
+HELP_PLAYLIST_EDITOR_04=Triangle to check files
+HELP_PLAYLIST_EDITOR_05=Start to save playlist
+HELP_PLAYLIST_EDITOR_06=Select to clear playlist
+HELP_PLAYLIST_EDITOR_07=Note to play playlist
 
 HELP_MEDIALIBRARY_TITLE=Media Library help
 HELP_MEDIALIBRARY_01=Cross to enter selection/play track
@@ -172,3 +173,6 @@ OSK_LANGUAGE=1
 
 LOADING_SKIN_TITLE=Please Wait
 LOADING_SKIN=Loading new skin
+CHECKING_PLAYLIST=Checking playlist's files
+
+SETTINGS_16=Keys repeat interval

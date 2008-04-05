@@ -641,13 +641,13 @@ int gui_mediaLibrary(){
                         MLresult[commonMenu.selected - mlBufferPosition].rating = ML_MAX_RATING;
                     ratingChangedUpDown = 1;
                     ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
-                    sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
+                    sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
                 }else if (osl_pad.held.cross && osl_pad.held.down  && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                     if (--MLresult[commonMenu.selected - mlBufferPosition].rating < 0)
                         MLresult[commonMenu.selected - mlBufferPosition].rating = 0;
                     ratingChangedUpDown = 1;
                     ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
-                    sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
+                    sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
                 }else if(osl_pad.released.R){
                     mediaLibraryRetValue = nextAppMode(MODE_MEDIA_LIBRARY);
                     exitFlagMediaLibrary = 1;

@@ -45,3 +45,4 @@ int M3U_isModified();
 int M3U_forceModified(int modified);
 int M3U_clear();
 struct M3U_playList *M3U_getPlaylist();
+int M3U_checkFiles();

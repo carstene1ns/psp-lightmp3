@@ -35,6 +35,8 @@ struct settings{
 	int FADE_OUT;
     int MUTED_VOLUME;
     int BRIGHTNESS_CHECK;
+    int KEY_AUTOREPEAT_GUI;
+    int KEY_AUTOREPEAT_PLAYER;
 
 	//CPU clock for filetype:
     int CLOCK_GUI;

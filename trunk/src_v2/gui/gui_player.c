@@ -468,13 +468,13 @@ int playFile(char *fileName, char *trackMessage){
                     libEntry.rating = ML_MAX_RATING;
                 ratingChangedUpDown = 1;
                 ratingChangedCross= 1;
-                sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
+                sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
             }else if (osl_pad.held.cross && osl_pad.held.down){
                 if (--libEntry.rating < 0)
                     libEntry.rating = 0;
                 ratingChangedUpDown = 1;
                 ratingChangedCross= 1;
-                sceKernelDelayThread(KEY_AUTOREPEAT_PLAYER*15000);
+                sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
             }else if (osl_pad.released.circle){
                 (*endFunct)();
                 playerStatus = 0;
@@ -859,8 +859,8 @@ int gui_player(){
     strcpy(playerStatusDesc[1], langGetString("PLAYER_STATUS_1"));
     strcpy(playerStatusDesc[2], langGetString("PLAYER_STATUS_2"));
 
-    oslSetKeyAutorepeatInit(KEY_AUTOREPEAT_PLAYER);
-    oslSetKeyAutorepeatInterval(KEY_AUTOREPEAT_PLAYER);
+    oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_PLAYER);
+    oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_PLAYER);
 
     char dir[264] = "";
     char ext[5] = "";
@@ -889,7 +889,7 @@ int gui_player(){
     if (userSettings->CLOCK_AUTO)
       setCpuClock(userSettings->CLOCK_GUI);
 
-    oslSetKeyAutorepeatInit(KEY_AUTOREPEAT_GUI);
-    oslSetKeyAutorepeatInterval(KEY_AUTOREPEAT_GUI);
+    oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
+    oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
     return playerRetValue;
 }

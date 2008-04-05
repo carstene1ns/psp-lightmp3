@@ -226,6 +226,24 @@ int gui_playlistEditor(){
                     playlistEditorRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_PLAYLIST_EDITOR;
                     exitFlagPlaylistEditor = 1;
+                }else if(osl_pad.pressed.triangle && M3U_getSongCount()){
+                    drawWait(langGetString("WAIT"), langGetString("CHECKING_PLAYLIST"));
+                	oslEndDrawing();
+                    oslEndFrame();
+                	oslSyncFrame();
+                    M3U_checkFiles();
+                    oldSelected = commonMenu.selected;
+                    oldFirst = commonMenu.first;
+                    buildMenuFromPlaylist(&commonMenu);
+                    if (oldSelected < M3U_getSongCount())
+        				commonMenu.selected = oldSelected;
+                    else
+                        commonMenu.selected = oldSelected - 1;
+                    if (oldSelected < M3U_getSongCount())
+        				commonMenu.first = oldFirst;
+                    else
+        				commonMenu.first = oldFirst - 1;
+                    continue;
                 }else if(osl_pad.pressed.square && M3U_getSongCount()){
         			if (M3U_moveSongUp(commonMenu.selected) == 0){
                         oldSelected = commonMenu.selected;

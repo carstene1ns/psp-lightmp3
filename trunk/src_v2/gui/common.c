@@ -476,6 +476,6 @@ int formatHHMMSS(int seconds, char *timeString){
     int hh = seconds / 3600;
     int mm = (seconds - hh * 3600) / 60;
     int ss = seconds - hh * 3600 - mm * 60;
-    sprintf(buffer, "%2.2i:%2.2i:%2.2i", hh, mm, ss);
+    sprintf(timeString, "%2.2i:%2.2i:%2.2i", hh, mm, ss);
     return 0;
 }
