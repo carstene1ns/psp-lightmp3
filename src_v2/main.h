@@ -22,8 +22,6 @@
 
 #define VERSION "2.0.0b2"
 
-#define KEY_AUTOREPEAT_GUI 5
-#define KEY_AUTOREPEAT_PLAYER 10
 #define ML_DB "mediaLibrary.db"
 
 #define MODE_FILEBROWSER 0

@@ -2,6 +2,7 @@
 //       LightMP3, 2007, 2008 by Sakya       //
 ///////////////////////////////////////////////
 Homepage   : http://sakya.altervista.org/new/index.php?mod=none_lightmp3
+Forums     : http://www.sakya.it/forums/viewforum.php?f=4
 Google Code: http://code.google.com/p/lightmp3/
 Contacts   : sakya_tg@yahoo.it
 To donate  : https://www.paypal.com/xclick/business=sakya_tg@yahoo.it&item_name=lightmp3&item_number=0001&no_note=1&tax=0&currency_code=EUR
@@ -145,10 +146,19 @@ I built libMad, libTremor and libFLAC with
 CFLAGS += -O3 -frename-registers -ffast-math -fomit-frame-pointer
 
 
+SKINS:
+------
+LightMP3 is totally skinnable.
+For further informations please refer to this forum:
+http://www.sakya.it/forums/viewforum.php?f=5
+
+
 BUGS:
 -----
 To report a bug or check for known bugs please refer to:
 http://code.google.com/p/lightmp3/issues/list
+You can also check this forum:
+http://www.sakya.it/forums/viewforum.php?f=4
 
 
 SOURCE:

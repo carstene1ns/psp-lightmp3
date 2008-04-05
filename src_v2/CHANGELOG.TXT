@@ -12,6 +12,9 @@ Version 2.0.0 BETA2
 -Added help (press L + R)
 -Added: you can add selected playlist to the current one (press START in the playlist browser)
 -Added: Directories are marked with a starting "/" in the file browser
+-Fixed: stop FLAC playback
+-Added: You can check a playlist with triangle (removes dead-links)
+-Added: option for keys autorepeat interval
 
 
 Version 2.0.0 BETA1

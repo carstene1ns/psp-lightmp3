@@ -62,6 +62,8 @@ int drawPlaylistInfo(){
     oslDrawString(tempPos[0], tempPos[1], langGetString("PLAYLIST_NAME"));
     skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("TOTAL_TRACKS"));
+    skinGetPosition("POS_PLAYLIST_TOTAL_TIME_LABEL", tempPos);
+    oslDrawString(tempPos[0], tempPos[1], langGetString("TOTAL_TIME"));
 
     if (commonMenu.numberOfElements){
         skinGetColor("RGBA_TEXT", tempColor);

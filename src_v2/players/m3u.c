@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "m3u.h"
+#include "../system/opendir.h"
 
 struct M3U_playList lPlayList;
 struct M3U_songEntry emptySong;
@@ -78,10 +79,10 @@ int M3U_open(char *fileName){
 	}
 
 	while(fgets(lineText, 256, f) != NULL){
-		if (strstr(lineText, "#EXTINF:") != NULL){
+		if (!strncmp(lineText, "#EXTINF:", 8)){
 			//Length and title:
 			splitSongInfo(lineText, chrLength, title);
-		}else if (strstr(lineText, "#EXTM3U") != NULL){
+		}else if (!strncmp(lineText, "#EXTM3U", 7)){
 			//Nothing to do. :)
 		}else if (strlen(lineText) > 2){
 			//Store song info:
@@ -266,4 +267,14 @@ int M3U_clear(){
 //Returns the whole playlist:
 struct M3U_playList *M3U_getPlaylist(){
     return &lPlayList;
+}
+
+//Check for files existance:
+int M3U_checkFiles(){
+    int i = 0;
+	for (i=0; i < lPlayList.songCount; i++){
+        if (fileExists(lPlayList.songs[i].fileName) < 0)
+            M3U_removeSong(i--);
+    }
+    return 0;
 }

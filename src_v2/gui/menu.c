@@ -18,6 +18,7 @@
 #include <pspkernel.h>
 #include <pspsdk.h>
 #include <psppower.h>
+#include <psprtc.h>
 #include <stdio.h>
 #include <oslib/oslib.h>
 #include "common.h"
@@ -134,9 +135,14 @@ int drawMenu(struct menuElements *menu){
 // NOTE: the oslReadKeys(); must be done in the calling function.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int processMenuKeys(struct menuElements *menu){
+    static u64 lastAnalogTick = 0;
+    u64 currentTick = 0;
     struct menuElement selected;
 
-    if (menu->numberOfElements && (osl_pad.pressed.down || osl_pad.analogY > ANALOG_SENS)){
+    sceRtcGetCurrentTick(&currentTick);
+    float fromLastKeys = (float)(currentTick - lastAnalogTick) / (float)sceRtcGetTickResolution();
+
+    if (menu->numberOfElements && (osl_pad.pressed.down || (osl_pad.analogY > ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
         if (menu->selected < menu->numberOfElements - 1){
             menu->selected++;
             if (menu->selected >= menu->first + menu->maxNumberVisible)
@@ -147,9 +153,9 @@ int processMenuKeys(struct menuElements *menu){
         }
         if (osl_pad.analogY > ANALOG_SENS){
             scePowerTick(0);
-            sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
+            sceRtcGetCurrentTick(&lastAnalogTick);
         }
-    }else if (menu->numberOfElements && (osl_pad.pressed.up || osl_pad.analogY < -ANALOG_SENS)){
+    }else if (menu->numberOfElements && (osl_pad.pressed.up || (osl_pad.analogY < -ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
         if (menu->selected > 0){
             menu->selected--;
             if (menu->selected < menu->first)
@@ -162,9 +168,9 @@ int processMenuKeys(struct menuElements *menu){
         }
         if (osl_pad.analogY < -ANALOG_SENS){
             scePowerTick(0);
-            sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
+            sceRtcGetCurrentTick(&lastAnalogTick);
         }
-    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.right || osl_pad.analogX > ANALOG_SENS)){
+    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.right || (osl_pad.analogX > ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
     	if (menu->first + menu->maxNumberVisible < menu->numberOfElements){
     		menu->first = menu->first + menu->maxNumberVisible;
     		menu->selected += menu->maxNumberVisible;
@@ -176,9 +182,9 @@ int processMenuKeys(struct menuElements *menu){
     	}
         if (osl_pad.analogX > ANALOG_SENS){
             scePowerTick(0);
-            sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
+            sceRtcGetCurrentTick(&lastAnalogTick);
         }
-    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.left || osl_pad.analogX < -ANALOG_SENS)){
+    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.left || (osl_pad.analogX < -ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
     	if (menu->first - menu->maxNumberVisible >= 0){
     		menu->first = menu->first - menu->maxNumberVisible;
     		menu->selected -= menu->maxNumberVisible;
@@ -188,7 +194,7 @@ int processMenuKeys(struct menuElements *menu){
     	}
         if (osl_pad.analogX < -ANALOG_SENS){
             scePowerTick(0);
-            sceKernelDelayThread(KEY_AUTOREPEAT_GUI*15000);
+            sceRtcGetCurrentTick(&lastAnalogTick);
         }
     }else if (menu->numberOfElements && osl_pad.pressed.cross){
         selected = menu->elements[menu->selected];

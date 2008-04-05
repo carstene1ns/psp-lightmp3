@@ -116,7 +116,11 @@ int SETTINGS_load(char *fileName){
 								localSettings.CLOCK_DELTA_ECONOMY_MODE = atoi(result);
 							}else if (strcmp(parName, "SKIN") == 0){
 								strcpy(localSettings.skinName, result);
-							}
+							}else if (strcmp(parName, "KEY_AUTOREPEAT_PLAYER") == 0){
+								localSettings.KEY_AUTOREPEAT_PLAYER = atoi(result);
+							}else if (strcmp(parName, "KEY_AUTOREPEAT_GUI") == 0){
+								localSettings.KEY_AUTOREPEAT_GUI = atoi(result);
+                            }
 						}
 						element++;
 					}
@@ -161,6 +165,8 @@ struct settings *SETTINGS_default(){
 	localSettings.CLOCK_DELTA_ECONOMY_MODE = 1;
 	localSettings.USE_OSK = 1;
     localSettings.playMode = 0;
+    localSettings.KEY_AUTOREPEAT_GUI = 10;
+    localSettings.KEY_AUTOREPEAT_PLAYER = 10;
 
 	//Skin's settings:
     strcpy(localSettings.skinName, "default");
@@ -230,6 +236,10 @@ int SETTINGS_save(struct settings tSettings){
     snprintf(testo, sizeof(testo), "CLOCK_AAC=%i\n", tSettings.CLOCK_AAC);
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "CLOCK_DELTA_ECONOMY_MODE=%i\n", tSettings.CLOCK_DELTA_ECONOMY_MODE);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "KEY_AUTOREPEAT_PLAYER=%i\n", tSettings.KEY_AUTOREPEAT_PLAYER);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "KEY_AUTOREPEAT_GUI=%i\n", tSettings.KEY_AUTOREPEAT_GUI);
     fwrite(testo, 1, strlen(testo), f);
 
 	fclose(f);

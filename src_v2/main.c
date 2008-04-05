@@ -202,8 +202,8 @@ int initOSLib(){
     oslInitGfx(OSL_PF_8888, 1);
     oslSetQuitOnLoadFailure(0);
     //Init input
-    oslSetKeyAutorepeatInit(KEY_AUTOREPEAT_GUI);
-    oslSetKeyAutorepeatInterval(KEY_AUTOREPEAT_GUI);
+    //oslSetKeyAutorepeatInit(KEY_AUTOREPEAT_GUI);
+    //oslSetKeyAutorepeatInterval(KEY_AUTOREPEAT_GUI);
     oslSetKeyAnalogToDPad(0);
     oslSetExitCallback(exit_callback);
     oslSetBkColor(RGBA(0, 0, 0, 0));
@@ -295,6 +295,9 @@ int main(){
     }
     strcpy(userSettings->ebootPath, ebootDirectory);
     userSettings->displayStatus = 1;
+
+    oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
+    oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
 
     //Temp m3u filename:
     sprintf(MLtempM3Ufile, "%s%s", userSettings->ebootPath, "MLtemp.m3u");
