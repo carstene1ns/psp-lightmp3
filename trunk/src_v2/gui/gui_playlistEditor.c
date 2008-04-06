@@ -196,7 +196,7 @@ int gui_playlistEditor(){
         				commonMenu.selected = oldSelected;
                     else
                         commonMenu.selected = oldSelected - 1;
-                    if (oldSelected < M3U_getSongCount())
+                    if (oldFirst < M3U_getSongCount())
         				commonMenu.first = oldFirst;
                     else
         				commonMenu.first = oldFirst - 1;
@@ -239,7 +239,7 @@ int gui_playlistEditor(){
         				commonMenu.selected = oldSelected;
                     else
                         commonMenu.selected = oldSelected - 1;
-                    if (oldSelected < M3U_getSongCount())
+                    if (oldFirst < M3U_getSongCount())
         				commonMenu.first = oldFirst;
                     else
         				commonMenu.first = oldFirst - 1;
