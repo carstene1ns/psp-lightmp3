@@ -219,13 +219,15 @@ void initController(){
     pspSdkSetK1(k1);
 }
 
-void readButtons(SceCtrlData *pad_data, int count){
+int readButtons(SceCtrlData *pad_data, int count){
+    int ret;
     k1 = pspSdkSetK1(0);
     if (sceKernelDevkitVersion() < 0x03070110)
-       sceCtrlReadBufferPositive(pad_data, count);
+       ret = sceCtrlReadBufferPositive(pad_data, count);
     else
-       sceCtrlReadBufferPositive371(pad_data, count);
+       ret = sceCtrlReadBufferPositive371(pad_data, count);
     pspSdkSetK1(k1);
+    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

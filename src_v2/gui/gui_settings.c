@@ -132,7 +132,7 @@ int initSettingsMenu(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 1;
+    commonMenu.interline = 0;
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
 
@@ -305,9 +305,6 @@ int changeSettingVal(int index, int delta){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int gui_settings(){
     int confirmStatus = STATUS_CONFIRM_NONE;
-    u64 lastAnalogTick = 0;
-    u64 currentTick = 0;
-
     initSettingsMenu();
     buildSettingsMenu(&commonMenu, &commonSubMenu);
 
@@ -329,46 +326,37 @@ int gui_settings(){
         }
 
         oslReadKeys();
-        sceRtcGetCurrentTick(&currentTick);
-        float fromLastKeys = (float)(currentTick - lastAnalogTick) / (float)sceRtcGetTickResolution();
+        if (confirmStatus == STATUS_CONFIRM_SAVE){
+            if(osl_pad.released.cross){
+                SETTINGS_save(userSettings);
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }else if(osl_pad.pressed.circle){
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }
+        }else if (confirmStatus == STATUS_HELP){
+            if (osl_pad.released.cross || osl_pad.released.circle)
+                confirmStatus = STATUS_CONFIRM_NONE;
+        }else{
+            processMenuKeys(&commonMenu);
+            commonSubMenu.selected = commonMenu.selected;
+            commonSubMenu.first = commonMenu.first;
 
-        if (!osl_pad.pressed.hold){
-            if (confirmStatus == STATUS_CONFIRM_SAVE){
-                if(osl_pad.released.cross){
-                    SETTINGS_save(userSettings);
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_pad.pressed.circle){
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }
-            }else if (confirmStatus == STATUS_HELP){
-                if (osl_pad.released.cross || osl_pad.released.circle)
-                    confirmStatus = STATUS_CONFIRM_NONE;
-            }else{
-                processMenuKeys(&commonMenu);
-                commonSubMenu.selected = commonMenu.selected;
-                commonSubMenu.first = commonMenu.first;
-
-                if (osl_pad.held.L && osl_pad.held.R){
-                    confirmStatus = STATUS_HELP;
-                }else if (osl_pad.pressed.right || (osl_pad.analogX > ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0)){
-                    changeSettingVal(commonMenu.selected, +1);
-                    buildSettingsMenu(&commonMenu, &commonSubMenu);
-                    if (osl_pad.analogX > ANALOG_SENS)
-                        sceRtcGetCurrentTick(&lastAnalogTick);
-                }else if (osl_pad.pressed.left || (osl_pad.analogX < -ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0)){
-                    changeSettingVal(commonMenu.selected, -1);
-                    buildSettingsMenu(&commonMenu, &commonSubMenu);
-                    if (osl_pad.analogX < -ANALOG_SENS)
-                        sceRtcGetCurrentTick(&lastAnalogTick);
-                }else if(osl_pad.released.start){
-                    confirmStatus = STATUS_CONFIRM_SAVE;
-                }else if(osl_pad.released.R){
-                    settingsRetValue = nextAppMode(MODE_SETTINGS);
-                    exitFlagSettings = 1;
-                }else if(osl_pad.released.L){
-                    settingsRetValue = previousAppMode(MODE_SETTINGS);
-                    exitFlagSettings = 1;
-                }
+            if (osl_pad.held.L && osl_pad.held.R){
+                confirmStatus = STATUS_HELP;
+            }else if (osl_pad.pressed.right){
+                changeSettingVal(commonMenu.selected, +1);
+                buildSettingsMenu(&commonMenu, &commonSubMenu);
+            }else if (osl_pad.pressed.left){
+                changeSettingVal(commonMenu.selected, -1);
+                buildSettingsMenu(&commonMenu, &commonSubMenu);
+            }else if(osl_pad.released.start){
+                confirmStatus = STATUS_CONFIRM_SAVE;
+            }else if(osl_pad.released.R){
+                settingsRetValue = nextAppMode(MODE_SETTINGS);
+                exitFlagSettings = 1;
+            }else if(osl_pad.released.L){
+                settingsRetValue = previousAppMode(MODE_SETTINGS);
+                exitFlagSettings = 1;
             }
         }
     	oslEndDrawing();

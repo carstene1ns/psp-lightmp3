@@ -1,3 +1,7 @@
+#Language   : Italiano
+#By         : Magic PSP
+#Contacts   : aliquo93@live.it (MSN)/aliquo93@hotmail.it (email)
+
 YES=Si
 NO=No
 WAIT=Attendere...
@@ -6,7 +10,7 @@ CHECK_BRIGHTNESS=Abbassare la luminosità?
 BRIGHTNESS_NO=No
 BRIGHTNESS_YES_WARNING=Si, con avviso
 BRIGHTNESS_YES=Si, senza avviso
-FREE_MEMORY=Memoria libera:
+FREE_MEMORY=Mem. libera:
 
 USB_ACTIVE=USB attivato
 USB_MESSAGE=Premere SELECT per disattivare l'USB.
@@ -17,7 +21,7 @@ GENRE=Genere
 YEAR=Anno
 TIME=Durata
 TRACK=Traccia
-ADDING_PLAYLIST=Traccia aggiunta nella playlist
+ADDING_PLAYLIST=Aggiunta traccia in corso
 RATING=Voto
 PLAYED=Avviata v.
 NOT_SUPPORTED=Non supportato
@@ -98,9 +102,9 @@ HELP_PLAYER_07=Premi SELECT per passare al play mode
 HELP_PLAYER_08=Premi START per spegnere l'LCD
 HELP_PLAYER_09=Premi X + SU/GIU per valutare la traccia
 
-BROWSE_ARTIST=Ordina per Artista
-BROWSE_ALBUM=Ordina per Album
-BROWSE_GENRE=Ordina per Genere
+BROWSE_ARTIST=Ordina per artista
+BROWSE_ALBUM=Ordina per album
+BROWSE_GENRE=Ordina per genere
 BROWSE_RATING=Ordina per valutazione
 SEARCH=Cerca
 SCAN_MS=Ricerca brani nella MS
@@ -108,7 +112,7 @@ SCAN_MS=Ricerca brani nella MS
 CONFIRM_SCAN_MS_TITLE=Conferma
 CONFIRM_SCAN_MS=Ricercare brani nella MS?
 CHECKING_FILE=Controllo files nella MS
-SCANNING=Ricercare brani nella MS
+SCANNING=Ricerca in corso
 MESSAGEBOX_CONTINUE=Premi X per continuare
 SCAN_FINISHED=Ricerca completata
 MEDIA_FOUND=Trovati XX brani.
@@ -119,4 +123,42 @@ TOTAL_TIME=Tempo totale
 WORKING=Elaborazione
 
 #This is used for the message "xx% done"
-DONE=OK
+DONE=Fatto
+
+################################################################################
+#2.0.0 BETA2
+################################################################################
+ALL=Tutti
+BOOST_NEW=Nuovo
+BOOST_OLD=Vecchio
+
+HELP_FILE_BROWSER_TITLE=Aiuto file browser
+HELP_FILE_BROWSER_01=X per entrare nella cartella/riprodurre brano
+HELP_FILE_BROWSER_02=O per andare nella cartella precedente
+HELP_FILE_BROWSER_03=[] per riprodurre l'intera cartella
+HELP_FILE_BROWSER_04=START per aggiungere cartella/brano nella playlist
+HELP_FILE_BROWSER_05=SELECT per attivare la modalità USB
+
+HELP_PLAYLIST_BROWSER_TITLE=Aiuto playlist
+HELP_PLAYLIST_BROWSER_01=X per riprodurre la playlist
+HELP_PLAYLIST_BROWSER_02=O per eliminare la playlist
+HELP_PLAYLIST_BROWSER_03=[] per caricare la playlist nell'editor
+HELP_PLAYLIST_BROWSER_04=START per aggiungere la playlist nell'editor
+
+CONFIRM_ADD_PLAYLIST_TITLE=Conferma
+CONFIRM_ADD_PLAYLIST=Aggiungere la playlist selezionata?
+
+HELP_PLAYLIST_EDITOR_TITLE=Aiuto modifica playlist
+HELP_PLAYLIST_EDITOR_01=[] per spostare la traccia in alto
+HELP_PLAYLIST_EDITOR_02=X per spostare la traccia in basso
+HELP_PLAYLIST_EDITOR_03=O per eliminare la traccia dalla playlist
+HELP_PLAYLIST_EDITOR_04=START per salvare la playlist
+HELP_PLAYLIST_EDITOR_05=SELECT per azzerare la playlist
+HELP_PLAYLIST_EDITOR_06=Nota per riprodurre la playlist
+
+HELP_MEDIALIBRARY_TITLE=Aiuto Media Library
+HELP_MEDIALIBRARY_01=X per cliccare selezionati/riprodurre traccia
+HELP_MEDIALIBRARY_02=O per tornare indietro
+HELP_MEDIALIBRARY_03=[] per riprodurre selezionati
+HELP_MEDIALIBRARY_04=START per aggiungere selez./traccia nella playlist
+HELP_MEDIALIBRARY_05=X + SU/GIU per valutare la traccia

@@ -45,7 +45,7 @@
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(7*1024);
+PSP_HEAP_SIZE_KB(12*1024);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -65,6 +65,7 @@ struct menuElements commonMenu;
 struct menuElements commonSubMenu;
 int tempPos[2];
 int tempColor[4];
+int tempColorShadow[4];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions imported from prx:
@@ -81,6 +82,7 @@ int displayEnable(void);
 int displayDisable(void);
 int getBrightness();
 void setBrightness(int brightness);
+int readButtons(SceCtrlData *pad_data, int count);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Power Callback:
@@ -198,15 +200,15 @@ int splashThread(SceSize args, void *argp){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int initOSLib(){
     oslInit(0);
-    //oslInitGfx(OSL_PF_5650, 1);
     oslInitGfx(OSL_PF_8888, 1);
     oslSetQuitOnLoadFailure(0);
     //Init input
-    //oslSetKeyAutorepeatInit(KEY_AUTOREPEAT_GUI);
-    //oslSetKeyAutorepeatInterval(KEY_AUTOREPEAT_GUI);
-    oslSetKeyAnalogToDPad(0);
+    //oslSetReadKeysFunction(readButtons);
+    oslSetHoldForAnalog(1);
+    oslSetKeyAnalogToDPad(ANALOG_SENS);
     oslSetExitCallback(exit_callback);
     oslSetBkColor(RGBA(0, 0, 0, 0));
+    oslIntraFontInit(INTRAFONT_CACHE_MED);
     return 0;
 }
 
@@ -367,6 +369,7 @@ int main(){
 
     //Wait for splash:
     sceKernelWaitThreadEnd(splash_thid, NULL);
+    oslSetReadKeysFunction(readButtons);
 
 	//Controllo luminosità:
     int initialBrightness = getBrightness();

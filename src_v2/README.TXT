@@ -137,6 +137,7 @@ LightMP3 will look for cover:
 DEPENDENCIES
 ------------
 To compile LightMP3 you need:
+-OldSchool Library MOD (OSLib MOD)
 -libMad
 -libTremor
 -libFLAC (built without OGG support)
