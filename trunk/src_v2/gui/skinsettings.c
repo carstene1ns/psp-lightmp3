@@ -268,7 +268,7 @@ void skinLoadList(char *dirName){
         strcpy(skinsList[i], "");
     skinsCount = 0;
 
-    char *result = opendir_open(&dhDir, dirName, NULL, 1, 1);
+    char *result = opendir_open(&dhDir, dirName, NULL, 0, 1);
 	if (result == 0){
         sortDirectory(&dhDir);
         for (i = 0; i < dhDir.number_of_directory_entries; i++)

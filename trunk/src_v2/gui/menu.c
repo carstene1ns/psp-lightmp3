@@ -26,8 +26,7 @@
 #include "main.h"
 #include "menu.h"
 
-OSL_FONT *fontNormal;
-OSL_FONT *fontSelected;
+OSL_FONT *fontMenuNormal;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -39,14 +38,14 @@ OSL_FONT *fontSelected;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int initMenu(){
     char buffer[264];
-    sprintf(buffer, "%s/fontNormal.oft", userSettings->skinImagesPath);
-    fontNormal = oslLoadFontFile(buffer);
-    if (!fontNormal)
+    //sprintf(buffer, "%s/fontNormal.oft", userSettings->skinImagesPath);
+    sprintf(buffer, "flash0:/font/ltn0.pgf");
+    fontMenuNormal = oslLoadFontFile(buffer);
+    if (!fontMenuNormal)
         errorLoadImage(buffer);
-    sprintf(buffer, "%s/fontSel.oft", userSettings->skinImagesPath);
-    fontSelected = oslLoadFontFile(buffer);
-    if (!fontSelected)
-        errorLoadImage(buffer);
+    oslIntraFontSetStyle(fontMenuNormal, 0.5f,0xFFFFFFFF,0xFF000000,INTRAFONT_ALIGN_LEFT);
+    fontMenuNormal->charHeight -= 2;
+
     return 0;
 }
 
@@ -88,35 +87,38 @@ int drawMenu(struct menuElements *menu){
     int xPos = 0;
     int yPos = 0;
 
-    int startY = menu->yPos + (float)(menu->height -  menu->maxNumberVisible * (fontNormal->charHeight + menu->interline)) / 2.0;
+    int startY = menu->yPos + (float)(menu->height -  menu->maxNumberVisible * (fontMenuNormal->charHeight + menu->interline)) / 2.0;
     if (menu->background != NULL){
         oslDrawImageXY(menu->background, menu->xPos, menu->yPos);
         if (menu->highlight != NULL)
             menu->highlight->stretchX = menu->background->sizeX;
     }
 
+    oslSetFont(fontMenuNormal);
     for (i=menu->first; i<menu->first + menu->maxNumberVisible; i++){
         if (i >= menu->numberOfElements)
             break;
 
-        yPos = startY + fontNormal->charHeight * count + menu->interline * count;
+        yPos = startY + fontMenuNormal->charHeight * count + menu->interline * count;
         if (i == menu->selected){
-            oslSetFont(fontSelected);
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
-            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+            skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
+            oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
             if (menu->highlight != NULL)
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
         }else{
-            oslSetFont(fontNormal);
             skinGetColor("RGBA_MENU_TEXT", tempColor);
-            oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+            skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
+            oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
 
         if (menu->dataFeedFunction != NULL)
             menu->dataFeedFunction(i, &menu->elements[i]);
 
         oslSetBkColor(RGBA(0, 0, 0, 0));
-        oslSetFont(fontNormal);
+        //oslSetFont(fontMenuNormal);
         if (menu->align == ALIGN_LEFT)
             xPos = menu->xPos + 4;
         else if (menu->align == ALIGN_RIGHT)
@@ -135,14 +137,12 @@ int drawMenu(struct menuElements *menu){
 // NOTE: the oslReadKeys(); must be done in the calling function.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int processMenuKeys(struct menuElements *menu){
-    static u64 lastAnalogTick = 0;
-    u64 currentTick = 0;
     struct menuElement selected;
 
-    sceRtcGetCurrentTick(&currentTick);
-    float fromLastKeys = (float)(currentTick - lastAnalogTick) / (float)sceRtcGetTickResolution();
+    if (checkHold())
+        return 0;
 
-    if (menu->numberOfElements && (osl_pad.pressed.down || (osl_pad.analogY > ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
+    if (menu->numberOfElements && osl_pad.pressed.down){
         if (menu->selected < menu->numberOfElements - 1){
             menu->selected++;
             if (menu->selected >= menu->first + menu->maxNumberVisible)
@@ -151,11 +151,7 @@ int processMenuKeys(struct menuElements *menu){
             menu->selected = 0;
             menu->first = 0;
         }
-        if (osl_pad.analogY > ANALOG_SENS){
-            scePowerTick(0);
-            sceRtcGetCurrentTick(&lastAnalogTick);
-        }
-    }else if (menu->numberOfElements && (osl_pad.pressed.up || (osl_pad.analogY < -ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
+    }else if (menu->numberOfElements && osl_pad.pressed.up){
         if (menu->selected > 0){
             menu->selected--;
             if (menu->selected < menu->first)
@@ -166,11 +162,7 @@ int processMenuKeys(struct menuElements *menu){
             if (menu->first < 0)
                 menu->first = 0;
         }
-        if (osl_pad.analogY < -ANALOG_SENS){
-            scePowerTick(0);
-            sceRtcGetCurrentTick(&lastAnalogTick);
-        }
-    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.right || (osl_pad.analogX > ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
+    }else if (menu->numberOfElements && menu->fastScrolling && osl_pad.pressed.right){
     	if (menu->first + menu->maxNumberVisible < menu->numberOfElements){
     		menu->first = menu->first + menu->maxNumberVisible;
     		menu->selected += menu->maxNumberVisible;
@@ -180,11 +172,7 @@ int processMenuKeys(struct menuElements *menu){
     	} else {
     		menu->selected = menu->numberOfElements - 1;
     	}
-        if (osl_pad.analogX > ANALOG_SENS){
-            scePowerTick(0);
-            sceRtcGetCurrentTick(&lastAnalogTick);
-        }
-    }else if (menu->numberOfElements && menu->fastScrolling && (osl_pad.pressed.left || (osl_pad.analogX < -ANALOG_SENS && fromLastKeys > (float)userSettings->KEY_AUTOREPEAT_GUI/60.0))){
+    }else if (menu->numberOfElements && menu->fastScrolling && osl_pad.pressed.left){
     	if (menu->first - menu->maxNumberVisible >= 0){
     		menu->first = menu->first - menu->maxNumberVisible;
     		menu->selected -= menu->maxNumberVisible;
@@ -192,10 +180,6 @@ int processMenuKeys(struct menuElements *menu){
     		menu->first = 0;
     		menu->selected = 0;
     	}
-        if (osl_pad.analogX < -ANALOG_SENS){
-            scePowerTick(0);
-            sceRtcGetCurrentTick(&lastAnalogTick);
-        }
     }else if (menu->numberOfElements && osl_pad.pressed.cross){
         selected = menu->elements[menu->selected];
         if (selected.triggerFunction != NULL)

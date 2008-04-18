@@ -39,12 +39,6 @@
 #define STATUS_HELP 3
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Functions imported from prx:
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void readButtons(SceCtrlData *pad_data, int count);
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int playlistEditorRetValue = 0;
@@ -85,7 +79,9 @@ int drawTrackInfo(struct fileInfo *info){
     oslSetFont(font);
 
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_PLAYLIST_TITLE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("TITLE"));
     skinGetPosition("POS_PLAYLIST_ARTIST_LABEL", tempPos);
@@ -94,7 +90,9 @@ int drawTrackInfo(struct fileInfo *info){
     oslDrawString(tempPos[0], tempPos[1], langGetString("ALBUM"));
 
     skinGetColor("RGBA_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_PLAYLIST_TITLE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->title);
     skinGetPosition("POS_PLAYLIST_ARTIST_VALUE", tempPos);
@@ -114,7 +112,6 @@ int gui_playlistEditor(){
     int oldFirst = 0;
     struct M3U_songEntry *song;
     struct fileInfo tagInfo;
-    SceCtrlData pad;
     int confirmStatus = STATUS_CONFIRM_NONE;
 
     //Load images:
@@ -148,7 +145,7 @@ int gui_playlistEditor(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 1;
+    commonMenu.interline = 0;
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
     buildMenuFromPlaylist(&commonMenu);
@@ -174,128 +171,125 @@ int gui_playlistEditor(){
         }
 
         oslReadKeys();
-        readButtons(&pad, 1);
-        if (!osl_pad.pressed.hold){
-            if (confirmStatus == STATUS_CONFIRM_CLEAR){
-                if(osl_pad.released.cross){
-                    M3U_clear();
-                    strcpy(userSettings->currentPlaylistName, "");
-                    memset(&tagInfo, 0, sizeof(tagInfo));
-                    buildMenuFromPlaylist(&commonMenu);
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_pad.pressed.circle){
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }
-            }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
-                if(osl_pad.released.cross){
-                    M3U_removeSong(commonMenu.selected);
-                    oldSelected = commonMenu.selected;
-                    oldFirst = commonMenu.first;
-                    buildMenuFromPlaylist(&commonMenu);
-                    if (oldSelected < M3U_getSongCount())
-        				commonMenu.selected = oldSelected;
-                    else
-                        commonMenu.selected = oldSelected - 1;
-                    if (oldFirst < M3U_getSongCount())
-        				commonMenu.first = oldFirst;
-                    else
-        				commonMenu.first = oldFirst - 1;
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_pad.released.circle){
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }
-            }else if (confirmStatus == STATUS_HELP){
-                if (osl_pad.released.cross || osl_pad.released.circle)
-                    confirmStatus = STATUS_CONFIRM_NONE;
-            }else{
+        if (confirmStatus == STATUS_CONFIRM_CLEAR){
+            if(osl_pad.released.cross){
+                M3U_clear();
+                strcpy(userSettings->currentPlaylistName, "");
+                memset(&tagInfo, 0, sizeof(tagInfo));
+                buildMenuFromPlaylist(&commonMenu);
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }else if(osl_pad.released.circle){
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }
+        }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
+            if(osl_pad.released.cross){
+                M3U_removeSong(commonMenu.selected);
                 oldSelected = commonMenu.selected;
-                processMenuKeys(&commonMenu);
-                //Check if user changed track:
-                if (commonMenu.selected != oldSelected){
-                    song = M3U_getSong(commonMenu.selected);
-                    setAudioFunctions(song->fileName, userSettings->MP3_ME);
-                    tagInfo = (*getTagInfoFunct)(song->fileName);
-                    unsetAudioFunctions();
-                }
+                oldFirst = commonMenu.first;
+                buildMenuFromPlaylist(&commonMenu);
+                if (oldSelected < M3U_getSongCount())
+                    commonMenu.selected = oldSelected;
+                else
+                    commonMenu.selected = oldSelected - 1;
+                if (oldFirst < M3U_getSongCount())
+                    commonMenu.first = oldFirst;
+                else
+                    commonMenu.first = oldFirst - 1;
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }else if(osl_pad.released.circle){
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }
+        }else if (confirmStatus == STATUS_HELP){
+            if (osl_pad.released.cross || osl_pad.released.circle)
+                confirmStatus = STATUS_CONFIRM_NONE;
+        }else{
+            oldSelected = commonMenu.selected;
+            processMenuKeys(&commonMenu);
+            //Check if user changed track:
+            if (commonMenu.selected != oldSelected){
+                song = M3U_getSong(commonMenu.selected);
+                setAudioFunctions(song->fileName, userSettings->MP3_ME);
+                tagInfo = (*getTagInfoFunct)(song->fileName);
+                unsetAudioFunctions();
+            }
 
-                if (osl_pad.held.L && osl_pad.held.R){
-                    confirmStatus = STATUS_HELP;
-                }else if((pad.Buttons & PSP_CTRL_NOTE) && M3U_getSongCount()){
-					sprintf(userSettings->selectedBrowserItem, "%s", tempM3Ufile);
-                    userSettings->playlistStartIndex = -1;
-                    playlistEditorRetValue = MODE_PLAYER;
-                    userSettings->previousMode = MODE_PLAYLIST_EDITOR;
-                    exitFlagPlaylistEditor = 1;
-                }else if(osl_pad.pressed.triangle && M3U_getSongCount()){
-                    drawWait(langGetString("WAIT"), langGetString("CHECKING_PLAYLIST"));
-                	oslEndDrawing();
-                    oslEndFrame();
-                	oslSyncFrame();
-                    M3U_checkFiles();
+            if (osl_pad.held.L && osl_pad.held.R){
+                confirmStatus = STATUS_HELP;
+            }else if(osl_pad.pressed.note && M3U_getSongCount()){
+                sprintf(userSettings->selectedBrowserItem, "%s", tempM3Ufile);
+                userSettings->playlistStartIndex = -1;
+                playlistEditorRetValue = MODE_PLAYER;
+                userSettings->previousMode = MODE_PLAYLIST_EDITOR;
+                exitFlagPlaylistEditor = 1;
+            }else if(osl_pad.pressed.triangle && M3U_getSongCount()){
+                drawWait(langGetString("WAIT"), langGetString("CHECKING_PLAYLIST"));
+                oslEndDrawing();
+                oslEndFrame();
+                oslSyncFrame();
+                M3U_checkFiles();
+                oldSelected = commonMenu.selected;
+                oldFirst = commonMenu.first;
+                buildMenuFromPlaylist(&commonMenu);
+                if (oldSelected < M3U_getSongCount())
+                    commonMenu.selected = oldSelected;
+                else
+                    commonMenu.selected = oldSelected - 1;
+                if (oldFirst < M3U_getSongCount())
+                    commonMenu.first = oldFirst;
+                else
+                    commonMenu.first = oldFirst - 1;
+                continue;
+            }else if(osl_pad.pressed.square && M3U_getSongCount()){
+                if (M3U_moveSongUp(commonMenu.selected) == 0){
                     oldSelected = commonMenu.selected;
                     oldFirst = commonMenu.first;
                     buildMenuFromPlaylist(&commonMenu);
-                    if (oldSelected < M3U_getSongCount())
-        				commonMenu.selected = oldSelected;
-                    else
-                        commonMenu.selected = oldSelected - 1;
-                    if (oldFirst < M3U_getSongCount())
-        				commonMenu.first = oldFirst;
-                    else
-        				commonMenu.first = oldFirst - 1;
-                    continue;
-                }else if(osl_pad.pressed.square && M3U_getSongCount()){
-        			if (M3U_moveSongUp(commonMenu.selected) == 0){
-                        oldSelected = commonMenu.selected;
-                        oldFirst = commonMenu.first;
-                        buildMenuFromPlaylist(&commonMenu);
-        				commonMenu.selected = oldSelected - 1;
-        				commonMenu.first = oldFirst;
-        				if (commonMenu.selected == oldFirst - 1)
-        					commonMenu.first--;
-        			}
-                }else if(osl_pad.pressed.cross && M3U_getSongCount()){
-        			if (M3U_moveSongDown(commonMenu.selected) == 0){
-                        oldSelected = commonMenu.selected;
-                        oldFirst = commonMenu.first;
-                        buildMenuFromPlaylist(&commonMenu);
-        				commonMenu.selected = oldSelected + 1;
-        				commonMenu.first = oldFirst;
-        				if (commonMenu.selected == oldFirst + commonMenu.maxNumberVisible)
-        					commonMenu.first++;
-        			}
-                }else if(osl_pad.released.circle && M3U_getSongCount()){
-                    confirmStatus = STATUS_CONFIRM_REMOVE;
-                }else if(osl_pad.released.start && M3U_getSongCount()){
-                    char onlyName[264] = "";
-                	oslEndDrawing();
-                    oslEndFrame();
-                	oslSyncFrame();
-                	setCpuClock(222);
-                	getFileName(userSettings->currentPlaylistName, onlyName);
-                    char *newName = requestString(atoi(langGetString("OSK_LANGUAGE")), langGetString("ASK_PLAYLIST_NAME"), onlyName);
-                    char ext[4] = "";
-                    getExtension(newName, ext, 3);
-                    oslInitGfx(OSL_PF_8888, 1); //Re-init OSLib to avoid gaphics corruption!
-                    setCpuClock(userSettings->CLOCK_GUI);
-                    if (strlen(newName)){
-                        if (strcmp(ext, "M3U"))
-                            sprintf(buffer, "%s%s/%s.m3u", userSettings->ebootPath, "playLists", newName);
-                        else
-                        sprintf(buffer, "%s%s/%s", userSettings->ebootPath, "playLists", newName);
-                        strcpy(userSettings->currentPlaylistName, buffer);
-                        M3U_save(userSettings->currentPlaylistName);
-                    }
-                    continue;
-                }else if(osl_pad.released.select && M3U_getSongCount()){
-                    confirmStatus = STATUS_CONFIRM_CLEAR;
-                }else if(osl_pad.released.R){
-                    playlistEditorRetValue = nextAppMode(MODE_PLAYLIST_EDITOR);
-                    exitFlagPlaylistEditor = 1;
-                }else if(osl_pad.released.L){
-                    playlistEditorRetValue = previousAppMode(MODE_PLAYLIST_EDITOR);
-                    exitFlagPlaylistEditor = 1;
+                    commonMenu.selected = oldSelected - 1;
+                    commonMenu.first = oldFirst;
+                    if (commonMenu.selected == oldFirst - 1)
+                        commonMenu.first--;
                 }
+            }else if(osl_pad.pressed.cross && M3U_getSongCount()){
+                if (M3U_moveSongDown(commonMenu.selected) == 0){
+                    oldSelected = commonMenu.selected;
+                    oldFirst = commonMenu.first;
+                    buildMenuFromPlaylist(&commonMenu);
+                    commonMenu.selected = oldSelected + 1;
+                    commonMenu.first = oldFirst;
+                    if (commonMenu.selected == oldFirst + commonMenu.maxNumberVisible)
+                        commonMenu.first++;
+                }
+            }else if(osl_pad.released.circle && M3U_getSongCount()){
+                confirmStatus = STATUS_CONFIRM_REMOVE;
+            }else if(osl_pad.released.start && M3U_getSongCount()){
+                char onlyName[264] = "";
+                oslEndDrawing();
+                oslEndFrame();
+                oslSyncFrame();
+                setCpuClock(222);
+                getFileName(userSettings->currentPlaylistName, onlyName);
+                char *newName = requestString(atoi(langGetString("OSK_LANGUAGE")), langGetString("ASK_PLAYLIST_NAME"), onlyName);
+                char ext[4] = "";
+                getExtension(newName, ext, 3);
+                oslInitGfx(OSL_PF_8888, 1); //Re-init OSLib to avoid gaphics corruption!
+                setCpuClock(userSettings->CLOCK_GUI);
+                if (strlen(newName)){
+                    if (strcmp(ext, "M3U"))
+                        sprintf(buffer, "%s%s/%s.m3u", userSettings->ebootPath, "playLists", newName);
+                    else
+                    sprintf(buffer, "%s%s/%s", userSettings->ebootPath, "playLists", newName);
+                    strcpy(userSettings->currentPlaylistName, buffer);
+                    M3U_save(userSettings->currentPlaylistName);
+                }
+                continue;
+            }else if(osl_pad.released.select && M3U_getSongCount()){
+                confirmStatus = STATUS_CONFIRM_CLEAR;
+            }else if(osl_pad.released.R){
+                playlistEditorRetValue = nextAppMode(MODE_PLAYLIST_EDITOR);
+                exitFlagPlaylistEditor = 1;
+            }else if(osl_pad.released.L){
+                playlistEditorRetValue = previousAppMode(MODE_PLAYLIST_EDITOR);
+                exitFlagPlaylistEditor = 1;
             }
         }
     	oslEndDrawing();

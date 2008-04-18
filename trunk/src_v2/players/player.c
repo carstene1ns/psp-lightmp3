@@ -479,25 +479,6 @@ short volume_boost(short *Sample, unsigned int *boost){
     	return intSample;
 }
 
-/*unsigned long volume_boost_long(unsigned long *Sample, unsigned int *boost){
-	long intSample = *Sample * (*boost + 1);
-	if (intSample > 2147483647)
-		return 2147483647;
-	else if (intSample < -2147483648)
-		return -2147483648;
-	else
-    	return intSample;
-}*/
-
-unsigned char volume_boost_char(unsigned char *Sample, unsigned int *boost){
-	int intSample = (int)*Sample * (*boost + 1);
-	if (intSample > 255)
-		return 255;
-	else if (intSample < 0)
-		return 0;
-	else
-    	return (unsigned char)intSample;
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set volume:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

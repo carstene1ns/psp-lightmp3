@@ -52,7 +52,6 @@ int displayEnable(void);
 int displayDisable(void);
 int getBrightness();
 void setBrightness(int brightness);
-void readButtons(SceCtrlData *pad_data, int count);
 int imposeSetHomePopup(int value);
 void MEDisable();
 void MEEnable();
@@ -87,7 +86,9 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
     oslDrawImageXY(fileInfoBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_TITLE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("TITLE"));
     skinGetPosition("POS_ARTIST_LABEL", tempPos);
@@ -108,7 +109,9 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
     oslDrawString(tempPos[0], tempPos[1], langGetString("TRACK"));
 
     skinGetColor("RGBA_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_TITLE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->title);
     skinGetPosition("POS_ARTIST_VALUE", tempPos);
@@ -158,7 +161,9 @@ int drawFileSpecs(struct fileInfo *info){
     oslDrawImageXY(fileSpecsBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_MODE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("MODE"));
     skinGetPosition("POS_BITRATE_LABEL", tempPos);
@@ -171,7 +176,9 @@ int drawFileSpecs(struct fileInfo *info){
     oslDrawString(tempPos[0], tempPos[1], langGetString("EMPHASIS"));
 
     skinGetColor("RGBA_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_MODE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->mode);
     skinGetPosition("POS_BITRATE_VALUE", tempPos);
@@ -201,7 +208,9 @@ int drawPlayerStatus(){
     oslDrawImageXY(playerStatusBkg, tempPos[0], tempPos[1]);
     oslSetFont(font);
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_SLEEP_MODE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("SLEEP_MODE"));
     skinGetPosition("POS_PLAY_MODE_LABEL", tempPos);
@@ -214,7 +223,9 @@ int drawPlayerStatus(){
     oslDrawString(tempPos[0], tempPos[1], langGetString("EQUALIZER"));
 
     skinGetColor("RGBA_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_SLEEP_MODE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], sleepModeDesc[userSettings->sleepMode]);
     skinGetPosition("POS_PLAY_MODE_VALUE", tempPos);
@@ -276,7 +287,6 @@ int playFile(char *fileName, char *trackMessage){
     int ratingChangedUpDown = 0;
     int ratingChangedCross = 0;
     int helpShown = 0;
-    SceCtrlData pad;
     u32 remoteButtons;
     int flagExit = 0;
     int status = STATUS_NORMAL;
@@ -451,7 +461,6 @@ int playFile(char *fileName, char *trackMessage){
 
         lastPercentage = (*getPercentageFunct)();
         oslReadKeys();
-        readButtons(&pad, 1);
         sceHprmPeekCurrentKey(&remoteButtons);
 
         if (status == STATUS_HELP){
@@ -551,7 +560,7 @@ int playFile(char *fileName, char *trackMessage){
         		//Change sleep mode:
         		if (++userSettings->sleepMode > SLEEP_PLAYLIST)
         			userSettings->sleepMode = 0;
-    		}else if(pad.Buttons & PSP_CTRL_NOTE){
+    		}else if(osl_pad.released.note){
     			//Cambio equalizzatore:
                 if ((*isFilterSupportedFunct)()){
                     if (++userSettings->currentEQ >= EQ_getEqualizersNumber()){
@@ -561,7 +570,6 @@ int playFile(char *fileName, char *trackMessage){
                         (*enableFilterFunct)();
                     tEQ = EQ_getIndex(userSettings->currentEQ);
                     (*setFilterFunct)(tEQ.filter, 1);
-                    sceKernelDelayThread(400000);
                 }
             }else if (osl_pad.released.select){
     				//Change playing mode:
@@ -861,6 +869,7 @@ int gui_player(){
 
     oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_PLAYER);
     oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_PLAYER);
+    oslSetKeyAnalogToDPad(0);
 
     char dir[264] = "";
     char ext[5] = "";
@@ -891,5 +900,6 @@ int gui_player(){
 
     oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
     oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
+    oslSetKeyAnalogToDPad(ANALOG_SENS);
     return playerRetValue;
 }

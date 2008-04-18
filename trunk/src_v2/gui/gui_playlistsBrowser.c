@@ -57,7 +57,9 @@ int drawPlaylistInfo(){
     oslSetFont(font);
 
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
-    oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
+    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_PLAYLIST_NAME_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("PLAYLIST_NAME"));
     skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_LABEL", tempPos);
@@ -67,7 +69,9 @@ int drawPlaylistInfo(){
 
     if (commonMenu.numberOfElements){
         skinGetColor("RGBA_TEXT", tempColor);
-        oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+        skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
+        oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+        //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         skinGetPosition("POS_PLAYLIST_NAME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], commonMenu.elements[commonMenu.selected].text);
         skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_VALUE", tempPos);
@@ -114,7 +118,7 @@ int gui_playlistsBrowser(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 1;
+    commonMenu.interline = 0;
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
 
@@ -156,69 +160,67 @@ int gui_playlistsBrowser(){
 
 
         oslReadKeys();
-        if (!osl_pad.pressed.hold){
-            if (!confirmStatus){
-                processMenuKeys(&commonMenu);
-                if(osl_pad.released.cross && commonMenu.numberOfElements){
-                    sprintf(userSettings->selectedBrowserItem, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
-                    userSettings->playlistStartIndex = -1;
-                    playlistsBrowserRetValue = MODE_PLAYER;
-                    userSettings->previousMode = MODE_PLAYLISTS;
-                    exitFlagPlaylistsBrowser = 1;
-                }else if(osl_pad.released.square && commonMenu.numberOfElements){
-                    confirmStatus = STATUS_CONFIRM_LOAD;
-                }else if(osl_pad.released.circle && commonMenu.numberOfElements){
-                    confirmStatus = STATUS_CONFIRM_REMOVE;
-                }else if(osl_pad.released.start && commonMenu.numberOfElements){
-                    confirmStatus = STATUS_CONFIRM_ADD;
-                }else if(osl_pad.released.R){
-                    playlistsBrowserRetValue = nextAppMode(MODE_PLAYLISTS);
-                    exitFlagPlaylistsBrowser = 1;
-                }else if(osl_pad.released.L){
-                    playlistsBrowserRetValue = previousAppMode(MODE_PLAYLISTS);
-                    exitFlagPlaylistsBrowser = 1;
-                }else if (osl_pad.held.L && osl_pad.held.R){
-                    confirmStatus = STATUS_HELP;
-                }
-            }else if (confirmStatus == STATUS_HELP){
-                if (osl_pad.released.cross || osl_pad.released.circle)
-                    confirmStatus = STATUS_CONFIRM_NONE;
-            }else if (confirmStatus == STATUS_CONFIRM_LOAD){
-                if(osl_pad.released.cross){
-                    sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
-                    M3U_clear();
-                    M3U_open(buffer);
-                    M3U_save(tempM3Ufile);
-                    strcpy(userSettings->currentPlaylistName, buffer);
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_pad.released.circle){
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }
-            }else if (confirmStatus == STATUS_CONFIRM_ADD){
-                if(osl_pad.released.cross){
-                    M3U_clear();
-                    M3U_open(tempM3Ufile);
-                    sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
-                    M3U_open(buffer);
-                    M3U_save(tempM3Ufile);
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_pad.released.circle){
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }
-            }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
-                if(osl_pad.released.cross){
-                    sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
-                    sceIoRemove(buffer);
-                    opendir_close(&directory);
-                    result = opendir_open(&directory, playlistsDir, ext, 1, 1);
-                    sortDirectory(&directory);
-                    buildMenuFromDirectory(&commonMenu, &directory, "");
-                    commonMenu.first = 0;
-                    commonMenu.selected = 0;
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }else if(osl_pad.released.circle){
-                    confirmStatus = STATUS_CONFIRM_NONE;
-                }
+        if (!confirmStatus){
+            processMenuKeys(&commonMenu);
+            if(osl_pad.released.cross && commonMenu.numberOfElements){
+                sprintf(userSettings->selectedBrowserItem, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                userSettings->playlistStartIndex = -1;
+                playlistsBrowserRetValue = MODE_PLAYER;
+                userSettings->previousMode = MODE_PLAYLISTS;
+                exitFlagPlaylistsBrowser = 1;
+            }else if(osl_pad.released.square && commonMenu.numberOfElements){
+                confirmStatus = STATUS_CONFIRM_LOAD;
+            }else if(osl_pad.released.circle && commonMenu.numberOfElements){
+                confirmStatus = STATUS_CONFIRM_REMOVE;
+            }else if(osl_pad.released.start && commonMenu.numberOfElements){
+                confirmStatus = STATUS_CONFIRM_ADD;
+            }else if(osl_pad.released.R){
+                playlistsBrowserRetValue = nextAppMode(MODE_PLAYLISTS);
+                exitFlagPlaylistsBrowser = 1;
+            }else if(osl_pad.released.L){
+                playlistsBrowserRetValue = previousAppMode(MODE_PLAYLISTS);
+                exitFlagPlaylistsBrowser = 1;
+            }else if (osl_pad.held.L && osl_pad.held.R){
+                confirmStatus = STATUS_HELP;
+            }
+        }else if (confirmStatus == STATUS_HELP){
+            if (osl_pad.released.cross || osl_pad.released.circle)
+                confirmStatus = STATUS_CONFIRM_NONE;
+        }else if (confirmStatus == STATUS_CONFIRM_LOAD){
+            if(osl_pad.released.cross){
+                sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                M3U_clear();
+                M3U_open(buffer);
+                M3U_save(tempM3Ufile);
+                strcpy(userSettings->currentPlaylistName, buffer);
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }else if(osl_pad.released.circle){
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }
+        }else if (confirmStatus == STATUS_CONFIRM_ADD){
+            if(osl_pad.released.cross){
+                M3U_clear();
+                M3U_open(tempM3Ufile);
+                sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                M3U_open(buffer);
+                M3U_save(tempM3Ufile);
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }else if(osl_pad.released.circle){
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }
+        }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
+            if(osl_pad.released.cross){
+                sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                sceIoRemove(buffer);
+                opendir_close(&directory);
+                result = opendir_open(&directory, playlistsDir, ext, 1, 1);
+                sortDirectory(&directory);
+                buildMenuFromDirectory(&commonMenu, &directory, "");
+                commonMenu.first = 0;
+                commonMenu.selected = 0;
+                confirmStatus = STATUS_CONFIRM_NONE;
+            }else if(osl_pad.released.circle){
+                confirmStatus = STATUS_CONFIRM_NONE;
             }
         }
     	oslEndDrawing();

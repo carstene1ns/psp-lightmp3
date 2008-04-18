@@ -42,5 +42,6 @@ extern struct menuElements commonMenu;
 extern struct menuElements commonSubMenu;
 extern int tempPos[2];
 extern int tempColor[4];
+extern int tempColorShadow[4];
 
 #endif

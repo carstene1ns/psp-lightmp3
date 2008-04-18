@@ -3,7 +3,7 @@ OBJS = prx/supportlib.o \
        players/m3u.o players/pspaudiolib.o players/id3.o players/mp3player.o players/oggplayer.o players/aacplayer.o \
        players/mp3playerME.o players/aa3playerME.o players/flacplayer.o players/player.o players/equalizer.o \
        system/clock.o system/freeMem.o system/mem64.o system/opendir.o \
-       system/exception.o system/usb.o system/osk.o \
+       system/exception.o system/osk.o \
        others/audioscrobbler.o others/medialibrary.o others/log.o others/strreplace.o \
        gui/settings.o gui/skinsettings.o gui/languages.o gui/menu.o gui/common.o \
        gui/gui_fileBrowser.o gui/gui_player.o gui/gui_playlistsBrowser.o \
