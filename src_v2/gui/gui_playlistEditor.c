@@ -24,7 +24,6 @@
 #include "../main.h"
 #include "../players/m3u.h"
 #include "../players/player.h"
-#include "../system/osk.h"
 #include "../system/clock.h"
 #include "gui_playlistEditor.h"
 #include "common.h"
@@ -44,6 +43,8 @@
 static int playlistEditorRetValue = 0;
 static int exitFlagPlaylistEditor = 0;
 OSL_IMAGE *trackInfoBkg;
+struct fileInfo tagInfo;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Build menu from current playlist:
@@ -67,6 +68,7 @@ int buildMenuFromPlaylist(struct menuElements *menu){
     }
     return 0;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw file info:
@@ -103,6 +105,49 @@ int drawTrackInfo(struct fileInfo *info){
     return 0;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ask playlist name:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void askPlaylistName(char *message, char *initialValue, char *target){
+	int skip = 0;
+	int done = 0;
+    int oldClock = getCpuClock();
+    int oldBus = getBusClock();
+    setCpuClock(222);
+    setBusClock(111);
+
+	oslInitOsk(message, initialValue, 128, 1);
+    while(!osl_quit && !done){
+		if (!skip){
+			oslStartDrawing();
+			drawCommonGraphics();
+			drawButtonBar(MODE_PLAYLIST_EDITOR);
+			drawMenu(&commonMenu);
+			drawTrackInfo(&tagInfo);
+
+			if (oslOskIsActive())
+				oslDrawOsk();
+			if (oslGetOskStatus() == PSP_UTILITY_DIALOG_NONE){
+				if (oslOskGetResult() == OSL_OSK_CANCEL){
+					strcpy(target, "");
+					done = 1;
+				}else{
+					oslOskGetText(target);
+					done = 1;
+				}
+				oslEndOsk();
+			}
+			oslEndDrawing();
+		}
+        oslEndFrame();
+        skip = oslSyncFrame();
+	}
+    setBusClock(oldBus);
+    setCpuClock(oldClock);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Playlist Editor:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +156,6 @@ int gui_playlistEditor(){
     int oldSelected = 0;
     int oldFirst = 0;
     struct M3U_songEntry *song;
-    struct fileInfo tagInfo;
     int confirmStatus = STATUS_CONFIRM_NONE;
 
     //Load images:
@@ -266,21 +310,21 @@ int gui_playlistEditor(){
                 oslEndDrawing();
                 oslEndFrame();
                 oslSyncFrame();
-                setCpuClock(222);
                 getFileName(userSettings->currentPlaylistName, onlyName);
-                char *newName = requestString(atoi(langGetString("OSK_LANGUAGE")), langGetString("ASK_PLAYLIST_NAME"), onlyName);
-                char ext[4] = "";
-                getExtension(newName, ext, 3);
-                oslInitGfx(OSL_PF_8888, 1); //Re-init OSLib to avoid gaphics corruption!
-                setCpuClock(userSettings->CLOCK_GUI);
-                if (strlen(newName)){
-                    if (strcmp(ext, "M3U"))
-                        sprintf(buffer, "%s%s/%s.m3u", userSettings->ebootPath, "playLists", newName);
-                    else
-                    sprintf(buffer, "%s%s/%s", userSettings->ebootPath, "playLists", newName);
-                    strcpy(userSettings->currentPlaylistName, buffer);
-                    M3U_save(userSettings->currentPlaylistName);
-                }
+                char newName[129] = "";
+				askPlaylistName(langGetString("ASK_PLAYLIST_NAME"), onlyName, newName);
+				if (strlen(newName)){
+					char ext[4] = "";
+					getExtension(newName, ext, 3);
+					if (strlen(newName)){
+						if (strcmp(ext, "M3U"))
+							sprintf(buffer, "%s%s/%s.m3u", userSettings->ebootPath, "playLists", newName);
+						else
+						sprintf(buffer, "%s%s/%s", userSettings->ebootPath, "playLists", newName);
+						strcpy(userSettings->currentPlaylistName, buffer);
+						M3U_save(userSettings->currentPlaylistName);
+					}
+				}
                 continue;
             }else if(osl_pad.released.select && M3U_getSongCount()){
                 confirmStatus = STATUS_CONFIRM_CLEAR;

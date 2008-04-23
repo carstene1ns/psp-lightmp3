@@ -117,7 +117,7 @@ int drawMenu(struct menuElements *menu){
         if (menu->dataFeedFunction != NULL)
             menu->dataFeedFunction(i, &menu->elements[i]);
 
-        oslSetBkColor(RGBA(0, 0, 0, 0));
+        //oslSetBkColor(RGBA(0, 0, 0, 0));
         //oslSetFont(fontMenuNormal);
         if (menu->align == ALIGN_LEFT)
             xPos = menu->xPos + 4;
