@@ -30,7 +30,6 @@
 #include "menu.h"
 #include "../others/strreplace.h"
 #include "../others/medialibrary.h"
-#include "../system/osk.h"
 #include "../system/clock.h"
 #include "../players/player.h"
 #include "../players/m3u.h"
@@ -403,7 +402,8 @@ void queryDataFeed(int index, struct menuElement *element){
             //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
         oslDrawString(commonMenu.xPos + star->sizeX*ML_MAX_RATING + 8, commonMenu.yPos + (fontNormal->charHeight * index + commonMenu.interline * index), buffer);
-        strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+		strcpy(element->text, "");
+		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
         element->triggerFunction = enterSelection;
     }
 }
@@ -491,6 +491,48 @@ int browseByRating(){
     return 0;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ask for Search string:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void askSearchString(char *message, char *initialValue, char *target){
+	int skip = 0;
+	int done = 0;
+    int oldClock = getCpuClock();
+    int oldBus = getBusClock();
+    setCpuClock(222);
+    setBusClock(111);
+
+	oslInitOsk(message, initialValue, 128, 1);
+    while(!osl_quit && !done){
+		if (!skip){
+			oslStartDrawing();
+			drawCommonGraphics();
+			drawButtonBar(MODE_MEDIA_LIBRARY);
+			drawMenu(&commonMenu);
+
+			if (oslOskIsActive())
+				oslDrawOsk();
+			if (oslGetOskStatus() == PSP_UTILITY_DIALOG_NONE){
+				if (oslOskGetResult() == OSL_OSK_CANCEL){
+					strcpy(target, "");
+					done = 1;
+				}else{
+					oslOskGetText(target);
+					done = 1;
+				}
+				oslEndOsk();
+			}
+			oslEndDrawing();
+		}
+        oslEndFrame();
+        skip = oslSyncFrame();
+	}
+    setBusClock(oldBus);
+    setCpuClock(oldClock);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Search:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,32 +540,32 @@ int search(){
 	oslEndDrawing();
     oslEndFrame();
 	oslSyncFrame();
-	setCpuClock(222);
-    char *searchString = requestString(atoi(langGetString("OSK_LANGUAGE")), langGetString("ASK_SEARCH_STRING"), "");
-    oslInitGfx(OSL_PF_8888, 1); //Re-init OSLib to avoid gaphics corruption!
+    char searchString[129] = "";
+	askSearchString(langGetString("ASK_SEARCH_STRING"), "", searchString);
+	if (strlen(searchString)){
+		oslStartDrawing();
+		drawCommonGraphics();
+		drawButtonBar(MODE_MEDIA_LIBRARY);
+		oslEndDrawing();
+		oslSyncFrame();
 
-    oslStartDrawing();
-    drawCommonGraphics();
-    drawButtonBar(MODE_PLAYLIST_EDITOR);
-	oslEndDrawing();
-	oslSyncFrame();
 
-    setCpuClock(userSettings->CLOCK_GUI);
-
-    if (strlen(searchString)){
-        mlQueryType = QUERY_SINGLE_ENTRY;
-        mlQueryCount = -1;
-        mlBufferPosition = 0;
-        sprintf(tempSql, "Select media.*, title || ' - ' || artist as strfield, \
-                                'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-                         From media \
-                         Where title like '%%%s%%' \
-                            or artist like '%%%s%%' \
-                            or album like '%%%s%%' \
-                         Order by title, artist, album",
-                            searchString, searchString, searchString);
-        buildQueryMenu(tempSql, backToMainMenu);
-    }
+		if (strlen(searchString)){
+			mlQueryType = QUERY_SINGLE_ENTRY;
+			mlQueryCount = -1;
+			mlBufferPosition = 0;
+			sprintf(tempSql, "Select media.*, title || ' - ' || artist as strfield, \
+									'path = ''' || replace(path, '''', '''''') || '''' as datafield \
+						 	  From media \
+							  Where title like '%%%s%%' \
+								 or artist like '%%%s%%' \
+								 or album like '%%%s%%' \
+							  Order by title, artist, album",
+							  searchString, searchString, searchString);
+			buildQueryMenu(tempSql, backToMainMenu);
+		}
+	}
+	oslStartDrawing();
     return 0;
 }
 
