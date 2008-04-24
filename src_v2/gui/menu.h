@@ -25,6 +25,8 @@
 #define ALIGN_RIGHT 1
 #define ALIGN_CENTER 2
 
+extern OSL_FONT *fontMenuNormal;
+
 struct menuElement{
     char text[264];
     int value;
