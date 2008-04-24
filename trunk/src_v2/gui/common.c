@@ -42,7 +42,7 @@ int readButtons(SceCtrlData *pad_data, int count);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-char buffer[264];
+static char buffer[264];
 OSL_IMAGE *commonBkg;
 OSL_IMAGE *commonTopToolbar;
 OSL_IMAGE *commonBottomToolbar;
@@ -486,7 +486,7 @@ int drawRating(int startX, int startY, int rating){
     int i = 0;
     for (i=0; i<ML_MAX_RATING; i++){
         if (i<rating)
-            oslDrawImageXY(star, startX+ star->sizeX * i, startY);
+            oslDrawImageXY(star, startX + star->sizeX * i, startY);
         else
             oslDrawImageXY(blankStar, startX + star->sizeX * i, startY);
     }

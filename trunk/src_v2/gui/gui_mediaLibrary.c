@@ -54,23 +54,23 @@ void drawMLinfo();
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int mediaLibraryRetValue = 0;
 static int exitFlagMediaLibrary = 0;
-struct menuElement tMenuEl;
-char buffer[264];
-int mediaLibraryStatus = STATUS_MAINMENU;
-int confirmStatus = STATUS_CONFIRM_NONE;
+static struct menuElement tMenuEl;
+static char buffer[264];
+static int mediaLibraryStatus = STATUS_MAINMENU;
+static int confirmStatus = STATUS_CONFIRM_NONE;
 
-int mlQueryType = QUERY_SINGLE_ENTRY;
-int mlPrevQueryType = 0;
-int mlQueryCount = -1;
-int mlBufferPosition = 0;
-OSL_IMAGE *scanBkg;
-OSL_IMAGE *infoBkg;
+static int mlQueryType = QUERY_SINGLE_ENTRY;
+static int mlPrevQueryType = 0;
+static int mlQueryCount = -1;
+static int mlBufferPosition = 0;
+static OSL_IMAGE *scanBkg;
+static OSL_IMAGE *infoBkg;
 
-char currentSql[ML_SQLMAXLENGTH] = "";
-char previousSql[ML_SQLMAXLENGTH] = "";
-char currentWhere[ML_SQLMAXLENGTH] = "";
-char previousWhere[ML_SQLMAXLENGTH] = "";
-char tempSql[ML_SQLMAXLENGTH] = "";
+static char currentSql[ML_SQLMAXLENGTH] = "";
+static char previousSql[ML_SQLMAXLENGTH] = "";
+static char currentWhere[ML_SQLMAXLENGTH] = "";
+static char previousWhere[ML_SQLMAXLENGTH] = "";
+static char tempSql[ML_SQLMAXLENGTH] = "";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Add selection to playlist:
@@ -82,11 +82,16 @@ int addSelectionToPlaylist(char *where, int fastMode, char *m3uName){
     char onlyName[264] = "";
     char message[10] = "";
 
+	oslEndDrawing();
+	oslEndFrame();
+	oslSyncFrame();
+
+	setCpuClock(222);
+	setBusClock(111);
+
     int i = 0;
-    int count = ML_countRecords(where);
+	int count = ML_countRecords(where);
     if (count){
-        setCpuClock(222);
-        setBusClock(111);
         M3U_clear();
         M3U_open(m3uName);
         ML_queryDB(where, "title", offset, ML_BUFFERSIZE, localResult);
@@ -136,11 +141,13 @@ int addSelectionToPlaylist(char *where, int fastMode, char *m3uName){
         	oslSyncFrame();
         }
         M3U_save(m3uName);
-        setBusClock(userSettings->BUS);
-        setCpuClock(userSettings->CLOCK_GUI);
     }
-    return 0;
+	setBusClock(userSettings->BUS);
+	setCpuClock(userSettings->CLOCK_GUI);
+	oslStartDrawing();
+	return 0;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Back to main menu:
@@ -350,8 +357,8 @@ int enterSelection(){
                       Order by title ", commonMenu.elements[commonMenu.selected].data);
     strcpy(previousSql, currentSql);
     strcpy(previousWhere, currentWhere);
-    buildQueryMenu(tempSql, exitSelection);
     strcpy(currentWhere, commonMenu.elements[commonMenu.selected].data);
+	buildQueryMenu(tempSql, exitSelection);
     mlPrevQueryType = mlQueryType;
     mlQueryType = QUERY_SINGLE_ENTRY;
     oslReadKeys(); //To avoid reread the CROSS button after entering selection
@@ -387,21 +394,22 @@ void queryDataFeed(int index, struct menuElement *element){
         strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
         element->triggerFunction = NULL;
     }else if (mlQueryType == QUERY_COUNT_RATING){
-        drawRating(commonMenu.xPos + 4, commonMenu.yPos + (fontNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
+	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
+        drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
         sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
-        oslSetFont(fontNormal);
+        oslSetFont(fontMenuNormal);
         if (index == commonMenu.selected){
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
             //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
             //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
-        oslDrawString(commonMenu.xPos + star->sizeX*ML_MAX_RATING + 8, commonMenu.yPos + (fontNormal->charHeight * index + commonMenu.interline * index), buffer);
+        oslDrawString(commonMenu.xPos + star->sizeX*ML_MAX_RATING + 8, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), buffer);
 		strcpy(element->text, "");
 		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
         element->triggerFunction = enterSelection;
@@ -528,6 +536,7 @@ void askSearchString(char *message, char *initialValue, char *target){
         oslEndFrame();
         skip = oslSyncFrame();
 	}
+	oslReadKeys();
     setBusClock(oldBus);
     setCpuClock(oldClock);
 }
@@ -563,6 +572,10 @@ int search(){
 							  Order by title, artist, album",
 							  searchString, searchString, searchString);
 			buildQueryMenu(tempSql, backToMainMenu);
+		    sprintf(currentWhere, " title like '%%%s%%' \
+								    or artist like '%%%s%%' \
+									or album like '%%%s%%' ",
+								   searchString, searchString, searchString);
 		}
 	}
 	oslStartDrawing();
@@ -635,7 +648,6 @@ int gui_mediaLibrary(){
 
     //Build menu:
     buildMainMenu();
-
     exitFlagMediaLibrary = 0;
     while(!osl_quit && !exitFlagMediaLibrary){
         oslStartDrawing();

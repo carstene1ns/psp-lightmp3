@@ -101,16 +101,16 @@ int drawMenu(struct menuElements *menu){
 
         yPos = startY + fontMenuNormal->charHeight * count + menu->interline * count;
         if (i == menu->selected){
-            skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
-            skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
             if (menu->highlight != NULL)
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
+			skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
+            skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
+            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
             //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
 

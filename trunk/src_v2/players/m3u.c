@@ -25,8 +25,8 @@
 #include "m3u.h"
 #include "../system/opendir.h"
 
-struct M3U_playList lPlayList;
-struct M3U_songEntry emptySong;
+static struct M3U_playList lPlayList;
+static struct M3U_songEntry emptySong;
 
 //Split song length and title:
 int splitSongInfo(char *text, char *chrLength, char *title){

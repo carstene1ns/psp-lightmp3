@@ -45,15 +45,15 @@
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(10*1024);
+PSP_HEAP_SIZE_KB(12*1024);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-char ebootDirectory[264] = "";
-struct settings *userSettings;
+static char ebootDirectory[264] = "";
 static int resuming = 0;
 static int suspended = 0;
+struct settings *userSettings;
 
 //Shared globals:
 int fileExtCount = 8;
@@ -208,7 +208,7 @@ int initOSLib(){
     oslSetKeyAnalogToDPad(ANALOG_SENS);
     oslSetExitCallback(exit_callback);
     oslSetBkColor(RGBA(0, 0, 0, 0));
-    oslIntraFontInit(INTRAFONT_CACHE_MED);
+    oslIntraFontInit(INTRAFONT_CACHE_LARGE);
     return 0;
 }
 
