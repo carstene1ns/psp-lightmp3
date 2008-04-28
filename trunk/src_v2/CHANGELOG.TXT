@@ -16,6 +16,7 @@ Version 2.0.0 BETA2
 -Fixed: stop FLAC playback
 -Added: You can check a playlist with triangle (removes dead-links)
 -Added: option for keys autorepeat interval
+-Added: Top 100 in media library
 -Fixed: Font (wow...the W now is ok!). ;)
 -Fixed: Analog was working also in HOLD
 -Fixed: Minor bugs

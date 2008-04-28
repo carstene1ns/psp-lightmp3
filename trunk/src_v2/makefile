@@ -26,7 +26,7 @@ LIBDIR =
 LIBS= -lsqlite3 -losl -lpng -lz \
       -laac -lFLAC -lmad -lvorbisidec \
       -lpsphprm -lpspusb -lpspusbstor -lpspaudio -lpspaudiocodec -lpspkubridge \
-	  -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lm
+	  -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan -lm
 
 LDFLAGS =
 EXTRA_TARGETS = EBOOT.PBP

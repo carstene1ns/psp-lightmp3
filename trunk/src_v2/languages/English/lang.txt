@@ -176,3 +176,4 @@ LOADING_SKIN=Loading new skin
 CHECKING_PLAYLIST=Checking playlist's files
 
 SETTINGS_16=Keys repeat interval
+BROWSE_TOP100=Top 100
