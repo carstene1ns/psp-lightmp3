@@ -45,7 +45,7 @@
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(12*1024);
+PSP_HEAP_SIZE_KB(14*1024);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -208,7 +208,6 @@ int initOSLib(){
     oslSetKeyAnalogToDPad(ANALOG_SENS);
     oslSetExitCallback(exit_callback);
     oslSetBkColor(RGBA(0, 0, 0, 0));
-    oslIntraFontInit(INTRAFONT_CACHE_LARGE);
     return 0;
 }
 
@@ -265,22 +264,6 @@ int main(){
     initOSLib();
 
     getcwd(ebootDirectory, 256);
-
-    //Splash screen:
-    int splash_thid = sceKernelCreateThread("splash", splashThread, 15, 0x10000, PSP_THREAD_ATTR_USER | THREAD_ATTR_VFPU, NULL);
-    if(splash_thid >= 0)
-        sceKernelStartThread(splash_thid, 0, NULL);
-
-    //Start support prx
-	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
-	if (modid < 0){
-        sprintf(buffer, "Error 0x%08X loading/starting support.prx.\n", modid);
-        debugMessageBox(buffer);
-        sceKernelDelayThread(3000000);
-        sceKernelExitGame();
-        return -1;
-	}
-
 	//Full name for settings' file:
 	if (ebootDirectory[strlen(ebootDirectory)-1] != '/')
 		strcat(ebootDirectory, "/");
@@ -296,8 +279,30 @@ int main(){
     strcpy(userSettings->ebootPath, ebootDirectory);
     userSettings->displayStatus = 1;
 
+    //Splash screen:
+	int splash_thid = 0;
+	if (userSettings->SHOW_SPLASH){
+		splash_thid = sceKernelCreateThread("splash", splashThread, 15, 0x10000, PSP_THREAD_ATTR_USER | THREAD_ATTR_VFPU, NULL);
+		if(splash_thid >= 0)
+			sceKernelStartThread(splash_thid, 0, NULL);
+	}
+
+    //Start support prx
+	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
+	if (modid < 0){
+        sprintf(buffer, "Error 0x%08X loading/starting support.prx.\n", modid);
+        debugMessageBox(buffer);
+        sceKernelDelayThread(3000000);
+        sceKernelExitGame();
+        return -1;
+	}
+
+
+
     oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
     oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
+    oslSetRemoteKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
+    oslSetRemoteKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
 
     //Temp m3u filename:
     sprintf(MLtempM3Ufile, "%s%s", userSettings->ebootPath, "MLtemp.m3u");
@@ -321,6 +326,8 @@ int main(){
     	sceKernelExitGame();
         return 0;
     }
+
+	initFonts();
 
     sprintf(buffer, "%sskins/", userSettings->ebootPath);
     skinLoadList(buffer);
@@ -366,7 +373,8 @@ int main(){
     srand(time(NULL));
 
     //Wait for splash:
-    sceKernelWaitThreadEnd(splash_thid, NULL);
+	if (userSettings->SHOW_SPLASH)
+		sceKernelWaitThreadEnd(splash_thid, NULL);
     oslSetReadKeysFunction(readButtons);
 
 	//Controllo luminosità:

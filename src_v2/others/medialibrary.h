@@ -18,6 +18,8 @@
 #ifndef __medialibrary_h
 #define __medialibrary_h (1)
 
+#define ML_DB_VERSION "01.00"
+
 #define ML_ERROR_CHDIR  -1
 #define ML_ERROR_OPENDB -2
 #define ML_ERROR_SQL    -3

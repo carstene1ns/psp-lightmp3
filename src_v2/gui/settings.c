@@ -120,7 +120,9 @@ int SETTINGS_load(char *fileName){
 								localSettings.KEY_AUTOREPEAT_PLAYER = atoi(result);
 							}else if (strcmp(parName, "KEY_AUTOREPEAT_GUI") == 0){
 								localSettings.KEY_AUTOREPEAT_GUI = atoi(result);
-                            }
+							}else if (strcmp(parName, "SHOW_SPLASH") == 0){
+								localSettings.SHOW_SPLASH = atoi(result);
+							}
 						}
 						element++;
 					}
@@ -167,6 +169,7 @@ struct settings *SETTINGS_default(){
     localSettings.playMode = 0;
     localSettings.KEY_AUTOREPEAT_GUI = 10;
     localSettings.KEY_AUTOREPEAT_PLAYER = 10;
+	localSettings.SHOW_SPLASH = 1;
 
 	//Skin's settings:
     strcpy(localSettings.skinName, "default");
@@ -240,6 +243,8 @@ int SETTINGS_save(struct settings tSettings){
     snprintf(testo, sizeof(testo), "KEY_AUTOREPEAT_PLAYER=%i\n", tSettings.KEY_AUTOREPEAT_PLAYER);
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "KEY_AUTOREPEAT_GUI=%i\n", tSettings.KEY_AUTOREPEAT_GUI);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "SHOW_SPLASH=%i\n", tSettings.SHOW_SPLASH);
     fwrite(testo, 1, strlen(testo), f);
 
 	fclose(f);

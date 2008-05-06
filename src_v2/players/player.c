@@ -118,15 +118,11 @@ SceUID LoadStartAudioModule(char *modname, int partition){
 //Load and start needed modules:
 int initMEAudioModules(){
    if (!HW_ModulesInit){
-        if (sceKernelDevkitVersion() == 0x01050001)
-        {
-            LoadStartAudioModule("flash0:/kd/me_for_vsh.prx", PSP_MEMORY_PARTITION_KERNEL);
-            LoadStartAudioModule("flash0:/kd/audiocodec.prx", PSP_MEMORY_PARTITION_KERNEL);
-        }
-        else
-        {
-            sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
-        }
+       if (sceKernelDevkitVersion() == 0x01050001){
+           LoadStartAudioModule("flash0:/kd/me_for_vsh.prx", PSP_MEMORY_PARTITION_KERNEL);
+           LoadStartAudioModule("flash0:/kd/audiocodec.prx", PSP_MEMORY_PARTITION_KERNEL);
+       }else
+           sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
        HW_ModulesInit = 1;
    }
    return 0;
@@ -514,27 +510,23 @@ void fadeOut(int channel, float seconds){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set frequency for output:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int sceAudio_38553111(int samplecount, int samplerate, int unk);
 int setAudioFrequency(unsigned short samples, unsigned short freq, char car){
-	return sceAudio_38553111(samples, freq, car);
+	return sceAudioSRCChReserve(samples, freq, car);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Release audio:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int sceAudioOutput2GetRestSample();
-int sceAudio_5C37C0AE(void);
 int releaseAudio(void){
 	while(sceAudioOutput2GetRestSample() > 0);
-	return sceAudio_5C37C0AE();
+	return sceAudioSRCChRelease();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Audio output:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int sceAudio_E0727056(int volume, void *buffer);
 int audioOutput(int volume, void *buffer){
-	return sceAudio_E0727056(volume, buffer);
+	return sceAudioSRCOutputBlocking(volume, buffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

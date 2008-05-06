@@ -40,10 +40,11 @@ int initMenu(){
     char buffer[264];
     //sprintf(buffer, "%s/fontNormal.oft", userSettings->skinImagesPath);
     sprintf(buffer, "flash0:/font/ltn0.pgf");
+    //sprintf(buffer, "%s/fontNormal.pgf", userSettings->skinImagesPath);
     fontMenuNormal = oslLoadFontFile(buffer);
     if (!fontMenuNormal)
         errorLoadImage(buffer);
-    oslIntraFontSetStyle(fontMenuNormal, 0.5f,0xFFFFFFFF,0xFF000000,INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontMenuNormal, 0.5f, 0xFFFFFFFF, 0xFF000000, INTRAFONT_ALIGN_LEFT);
     fontMenuNormal->charHeight -= 2;
 
     return 0;
@@ -106,19 +107,15 @@ int drawMenu(struct menuElements *menu){
 			skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
             oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
             oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
 
         if (menu->dataFeedFunction != NULL)
             menu->dataFeedFunction(i, &menu->elements[i]);
 
-        //oslSetBkColor(RGBA(0, 0, 0, 0));
-        //oslSetFont(fontMenuNormal);
         if (menu->align == ALIGN_LEFT)
             xPos = menu->xPos + 4;
         else if (menu->align == ALIGN_RIGHT)
@@ -138,9 +135,6 @@ int drawMenu(struct menuElements *menu){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int processMenuKeys(struct menuElements *menu){
     struct menuElement selected;
-
-    if (checkHold())
-        return 0;
 
     if (menu->numberOfElements && osl_pad.pressed.down){
         if (menu->selected < menu->numberOfElements - 1){

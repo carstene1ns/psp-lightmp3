@@ -28,23 +28,23 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //Globals
 /////////////////////////////////////////////////////////////////////////////////////////
-int OGG_audio_channel;
-char OGG_fileName[264];
-int OGG_file = -1;
-OggVorbis_File OGG_VorbisFile;
-int OGG_eos = 0;
-struct fileInfo OGG_info;
-int OGG_isPlaying = 0;
-unsigned int OGG_volume_boost = 0.0;
-double OGG_milliSeconds = 0.0;
-int OGG_playingSpeed = 0; // 0 = normal
-int OGG_playingDelta = 0;
-int outputInProgress = 0;
-long OGG_suspendPosition = -1;
-long OGG_suspendIsPlaying = 0;
+static int OGG_audio_channel;
+static char OGG_fileName[264];
+static int OGG_file = -1;
+static OggVorbis_File OGG_VorbisFile;
+static int OGG_eos = 0;
+static struct fileInfo OGG_info;
+static int OGG_isPlaying = 0;
+static unsigned int OGG_volume_boost = 0.0;
+static double OGG_milliSeconds = 0.0;
+static int OGG_playingSpeed = 0; // 0 = normal
+static int OGG_playingDelta = 0;
+static int outputInProgress = 0;
+static long OGG_suspendPosition = -1;
+static long OGG_suspendIsPlaying = 0;
 int OGG_defaultCPUClock = 50;
-short OGG_mixBuffer[PSP_NUM_AUDIO_SAMPLES * 2 * 2]__attribute__ ((aligned(64)));
-unsigned long OGG_tempmixleft = 0;
+static short OGG_mixBuffer[PSP_NUM_AUDIO_SAMPLES * 2 * 2]__attribute__ ((aligned(64)));
+static unsigned long OGG_tempmixleft = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Audio callback

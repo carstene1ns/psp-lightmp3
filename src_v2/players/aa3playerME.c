@@ -49,9 +49,9 @@ long AA3ME_suspendPosition = -1;
 long AA3ME_suspendIsPlaying = 0;
 double AA3ME_filePos = 0;
 
-unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
-unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
-short AA3ME_output_buffer[2048*2]__attribute__((aligned(64)));//at3+ sample_per_frame*4
+static unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
+static unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
+static short AA3ME_output_buffer[2048*2]__attribute__((aligned(64)));//at3+ sample_per_frame*4
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Private functions:
