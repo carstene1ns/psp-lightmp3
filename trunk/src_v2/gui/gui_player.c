@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <oslib/oslib.h>
-#include <psphprm.h>
 
 #include "../main.h"
 #include "gui_player.h"
@@ -287,7 +286,6 @@ int playFile(char *fileName, char *trackMessage){
     int ratingChangedUpDown = 0;
     int ratingChangedCross = 0;
     int helpShown = 0;
-    u32 remoteButtons;
     int flagExit = 0;
     int status = STATUS_NORMAL;
 
@@ -443,8 +441,9 @@ int playFile(char *fileName, char *trackMessage){
     playerStatus = 1;
 
     flagExit = 0;
+	int skip = 0;
     while(!osl_quit && !flagExit){
-        if (userSettings->displayStatus){
+        if (userSettings->displayStatus && !skip){
             oslStartDrawing();
             drawCommonGraphics();
             info = (*getInfoFunct)();
@@ -455,13 +454,16 @@ int playFile(char *fileName, char *trackMessage){
             drawCoverArt();
             if (status == STATUS_HELP)
                 drawHelp("PLAYER");
-        }else{
+        	oslEndDrawing();
+        }else if (!userSettings->displayStatus)
 			scePowerTick(0);
-        }
+
+        oslEndFrame();
+    	skip = oslSyncFrame();
 
         lastPercentage = (*getPercentageFunct)();
         oslReadKeys();
-        sceHprmPeekCurrentKey(&remoteButtons);
+        oslReadRemoteKeys();
 
         if (status == STATUS_HELP){
             if (osl_pad.released.cross || osl_pad.released.circle)
@@ -494,7 +496,7 @@ int playFile(char *fileName, char *trackMessage){
                     userSettings->muted = !userSettings->muted;
         			(*setMuteFunct)(userSettings->muted);
                 }
-            }else if (osl_pad.released.R || (remoteButtons & PSP_HPRM_FORWARD)){
+            }else if (osl_pad.released.R || osl_remote.released.rmforward){
                 if (helpShown)
                     helpShown = 0;
                 else{
@@ -504,7 +506,7 @@ int playFile(char *fileName, char *trackMessage){
                     retValue = PLAYER_NEXT;
                     flagExit = 1;
                 }
-            }else if (osl_pad.released.L || (remoteButtons & PSP_HPRM_BACK)){
+            }else if (osl_pad.released.L || osl_remote.released.rmback){
                 if (helpShown)
                     helpShown = 0;
                 else{
@@ -514,7 +516,7 @@ int playFile(char *fileName, char *trackMessage){
                     retValue = PLAYER_PREVIOUS;
                     flagExit = 1;
                 }
-            }else if (osl_pad.released.cross || (remoteButtons & PSP_HPRM_PLAYPAUSE)){
+            }else if (osl_pad.released.cross || osl_remote.released.rmplaypause){
                 if (ratingChangedCross)
                     ratingChangedCross = 0;
                 else{
@@ -525,8 +527,6 @@ int playFile(char *fileName, char *trackMessage){
                         (*pauseFunct)();
                         playerStatus = !playerStatus;
                     }
-                    if (remoteButtons & PSP_HPRM_PLAYPAUSE)
-                        sceKernelDelayThread(100000);
                 }
             }else if (osl_pad.released.up){
                 if (ratingChangedUpDown)
@@ -577,7 +577,6 @@ int playFile(char *fileName, char *trackMessage){
     					userSettings->playMode = MODE_NORMAL;
             }else if (osl_pad.released.start){
         		if (userSettings->displayStatus){
-                    oslEndDrawing();
         			//Spengo il display:
                     userSettings->curBrightness = getBrightness();
                     setBrightness(0);
@@ -590,7 +589,6 @@ int playFile(char *fileName, char *trackMessage){
                         setCpuClock(clock - userSettings->CLOCK_DELTA_ECONOMY_MODE);
         		} else {
         			//Accendo il display:
-                    oslStartDrawing();
                     oslClearScreen(RGBA(0, 0, 0, 255));
         			displayEnable();
                     oslSetFrameskip(0);
@@ -602,11 +600,6 @@ int playFile(char *fileName, char *trackMessage){
         		}
             }
         }
-
-        if (userSettings->displayStatus)
-        	oslEndDrawing();
-        oslEndFrame();
-    	oslSyncFrame();
 
         //Controllo se la riproduzione è finita:
         if (!flagExit && (*endOfStreamFunct)() == 1) {

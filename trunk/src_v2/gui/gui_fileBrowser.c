@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <oslib/oslib.h>
+#include <psprtc.h>
 
 #include "../main.h"
 #include "gui_fileBrowser.h"
@@ -150,6 +151,9 @@ int gui_fileBrowser(){
     int status = STATUS_NORMAL;
 	int oldClock = 0;
 	int oldBus = 0;
+	OSL_IMAGE *coverArt = NULL;
+	u64 lastMenuChange = 0;
+	int lastSelected = -1;
 
     fileBrowserRetValue = -1;
 
@@ -198,7 +202,11 @@ int gui_fileBrowser(){
         drawCommonGraphics();
         drawButtonBar(MODE_FILEBROWSER);
         drawMenu(&commonMenu);
-        if (status == STATUS_HELP)
+		if (coverArt){
+			skinGetPosition("POS_FILE_BROWSER_COVERART", tempPos);
+			oslDrawImageXY(coverArt, tempPos[0], tempPos[1]);
+		}
+		if (status == STATUS_HELP)
             drawHelp("FILE_BROWSER");
 
         if (USBactive)
@@ -209,8 +217,48 @@ int gui_fileBrowser(){
             if (osl_pad.released.cross || osl_pad.released.circle)
                 status = STATUS_NORMAL;
         }else{
-            if (!USBactive)
+            if (!USBactive){
                 processMenuKeys(&commonMenu);
+				//Coverart:
+				if (commonMenu.selected != lastSelected){
+					sceRtcGetCurrentTick(&lastMenuChange);
+					lastSelected = commonMenu.selected;
+					if (coverArt){
+						oslDeleteImage(coverArt);
+						coverArt = NULL;
+					}
+				}else if (!coverArt){
+					u64 currentTime;
+					sceRtcGetCurrentTick(&currentTime);
+					if (currentTime - lastMenuChange > 500000){
+						char dirName[264];
+					    int size = 0;
+
+						if (curDir[strlen(curDir)-1] != '/')
+							sprintf(dirName, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+						else
+							sprintf(dirName, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+						if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
+							directoryUp(dirName);
+						//Look for folder.jpg in the same directory:
+						sprintf(buffer, "%s/%s.jpg", dirName, "folder.jpg");
+						size = fileExists(buffer);
+						if (size > 0 && size <= MAX_IMAGE_DIMENSION)
+				            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+						else{
+							//Look for cover.jpg in same directory:
+							sprintf(buffer, "%s/%s", dirName, "cover.jpg");
+							size = fileExists(buffer);
+							if (size > 0 && size <= MAX_IMAGE_DIMENSION)
+					            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+						}
+						if (coverArt){
+							coverArt->stretchX = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
+							coverArt->stretchY = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
+						}
+					}
+				}
+			}
 
             if (!USBactive && osl_pad.held.L && osl_pad.held.R){
                 status = STATUS_HELP;

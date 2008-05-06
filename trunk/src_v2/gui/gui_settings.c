@@ -108,7 +108,10 @@ int getSettingVal(int index, char *value){
         case 15:
             sprintf(value, "%i", userSettings->KEY_AUTOREPEAT_GUI);
             break;
-    }
+        case 16:
+            sprintf(value, "%s", yesNo[userSettings->SHOW_SPLASH]);
+            break;
+	}
 
     return 0;
 }
@@ -161,7 +164,7 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     char settingVal[10] = "";
     struct menuElement tMenuEl;
 
-    menu->numberOfElements = 16;
+    menu->numberOfElements = 17;
 
     values->first = menu->first;
     values->selected = menu->selected;
@@ -227,6 +230,10 @@ int changeSettingVal(int index, int delta){
             	oslQuit ();
                 return 0;
             }
+			//Reset intraFont:
+			//oslIntraFontShutdown();
+			//initFonts();
+
             buildSettingsMenu(&commonMenu, &commonSubMenu);
             break;
         case 2:
@@ -294,6 +301,9 @@ int changeSettingVal(int index, int delta){
                 userSettings->KEY_AUTOREPEAT_GUI += delta;
                 oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
             }
+            break;
+        case 16:
+            userSettings->SHOW_SPLASH = !userSettings->SHOW_SPLASH;
             break;
     }
     return 0;

@@ -63,11 +63,11 @@ static int samplerates[4][3] =
 static int bitrates[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320 };
 static int bitrates_v2[] = {0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160 };
 
-unsigned char MP3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
-unsigned long MP3ME_codec_buffer[65]__attribute__((aligned(64)));
-unsigned char MP3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
-short OutputBuffer[2][OUTPUT_BUFFER_SIZE];
-short *OutputPtrME = OutputBuffer[0];
+static unsigned char MP3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
+static unsigned long MP3ME_codec_buffer[65]__attribute__((aligned(64)));
+static unsigned char MP3ME_output_buffer[2048*4]__attribute__((aligned(64)));//at3+ sample_per_frame*4
+static short OutputBuffer[2][OUTPUT_BUFFER_SIZE];
+static short *OutputPtrME = OutputBuffer[0];
 
 int MP3ME_output_index = 0;
 long MP3ME_suspendPosition = -1;

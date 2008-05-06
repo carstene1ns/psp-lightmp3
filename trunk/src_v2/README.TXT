@@ -27,7 +27,7 @@ The src directory contains source code: you don't need it to run the application
 
 FEATURES
 --------
--Skinnable and multilanguage (english, italian, portuguese, french, polish, german)
+-Skinnable and multilanguage (english, italian, portuguese, french, polish, dutch)
 -Support for kernel 3.x and Slim&Light
 -Support for MP3, OGG Vorbis, ATRAC3+ (*.aa3, *.omg, *.oma), FLAC
 -File browser
@@ -145,6 +145,8 @@ To compile LightMP3 you need:
 
 I built libMad, libTremor and libFLAC with
 CFLAGS += -O3 -frename-registers -ffast-math -fomit-frame-pointer
+
+I often update my sdk so you'll need an updated sdk to compile LightMP3.
 
 
 SKINS:

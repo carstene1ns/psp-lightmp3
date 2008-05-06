@@ -3,20 +3,23 @@ LightMP3 Changelog
 
 Version 2.0.0 BETA2
 -------------------
--Switched to OSLib MOD and intraFont
--New skin system (now all the elements can be moved, see skin.cfg)
--In the Media Library you can play a track pressing CROSS (like in the file browser)
--You can rate your tracks in the Media Library (CROSS + DPAD UP/DOWN)
--Fixed crash in playlist editor when press UP, RIGHT or NOTE on an empty list
--Added italian, french, dutch, polish, portuguese, russian language
- Many thanks to fabiom, borgqueenx, Mizou93, G-King, coach777, Magic_PSP
--Added help (press L + R)
+-Added: Switched to OSLib MOD and intraFont
+-Added: New skin system (now all the elements can be moved, see skin.cfg)
+-Added: In the Media Library you can play a track pressing CROSS (like in the file browser)
+-Added: You can rate your tracks in the Media Library (CROSS + DPAD UP/DOWN)
+-Added: italian, french, dutch, polish, portuguese, russian language
+        Many thanks to fabiom, borgqueenx, Mizou93, G-King, coach777, Magic_PSP
+-Added: help (press L + R)
 -Added: you can add selected playlist to the current one (press START in the playlist browser)
--Added: Directories are marked with a starting "/" in the file browser
--Fixed: stop FLAC playback
+-Added: Directories are marked with a leading "/" in the file browser
 -Added: You can check a playlist with triangle (removes dead-links)
 -Added: option for keys autorepeat interval
 -Added: Top 100 in media library
+-Added: Option to enable/disable splash screen
+-Added: Top "Borwse All" in media library
+-Added: Cover displayed in file browser and in Media Library(stay 0.5 seconds on an item)
+-Fixed: crash in playlist editor when press UP, RIGHT or NOTE on an empty list
+-Fixed: stop FLAC playback
 -Fixed: Font (wow...the W now is ok!). ;)
 -Fixed: Analog was working also in HOLD
 -Fixed: Minor bugs

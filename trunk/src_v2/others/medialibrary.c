@@ -124,7 +124,22 @@ int ML_createEmptyDB(char *directory, char *fileName){
         return ML_ERROR_SQL;
     }
 
-    sprintf(sql, "create index media_idx_01 on media (artist, album);");
+    sprintf(sql, "create table sysvars (varname varchar(256), varvalue varchar(256), \
+                                         PRIMARY KEY (varname));");
+    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
+    if (result != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+	sprintf(sql, "Insert into sysvars(varname, varvalue) values('DB_VERSION', '%s');", ML_DB_VERSION);
+    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
+    if (result != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+
+
+	sprintf(sql, "create index media_idx_01 on media (artist, album);");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
@@ -145,7 +160,21 @@ int ML_createEmptyDB(char *directory, char *fileName){
         return ML_ERROR_SQL;
     }
 
-    ML_INTERNAL_closeDB();
+    sprintf(sql, "create index media_idx_04 on media (played desc, rating desc, title);");
+    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
+    if (result != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+
+    sprintf(sql, "create index media_idx_05 on media (title, artist);");
+    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
+    if (result != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+
+	ML_INTERNAL_closeDB();
     return 0;
 }
 
@@ -397,7 +426,10 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
 int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *resultBuffer){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
-    sprintf(sql, "%s LIMIT %i OFFSET %i", select, limit, offset);
+	if (strstr(select, " LIMIT "))
+	    sprintf(sql, "%s OFFSET %i", select, offset);
+	else
+	    sprintf(sql, "%s LIMIT %i OFFSET %i", select, limit, offset);
 
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
@@ -537,24 +569,7 @@ int ML_updateEntry(struct libraryEntry entry){
 // Clear an entry:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int ML_clearEntry(struct libraryEntry *entry){
-    strcpy(entry->artist, "");
-    strcpy(entry->album, "");
-    strcpy(entry->title, "");
-    strcpy(entry->genre, "");
-    strcpy(entry->year, "");
-    entry->tracknumber = 0;
-    strcpy(entry->path, "");
-    strcpy(entry->extension, "");
-    entry->seconds = 0;
-    entry->rating = 0;
-    entry->samplerate = 0;
-    entry->bitrate = 0;
-    entry->played = 0;
-
-    strcpy(entry->strField, "");
-    strcpy(entry->dataField, "");
-    entry->intField01 = 0;
-    entry->intField02 = 0;
+	memset(entry, 0, sizeof(struct libraryEntry));
     return 0;
 }
 
@@ -630,4 +645,3 @@ int ML_vacuum(){
     ML_INTERNAL_closeDB();
     return 0;
 }
-

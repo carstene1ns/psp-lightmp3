@@ -59,6 +59,6 @@ int drawHelp(char *help);
 int drawRating(int startX, int startY, int rating);
 
 int formatHHMMSS(int seconds, char *timeString);
-int checkHold();
+int initFonts();
 
 #endif

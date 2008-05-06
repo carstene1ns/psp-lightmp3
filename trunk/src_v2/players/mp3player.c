@@ -37,24 +37,23 @@
 * is initialized by the ParseArgs() function and is used as
 * coefficients against each subband samples when DoFilter is non-nul.
 */
-mad_fixed_t Filter[32];
-double filterDouble[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static mad_fixed_t Filter[32];
+static double filterDouble[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /* DoFilter is non-nul when the Filter table defines a filter bank to
 * be applied to the decoded audio subbands.
 */
-int DoFilter = 0;
+static int DoFilter = 0;
 
 //////////////////////////////////////////////////////////////////////
 // Global local variables
 //////////////////////////////////////////////////////////////////////
-struct mad_stream Stream;
-struct mad_header Header;
-struct mad_frame Frame;
-struct mad_synth Synth;
-mad_timer_t Timer;
-int i;
-int MP3_outputInProgress = 0;
+static struct mad_stream Stream;
+static struct mad_header Header;
+static struct mad_frame Frame;
+static struct mad_synth Synth;
+static mad_timer_t Timer;
+static int MP3_outputInProgress = 0;
 
 // The following variables are maintained and updated by the tracker during playback
 static int MP3_isPlaying;		// Set to true when a mod is being played

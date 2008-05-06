@@ -52,12 +52,12 @@ int kill_flac_thread;
 int bufferLow;
 
 #define MIX_BUF_SIZE (PSP_NUM_AUDIO_SAMPLES * 2)
-short FLAC_mixBuffer[MIX_BUF_SIZE * 4]__attribute__ ((aligned(64)));
+static short FLAC_mixBuffer[MIX_BUF_SIZE * 4]__attribute__ ((aligned(64)));
 
 long FLAC_tempmixleft = 0;
 long samples_played = 0;
 
-FLAC__StreamDecoder *decoder = 0;
+static FLAC__StreamDecoder *decoder = 0;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////

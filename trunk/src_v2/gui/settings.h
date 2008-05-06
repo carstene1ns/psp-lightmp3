@@ -37,6 +37,7 @@ struct settings{
     int BRIGHTNESS_CHECK;
     int KEY_AUTOREPEAT_GUI;
     int KEY_AUTOREPEAT_PLAYER;
+	int SHOW_SPLASH;
 
 	//CPU clock for filetype:
     int CLOCK_GUI;

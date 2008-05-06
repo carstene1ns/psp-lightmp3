@@ -20,23 +20,18 @@
 
 #define THREAD_STACK_SIZE 128*1024
 
-int sceAudio_38553111(unsigned short samples, unsigned short freq, char);
-int sceAudio_5C37C0AE(void);
-int sceAudio_E0727056(int volume, void *buffer);
-int sceAudioOutput2GetRestSample();
-
 int setFrequency(unsigned short samples, unsigned short freq, char car){
-	return sceAudio_38553111(samples, freq, car);
+	return sceAudioSRCChReserve(samples, freq, car);
 }
 
 int pspReleaseAudio(void){
 	while(sceAudioOutput2GetRestSample() > 0);
-	return sceAudio_5C37C0AE();
+	return sceAudioSRCChRelease();
 }
 
 
 int audioOutpuBlocking(int volume, void *buffer){
-	return sceAudio_E0727056(volume, buffer);
+	return sceAudioSRCOutputBlocking(volume, buffer);
 }
 
 static int audio_ready=0;

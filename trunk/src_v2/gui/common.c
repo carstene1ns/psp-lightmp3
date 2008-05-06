@@ -17,7 +17,6 @@
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pspkernel.h>
 #include <psppower.h>
-#include <psphprm.h>
 #include <pspsysmem.h>
 #include <psprtc.h>
 #include <oslib/oslib.h>
@@ -152,7 +151,8 @@ int loadCommonGraphics(){
 
     //sprintf(buffer, "%s/fontNormal.oft", userSettings->skinImagesPath);
     sprintf(buffer, "flash0:/font/ltn0.pgf");
-    fontNormal = oslLoadFontFile(buffer);
+    //sprintf(buffer, "%s/fontNormal.pgf", userSettings->skinImagesPath);
+	fontNormal = oslLoadFontFile(buffer);
     if (!fontNormal)
         errorLoadImage(buffer);
     oslIntraFontSetStyle(fontNormal, 0.5f,0xFFFFFFFF,0xFF000000,INTRAFONT_ALIGN_LEFT);
@@ -216,7 +216,7 @@ int drawToolbars(){
 		btrm = 0;
 	}
 
-    if (sceHprmIsRemoteExist())
+    if (oslIsRemoteExist())
         strcpy(remote, "RM");
 
 	//Current time:
@@ -370,7 +370,7 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
         else
             strcpy(menu->elements[i].text, directory->directory_entry[i].d_name);
         menu->elements[i].triggerFunction = NULL;
-        if (!strcmp(selected, menu->elements[i].text)){
+        if (!strcmp(selected, directory->directory_entry[i].d_name)){
             menu->first = i;
             menu->selected = i;
         }
@@ -507,14 +507,15 @@ int formatHHMMSS(int seconds, char *timeString){
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check HOLD
+// Init fonts based on language encoding:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int checkHold(){
-    SceCtrlData pad;
-
-    readButtons(&pad, 1);
-    if (pad.Buttons & PSP_CTRL_HOLD)
-        return 1;
-    else
-        return 0;
+int initFonts(){
+	//Init intraFont based on language settings:
+	char encoding[10];
+	strcpy(encoding, langGetString("ENCODING"));
+	if (!strcmp(encoding, "UTF8"))
+	    oslIntraFontInit(INTRAFONT_CACHE_LARGE | INTRAFONT_STRING_UTF8);
+	else
+	    oslIntraFontInit(INTRAFONT_CACHE_LARGE);
+	return 0;
 }
