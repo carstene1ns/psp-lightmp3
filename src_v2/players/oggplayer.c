@@ -191,7 +191,7 @@ void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
 			strcpy(targetInfo->artist, value);
 		else if(!strcmp(name, "GENRE"))
 			strcpy(targetInfo->genre, value);
-		else if(!strcmp(name, "DATE")){
+		else if(!strcmp(name, "DATE") || !strcmp(name, "YEAR")){
             strncpy(targetInfo->year, value, 4);
             targetInfo->year[4] = '\0';
 		}else if(!strcmp(name, "TRACKNUMBER"))

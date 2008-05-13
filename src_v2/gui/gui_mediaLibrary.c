@@ -75,6 +75,8 @@ static char previousWhere[ML_SQLMAXLENGTH] = "";
 static char previousOrderBy[ML_SQLMAXLENGTH] = "";
 static char tempSql[ML_SQLMAXLENGTH] = "";
 
+static OSL_IMAGE *coverArt = NULL;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Add selection to playlist:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +160,10 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
 int backToMainMenu(){
     clearMenu(&commonMenu);
     buildMainMenu();
+	if (coverArt){
+		oslDeleteImage(coverArt);
+		coverArt = NULL;
+	}
     return 0;
 }
 
@@ -175,12 +181,10 @@ int checkFileCallback(char *fileName){
     skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_TITLE_TEXT_SHADOW", tempColorShadow);
     oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("CHECKING_FILE"))) / 2, startY + 3, langGetString("CHECKING_FILE"));
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT_SHADOW", tempColorShadow);
     oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     getFileName(fileName, buffer);
     if (strlen(buffer) > 70)
        buffer[70] = '\0';
@@ -204,12 +208,10 @@ int scanDirCallback(char *dirName){
     skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_TITLE_TEXT_SHADOW", tempColorShadow);
     oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("SCANNING"))) / 2, startY + 3, langGetString("SCANNING"));
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT_SHADOW", tempColorShadow);
     oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     getFileName(dirName, buffer);
     if (strlen(buffer) > 70)
        buffer[70] = '\0';
@@ -279,7 +281,6 @@ void drawQueryRunning(){
 // Draw info on selected item:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void drawMLinfo(){
-	static OSL_IMAGE *coverArt = NULL;
 	static u64 lastMenuChange = 0;
 	static int lastSelected = -1;
 
@@ -294,7 +295,6 @@ void drawMLinfo(){
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
     oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
 
     if (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING){
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_LABEL", tempPos);
@@ -304,7 +304,6 @@ void drawMLinfo(){
         skinGetColor("RGBA_TEXT", tempColor);
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
         oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         sprintf(buffer, "%.f", MLresult[commonMenu.selected - mlBufferPosition].intField01);
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
@@ -327,7 +326,6 @@ void drawMLinfo(){
         skinGetColor("RGBA_TEXT", tempColor);
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
         oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         skinGetPosition("POS_MEDIALIBRARY_GENRE_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].genre);
         skinGetPosition("POS_MEDIALIBRARY_YEAR_VALUE", tempPos);
@@ -354,14 +352,14 @@ void drawMLinfo(){
 		}else if (!coverArt){
 			u64 currentTime;
 			sceRtcGetCurrentTick(&currentTime);
-			if (currentTime - lastMenuChange > 500000){
+			if (currentTime - lastMenuChange > COVERTART_DELAY){
 				char dirName[264];
 				int size = 0;
 
 				sprintf(dirName, "%s", MLresult[commonMenu.selected - mlBufferPosition].path);
 				directoryUp(dirName);
 				//Look for folder.jpg in the same directory:
-				sprintf(buffer, "%s/%s.jpg", dirName, "folder.jpg");
+				sprintf(buffer, "%s/%s", dirName, "folder.jpg");
 				size = fileExists(buffer);
 				if (size > 0 && size <= MAX_IMAGE_DIMENSION)
 					coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
@@ -459,12 +457,10 @@ void queryDataFeed(int index, struct menuElement *element){
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
             oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
             oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-            //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
         }
         oslDrawString(commonMenu.xPos + star->sizeX*ML_MAX_RATING + 8, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), buffer);
 		strcpy(element->text, "");

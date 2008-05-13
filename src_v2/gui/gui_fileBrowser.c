@@ -230,7 +230,7 @@ int gui_fileBrowser(){
 				}else if (!coverArt){
 					u64 currentTime;
 					sceRtcGetCurrentTick(&currentTime);
-					if (currentTime - lastMenuChange > 500000){
+					if (currentTime - lastMenuChange > COVERTART_DELAY){
 						char dirName[264];
 					    int size = 0;
 
@@ -241,7 +241,7 @@ int gui_fileBrowser(){
 						if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
 							directoryUp(dirName);
 						//Look for folder.jpg in the same directory:
-						sprintf(buffer, "%s/%s.jpg", dirName, "folder.jpg");
+						sprintf(buffer, "%s/%s", dirName, "folder.jpg");
 						size = fileExists(buffer);
 						if (size > 0 && size <= MAX_IMAGE_DIMENSION)
 				            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
