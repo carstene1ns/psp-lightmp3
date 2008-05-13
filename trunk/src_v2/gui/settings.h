@@ -19,6 +19,8 @@
 #ifndef __setting_h
 #define __setting_h (1)
 
+#define COVERTART_DELAY 800000
+
 //Settings:
 struct settings{
     char ebootPath[264];

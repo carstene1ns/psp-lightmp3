@@ -606,7 +606,7 @@ void getCovertArtImageName(char *fileName, struct fileInfo *info){
     }
 
     //Look for folder.jpg in the same directory:
-    sprintf(buffer, "%s/%s.jpg", dirName, "folder.jpg");
+    sprintf(buffer, "%s/%s", dirName, "folder.jpg");
     size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){
         strcpy(info->coverArtImageName, buffer);
