@@ -125,7 +125,7 @@ int ML_createEmptyDB(char *directory, char *fileName){
     }
 
     sprintf(sql, "create table sysvars (varname varchar(256), varvalue varchar(256), \
-                                         PRIMARY KEY (varname));");
+                                        PRIMARY KEY (varname));");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();

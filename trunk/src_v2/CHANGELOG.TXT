@@ -16,8 +16,10 @@ Version 2.0.0 BETA2
 -Added: option for keys autorepeat interval
 -Added: Top 100 in media library
 -Added: Option to enable/disable splash screen
--Added: Top "Borwse All" in media library
--Added: Cover displayed in file browser and in Media Library(stay 0.5 seconds on an item)
+-Added: "Borwse All" in media library
+-Added: Cover displayed in file browser and in Media Library (stay 0.5 seconds on an item).
+        Works only with folder,jpg and cover.jpg (doesen't read coverart from ID3v2)
+-Added: Display now fades in and out when you toggle economy mode
 -Fixed: crash in playlist editor when press UP, RIGHT or NOTE on an empty list
 -Fixed: stop FLAC playback
 -Fixed: Font (wow...the W now is ok!). ;)

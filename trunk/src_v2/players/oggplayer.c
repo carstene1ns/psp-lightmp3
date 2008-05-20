@@ -96,7 +96,6 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
                     *(_buf2) = volume_boost(&OGG_mixBuffer[count2], &OGG_volume_boost);
                     *(_buf2 + 1) = volume_boost(&OGG_mixBuffer[count2 + 1], &OGG_volume_boost);
                 }else{
-                    // Double up for stereo
                     *(_buf2) = OGG_mixBuffer[count2];
                     *(_buf2 + 1) = OGG_mixBuffer[count2 + 1];
                 }

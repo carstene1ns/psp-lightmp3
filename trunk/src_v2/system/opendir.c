@@ -180,7 +180,7 @@ int directoryUp(char *dirName)
 		//Cerco l'ultimo slash:
 		int i = 0;
 		for (i = strlen(dirName) - 1; i >= 0; i--){
-			if ((dirName[i] == '/') & (i != strlen(dirName))){
+			if (dirName[i] == '/' && i != strlen(dirName)){
 				if (i > 4){
 					dirName[i] = '\0';
 				}else{
@@ -197,25 +197,20 @@ int directoryUp(char *dirName)
 
 //Prendo solo il nome del file/directory:
 void getFileName(char *fileName, char *onlyName){
-	int slash = -1;
-	int retCount;
+	int slash = 0;
 
 	strcpy(onlyName, fileName);
 	//Cerco l'ultimo slash:
 	int i = 0;
-	for (i = strlen(fileName) - 1; i >= 0; i--){
-		if ((fileName[i] == '/') & (i != strlen(fileName))){
+	int len = strlen(fileName);
+	for (i = len - 2; i >= 0; i--){
+		if (fileName[i] == '/'){
 			slash = i;
 			break;
 		}
 	}
 	if (slash){
-		retCount = 0;
-		for (i = slash + 1; i < strlen(fileName); i++){
-			onlyName[retCount] = fileName[i];
-			retCount++;
-		}
-		onlyName[retCount] = '\0';
+		strcpy(onlyName, fileName + slash + 1);
 	}else{
 		strcpy(onlyName, fileName);
 	}

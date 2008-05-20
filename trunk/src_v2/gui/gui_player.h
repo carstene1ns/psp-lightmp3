@@ -23,6 +23,7 @@
 #define MODE_SHUFFLE 3
 #define MODE_SHUFFLE_REPEAT 4
 
+#define SLEEP_NONE 0
 #define SLEEP_TRACK 1
 #define SLEEP_PLAYLIST 2
 
