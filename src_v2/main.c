@@ -36,6 +36,7 @@
 
 #include "system/exception.h"
 #include "system/clock.h"
+#include "system/brightness.h"
 #include "players/m3u.h"
 #include "players/player.h"
 #include "players/equalizer.h"
@@ -231,19 +232,19 @@ int checkBrightness(){
             oslStartDrawing();
             drawCommonGraphics();
             drawConfirm(langGetString("CHECK_BRIGHTNESS_TITLE"), langGetString("CHECK_BRIGHTNESS"));
+        	oslEndDrawing();
+            oslEndFrame();
+        	oslSyncFrame();
 
             oslReadKeys();
             if(osl_pad.released.cross){
-                setBrightness(24);
+				fadeDisplay(24, DISPLAY_FADE_TIME);
             	userSettings->curBrightness = 24;
                 imposeSetBrightness(0);
                 done = 1;
             }else if(osl_pad.released.circle){
                 done = 1;
             }
-        	oslEndDrawing();
-            oslEndFrame();
-        	oslSyncFrame();
         }
     }
     return 0;
@@ -298,11 +299,10 @@ int main(){
 	}
 
 
-
     oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
     oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
-    oslSetRemoteKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
-    oslSetRemoteKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
+    //oslSetRemoteKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_PLAYER);
+    //oslSetRemoteKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_PLAYER);
 
     //Temp m3u filename:
     sprintf(MLtempM3Ufile, "%s%s", userSettings->ebootPath, "MLtemp.m3u");
@@ -384,7 +384,7 @@ int main(){
 	if (userSettings->BRIGHTNESS_CHECK == 1)
     	checkBrightness();
     else if (userSettings->BRIGHTNESS_CHECK == 2){
-        setBrightness(24);
+		fadeDisplay(24, DISPLAY_FADE_TIME);
     	userSettings->curBrightness = 24;
         imposeSetBrightness(0);
     }

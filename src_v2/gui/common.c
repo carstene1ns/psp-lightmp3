@@ -194,6 +194,9 @@ int unLoadCommonGraphics(){
 int drawToolbars(){
     int m, h, btrh, btrm, btr, rh, battPerc;
     char remote[3] = "";
+	static u64 lastFreeMemTime = 0;
+	static SceSize freeKMem = 0;
+	u64 currentTime = 0;
 
     skinGetPosition("POS_TOOLBAR_1", tempPos);
     oslDrawImageXY(commonTopToolbar, tempPos[0], tempPos[1]);
@@ -266,12 +269,19 @@ int drawToolbars(){
     skinGetPosition("POS_CPU_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
+	//Freee memory:
+	sceRtcGetCurrentTick(&currentTime);
+	if (currentTime - lastFreeMemTime >= 1000000){
+		freeKMem = sceKernelTotalFreeMemSize();
+		sceRtcGetCurrentTick(&lastFreeMemTime);
+	}
     skinGetPosition("POS_FREE_MEMORY_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("FREE_MEMORY"));
-    sprintf(buffer, "%i kb", sceKernelTotalFreeMemSize() / 1024);
+    sprintf(buffer, "%i kb", freeKMem / 1024);
     skinGetPosition("POS_FREE_MEMORY_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
+	//Time:
 	sprintf(buffer, "%2.2d/%2.2d/%4.4d %2.2d:%2.2d",currTime.day, currTime.month, currTime.year, currTime.hour, currTime.minutes);
     skinGetPosition("POS_CLOCK_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);

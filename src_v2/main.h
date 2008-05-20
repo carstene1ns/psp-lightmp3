@@ -24,6 +24,8 @@
 
 #define ML_DB "mediaLibrary.db"
 
+#define DISPLAY_FADE_TIME 0.2
+
 #define MODE_FILEBROWSER 0
 #define MODE_PLAYLISTS 1
 #define MODE_PLAYLIST_EDITOR 2

@@ -38,8 +38,8 @@ int getBusClock(){
 void setBusClock(int bus){
     if (bus >= 54 && bus <= 111 && sceKernelDevkitVersion() < 0x03070110){
         scePowerSetBusClockFrequency(bus);
-		if (getBusClock() < bus)
-			scePowerSetBusClockFrequency(++bus);
+		//if (getBusClock() < bus)
+		//	scePowerSetBusClockFrequency(++bus);
 	}
 }
 

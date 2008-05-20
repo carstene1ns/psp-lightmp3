@@ -29,6 +29,7 @@
 #include "skinsettings.h"
 #include "../system/opendir.h"
 #include "../system/clock.h"
+#include "../system/brightness.h"
 #include "../players/player.h"
 #include "../players/equalizer.h"
 #include "../players/m3u.h"
@@ -44,6 +45,7 @@
 
 #define STATUS_NORMAL 0
 #define STATUS_HELP 1
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions imported from prx:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,6 +271,28 @@ int drawProgressBar(){
     return 0;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Draws the player:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
+	struct fileInfo info;
+
+	oslStartDrawing();
+	drawCommonGraphics();
+	info = (*getInfoFunct)();
+	drawFileInfo(&info, libEntry, trackMessage);
+	drawFileSpecs(&info);
+	drawPlayerStatus();
+	drawProgressBar();
+	drawCoverArt();
+	if (status == STATUS_HELP)
+		drawHelp("PLAYER");
+	oslEndDrawing();
+	return 0;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Play a single file:
 //		 Returns 1 if user pressed NEXT
@@ -443,19 +467,9 @@ int playFile(char *fileName, char *trackMessage){
     flagExit = 0;
 	int skip = 0;
     while(!osl_quit && !flagExit){
-        if (userSettings->displayStatus && !skip){
-            oslStartDrawing();
-            drawCommonGraphics();
-            info = (*getInfoFunct)();
-            drawFileInfo(&info, &libEntry, trackMessage);
-            drawFileSpecs(&info);
-            drawPlayerStatus();
-            drawProgressBar();
-            drawCoverArt();
-            if (status == STATUS_HELP)
-                drawHelp("PLAYER");
-        	oslEndDrawing();
-        }else if (!userSettings->displayStatus)
+        if (userSettings->displayStatus && !skip)
+			drawPlayer(status, &libEntry, trackMessage);
+        else if (!userSettings->displayStatus)
 			scePowerTick(0);
 
         oslEndFrame();
@@ -491,6 +505,7 @@ int playFile(char *fileName, char *trackMessage){
                 playerStatus = 0;
                 retValue = PLAYER_STOP;
                 flagExit = 1;
+				userSettings->sleepMode = SLEEP_NONE;
             }else if (osl_pad.released.square){
         		if (playerStatus == 1){
                     userSettings->muted = !userSettings->muted;
@@ -579,9 +594,8 @@ int playFile(char *fileName, char *trackMessage){
         		if (userSettings->displayStatus){
         			//Spengo il display:
                     userSettings->curBrightness = getBrightness();
-                    setBrightness(0);
+                    fadeDisplay(0, DISPLAY_FADE_TIME);
         			displayDisable();
-                    oslSetFrameskip(5);
         			imposeSetHomePopup(0);
         			userSettings->displayStatus = 0;
         			//Downclock:
@@ -589,14 +603,16 @@ int playFile(char *fileName, char *trackMessage){
                         setCpuClock(clock - userSettings->CLOCK_DELTA_ECONOMY_MODE);
         		} else {
         			//Accendo il display:
-                    oslClearScreen(RGBA(0, 0, 0, 255));
-        			displayEnable();
-                    oslSetFrameskip(0);
-        			imposeSetHomePopup(1);
-                    setBrightness(userSettings->curBrightness);
-        			userSettings->displayStatus = 1;
                     if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
             			setCpuClock(clock);
+					drawPlayer(status, &libEntry, trackMessage);
+					oslEndFrame();
+					skip = oslSyncFrame();
+					displayEnable();
+        			setBrightness(0);
+        			imposeSetHomePopup(1);
+					fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
+        			userSettings->displayStatus = 1;
         		}
             }
         }
@@ -761,9 +777,9 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
         oslEndFrame();
     	oslSyncFrame();
     	displayEnable();
-    	oslSetFrameskip(0);
+		setBrightness(0);
     	imposeSetHomePopup(1);
-        setBrightness(userSettings->curBrightness);
+        fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
         userSettings->displayStatus = 1;
     }
 
