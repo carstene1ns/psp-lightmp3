@@ -29,7 +29,7 @@ void MP3ME_FreeTune();
 int MP3ME_Load(char *filename);
 void MP3ME_GetTimeString(char *dest);
 int MP3ME_EndOfStream();
-struct fileInfo MP3ME_GetInfo();
+struct fileInfo *MP3ME_GetInfo();
 struct fileInfo MP3ME_GetTagInfoOnly(char *filename);
 int MP3ME_GetStatus();
 int MP3ME_GetPercentage();

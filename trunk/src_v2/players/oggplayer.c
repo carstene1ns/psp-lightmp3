@@ -330,8 +330,8 @@ int OGG_EndOfStream(){
 	return OGG_eos;
 }
 
-struct fileInfo OGG_GetInfo(){
-	return OGG_info;
+struct fileInfo *OGG_GetInfo(){
+	return &OGG_info;
 }
 
 

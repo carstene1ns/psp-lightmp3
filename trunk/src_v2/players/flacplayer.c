@@ -412,8 +412,8 @@ int FLAC_EndOfStream(){
 }
 
 
-struct fileInfo FLAC_GetInfo(){
-	return FLAC_info;
+struct fileInfo *FLAC_GetInfo(){
+	return &FLAC_info;
 }
 
 

@@ -21,12 +21,16 @@
 //    This code is based upon this sample code from ps2dev.org
 //    http://forums.ps2dev.org/viewtopic.php?t=8469
 //    and the source code of Music prx by joek2100
+#ifndef __player_h
+#define __player_h (1)
+
 #include <pspkernel.h>
 #include <pspsdk.h>
 #include <pspaudiocodec.h>
 #include <pspaudio.h>
 #include "pspaudiolib.h"
 
+#include "info.h"
 #include "mp3player.h"
 #include "mp3playerME.h"
 #include "aa3playerME.h"
@@ -85,34 +89,6 @@ int initMEAudioModules();
 int GetID3TagSize(char *fname);
 int SeekNextFrameMP3(SceUID fd);
 
-struct fileInfo{
-    int fileType;
-    int defaultCPUClock;
-    int needsME;
-	double fileSize;
-	char layer[12];
-	int kbit;
-	long instantBitrate;
-	long hz;
-	char mode[52];
-	char emphasis[20];
-	long length;
-	char strLength[12];
-	long frames;
-	long framesDecoded;
-	int  encapsulatedPictureType;
-	int  encapsulatedPictureOffset;
-	int  encapsulatedPictureLength;
-	char coverArtImageName[264];
-
-    //Tag/comments:
-	char album[260];
-	char title[260];
-	char artist[260];
-	char genre[260];
-    char year[8];
-    char trackNumber[8];
-};
 
 
 //Pointers for functions:
@@ -123,7 +99,7 @@ extern void (*pauseFunct)();
 extern void (*endFunct)();
 extern void (*setVolumeBoostTypeFunct)(char*);
 extern void (*setVolumeBoostFunct)(int);
-extern struct fileInfo (*getInfoFunct)();
+extern struct fileInfo *(*getInfoFunct)();
 extern struct fileInfo (*getTagInfoFunct)();
 extern void (*getTimeStringFunct)();
 extern int (*getPercentageFunct)();
@@ -156,3 +132,5 @@ int releaseAudio(void);
 int audioOutput(int volume, void *buffer);
 void initFileInfo(struct fileInfo *info);
 void getCovertArtImageName(char *fileName, struct fileInfo *info);
+
+#endif

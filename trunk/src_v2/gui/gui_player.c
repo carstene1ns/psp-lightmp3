@@ -276,13 +276,13 @@ int drawProgressBar(){
 // Draws the player:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
-	struct fileInfo info;
+	struct fileInfo *info = NULL;
 
 	oslStartDrawing();
 	drawCommonGraphics();
 	info = (*getInfoFunct)();
-	drawFileInfo(&info, libEntry, trackMessage);
-	drawFileSpecs(&info);
+	drawFileInfo(info, libEntry, trackMessage);
+	drawFileSpecs(info);
 	drawPlayerStatus();
 	drawProgressBar();
 	drawCoverArt();
@@ -302,7 +302,8 @@ int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int playFile(char *fileName, char *trackMessage){
     int retValue = PLAYER_END;
-    struct fileInfo info;
+    struct fileInfo tagInfo;
+	struct fileInfo *info = NULL;
     struct libraryEntry libEntry;
     int currentSpeed = 0;
     int clock = 0;
@@ -320,7 +321,6 @@ int playFile(char *fileName, char *trackMessage){
     setCpuClock(222);
     setBusClock(111);
 
-    initFileInfo(&info);
     if (userSettings->displayStatus){
         oslStartDrawing();
         drawCommonGraphics();
@@ -332,11 +332,11 @@ int playFile(char *fileName, char *trackMessage){
     setVolume(0,0x8000);
     setAudioFunctions(fileName, userSettings->MP3_ME);
     //Tipo di volume boost:
-    if (strcmp(userSettings->BOOST, "OLD") == 0){
+    if (strcmp(userSettings->BOOST, "OLD") == 0)
         (*setVolumeBoostTypeFunct)("OLD");
-    }else{
+    else
         (*setVolumeBoostTypeFunct)("NEW");
-    }
+
     if (userSettings->volumeBoost > MAX_VOLUME_BOOST)
         userSettings->volumeBoost = MAX_VOLUME_BOOST;
     if (userSettings->volumeBoost < MIN_VOLUME_BOOST)
@@ -357,8 +357,8 @@ int playFile(char *fileName, char *trackMessage){
     (*setVolumeBoostFunct)(userSettings->volumeBoost);
 
     //Read TAG and Media Library:
-    info = (*getTagInfoFunct)(fileName);
-    getCovertArtImageName(fileName, &info);
+    tagInfo = (*getTagInfoFunct)(fileName);
+    getCovertArtImageName(fileName, &tagInfo);
 
     char whereCond[200] = "";
     char fixedName[264] = "";
@@ -374,17 +374,17 @@ int playFile(char *fileName, char *trackMessage){
 
     //Save temp coverart file:
     coverArt = NULL;
-    if (info.encapsulatedPictureOffset && info.encapsulatedPictureLength <= MAX_IMAGE_DIMENSION){
+    if (tagInfo.encapsulatedPictureOffset && tagInfo.encapsulatedPictureLength <= MAX_IMAGE_DIMENSION){
         FILE *in = fopen(fileName, "rb");
-        if (info.encapsulatedPictureType == JPEG_IMAGE)
+        if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
             sprintf(buffer, "%scoverart.jpg", userSettings->ebootPath);
-        else if (info.encapsulatedPictureType == PNG_IMAGE)
+        else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
             sprintf(buffer, "%scoverart.png", userSettings->ebootPath);
         FILE *out = fopen(buffer, "wb");
         int buffSize = 4*1024;
         unsigned char cover[4*1024] = "";
-        fseek(in, info.encapsulatedPictureOffset, SEEK_SET);
-        int remaining = info.encapsulatedPictureLength;
+        fseek(in, tagInfo.encapsulatedPictureOffset, SEEK_SET);
+        int remaining = tagInfo.encapsulatedPictureLength;
         while (remaining > 0){
             if (remaining < buffSize)
                 buffSize = remaining;
@@ -394,13 +394,13 @@ int playFile(char *fileName, char *trackMessage){
         }
         fclose(out);
         fclose(in);
-        if (info.encapsulatedPictureType == JPEG_IMAGE)
+        if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
             coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-        else if (info.encapsulatedPictureType == PNG_IMAGE)
+        else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
             coverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         sceIoRemove(buffer);
-    }else if (strlen(info.coverArtImageName))
-        coverArt = oslLoadImageFileJPG(info.coverArtImageName, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+    }else if (strlen(tagInfo.coverArtImageName))
+        coverArt = oslLoadImageFileJPG(tagInfo.coverArtImageName, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 
     if (coverArt){
         coverArt->stretchX = skinGetParam("COVERART_WIDTH");
@@ -411,8 +411,8 @@ int playFile(char *fileName, char *trackMessage){
     if (userSettings->displayStatus){
         oslStartDrawing();
         drawCommonGraphics();
-        drawFileInfo(&info, &libEntry, trackMessage);
-        drawFileSpecs(&info);
+        drawFileInfo(&tagInfo, &libEntry, trackMessage);
+        drawFileSpecs(&tagInfo);
         drawPlayerStatus();
         drawCoverArt();
     	oslEndDrawing();
@@ -436,29 +436,29 @@ int playFile(char *fileName, char *trackMessage){
 
     //Update media library info:
     getExtension(fileName, libEntry.extension, 4);
-    strcpy(libEntry.album, info.album);
-    strcpy(libEntry.artist, info.artist);
-    strcpy(libEntry.title, info.title);
-    strcpy(libEntry.genre, info.genre);
-    strcpy(libEntry.year, info.year);
+    strcpy(libEntry.album, info->album);
+    strcpy(libEntry.artist, info->artist);
+    strcpy(libEntry.title, info->title);
+    strcpy(libEntry.genre, info->genre);
+    strcpy(libEntry.year, info->year);
     strcpy(libEntry.path, fileName);
-    libEntry.seconds = info.length;
-    libEntry.bitrate = info.kbit;
-    libEntry.samplerate = info.hz;
-    libEntry.tracknumber = atoi(info.trackNumber);
+    libEntry.seconds = info->length;
+    libEntry.bitrate = info->kbit;
+    libEntry.samplerate = info->hz;
+    libEntry.tracknumber = atoi(info->trackNumber);
 
     //Imposto il clock:
     if (userSettings->CLOCK_AUTO){
         if (userSettings->displayStatus)
-            setCpuClock(info.defaultCPUClock);
+            setCpuClock(info->defaultCPUClock);
         else
-            setCpuClock(info.defaultCPUClock - userSettings->CLOCK_DELTA_ECONOMY_MODE);
-        clock = info.defaultCPUClock;
+            setCpuClock(info->defaultCPUClock - userSettings->CLOCK_DELTA_ECONOMY_MODE);
+        clock = info->defaultCPUClock;
     }else
         clock = getCpuClock();
 
     //Disable media engine if safe and unused
-    if (!info.needsME && sceKernelDevkitVersion() < 0x03070110 && !getModel())
+    if (!info->needsME && sceKernelDevkitVersion() < 0x03070110 && !getModel())
         MEDisable();
 
     (*playFunct)();
@@ -626,13 +626,13 @@ int playFile(char *fileName, char *trackMessage){
     }
 
     //Srobbler LOG:
-    if (userSettings->SCROBBLER && strlen(info.title)){
+    if (userSettings->SCROBBLER && strlen(info->title)){
         time_t mytime;
         time(&mytime);
         if (lastPercentage >= 50)
-            SCROBBLER_addTrack(info, info.length, "L", mytime);
+            SCROBBLER_addTrack(*info, info->length, "L", mytime);
         else
-        	SCROBBLER_addTrack(info, info.length, "S", mytime);
+        	SCROBBLER_addTrack(*info, info->length, "S", mytime);
     }
 
     unsetAudioFunctions();
@@ -723,7 +723,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 		}
 		if (playerReturn == PLAYER_STOP){
 			break;
-		}else if ((playerReturn == PLAYER_NEXT) | (playerReturn == PLAYER_END)){
+		}else if (playerReturn == PLAYER_NEXT || playerReturn == PLAYER_END){
             //Controllo la ripetizione della traccia:
             if (playerReturn == PLAYER_END && userSettings->playMode == MODE_REPEAT)
                 continue;
