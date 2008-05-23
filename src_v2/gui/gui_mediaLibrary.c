@@ -83,7 +83,7 @@ static OSL_IMAGE *coverArt = NULL;
 int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uName){
     int offset = 0;
     struct libraryEntry localResult[ML_BUFFERSIZE];
-    struct fileInfo info;
+    struct fileInfo *info = NULL;
     char onlyName[264] = "";
     char message[10] = "";
 
@@ -123,13 +123,13 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
             	    (*initFunct)(0);
                 	if ((*loadFunct)(localResult[i - offset].path) == OPENING_OK){
                 		info = (*getInfoFunct)();
-                		if (strlen(info.title)){
-                			M3U_addSong(localResult[i - offset].path, info.length, info.title);
+                		if (strlen(info->title)){
+                			M3U_addSong(localResult[i - offset].path, info->length, info->title);
                 		}else{
                 			getFileName(localResult[i - offset].path, onlyName);
-                			M3U_addSong(localResult[i - offset].path, info.length, onlyName);
+                			M3U_addSong(localResult[i - offset].path, info->length, onlyName);
                 		}
-                    	localResult[i - offset].seconds = info.length;
+                    	localResult[i - offset].seconds = info->length;
                         ML_updateEntry(localResult[i - offset]);
                 	}
                 	(*endFunct)();

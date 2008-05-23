@@ -531,8 +531,8 @@ void MP3ME_End(){
 }
 
 
-struct fileInfo MP3ME_GetInfo(){
-    return MP3ME_info;
+struct fileInfo *MP3ME_GetInfo(){
+    return &MP3ME_info;
 }
 
 

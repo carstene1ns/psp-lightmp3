@@ -27,7 +27,7 @@ void AAC_FreeTune();
 int AAC_Load(char *filename);
 void AAC_GetTimeString(char *dest);
 int AAC_EndOfStream();
-struct fileInfo AAC_GetInfo();
+struct fileInfo *AAC_GetInfo();
 struct fileInfo AAC_GetTagInfoOnly(char *filename);
 int AAC_GetStatus();
 int AAC_GetPercentage();

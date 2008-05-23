@@ -74,7 +74,7 @@ int drawUSBmessage(){
 // Add one file to the current playlist:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void addFileToPlaylist(char *fileName, int save){
-	struct fileInfo info;
+	struct fileInfo *info = NULL;
 	char onlyName[264] = "";
 
 	if (save == 1)
@@ -85,11 +85,11 @@ void addFileToPlaylist(char *fileName, int save){
 	if ((*loadFunct)(fileName) == OPENING_OK){
 		info = (*getInfoFunct)();
 		(*endFunct)();
-		if (strlen(info.title)){
-			M3U_addSong(fileName, info.length, info.title);
+		if (strlen(info->title)){
+			M3U_addSong(fileName, info->length, info->title);
 		}else{
 			getFileName(fileName, onlyName);
-			M3U_addSong(fileName, info.length, onlyName);
+			M3U_addSong(fileName, info->length, onlyName);
 		}
 
 		if (save == 1)

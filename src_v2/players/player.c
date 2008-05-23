@@ -67,7 +67,7 @@ void (*pauseFunct)();
 void (*endFunct)();
 void (*setVolumeBoostTypeFunct)(char*);
 void (*setVolumeBoostFunct)(int);
-struct fileInfo (*getInfoFunct)();
+struct fileInfo *(*getInfoFunct)();
 struct fileInfo (*getTagInfoFunct)();
 void (*getTimeStringFunct)();
 int (*getPercentageFunct)();

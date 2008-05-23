@@ -411,7 +411,9 @@ int AA3MEgetInfo(){
         AA3ME_info.kbit = 105;
     else if ( data_align == 0x180 )
         AA3ME_info.kbit = 132;
-    else
+    else if ( data_align == 0x2E8 )
+        AA3ME_info.kbit = 128;
+	else
         AA3ME_info.kbit = data_align; //Unknown bitrate!
     AA3ME_info.instantBitrate = AA3ME_info.kbit * 1000;
 
@@ -469,7 +471,7 @@ int AA3ME_Load(char *fileName){
 
     releaseAudio();
     if (setAudioFrequency(AT3_OUTPUT_BUFFER_SIZE/2, AA3ME_info.hz, 2) < 0){
-        MP3ME_End();
+        AA3ME_End();
         return ERROR_INVALID_SAMPLE_RATE;
     }
 
@@ -514,8 +516,8 @@ void AA3ME_End(){
 }
 
 
-struct fileInfo AA3ME_GetInfo(){
-    return AA3ME_info;
+struct fileInfo *AA3ME_GetInfo(){
+    return &AA3ME_info;
 }
 
 

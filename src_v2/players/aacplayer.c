@@ -270,8 +270,8 @@ int AAC_EndOfStream(){
 	return AAC_eos;
 }
 
-struct fileInfo AAC_GetInfo(){
-	return AAC_info;
+struct fileInfo *AAC_GetInfo(){
+	return &AAC_info;
 }
 
 

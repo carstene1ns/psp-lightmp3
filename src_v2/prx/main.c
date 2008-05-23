@@ -50,9 +50,9 @@ u32 k1;
 //getBrightness
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int getBrightness(){
-    int currentBrightness = 0;
     k1 = pspSdkSetK1(0);
-    if (sceKernelDevkitVersion() < 0x03070110)
+    int currentBrightness = 0;
+	if (sceKernelDevkitVersion() < 0x03070110)
         sceDisplayGetBrightness(&currentBrightness, 0);
     else
         sceDisplayGetBrightness371(&currentBrightness, 0);
@@ -170,8 +170,8 @@ int displayEnable(void){
 //displayDisable
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int displayDisable(void){
-    int ret;
     k1 = pspSdkSetK1(0);
+	int ret;
     if (sceKernelDevkitVersion() < 0x03070110)
         ret = sceDisplayDisable();
     else
@@ -220,8 +220,8 @@ void initController(){
 }
 
 int readButtons(SceCtrlData *pad_data, int count){
-    int ret;
     k1 = pspSdkSetK1(0);
+	int ret;
     if (sceKernelDevkitVersion() < 0x03070110)
        ret = sceCtrlReadBufferPositive(pad_data, count);
     else

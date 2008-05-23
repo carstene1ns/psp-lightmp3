@@ -27,7 +27,7 @@ void OGG_FreeTune();
 int OGG_Load(char *filename);
 void OGG_GetTimeString(char *dest);
 int OGG_EndOfStream();
-struct fileInfo OGG_GetInfo();
+struct fileInfo *OGG_GetInfo();
 struct fileInfo OGG_GetTagInfoOnly(char *filename);
 int OGG_GetStatus();
 int OGG_GetPercentage();
@@ -39,7 +39,7 @@ int OGG_setPlayingSpeed(int playingSpeed);
 int OGG_setMute(int onOff);
 void OGG_fadeOut(float seconds);
 
-//Functions for filter (equalizer):	
+//Functions for filter (equalizer):
 int OGG_setFilter(double tFilter[32], int copyFilter);
 void OGG_enableFilter();
 void OGG_disableFilter();

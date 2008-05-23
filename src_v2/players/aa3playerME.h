@@ -30,7 +30,7 @@ void AA3ME_FreeTune();
 int AA3ME_Load(char *filename);
 void AA3ME_GetTimeString(char *dest);
 int AA3ME_EndOfStream();
-struct fileInfo AA3ME_GetInfo();
+struct fileInfo *AA3ME_GetInfo();
 struct fileInfo AA3ME_GetTagInfoOnly(char *filename);
 int AA3ME_GetStatus();
 int AA3ME_GetPercentage();
