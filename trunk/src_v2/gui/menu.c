@@ -18,7 +18,6 @@
 #include <pspkernel.h>
 #include <pspsdk.h>
 #include <psppower.h>
-#include <psprtc.h>
 #include <stdio.h>
 #include <oslib/oslib.h>
 #include "common.h"
@@ -38,14 +37,12 @@ OSL_FONT *fontMenuNormal;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int initMenu(){
     char buffer[264];
-    //sprintf(buffer, "%s/fontNormal.oft", userSettings->skinImagesPath);
-    sprintf(buffer, "flash0:/font/ltn0.pgf");
-    //sprintf(buffer, "%s/fontNormal.pgf", userSettings->skinImagesPath);
+	skinGetString("STR_FONT_NORMAL_NAME", buffer);
     fontMenuNormal = oslLoadFontFile(buffer);
     if (!fontMenuNormal)
         errorLoadImage(buffer);
-    oslIntraFontSetStyle(fontMenuNormal, 0.5f, 0xFFFFFFFF, 0xFF000000, INTRAFONT_ALIGN_LEFT);
-    fontMenuNormal->charHeight -= 2;
+    oslIntraFontSetStyle(fontMenuNormal, defaultTextSize, 0xFFFFFFFF, 0xFF000000, INTRAFONT_ALIGN_LEFT);
+    //fontMenuNormal->charHeight -= 2;
 
     return 0;
 }
@@ -106,11 +103,11 @@ int drawMenu(struct menuElements *menu){
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
 			skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            oslIntraFontSetStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            oslIntraFontSetStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         }
 
         if (menu->dataFeedFunction != NULL)

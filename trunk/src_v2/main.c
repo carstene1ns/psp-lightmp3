@@ -67,6 +67,7 @@ struct menuElements commonSubMenu;
 int tempPos[2];
 int tempColor[4];
 int tempColorShadow[4];
+float defaultTextSize;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions imported from prx:
@@ -336,6 +337,8 @@ int main(){
 
     //Skin's s images path:
     sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
+	//Default text size:
+	defaultTextSize = skinGetParam("FONT_NORMAL_SIZE") / 100.0;
 
     //Volume iniziale:
     int initialMute = imposeGetMute();

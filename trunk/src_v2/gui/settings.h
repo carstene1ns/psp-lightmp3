@@ -19,7 +19,7 @@
 #ifndef __setting_h
 #define __setting_h (1)
 
-#define COVERTART_DELAY 800000
+#define COVERTART_DELAY 1000000
 
 //Settings:
 struct settings{

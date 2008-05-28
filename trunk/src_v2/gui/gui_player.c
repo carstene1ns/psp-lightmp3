@@ -88,8 +88,7 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
     oslSetFont(font);
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_TITLE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("TITLE"));
     skinGetPosition("POS_ARTIST_LABEL", tempPos);
@@ -111,8 +110,7 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
 
     skinGetColor("RGBA_TEXT", tempColor);
     skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_TITLE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->title);
     skinGetPosition("POS_ARTIST_VALUE", tempPos);
@@ -163,8 +161,7 @@ int drawFileSpecs(struct fileInfo *info){
     oslSetFont(font);
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_MODE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("MODE"));
     skinGetPosition("POS_BITRATE_LABEL", tempPos);
@@ -178,8 +175,7 @@ int drawFileSpecs(struct fileInfo *info){
 
     skinGetColor("RGBA_TEXT", tempColor);
     skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_MODE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->mode);
     skinGetPosition("POS_BITRATE_VALUE", tempPos);
@@ -210,8 +206,7 @@ int drawPlayerStatus(){
     oslSetFont(font);
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_SLEEP_MODE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("SLEEP_MODE"));
     skinGetPosition("POS_PLAY_MODE_LABEL", tempPos);
@@ -225,8 +220,7 @@ int drawPlayerStatus(){
 
     skinGetColor("RGBA_TEXT", tempColor);
     skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_SLEEP_MODE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], sleepModeDesc[userSettings->sleepMode]);
     skinGetPosition("POS_PLAY_MODE_VALUE", tempPos);

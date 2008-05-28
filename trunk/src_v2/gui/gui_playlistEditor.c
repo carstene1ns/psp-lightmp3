@@ -82,7 +82,7 @@ int drawTrackInfo(struct fileInfo *info){
 
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_PLAYLIST_TITLE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("TITLE"));
@@ -93,7 +93,7 @@ int drawTrackInfo(struct fileInfo *info){
 
     skinGetColor("RGBA_TEXT", tempColor);
     skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     skinGetPosition("POS_PLAYLIST_TITLE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->title);
@@ -190,8 +190,8 @@ int gui_playlistEditor(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 0;
-    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
+    commonMenu.interline = skinGetParam("MENU_INTERLINE");
+    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
     buildMenuFromPlaylist(&commonMenu);
 

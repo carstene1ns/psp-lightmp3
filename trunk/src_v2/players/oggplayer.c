@@ -105,7 +105,6 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
 			//  Now shuffle the buffer along
 			for (count = 0; count < OGG_tempmixleft * 2; count++)
 			    OGG_mixBuffer[count] = OGG_mixBuffer[numSamples * 2 + count];
-
 		}
         outputInProgress = 0;
     } else {			//  Not Playing , so clear buffer

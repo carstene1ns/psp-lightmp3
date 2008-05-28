@@ -169,9 +169,6 @@ HELP_SETTINGS_TITLE=Settings help
 HELP_SETTINGS_01=Left/Right to cange setting
 HELP_SETTINGS_02=Start to save settings
 
-#0=Japanese, 1=English, 2=French, 3=Spanish, 4=German, 5=Italian, 6=Dutch, 7=Portuguese, 8=Russian, 9=Korean, 10-11=Chinese
-OSK_LANGUAGE=1
-
 LOADING_SKIN_TITLE=Please Wait
 LOADING_SKIN=Loading new skin
 CHECKING_PLAYLIST=Checking playlist's files

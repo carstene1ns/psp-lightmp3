@@ -18,7 +18,7 @@
 #ifndef __languages_h
 #define __languages_h (1)
 
-#define MAX_LANGSTRINGS 1000
+#define MAX_LANGSTRINGS 500
 
 struct strLangString{
     char name[52];
@@ -42,6 +42,5 @@ char *langGetString(char *stringName);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern int languagesCount;
 char languagesList[100][100];
-struct strLangStrings langStrings;
 
 #endif

@@ -46,4 +46,5 @@ extern int tempPos[2];
 extern int tempColor[4];
 extern int tempColorShadow[4];
 
+extern float defaultTextSize;
 #endif

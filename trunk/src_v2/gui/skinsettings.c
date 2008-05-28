@@ -26,6 +26,10 @@
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int skinsCount = 0;
+static struct intSkinParams skinParams;
+static struct intSkinColors skinColors;
+static struct intSkinPositions skinPositions;
+static struct intSkinStrings skinStrings;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +175,13 @@ int skinLoad(char *fileName){
                                     skinReadPOS(skinPositions.positions[skinPositions.positionCount].value, result);
                                     skinPositions.positionCount++;
                                 }
-                            }else{
+                            }else if (!strncmp(name, "STR_", 4)){
+                                if (skinStrings.stringCount < MAX_SKINSTRINGS){
+                                    strcpy(skinStrings.strings[skinStrings.stringCount].name, name);
+                                    strcpy(skinStrings.strings[skinStrings.stringCount].value, result);
+                                    skinStrings.stringCount++;
+                                }
+							}else{
                                 if (skinParams.paramCount < MAX_SKINPARAMS){
                                     strcpy(skinParams.params[skinParams.paramCount].name, name);
                                     skinParams.params[skinParams.paramCount].value = atoi(result);
@@ -250,6 +260,29 @@ int skinGetPosition(char *positionName, int *position){
            return 0;
        }
        if(strcmp(skinPositions.positions[m].name, positionName) < 0)
+           p = m + 1;
+       else
+           u = m - 1;
+    }
+    return -1;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Get a skin's string:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int skinGetString(char *stringName, char *string){
+    int p,u,m;
+    p = 0;
+    memset(string, 0, sizeof(skinStrings.strings[0].value));
+    u = skinStrings.stringCount - 1;
+    while(p <= u) {
+       m = (p + u) / 2;
+       if(!strcmp(skinStrings.strings[m].name, stringName)){
+           memcpy(string, skinStrings.strings[m].value, sizeof(skinStrings.strings[m].value));
+           return 0;
+       }
+       if(strcmp(skinStrings.strings[m].name, stringName) < 0)
            p = m + 1;
        else
            u = m - 1;

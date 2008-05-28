@@ -24,7 +24,7 @@ LIBDIR =
 #LIBS for libtremor : -lvorbisidec
 
 LIBS= -lsqlite3 -losl -lpng -lz \
-      -laac -lFLAC -lmad -lvorbisidec \
+      -lAac -lFLAC -lmad -lvorbisidec \
       -lpsphprm -lpspusb -lpspusbstor -lpspaudio -lpspaudiocodec -lpspkubridge \
 	  -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan -lm
 
