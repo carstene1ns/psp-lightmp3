@@ -18,9 +18,10 @@
 #ifndef __skinsettings_h
 #define __skinsettings_h (1)
 
-#define MAX_SKINPARAMS  500
-#define MAX_SKINCOLORS 500
-#define MAX_SKINPOSITIONS 500
+#define MAX_SKINPARAMS		200
+#define MAX_SKINSTRINGS		200
+#define MAX_SKINCOLORS		200
+#define MAX_SKINPOSITIONS	200
 
 struct intSkinParam{
     char name[52];
@@ -32,6 +33,15 @@ struct intSkinParams{
     struct intSkinParam params[MAX_SKINPARAMS];
 };
 
+struct intSkinString{
+    char name[52];
+    char value[264];
+};
+
+struct intSkinStrings{
+    int stringCount;
+    struct intSkinString strings[MAX_SKINSTRINGS];
+};
 
 struct intSkinColor{
     char name[52];
@@ -63,14 +73,12 @@ void skinLoadList(char *dirName);
 int skinGetParam(char *paramName);
 int skinGetColor(char *colorName, int *color);
 int skinGetPosition(char *positionName, int *position);
+int skinGetString(char *stringName, char *string);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern int skinsCount;
 char skinsList[100][100];
-struct intSkinParams skinParams;
-struct intSkinColors skinColors;
-struct intSkinPositions skinPositions;
 
 #endif

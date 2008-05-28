@@ -180,11 +180,11 @@ int checkFileCallback(char *fileName){
     oslDrawImageXY(scanBkg, startX, startY);
     skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_TITLE_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     oslDrawString((480 - oslGetStringWidth(langGetString("CHECKING_FILE"))) / 2, startY + 3, langGetString("CHECKING_FILE"));
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     getFileName(fileName, buffer);
     if (strlen(buffer) > 70)
        buffer[70] = '\0';
@@ -207,11 +207,11 @@ int scanDirCallback(char *dirName){
     oslDrawImageXY(scanBkg, startX, startY);
     skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_TITLE_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     oslDrawString((480 - oslGetStringWidth(langGetString("SCANNING"))) / 2, startY + 3, langGetString("SCANNING"));
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     getFileName(dirName, buffer);
     if (strlen(buffer) > 70)
        buffer[70] = '\0';
@@ -294,7 +294,7 @@ void drawMLinfo(){
     oslSetFont(font);
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
 
     if (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING){
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_LABEL", tempPos);
@@ -303,7 +303,7 @@ void drawMLinfo(){
         oslDrawString(tempPos[0], tempPos[1], langGetString("TOTAL_TIME"));
         skinGetColor("RGBA_TEXT", tempColor);
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-        oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+        oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         sprintf(buffer, "%.f", MLresult[commonMenu.selected - mlBufferPosition].intField01);
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
@@ -325,7 +325,7 @@ void drawMLinfo(){
 
         skinGetColor("RGBA_TEXT", tempColor);
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-        oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+        oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         skinGetPosition("POS_MEDIALIBRARY_GENRE_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].genre);
         skinGetPosition("POS_MEDIALIBRARY_YEAR_VALUE", tempPos);
@@ -456,12 +456,11 @@ void queryDataFeed(int index, struct menuElement *element){
         if (index == commonMenu.selected){
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontMenuNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         }
+		oslIntraFontSetStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         oslDrawString(commonMenu.xPos + star->sizeX*ML_MAX_RATING + 8, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), buffer);
 		strcpy(element->text, "");
 		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
@@ -501,8 +500,8 @@ int buildQueryMenu(char *select, int (*cancelFunction)()){
     commonMenu.height = commonMenu.background->sizeY;
     commonMenu.dataFeedFunction = queryDataFeed;
     commonMenu.align = ALIGN_LEFT;
-    commonMenu.interline = 0;
-    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
+    commonMenu.interline = skinGetParam("MENU_INTERLINE");
+    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = (cancelFunction);
 
     return 0;
@@ -698,8 +697,8 @@ int buildMainMenu(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 0;
-    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
+    commonMenu.interline = skinGetParam("MENU_INTERLINE");
+    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
 
     commonMenu.first = 0;
@@ -840,5 +839,7 @@ int gui_mediaLibrary(){
     clearMenu(&commonMenu);
     oslDeleteImage(scanBkg);
     oslDeleteImage(infoBkg);
-    return mediaLibraryRetValue;
+	if (coverArt)
+		oslDeleteImage(coverArt);
+	return mediaLibraryRetValue;
 }

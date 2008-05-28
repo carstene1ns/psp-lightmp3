@@ -262,9 +262,20 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
          {
             fseek(fp, 1, SEEK_CUR);
             fseek(fp, 5, SEEK_CUR);
-            id3tag->ID3EncapsulatedPictureOffset = ftell(fp);
+            id3tag->ID3EncapsulatedPictureType = JPEG_IMAGE;
+            id3tag->ID3EncapsulatedPictureOffset = searchJPGstart(fp, 20);
+            if (id3tag->ID3EncapsulatedPictureOffset < 0){
+                id3tag->ID3EncapsulatedPictureType = PNG_IMAGE;
+                id3tag->ID3EncapsulatedPictureOffset = searchPNGstart(fp, 20);
+            }
+            tag_length = tag_length - (id3tag->ID3EncapsulatedPictureOffset - ftell(fp));
             id3tag->ID3EncapsulatedPictureLength = tag_length-6;
-            fseek(fp, tag_length - 6, SEEK_CUR);
+            fseek(fp, tag_length-6, SEEK_CUR);
+            if (id3tag->ID3EncapsulatedPictureOffset < 0){
+                id3tag->ID3EncapsulatedPictureType = 0;
+                id3tag->ID3EncapsulatedPictureOffset = 0;
+                id3tag->ID3EncapsulatedPictureLength = 0;
+            }
          }
          else
          {

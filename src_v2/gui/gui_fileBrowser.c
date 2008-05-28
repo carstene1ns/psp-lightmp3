@@ -58,12 +58,12 @@ int drawUSBmessage(){
     oslSetFont(font);
     skinGetColor("RGBA_POPUP_TITLE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_TITLE_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("USB_ACTIVE"))) / 2, (272 - popupBkg->sizeY) / 2 + 3, langGetString("USB_ACTIVE"));
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT", tempColor);
     skinGetColor("RGBA_POPUP_MESSAGE_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, 0.5f, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
     oslDrawString((480 - oslGetStringWidth(langGetString("USB_MESSAGE"))) / 2, (272 - popupBkg->sizeY) / 2 + 40, langGetString("USB_MESSAGE"));
     return 0;
@@ -169,8 +169,8 @@ int gui_fileBrowser(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 0;
-    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
+    commonMenu.interline = skinGetParam("MENU_INTERLINE");
+    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
     if (!strlen(userSettings->lastBrowserDir)){
 		//Provo la prima directory:
@@ -366,7 +366,9 @@ int gui_fileBrowser(){
     }
     opendir_close(&directory);
     //unLoad images:
-    clearMenu(&commonMenu);
+	if (coverArt)
+		oslDeleteImage(coverArt);
+	clearMenu(&commonMenu);
 
     strcpy(userSettings->lastBrowserDir, curDir);
     return fileBrowserRetValue;

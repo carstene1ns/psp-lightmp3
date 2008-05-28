@@ -17,7 +17,6 @@
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pspkernel.h>
 #include <pspsdk.h>
-#include <psprtc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <oslib/oslib.h>
@@ -135,8 +134,8 @@ int initSettingsMenu(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
-    commonMenu.interline = 0;
-    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
+    commonMenu.interline = skinGetParam("MENU_INTERLINE");
+    commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
 
     //Values menu:
