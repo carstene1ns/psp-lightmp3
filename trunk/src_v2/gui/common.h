@@ -60,5 +60,6 @@ int drawRating(int startX, int startY, int rating);
 
 int formatHHMMSS(int seconds, char *timeString);
 int initFonts();
+void setFontStyle(OSL_FONT *f, float size, unsigned int color, unsigned int shadowColor, unsigned int options);
 
 #endif

@@ -228,9 +228,10 @@ int M3U_removeSong(int index){
 //Add a song to the playlist:
 int M3U_addSong(char *fileName, int length, char *title){
 	if (lPlayList.songCount < MAX_SONGS){
-		strcpy(lPlayList.songs[lPlayList.songCount].fileName, fileName);
-		lPlayList.songs[lPlayList.songCount].length = length;
-		strcpy(lPlayList.songs[lPlayList.songCount].title, title);
+		struct M3U_songEntry *entry = &lPlayList.songs[lPlayList.songCount];
+		strcpy(entry->fileName, fileName);
+		entry->length = length;
+		strcpy(entry->title, title);
 		lPlayList.songCount++;
 		lPlayList.modified = 1;
 		return(0);

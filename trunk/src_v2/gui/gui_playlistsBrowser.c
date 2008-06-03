@@ -58,8 +58,7 @@ int drawPlaylistInfo(){
 
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_PLAYLIST_NAME_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("PLAYLIST_NAME"));
     skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_LABEL", tempPos);
@@ -70,8 +69,7 @@ int drawPlaylistInfo(){
     if (commonMenu.numberOfElements){
         skinGetColor("RGBA_TEXT", tempColor);
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-        oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+        setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         skinGetPosition("POS_PLAYLIST_NAME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], commonMenu.elements[commonMenu.selected].text);
         skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_VALUE", tempPos);

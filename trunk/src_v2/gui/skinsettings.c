@@ -21,6 +21,7 @@
 
 #include "skinsettings.h"
 #include "../system/opendir.h"
+#include "../others/strreplace.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
@@ -135,6 +136,11 @@ int skinLoad(char *fileName){
 	FILE *f;
 	char lineText[256];
     char name[52];
+	char imagePath[264];
+
+	strcpy(imagePath, fileName);
+	directoryUp(imagePath);
+	strcat(imagePath, "/images");
 
     skinClear();
 	f = fopen(fileName, "rt");
@@ -178,7 +184,12 @@ int skinLoad(char *fileName){
                             }else if (!strncmp(name, "STR_", 4)){
                                 if (skinStrings.stringCount < MAX_SKINSTRINGS){
                                     strcpy(skinStrings.strings[skinStrings.stringCount].name, name);
-                                    strcpy(skinStrings.strings[skinStrings.stringCount].value, result);
+									char *repStr = replace(result, "$skinimage", imagePath);
+									if (repStr != NULL){
+	                                    strcpy(skinStrings.strings[skinStrings.stringCount].value, repStr);
+										free(repStr);
+									}else
+	                                    strcpy(skinStrings.strings[skinStrings.stringCount].value, result);
                                     skinStrings.stringCount++;
                                 }
 							}else{

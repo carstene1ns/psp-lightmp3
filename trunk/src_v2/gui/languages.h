@@ -18,7 +18,7 @@
 #ifndef __languages_h
 #define __languages_h (1)
 
-#define MAX_LANGSTRINGS 500
+#define MAX_LANGSTRINGS 300
 
 struct strLangString{
     char name[52];

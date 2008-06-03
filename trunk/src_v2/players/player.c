@@ -260,13 +260,11 @@ int SeekNextFrameMP3(SceUID fd)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set pointer to audio functions based on filename:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void setAudioFunctions(char *filename, int useME_MP3){
-	char ext[6];
-	if (strrchr(filename, '.'))
-		memcpy(ext, strrchr(filename, '.'), 6);
-	else
-		memcpy(ext, filename + strlen(filename) - 4, 5);
-	if (!stricmp(ext, ".ogg")){
+int setAudioFunctions(char *filename, int useME_MP3){
+	char ext[6] = "";
+	getExtension(filename, ext, 4);
+
+	if (!stricmp(ext, "OGG")){
         //OGG Vorbis
 		initFunct = OGG_Init;
 		loadFunct = OGG_Load;
@@ -293,7 +291,7 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = OGG_suspend;
         resumeFunct = OGG_resume;
         fadeOutFunct = OGG_fadeOut;
-    } else if (!stricmp(ext, ".mp3") && useME_MP3){
+    } else if (!stricmp(ext, "MP3") && useME_MP3){
         //MP3 via Media Engine
 		initFunct = MP3ME_Init;
 		loadFunct = MP3ME_Load;
@@ -320,7 +318,7 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = MP3ME_suspend;
         resumeFunct = MP3ME_resume;
         fadeOutFunct = MP3ME_fadeOut;
-    } else if (!stricmp(ext, ".mp3")){
+    } else if (!stricmp(ext, "MP3")){
         //MP3 via LibMad
 		initFunct = MP3_Init;
 		loadFunct = MP3_Load;
@@ -347,7 +345,8 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = MP3_suspend;
         resumeFunct = MP3_resume;
         fadeOutFunct = MP3_fadeOut;
-    } else if (!stricmp(ext, ".aa3") || !stricmp(ext, ".oma") || !stricmp(ext, ".omg")){
+		return 0;
+    } else if (!stricmp(ext, "AA3") || !stricmp(ext, "OMA") || !stricmp(ext, "OMG")){
         //AA3
 		initFunct = AA3ME_Init;
 		loadFunct = AA3ME_Load;
@@ -374,7 +373,8 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = AA3ME_suspend;
         resumeFunct = AA3ME_resume;
         fadeOutFunct = AA3ME_fadeOut;
-    } else if (!stricmp(ext, ".flac")){
+		return 0;
+    } else if (!stricmp(ext, "FLAC")){
         //FLAC
 		initFunct = FLAC_Init;
 		loadFunct = FLAC_Load;
@@ -401,7 +401,8 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = FLAC_suspend;
         resumeFunct = FLAC_resume;
         fadeOutFunct = FLAC_fadeOut;
-    } else if (!stricmp(ext, ".aac")){
+		return 0;
+    } else if (!stricmp(ext, "AAC")){
         //AAC e AAC+ software
 		initFunct = AAC_Init;
 		loadFunct = AAC_Load;
@@ -428,7 +429,9 @@ void setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = AAC_suspend;
         resumeFunct = AAC_resume;
         fadeOutFunct = AAC_fadeOut;
+		return 0;
     }
+	return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
