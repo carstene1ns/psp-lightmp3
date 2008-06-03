@@ -82,8 +82,7 @@ int drawTrackInfo(struct fileInfo *info){
 
     skinGetColor("RGBA_LABEL_TEXT", tempColor);
     skinGetColor("RGBA_LABEL_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_PLAYLIST_TITLE_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("TITLE"));
     skinGetPosition("POS_PLAYLIST_ARTIST_LABEL", tempPos);
@@ -93,8 +92,7 @@ int drawTrackInfo(struct fileInfo *info){
 
     skinGetColor("RGBA_TEXT", tempColor);
     skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
-    oslIntraFontSetStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    //oslSetTextColor(RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]));
+    setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_PLAYLIST_TITLE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->title);
     skinGetPosition("POS_PLAYLIST_ARTIST_VALUE", tempPos);

@@ -72,6 +72,7 @@ static short *OutputPtrME = OutputBuffer[0];
 int MP3ME_output_index = 0;
 long MP3ME_suspendPosition = -1;
 long MP3ME_suspendIsPlaying = 0;
+double MP3ME_filesize = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Private functions:
@@ -338,6 +339,7 @@ int MP3MEgetInfo(){
     MP3ME_info.defaultCPUClock = MP3ME_defaultCPUClock;
     MP3ME_info.needsME = 1;
 	MP3ME_info.fileSize = size;
+	MP3ME_filesize = size;
     MP3ME_info.framesDecoded = 0;
 
     double totalBitrate = 0;
@@ -537,10 +539,15 @@ struct fileInfo *MP3ME_GetInfo(){
 
 
 int MP3ME_GetPercentage(){
-    int perc = (int)(MP3ME_playingTime/(double)MP3ME_info.length*100.0);
-    if (perc > 100)
-        perc = 100;
-    return perc;
+	//Calcolo posizione in %:
+	float perc;
+
+    if (MP3ME_filesize > 0){
+        perc = (float)MP3ME_filePos / (float)MP3ME_filesize * 100.0;
+    }else{
+        perc = 0;
+    }
+    return((int)perc);
 }
 
 

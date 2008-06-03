@@ -387,6 +387,7 @@ void FLAC_FreeTune(){
 	sceKernelSignalSema(bufferLow, 1);
 	sceKernelDelayThread(100*1000);
 	sceKernelDeleteSema(bufferLow);
+    //FLAC__stream_decoder_delete(decoder);
     if (FLAC_file)
         fclose(FLAC_file);
     memset(FLAC_mixBuffer, 0, sizeof(FLAC_mixBuffer));

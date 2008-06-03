@@ -379,6 +379,7 @@ int main(){
 	if (userSettings->SHOW_SPLASH)
 		sceKernelWaitThreadEnd(splash_thid, NULL);
     oslSetReadKeysFunction(readButtons);
+	oslSetDepthTest(1);
 
 	//Controllo luminosità:
     int initialBrightness = getBrightness();

@@ -41,8 +41,7 @@ int initMenu(){
     fontMenuNormal = oslLoadFontFile(buffer);
     if (!fontMenuNormal)
         errorLoadImage(buffer);
-    oslIntraFontSetStyle(fontMenuNormal, defaultTextSize, 0xFFFFFFFF, 0xFF000000, INTRAFONT_ALIGN_LEFT);
-    //fontMenuNormal->charHeight -= 2;
+    setFontStyle(fontMenuNormal, defaultTextSize, 0xFFFFFFFF, 0xFF000000, INTRAFONT_ALIGN_LEFT);
 
     return 0;
 }
@@ -103,11 +102,11 @@ int drawMenu(struct menuElements *menu){
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
 			skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
-            oslIntraFontSetStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         }
 
         if (menu->dataFeedFunction != NULL)

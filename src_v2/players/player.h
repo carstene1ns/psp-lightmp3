@@ -117,7 +117,7 @@ extern int (*suspendFunct)();
 extern int (*resumeFunct)();
 extern void (*fadeOutFunct)(float seconds);
 
-extern void setAudioFunctions(char *filename, int useME);
+extern int setAudioFunctions(char *filename, int useME);
 extern void unsetAudioFunctions();
 
 short volume_boost(short *Sample, unsigned int *boost);

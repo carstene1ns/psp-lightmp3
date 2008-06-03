@@ -3,8 +3,9 @@ LightMP3 Changelog
 
 Version 2.0.0 BETA2
 -------------------
--Added: Switched to OSLib MOD and intraFont
+-Added: Switched to OSLib MOD, now supports intraFont
 -Added: New skin system (now all the elements can be moved, see skin.cfg)
+        Font is defined in the skin.cfg file
 -Added: In the Media Library you can play a track pressing CROSS (like in the file browser)
 -Added: You can rate your tracks in the Media Library (CROSS + DPAD UP/DOWN)
 -Added: italian, french, dutch, polish, portuguese, russian language
@@ -20,9 +21,9 @@ Version 2.0.0 BETA2
 -Added: Cover displayed in file browser and in Media Library (stay 0.5 seconds on an item).
         Works only with folder,jpg and cover.jpg (doesen't read coverart from ID3v2)
 -Added: Display now fades in and out when you toggle economy mode
+-Added: Music pause if you remove the headphones while listening to a track
 -Fixed: crash in playlist editor when press UP, RIGHT or NOTE on an empty list
 -Fixed: stop FLAC playback
--Fixed: Font (wow...the W now is ok!). ;)
 -Fixed: Analog was working also in HOLD
 -Fixed: Minor bugs
 

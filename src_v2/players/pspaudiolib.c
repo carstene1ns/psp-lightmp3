@@ -178,7 +178,7 @@ int pspAudioInit()
         str[6]='0'+i;
         //AudioStatus[i].threadhandle = sceKernelCreateThread(str,(void*)&AudioChannelThread,0x12,0x10000,0,NULL);
         //sceAudioSetChannelDataLen(i, PSP_NUM_AUDIO_SAMPLES);
-        AudioStatus[i].threadhandle = sceKernelCreateThread(str,(void*)&AudioChannelThread, 0x12, THREAD_STACK_SIZE, PSP_THREAD_ATTR_USER,NULL);
+        AudioStatus[i].threadhandle = sceKernelCreateThread(str,(void*)&AudioChannelThread, 0x12, THREAD_STACK_SIZE, PSP_THREAD_ATTR_USER, NULL);
         if (AudioStatus[i].threadhandle < 0) {
             AudioStatus[i].threadhandle = -1;
             failed=1;
