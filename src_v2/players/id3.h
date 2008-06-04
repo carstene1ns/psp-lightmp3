@@ -4,13 +4,13 @@
 #define PNG_IMAGE 2
 
 struct ID3Tag {
-    char   ID3Title[100];
-    char   ID3Artist[100];
-    char   ID3Album[100];
+    char   ID3Title[260];
+    char   ID3Artist[260];
+    char   ID3Album[260];
 	char   ID3Year[12];
-	char   ID3Comment[200];
+	char   ID3Comment[260];
 	char   ID3GenreCode[12];
-	char   ID3GenreText[100];
+	char   ID3GenreText[260];
     char   versionfound[12];
     int    ID3Track;
     char   ID3TrackText[8];

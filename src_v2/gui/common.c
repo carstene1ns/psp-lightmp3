@@ -510,7 +510,8 @@ int formatHHMMSS(int seconds, char *timeString){
 int initFonts(){
 	//Init intraFont based on language settings:
 	char encoding[10];
-	strcpy(encoding, langGetString("ENCODING"));
+	strncpy(encoding, langGetString("ENCODING"), 9);
+	encoding[9] = '\0';
 	if (!strcmp(encoding, "UTF8"))
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_UTF8);
 	else if (!strcmp(encoding, "SJIS"))

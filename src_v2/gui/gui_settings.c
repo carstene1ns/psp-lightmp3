@@ -47,8 +47,8 @@ char buffer[264] = "";
 // Get a settings value from menu index:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int getSettingVal(int index, char *value){
-    char yesNo[2][10];
-    char bCheck[3][30];
+    char yesNo[2][20];
+    char bCheck[3][50];
 
     strcpy(yesNo[0], langGetString("NO"));
     strcpy(yesNo[1], langGetString("YES"));
@@ -198,9 +198,6 @@ int changeSettingVal(int index, int delta){
             }
             if (current + delta < skinsCount && current + delta >= 0){
                 drawWait(langGetString("LOADING_SKIN_TITLE"), langGetString("LOADING_SKIN"));
-                oslEndDrawing();
-                oslEndFrame();
-                oslSyncFrame();
                 current += delta;
                 strcpy(userSettings->skinName, skinsList[current]);
                 sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
@@ -209,7 +206,6 @@ int changeSettingVal(int index, int delta){
                 unLoadCommonGraphics();
                 loadCommonGraphics();
                 initSettingsMenu();
-                oslStartDrawing();
             }
             break;
         case 1:
@@ -318,21 +314,27 @@ int gui_settings(){
     buildSettingsMenu(&commonMenu, &commonSubMenu);
 
     exitFlagSettings = 0;
+	int skip = 0;
     while(!osl_quit && !exitFlagSettings){
-        oslStartDrawing();
-        drawCommonGraphics();
-        drawButtonBar(MODE_SETTINGS);
-        drawMenu(&commonMenu);
-        drawMenu(&commonSubMenu);
+		if (!skip){
+			oslStartDrawing();
+			drawCommonGraphics();
+			drawButtonBar(MODE_SETTINGS);
+			drawMenu(&commonMenu);
+			drawMenu(&commonSubMenu);
 
-        switch (confirmStatus){
-            case STATUS_CONFIRM_SAVE:
-                drawConfirm(langGetString("CONFIRM_SAVE_SETTINGS_TITLE"), langGetString("CONFIRM_SAVE_SETTINGS"));
-                break;
-            case STATUS_HELP:
-                drawHelp("SETTINGS");
-                break;
-        }
+			switch (confirmStatus){
+				case STATUS_CONFIRM_SAVE:
+					drawConfirm(langGetString("CONFIRM_SAVE_SETTINGS_TITLE"), langGetString("CONFIRM_SAVE_SETTINGS"));
+					break;
+				case STATUS_HELP:
+					drawHelp("SETTINGS");
+					break;
+			}
+	    	oslEndDrawing();
+		}
+        oslEndFrame();
+    	skip = oslSyncFrame();
 
         oslReadKeys();
         if (confirmStatus == STATUS_CONFIRM_SAVE){
@@ -368,9 +370,6 @@ int gui_settings(){
                 exitFlagSettings = 1;
             }
         }
-    	oslEndDrawing();
-        oslEndFrame();
-    	oslSyncFrame();
     }
     //unLoad images:
     clearMenu(&commonMenu);

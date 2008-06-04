@@ -113,7 +113,7 @@ int M3U_open(char *fileName){
 int M3U_save(char *fileName){
 	FILE *f;
 	int i;
-	char testo[256];
+	char testo[500];
 
 	f = fopen(fileName, "w");
 	if (f == NULL){

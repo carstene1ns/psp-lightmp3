@@ -499,10 +499,10 @@ int ParseID3v2(const char *mp3path, struct ID3Tag *id3tag)
    }
 
    /* If no Title is found, uses filename - extension for Title. */
-   if(*id3tag->ID3Title == 0) {
+   /*if(*id3tag->ID3Title == 0) {
       strcpy(id3tag->ID3Title,strrchr(mp3path,'/') + 1);
       if (*strrchr(id3tag->ID3Title,'.') != 0) *strrchr(id3tag->ID3Title,'.') = 0;
-   }
+   }*/
    return 0;
 }
 
@@ -578,7 +578,10 @@ struct ID3Tag ParseID3(char *mp3path)
     strcpy(TmpID3.ID3GenreCode,"");
     strcpy(TmpID3.ID3GenreText,"");
     strcpy(TmpID3.ID3TrackText, "");
-    TmpID3.ID3EncapsulatedPictureType = 0;
+    strcpy(TmpID3.versionfound, "");
+	TmpID3.ID3Track = 0;
+    strcpy(TmpID3.ID3TrackText, "");
+	TmpID3.ID3EncapsulatedPictureType = 0;
     TmpID3.ID3EncapsulatedPictureOffset = 0;
     TmpID3.ID3EncapsulatedPictureLength = 0;
     TmpID3.ID3Length = 0;

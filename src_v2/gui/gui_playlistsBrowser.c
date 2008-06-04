@@ -126,35 +126,41 @@ int gui_playlistsBrowser(){
 
     strcpy(buffer, "");
     exitFlagPlaylistsBrowser = 0;
+	int skip = 0;
     while(!osl_quit && !exitFlagPlaylistsBrowser){
-        oslStartDrawing();
+		if (!skip){
+			oslStartDrawing();
 
-        if (commonMenu.selected >= 0 && strcmp(buffer, commonMenu.elements[commonMenu.selected].text)){
-            sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
-            M3U_clear();
-			M3U_open(buffer);
-			strcpy(buffer, commonMenu.elements[commonMenu.selected].text);
-        }
+			if (commonMenu.selected >= 0 && strcmp(buffer, commonMenu.elements[commonMenu.selected].text)){
+				sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+				M3U_clear();
+				M3U_open(buffer);
+				strcpy(buffer, commonMenu.elements[commonMenu.selected].text);
+			}
 
-        drawCommonGraphics();
-        drawButtonBar(MODE_PLAYLISTS);
-        drawMenu(&commonMenu);
-        drawPlaylistInfo();
+			drawCommonGraphics();
+			drawButtonBar(MODE_PLAYLISTS);
+			drawMenu(&commonMenu);
+			drawPlaylistInfo();
 
-        switch (confirmStatus){
-            case STATUS_CONFIRM_LOAD:
-                drawConfirm(langGetString("CONFIRM_LOAD_TITLE"), langGetString("CONFIRM_LOAD"));
-                break;
-            case STATUS_CONFIRM_REMOVE:
-                drawConfirm(langGetString("CONFIRM_REMOVE_TITLE"), langGetString("CONFIRM_REMOVE"));
-                break;
-            case STATUS_CONFIRM_ADD:
-                drawConfirm(langGetString("CONFIRM_ADD_PLAYLIST_TITLE"), langGetString("CONFIRM_ADD_PLAYLIST"));
-                break;
-            case STATUS_HELP:
-                drawHelp("PLAYLIST_BROWSER");
-                break;
-        }
+			switch (confirmStatus){
+				case STATUS_CONFIRM_LOAD:
+					drawConfirm(langGetString("CONFIRM_LOAD_TITLE"), langGetString("CONFIRM_LOAD"));
+					break;
+				case STATUS_CONFIRM_REMOVE:
+					drawConfirm(langGetString("CONFIRM_REMOVE_TITLE"), langGetString("CONFIRM_REMOVE"));
+					break;
+				case STATUS_CONFIRM_ADD:
+					drawConfirm(langGetString("CONFIRM_ADD_PLAYLIST_TITLE"), langGetString("CONFIRM_ADD_PLAYLIST"));
+					break;
+				case STATUS_HELP:
+					drawHelp("PLAYLIST_BROWSER");
+					break;
+			}
+	    	oslEndDrawing();
+		}
+        oslEndFrame();
+    	skip = oslSyncFrame();
 
 
         oslReadKeys();
@@ -221,9 +227,6 @@ int gui_playlistsBrowser(){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }
-    	oslEndDrawing();
-        oslEndFrame();
-    	oslSyncFrame();
     }
     opendir_close(&directory);
     M3U_clear();
