@@ -194,24 +194,31 @@ int gui_playlistEditor(){
     buildMenuFromPlaylist(&commonMenu);
 
     exitFlagPlaylistEditor = 0;
-    while(!osl_quit && !exitFlagPlaylistEditor){
-        oslStartDrawing();
-        drawCommonGraphics();
-        drawButtonBar(MODE_PLAYLIST_EDITOR);
-        drawMenu(&commonMenu);
-        drawTrackInfo(&tagInfo);
+	int skip = 0;
 
-        switch (confirmStatus){
-            case STATUS_CONFIRM_CLEAR:
-                drawConfirm(langGetString("CONFIRM_CLEAR_PLAYLIST_TITLE"), langGetString("CONFIRM_CLEAR_PLAYLIST"));
-                break;
-            case STATUS_CONFIRM_REMOVE:
-                drawConfirm(langGetString("CONFIRM_REMOVE_FROM_PLAYLIST_TITLE"), langGetString("CONFIRM_REMOVE_FROM_PLAYLIST"));
-                break;
-            case STATUS_HELP:
-                drawHelp("PLAYLIST_EDITOR");
-                break;
-        }
+    while(!osl_quit && !exitFlagPlaylistEditor){
+		if (!skip){
+			oslStartDrawing();
+			drawCommonGraphics();
+			drawButtonBar(MODE_PLAYLIST_EDITOR);
+			drawMenu(&commonMenu);
+			drawTrackInfo(&tagInfo);
+
+			switch (confirmStatus){
+				case STATUS_CONFIRM_CLEAR:
+					drawConfirm(langGetString("CONFIRM_CLEAR_PLAYLIST_TITLE"), langGetString("CONFIRM_CLEAR_PLAYLIST"));
+					break;
+				case STATUS_CONFIRM_REMOVE:
+					drawConfirm(langGetString("CONFIRM_REMOVE_FROM_PLAYLIST_TITLE"), langGetString("CONFIRM_REMOVE_FROM_PLAYLIST"));
+					break;
+				case STATUS_HELP:
+					drawHelp("PLAYLIST_EDITOR");
+					break;
+			}
+			oslEndDrawing();
+		}
+        oslEndFrame();
+    	skip = oslSyncFrame();
 
         oslReadKeys();
         if (confirmStatus == STATUS_CONFIRM_CLEAR){
@@ -266,9 +273,6 @@ int gui_playlistEditor(){
                 exitFlagPlaylistEditor = 1;
             }else if(osl_pad.pressed.triangle && M3U_getSongCount()){
                 drawWait(langGetString("WAIT"), langGetString("CHECKING_PLAYLIST"));
-                oslEndDrawing();
-                oslEndFrame();
-                oslSyncFrame();
                 M3U_checkFiles();
                 oldSelected = commonMenu.selected;
                 oldFirst = commonMenu.first;
@@ -306,9 +310,6 @@ int gui_playlistEditor(){
                 confirmStatus = STATUS_CONFIRM_REMOVE;
             }else if(osl_pad.released.start && M3U_getSongCount()){
                 char onlyName[264] = "";
-                oslEndDrawing();
-                oslEndFrame();
-                oslSyncFrame();
                 getFileName(userSettings->currentPlaylistName, onlyName);
                 char newName[129] = "";
 				askPlaylistName(langGetString("ASK_PLAYLIST_NAME"), onlyName, newName);
@@ -335,9 +336,6 @@ int gui_playlistEditor(){
                 exitFlagPlaylistEditor = 1;
             }
         }
-    	oslEndDrawing();
-        oslEndFrame();
-    	oslSyncFrame();
     }
 
     M3U_save(tempM3Ufile);

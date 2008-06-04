@@ -49,9 +49,11 @@ int initEqualizers(int initFromEQ){
 				while(result != NULL){
 					if (strlen(result) > 0 && element < 34){
 						if (element == 0){
-							strcpy(tEQ.name, result);
+							strncpy(tEQ.name, result, 31);
+							tEQ.name[31] = '\0';
 						}else if(element == 1){
-							strcpy(tEQ.shortName, result);
+							strncpy(tEQ.shortName, result, 3);
+							tEQ.shortName[3] = '\0';
 						}else{
 							tEQ.filter[element - 2] = atof(result);
 						}

@@ -85,11 +85,7 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
     struct libraryEntry localResult[ML_BUFFERSIZE];
     struct fileInfo *info = NULL;
     char onlyName[264] = "";
-    char message[10] = "";
-
-	oslEndDrawing();
-	oslEndFrame();
-	oslSyncFrame();
+    char message[100] = "";
 
 	setCpuClock(222);
 	setBusClock(111);
@@ -149,7 +145,6 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
     }
 	setBusClock(userSettings->BUS);
 	setCpuClock(userSettings->CLOCK_GUI);
-	oslStartDrawing();
 	return 0;
 }
 
@@ -246,18 +241,14 @@ int scanMS(){
         scannedMsg = replace(buffer, "XX", strFound);
         drawMessageBox(langGetString("SCAN_FINISHED"), scannedMsg);
 
-        oslReadKeys();
-        if(osl_pad.released.cross){
-            oslEndDrawing();
-            oslEndFrame();
-            oslSyncFrame();
-            break;
-        }
-
         oslEndDrawing();
         oslEndFrame();
         oslSyncFrame();
-    }
+
+        oslReadKeys();
+        if(osl_pad.released.cross)
+            break;
+	}
     return 0;
 }
 
@@ -356,6 +347,11 @@ void drawMLinfo(){
 				char dirName[264];
 				int size = 0;
 
+				int oldClock = getCpuClock();
+				int oldBus = getBusClock();
+				setCpuClock(222);
+				setBusClock(111);
+
 				sprintf(dirName, "%s", MLresult[commonMenu.selected - mlBufferPosition].path);
 				directoryUp(dirName);
 				//Look for folder.jpg in the same directory:
@@ -374,6 +370,8 @@ void drawMLinfo(){
 					coverArt->stretchX = skinGetParam("MEDIALIBRARY_COVERART_WIDTH");
 					coverArt->stretchY = skinGetParam("MEDIALIBRARY_COVERART_HEIGHT");
 				}
+				setBusClock(oldBus);
+				setCpuClock(oldClock);
 			}
 		}
 
@@ -643,9 +641,6 @@ void askSearchString(char *message, char *initialValue, char *target){
 // Search:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int search(){
-	oslEndDrawing();
-    oslEndFrame();
-	oslSyncFrame();
     char searchString[129] = "";
 	askSearchString(langGetString("ASK_SEARCH_STRING"), "", searchString);
 	if (strlen(searchString)){
@@ -676,7 +671,6 @@ int search(){
 			strcpy(currentOrderBy, "title, artist, album");
 		}
 	}
-	oslStartDrawing();
     return 0;
 }
 
@@ -753,22 +747,28 @@ int gui_mediaLibrary(){
     //Build menu:
     buildMainMenu();
     exitFlagMediaLibrary = 0;
+	int skip = 0;
     while(!osl_quit && !exitFlagMediaLibrary){
-        oslStartDrawing();
-        drawCommonGraphics();
-        drawButtonBar(MODE_MEDIA_LIBRARY);
-        drawMenu(&commonMenu);
-        if (mediaLibraryStatus == STATUS_QUERYMENU)
-            drawMLinfo();
+		if (!skip){
+			oslStartDrawing();
+			drawCommonGraphics();
+			drawButtonBar(MODE_MEDIA_LIBRARY);
+			drawMenu(&commonMenu);
+			if (mediaLibraryStatus == STATUS_QUERYMENU)
+				drawMLinfo();
 
-        switch (confirmStatus){
-            case STATUS_CONFIRM_SCAN:
-                drawConfirm(langGetString("CONFIRM_SCAN_MS_TITLE"), langGetString("CONFIRM_SCAN_MS"));
-                break;
-            case STATUS_HELP:
-                drawHelp("MEDIALIBRARY");
-                break;
-        }
+			switch (confirmStatus){
+				case STATUS_CONFIRM_SCAN:
+					drawConfirm(langGetString("CONFIRM_SCAN_MS_TITLE"), langGetString("CONFIRM_SCAN_MS"));
+					break;
+				case STATUS_HELP:
+					drawHelp("MEDIALIBRARY");
+					break;
+			}
+	    	oslEndDrawing();
+		}
+        oslEndFrame();
+    	skip = oslSyncFrame();
 
         oslReadKeys();
         if (confirmStatus == STATUS_CONFIRM_SCAN){
@@ -831,9 +831,6 @@ int gui_mediaLibrary(){
             if (!ratingChangedUpDown)
                 processMenuKeys(&commonMenu);
         }
-    	oslEndDrawing();
-        oslEndFrame();
-    	oslSyncFrame();
     }
 
     clearMenu(&commonMenu);

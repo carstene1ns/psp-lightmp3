@@ -192,8 +192,10 @@ void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
 		else if(!strcmp(name, "DATE") || !strcmp(name, "YEAR")){
             strncpy(targetInfo->year, value, 4);
             targetInfo->year[4] = '\0';
-		}else if(!strcmp(name, "TRACKNUMBER"))
-            strcpy(targetInfo->trackNumber, value);
+		}else if(!strcmp(name, "TRACKNUMBER")){
+            strncpy(targetInfo->trackNumber, value, 7);
+			targetInfo->trackNumber[7] = '\0';
+		}
 		/*else if(!strcmp(name, "COVERART_UUENCODED")){
             FILE *out = fopen("ms0:/coverart.jpg", "wb");
             FILE *outEnc = fopen("ms0:/coverart.txt", "wb");

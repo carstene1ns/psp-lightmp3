@@ -101,7 +101,7 @@ void addFileToPlaylist(char *fileName, int save){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void addDirectoryToPlaylist(char *dirName){
 	char fileToAdd[264] = "";
-	char message[10] = "";
+	char message[100] = "";
 	int i;
 	float perc;
 	struct opendir_struct dirToAdd;
@@ -194,21 +194,27 @@ int gui_fileBrowser(){
     buildMenuFromDirectory(&commonMenu, &directory, buffer);
 
     exitFlagFileBrowser = 0;
+	int skip = 0;
     while(!osl_quit && !exitFlagFileBrowser){
-        oslStartDrawing();
 
-        drawCommonGraphics();
-        drawButtonBar(MODE_FILEBROWSER);
-        drawMenu(&commonMenu);
-		if (coverArt){
-			skinGetPosition("POS_FILE_BROWSER_COVERART", tempPos);
-			oslDrawImageXY(coverArt, tempPos[0], tempPos[1]);
+		if (!skip){
+			oslStartDrawing();
+			drawCommonGraphics();
+			drawButtonBar(MODE_FILEBROWSER);
+			drawMenu(&commonMenu);
+			if (coverArt){
+				skinGetPosition("POS_FILE_BROWSER_COVERART", tempPos);
+				oslDrawImageXY(coverArt, tempPos[0], tempPos[1]);
+			}
+			if (status == STATUS_HELP)
+				drawHelp("FILE_BROWSER");
+
+			if (USBactive)
+				drawUSBmessage();
+	    	oslEndDrawing();
 		}
-		if (status == STATUS_HELP)
-            drawHelp("FILE_BROWSER");
-
-        if (USBactive)
-            drawUSBmessage();
+        oslEndFrame();
+    	skip = oslSyncFrame();
 
         oslReadKeys();
         if (status == STATUS_HELP){
@@ -232,6 +238,10 @@ int gui_fileBrowser(){
 						char dirName[264];
 					    int size = 0;
 
+						oldClock = getCpuClock();
+						oldBus = getBusClock();
+						setCpuClock(222);
+						setBusClock(111);
 						if (curDir[strlen(curDir)-1] != '/')
 							sprintf(dirName, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
 						else
@@ -254,6 +264,8 @@ int gui_fileBrowser(){
 							coverArt->stretchX = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
 							coverArt->stretchY = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
 						}
+						setBusClock(oldBus);
+						setCpuClock(oldClock);
 					}
 				}
 			}
@@ -291,9 +303,6 @@ int gui_fileBrowser(){
                     continue;
                 }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
                     drawWait(langGetString("ADDING_PLAYLIST"), langGetString("WAIT"));
-                    oslEndDrawing();
-                    oslEndFrame();
-                    oslSyncFrame();
                     addFileToPlaylist(buffer, 1);
                     continue;
             }else if(!USBactive && osl_pad.released.square){
@@ -358,9 +367,6 @@ int gui_fileBrowser(){
                 exitFlagFileBrowser = 1;
             }
         }
-    	oslEndDrawing();
-        oslEndFrame();
-    	oslSyncFrame();
     }
     opendir_close(&directory);
     //unLoad images:

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <oslib/oslib.h>
+#include <malloc.h>
 
 #include "../main.h"
 #include "gui_player.h"
@@ -61,20 +62,20 @@ void MEEnable();
 // Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int playerRetValue = 0;
-OSL_IMAGE *coverArt;
-OSL_IMAGE *noCoverArt;
-OSL_IMAGE *fileInfoBkg;
-OSL_IMAGE *fileSpecsBkg;
-OSL_IMAGE *progressBkg;
-OSL_IMAGE *progress;
-OSL_IMAGE *playerStatusBkg;
-char buffer[264];
+static OSL_IMAGE *coverArt;
+static OSL_IMAGE *noCoverArt;
+static OSL_IMAGE *fileInfoBkg;
+static OSL_IMAGE *fileSpecsBkg;
+static OSL_IMAGE *progressBkg;
+static OSL_IMAGE *progress;
+static OSL_IMAGE *playerStatusBkg;
+static char buffer[264];
 
-char sleepModeDesc[3][50];
-char playModeDesc[5][50];
-char playerStatusDesc[3][50];
-int playerStatus = 0; //-1=open 0=paused 1=playing
-struct equalizer tEQ;
+static char sleepModeDesc[3][102];
+static char playModeDesc[5][102];
+static char playerStatusDesc[3][102];
+static int playerStatus = 0; //-1=open 0=paused 1=playing
+static struct equalizer tEQ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draws a file's info
@@ -863,19 +864,30 @@ int gui_player(){
     playerRetValue = userSettings->previousMode;
 
     //Load lang strings:
-    strcpy(sleepModeDesc[0], langGetString("SLEEP_MODE_0"));
-    strcpy(sleepModeDesc[1], langGetString("SLEEP_MODE_1"));
-    strcpy(sleepModeDesc[2], langGetString("SLEEP_MODE_2"));
+    strncpy(sleepModeDesc[0], langGetString("SLEEP_MODE_0"), 100);
+	sleepModeDesc[0][100] = '\0';
+    strncpy(sleepModeDesc[1], langGetString("SLEEP_MODE_1"), 100);
+	sleepModeDesc[1][100] = '\0';
+	strncpy(sleepModeDesc[2], langGetString("SLEEP_MODE_2"), 100);
+	sleepModeDesc[2][100] = '\0';
 
-    strcpy(playModeDesc[0], langGetString("PLAY_MODE_0"));
-    strcpy(playModeDesc[1], langGetString("PLAY_MODE_1"));
-    strcpy(playModeDesc[2], langGetString("PLAY_MODE_2"));
-    strcpy(playModeDesc[3], langGetString("PLAY_MODE_3"));
-    strcpy(playModeDesc[4], langGetString("PLAY_MODE_4"));
+    strncpy(playModeDesc[0], langGetString("PLAY_MODE_0"), 100);
+	playModeDesc[0][100] = '\0';
+    strncpy(playModeDesc[1], langGetString("PLAY_MODE_1"), 100);
+	playModeDesc[1][100] = '\0';
+	strncpy(playModeDesc[2], langGetString("PLAY_MODE_2"), 100);
+	playModeDesc[2][100] = '\0';
+    strncpy(playModeDesc[3], langGetString("PLAY_MODE_3"), 100);
+	playModeDesc[3][100] = '\0';
+    strncpy(playModeDesc[4], langGetString("PLAY_MODE_4"), 100);
+	playModeDesc[4][100] = '\0';
 
-    strcpy(playerStatusDesc[0], langGetString("PLAYER_STATUS_0"));
-    strcpy(playerStatusDesc[1], langGetString("PLAYER_STATUS_1"));
-    strcpy(playerStatusDesc[2], langGetString("PLAYER_STATUS_2"));
+    strncpy(playerStatusDesc[0], langGetString("PLAYER_STATUS_0"), 100);
+	playerStatusDesc[0][100] = '\0';
+    strncpy(playerStatusDesc[1], langGetString("PLAYER_STATUS_1"), 100);
+	playerStatusDesc[1][100] = '\0';
+	strncpy(playerStatusDesc[2], langGetString("PLAYER_STATUS_2"), 100);
+	playerStatusDesc[2][100] = '\0';
 
     oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_PLAYER);
     oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_PLAYER);
