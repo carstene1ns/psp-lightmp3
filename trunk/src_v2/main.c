@@ -47,6 +47,7 @@
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
 PSP_HEAP_SIZE_KB(12*1024);
+//PSP_HEAP_SIZE_KB(10*1024);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -103,6 +104,7 @@ int powerCallback(int unknown, int powerInfo, void *common){
                setBrightness(userSettings->curBrightness);
                userSettings->displayStatus = 1;
            }
+		   sceKernelDcacheWritebackAll();
            suspended = 1;
        }
     }else if (powerInfo & PSP_POWER_CB_RESUMING){

@@ -472,11 +472,13 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
                 resultBuffer[count].bitrate = sqlite3_column_int(stmt, i);
             else if (!stricmp(columnName, "played"))
                 resultBuffer[count].played = sqlite3_column_int(stmt, i);
-            else if (!stricmp(columnName, "strfield"))
-                strcpy(resultBuffer[count].strField, (char*)sqlite3_column_text(stmt, i));
-            else if (!stricmp(columnName, "datafield"))
-                strcpy(resultBuffer[count].dataField, (char*)sqlite3_column_text(stmt, i));
-            else if (!stricmp(columnName, "intfield01"))
+            else if (!stricmp(columnName, "strfield")){
+                strncpy(resultBuffer[count].strField, (char*)sqlite3_column_text(stmt, i), 263);
+				resultBuffer[count].strField[263] = '\0';
+            }else if (!stricmp(columnName, "datafield")){
+                strncpy(resultBuffer[count].dataField, (char*)sqlite3_column_text(stmt, i), 511);
+				resultBuffer[count].dataField[511] = '\0';
+            }else if (!stricmp(columnName, "intfield01"))
                 resultBuffer[count].intField01 = sqlite3_column_double(stmt, i);
             else if (!stricmp(columnName, "intfield02"))
                 resultBuffer[count].intField02 = sqlite3_column_double(stmt, i);

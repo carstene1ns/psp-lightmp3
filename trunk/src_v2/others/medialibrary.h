@@ -36,7 +36,7 @@ struct libraryEntry{
     char year[8];
     int tracknumber;
     int played;
-    char path[264];
+    char path[268];
     char extension[8];
     int seconds;
     int rating;

@@ -309,10 +309,7 @@ int playFile(char *fileName, char *trackMessage){
 
     MEEnable();
 
-    int oldClock = getCpuClock();
-    int oldBus = getBusClock();
-    setCpuClock(222);
-    setBusClock(111);
+	cpuBoost();
 
     if (userSettings->displayStatus){
         oslStartDrawing();
@@ -424,8 +421,7 @@ int playFile(char *fileName, char *trackMessage){
     }
 
     info = (*getInfoFunct)();
-    setBusClock(oldBus);
-    setCpuClock(oldClock);
+	cpuRestore();
 
     //Update media library info:
     getExtension(fileName, libEntry.extension, 4);

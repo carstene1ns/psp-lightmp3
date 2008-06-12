@@ -110,11 +110,8 @@ int drawTrackInfo(struct fileInfo *info){
 void askPlaylistName(char *message, char *initialValue, char *target){
 	int skip = 0;
 	int done = 0;
-    int oldClock = getCpuClock();
-    int oldBus = getBusClock();
-    setCpuClock(222);
-    setBusClock(111);
 
+	cpuBoost();
 	oslInitOsk(message, initialValue, 128, 1);
     while(!osl_quit && !done){
 		if (!skip){
@@ -141,8 +138,7 @@ void askPlaylistName(char *message, char *initialValue, char *target){
         oslEndFrame();
         skip = oslSyncFrame();
 	}
-    setBusClock(oldBus);
-    setCpuClock(oldClock);
+	cpuRestore();
 }
 
 

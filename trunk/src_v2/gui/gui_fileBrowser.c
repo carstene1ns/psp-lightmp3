@@ -109,8 +109,7 @@ void addDirectoryToPlaylist(char *dirName){
 	char *result = opendir_open(&dirToAdd, dirName, fileExt, fileExtCount, 0);
 	if (result == 0){
         M3U_open(tempM3Ufile);
-        setCpuClock(222);
-        setBusClock(111);
+		cpuBoost();
 		for (i = 0; i < dirToAdd.number_of_directory_entries; i++){
 			perc = ((float)(i + 1) / (float)dirToAdd.number_of_directory_entries) * 100.0;
 			snprintf(message, sizeof(message), "%3.3i%% %s", (int)perc, langGetString("DONE"));
@@ -131,8 +130,7 @@ void addDirectoryToPlaylist(char *dirName){
 			addFileToPlaylist(fileToAdd, 0);
 		}
 		M3U_save(tempM3Ufile);
-        setBusClock(userSettings->BUS);
-        setCpuClock(userSettings->CLOCK_GUI);
+		cpuRestore();
 	}
 	opendir_close(&dirToAdd);
 }
@@ -147,8 +145,6 @@ int gui_fileBrowser(){
     char *result;
     int USBactive = 0;
     int status = STATUS_NORMAL;
-	int oldClock = 0;
-	int oldBus = 0;
 	OSL_IMAGE *coverArt = NULL;
 	u64 lastMenuChange = 0;
 	int lastSelected = -1;
@@ -238,10 +234,7 @@ int gui_fileBrowser(){
 						char dirName[264];
 					    int size = 0;
 
-						oldClock = getCpuClock();
-						oldBus = getBusClock();
-						setCpuClock(222);
-						setBusClock(111);
+						cpuBoost();
 						if (curDir[strlen(curDir)-1] != '/')
 							sprintf(dirName, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
 						else
@@ -264,8 +257,7 @@ int gui_fileBrowser(){
 							coverArt->stretchX = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
 							coverArt->stretchY = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
 						}
-						setBusClock(oldBus);
-						setCpuClock(oldClock);
+						cpuRestore();
 					}
 				}
 			}
@@ -340,10 +332,7 @@ int gui_fileBrowser(){
                 //USB activate/deactivate:
                 USBactive = !USBactive;
                 if (USBactive){
-					oldClock = getCpuClock();
-					oldBus = getBusClock();
-					setCpuClock(222);
-					setBusClock(111);
+					cpuBoost();
 
                     int retVal = oslInitUsbStorage();
                     if (retVal){
@@ -355,8 +344,7 @@ int gui_fileBrowser(){
                 }else{
                     oslStopUsbStorage();
                     oslDeinitUsbStorage();
-					setBusClock(oldBus);
-					setCpuClock(oldClock);
+					cpuRestore();
                 }
                 sceKernelDelayThread(200000);
             }else if(!USBactive && osl_pad.released.R){

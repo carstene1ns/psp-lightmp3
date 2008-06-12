@@ -87,9 +87,7 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
     char onlyName[264] = "";
     char message[100] = "";
 
-	setCpuClock(222);
-	setBusClock(111);
-
+	cpuBoost();
     int i = 0;
 	int count = ML_countRecords(where);
     if (count){
@@ -143,8 +141,7 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
         }
         M3U_save(m3uName);
     }
-	setBusClock(userSettings->BUS);
-	setCpuClock(userSettings->CLOCK_GUI);
+	cpuRestore();
 	return 0;
 }
 
@@ -223,9 +220,8 @@ int scanMS(){
     char strFound[10] = "";
     char *scannedMsg;
 
-    setCpuClock(222);
-    setBusClock(111);
-    ML_checkFiles(checkFileCallback);
+	cpuBoost();
+	ML_checkFiles(checkFileCallback);
     int found = ML_scanMS(fileExt, fileExtCount-1, scanDirCallback, NULL);
     setBusClock(userSettings->BUS);
     setCpuClock(userSettings->CLOCK_GUI);
@@ -347,11 +343,7 @@ void drawMLinfo(){
 				char dirName[264];
 				int size = 0;
 
-				int oldClock = getCpuClock();
-				int oldBus = getBusClock();
-				setCpuClock(222);
-				setBusClock(111);
-
+				cpuBoost();
 				sprintf(dirName, "%s", MLresult[commonMenu.selected - mlBufferPosition].path);
 				directoryUp(dirName);
 				//Look for folder.jpg in the same directory:
@@ -370,8 +362,7 @@ void drawMLinfo(){
 					coverArt->stretchX = skinGetParam("MEDIALIBRARY_COVERART_WIDTH");
 					coverArt->stretchY = skinGetParam("MEDIALIBRARY_COVERART_HEIGHT");
 				}
-				setBusClock(oldBus);
-				setCpuClock(oldClock);
+				cpuRestore();
 			}
 		}
 
@@ -429,11 +420,9 @@ void queryDataFeed(int index, struct menuElement *element){
             if (mlBufferPosition < 0)
                 mlBufferPosition = 0;
         }
-		setCpuClock(222);
-        setBusClock(111);
-        ML_queryDBSelect(currentSql, mlBufferPosition, ML_BUFFERSIZE, MLresult);
-        setBusClock(userSettings->BUS);
-        setCpuClock(userSettings->CLOCK_GUI);
+		cpuBoost();
+		ML_queryDBSelect(currentSql, mlBufferPosition, ML_BUFFERSIZE, MLresult);
+        cpuRestore();
     }
 
     if (mlQueryType == QUERY_COUNT){
@@ -448,7 +437,7 @@ void queryDataFeed(int index, struct menuElement *element){
         element->triggerFunction = NULL;
     }else if (mlQueryType == QUERY_COUNT_RATING){
 	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
-        drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
+		drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
         sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
         oslSetFont(fontMenuNormal);
         if (index == commonMenu.selected){
@@ -470,16 +459,13 @@ int buildQueryMenu(char *select, int (*cancelFunction)()){
     drawQueryRunning();
     mediaLibraryStatus = STATUS_QUERYMENU;
 
-    setCpuClock(222);
-    setBusClock(111);
-
+	cpuBoost();
     mlQueryCount = ML_countRecordsSelect(select);
 	if (mlQueryCount > MENU_MAX_ELEMENTS)
 		mlQueryCount = MENU_MAX_ELEMENTS;
     ML_queryDBSelect(select, 0, ML_BUFFERSIZE, MLresult);
-    setBusClock(userSettings->BUS);
-    setCpuClock(userSettings->CLOCK_GUI);
-    strcpy(currentSql, select);
+	cpuRestore();
+	strcpy(currentSql, select);
 
     clearMenu(&commonMenu);
     commonMenu.numberOfElements = mlQueryCount;
@@ -601,11 +587,8 @@ int browseTop100(){
 void askSearchString(char *message, char *initialValue, char *target){
 	int skip = 0;
 	int done = 0;
-    int oldClock = getCpuClock();
-    int oldBus = getBusClock();
-    setCpuClock(222);
-    setBusClock(111);
 
+	cpuBoost();
 	oslInitOsk(message, initialValue, 128, 1);
     while(!osl_quit && !done){
 		if (!skip){
@@ -632,8 +615,7 @@ void askSearchString(char *message, char *initialValue, char *target){
         skip = oslSyncFrame();
 	}
 	oslReadKeys();
-    setBusClock(oldBus);
-    setCpuClock(oldClock);
+	cpuRestore();
 }
 
 

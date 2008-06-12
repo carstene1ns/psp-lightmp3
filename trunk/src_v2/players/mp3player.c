@@ -57,8 +57,8 @@ static int MP3_outputInProgress = 0;
 
 // The following variables are maintained and updated by the tracker during playback
 static int MP3_isPlaying;		// Set to true when a mod is being played
-long MP3_suspendPosition = -1;
-long MP3_suspendIsPlaying = 0;
+static long MP3_suspendPosition = -1;
+static long MP3_suspendIsPlaying = 0;
 
 typedef struct  {
 	short left;
@@ -76,20 +76,20 @@ struct fileInfo MP3_info;
 #define BOOST_OLD 0
 #define BOOST_NEW 1
 
-char MP3_fileName[264];
-int MP3_volume_boost_type = BOOST_NEW;
-double MP3_volume_boost = 0.0;
-unsigned int MP3_volume_boost_old = 0;
-double DB_forBoost = 1.0;
-int MP3_playingSpeed = 0; // 0 = normal
+static char MP3_fileName[264];
+static int MP3_volume_boost_type = BOOST_NEW;
+static double MP3_volume_boost = 0.0;
+static unsigned int MP3_volume_boost_old = 0;
+static double DB_forBoost = 1.0;
+static int MP3_playingSpeed = 0; // 0 = normal
 int MP3_defaultCPUClock = 70;
-int MP3_fd = -1;
+static int MP3_fd = -1;
 
 #define INPUT_BUFFER_SIZE 2048
-unsigned char fileBuffer[INPUT_BUFFER_SIZE];
-unsigned int samplesRead;
-unsigned int MP3_filePos;
-double fileSize;
+static unsigned char fileBuffer[INPUT_BUFFER_SIZE];
+static unsigned int samplesRead;
+static unsigned int MP3_filePos;
+static double fileSize;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

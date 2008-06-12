@@ -57,9 +57,9 @@ int SCROBBLER_writeHeader(){
 
 
 //Add a track to logfile:
-int SCROBBLER_addTrack(struct fileInfo tag, long int duration, char *rating, long timestamp){
+int SCROBBLER_addTrack(struct fileInfo tag, long duration, char *rating, long timestamp){
 	FILE *f;
-	char testo[1000] = "";
+	char testo[1024*2] = "";
 
     SCROBBLER_init(SCROBBLER_fileName);
 	f = fopen(SCROBBLER_fileName, "a");
