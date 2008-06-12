@@ -18,4 +18,4 @@
 
 int SCROBBLER_init(char *fileName);
 int SCROBBLER_writeHeader();
-int SCROBBLER_addTrack(struct fileInfo tag, long int duration, char *rating, long timestamp);
+int SCROBBLER_addTrack(struct fileInfo tag, long duration, char *rating, long timestamp);

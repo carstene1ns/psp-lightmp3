@@ -35,23 +35,23 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int MP3ME_threadActive = 0;
-int MP3ME_threadExited = 1;
-char MP3ME_fileName[264];
+static int MP3ME_threadActive = 0;
+static int MP3ME_threadExited = 1;
+static char MP3ME_fileName[264];
 static int MP3ME_isPlaying = 0;
-int MP3ME_thid = -1;
-int MP3ME_audio_channel = 0;
-int MP3ME_eof = 0;
-struct fileInfo MP3ME_info;
-int MP3ME_playingSpeed = 0; // 0 = normal
-unsigned int MP3ME_volume_boost = 0;
-float MP3ME_playingTime = 0;
-int MP3ME_volume = 0;
+static int MP3ME_thid = -1;
+static int MP3ME_audio_channel = 0;
+static int MP3ME_eof = 0;
+static struct fileInfo MP3ME_info;
+static int MP3ME_playingSpeed = 0; // 0 = normal
+static unsigned int MP3ME_volume_boost = 0;
+static float MP3ME_playingTime = 0;
+static int MP3ME_volume = 0;
 int MP3ME_defaultCPUClock = 20;
-double MP3ME_filePos = 0;
+static double MP3ME_filePos = 0;
 
 //Globals for decoding:
-SceUID MP3ME_handle;
+static SceUID MP3ME_handle;
 
 static int samplerates[4][3] =
 {
@@ -69,10 +69,9 @@ static unsigned char MP3ME_output_buffer[2048*4]__attribute__((aligned(64)));//a
 static short OutputBuffer[2][OUTPUT_BUFFER_SIZE];
 static short *OutputPtrME = OutputBuffer[0];
 
-int MP3ME_output_index = 0;
-long MP3ME_suspendPosition = -1;
-long MP3ME_suspendIsPlaying = 0;
-double MP3ME_filesize = 0;
+static long MP3ME_suspendPosition = -1;
+static long MP3ME_suspendIsPlaying = 0;
+static double MP3ME_filesize = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Private functions:
@@ -279,8 +278,10 @@ int decodeThread(SceSize args, void *argp){
       MP3ME_handle = -1;
     }
     MP3ME_threadExited = 1;
+	sceKernelExitThread(0);
     return 0;
 }
+
 
 void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
     //ID3:

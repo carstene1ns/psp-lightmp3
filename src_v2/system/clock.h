@@ -22,3 +22,5 @@ int getCpuClock();
 int getBusClock();
 int getMinCPUClock();
 int getModel();
+int cpuBoost();
+int cpuRestore();

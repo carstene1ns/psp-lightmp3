@@ -32,22 +32,22 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int AA3ME_threadActive = 0;
-int AA3ME_threadExited = 1;
-char AA3ME_fileName[264];
+static int AA3ME_threadActive = 0;
+static int AA3ME_threadExited = 1;
+static char AA3ME_fileName[264];
 static int AA3ME_isPlaying = 0;
-int AA3ME_thid = -1;
-int AA3ME_audio_channel = 0;
-int AA3ME_eof = 0;
-struct fileInfo AA3ME_info;
-float AA3ME_playingTime = 0;
-int AA3ME_volume = 0;
-int AA3ME_playingSpeed = 0; // 0 = normal
+static int AA3ME_thid = -1;
+static int AA3ME_audio_channel = 0;
+static int AA3ME_eof = 0;
+static struct fileInfo AA3ME_info;
+static float AA3ME_playingTime = 0;
+static int AA3ME_volume = 0;
+static int AA3ME_playingSpeed = 0; // 0 = normal
 int AA3ME_defaultCPUClock = 20;
-unsigned int AA3ME_volume_boost = 0;
-long AA3ME_suspendPosition = -1;
-long AA3ME_suspendIsPlaying = 0;
-double AA3ME_filePos = 0;
+static unsigned int AA3ME_volume_boost = 0;
+static long AA3ME_suspendPosition = -1;
+static long AA3ME_suspendIsPlaying = 0;
+static double AA3ME_filePos = 0;
 
 static unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
 static unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
@@ -263,6 +263,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 	sceIoClose(fd);
     fd = -1;
     AA3ME_threadExited = 1;
+	sceKernelExitThread(0);
     return 0;
 }
 

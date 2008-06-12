@@ -23,6 +23,9 @@
 #include "clock.h"
 
 int getModelKernel();
+void setKernelBusClock(int bus);
+void setKernelCpuClock(int cpu);
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Funzioni gestione BUS & CLOCK
@@ -81,4 +84,35 @@ int getModel(){
             return PSP_MODEL_SLIM_AND_LITE;
         else
             return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Boost per particolari operazioni:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define BOOST_CPU 222
+#define BOOST_BUS 111
+
+static int oldBus = 0;
+static int oldClock = 0;
+
+int cpuBoost(){
+    oldClock = getCpuClock();
+    oldBus = getBusClock();
+	if (BOOST_CPU <= 222){
+		setCpuClock(BOOST_CPU);
+		setBusClock(BOOST_BUS);
+	}else{
+		setKernelCpuClock(BOOST_CPU);
+		setKernelBusClock(BOOST_BUS);
+	}
+	return 0;
+}
+
+int cpuRestore(){
+    setBusClock(oldBus);
+	setCpuClock(oldClock);
+	oldClock = 0;
+    oldBus = 0;
+	return 0;
 }

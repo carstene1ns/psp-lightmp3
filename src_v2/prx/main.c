@@ -22,6 +22,7 @@
 #include <pspsysreg.h>
 #include <pspctrl.h>
 #include <pspsysmem_kernel.h>
+#include <psppower.h>
 
 PSP_MODULE_INFO("supportlib", 0x1006, 1, 1);
 PSP_MAIN_THREAD_ATTR(0);
@@ -270,6 +271,40 @@ int getModelKernel(){
     int retVal = sceKernelGetModel();
     pspSdkSetK1(k1);
     return retVal;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//setKernelBusClock
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void setKernelBusClock(int bus){
+	k1 = pspSdkSetK1(0);
+    if (bus >= 54 && bus <= 166 && sceKernelDevkitVersion() < 0x03070110){
+        scePowerSetBusClockFrequency(bus);
+		if (scePowerGetBusClockFrequency() < bus)
+			scePowerSetBusClockFrequency(++bus);
+	}
+    pspSdkSetK1(k1);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//setKernelBusClock
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void setKernelCpuClock(int cpu){
+	k1 = pspSdkSetK1(0);
+    if (cpu <= 333){
+        if (sceKernelDevkitVersion() < 0x03070110){
+            scePowerSetCpuClockFrequency(cpu);
+            if (scePowerGetCpuClockFrequency() < cpu)
+                scePowerSetCpuClockFrequency(++cpu);
+        }else{
+            scePowerSetClockFrequency(cpu, cpu, cpu/2);
+            if (scePowerGetCpuClockFrequency() < cpu){
+                cpu++;
+                scePowerSetClockFrequency(cpu, cpu, cpu/2);
+            }
+        }
+    }
+    pspSdkSetK1(k1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
