@@ -36,7 +36,7 @@
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int MP3ME_threadActive = 0;
-static int MP3ME_threadExited = 1;
+//static int MP3ME_threadExited = 1;
 static char MP3ME_fileName[264];
 static int MP3ME_isPlaying = 0;
 static int MP3ME_thid = -1;
@@ -51,7 +51,7 @@ int MP3ME_defaultCPUClock = 20;
 static double MP3ME_filePos = 0;
 
 //Globals for decoding:
-static SceUID MP3ME_handle;
+static SceUID MP3ME_handle = -1;
 
 static int samplerates[4][3] =
 {
@@ -91,7 +91,7 @@ int decodeThread(SceSize args, void *argp){
 
 	sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another mp3.
 	MP3ME_threadActive = 1;
-    MP3ME_threadExited = 0;
+    //MP3ME_threadExited = 0;
     OutputBuffer_flip = 0;
     OutputPtrME = OutputBuffer[0];
 
@@ -277,7 +277,7 @@ int decodeThread(SceSize args, void *argp){
       sceIoClose(MP3ME_handle);
       MP3ME_handle = -1;
     }
-    MP3ME_threadExited = 1;
+    //MP3ME_threadExited = 1;
 	sceKernelExitThread(0);
     return 0;
 }
@@ -287,7 +287,7 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
     //ID3:
     struct ID3Tag ID3;
     strcpy(MP3ME_fileName, filename);
-    ID3 = ParseID3(filename);
+    ParseID3(filename, &ID3);
     strcpy(targetInfo->title, ID3.ID3Title);
     strcpy(targetInfo->artist, ID3.ID3Artist);
     strcpy(targetInfo->album, ID3.ID3Album);
@@ -306,7 +306,7 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
 //E' una porcheria ma è più semplice. :)
 int MP3MEgetInfo(){
 	unsigned long FrameCount = 0;
-    int fd;
+    int fd = -1;
     int bufferSize = 1024*500;
     u8 *localBuffer;
     long singleDataRed = 0;
@@ -495,7 +495,7 @@ int MP3ME_Load(char *fileName){
 
     MP3ME_thid = -1;
     MP3ME_eof = 0;
-    MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
+    MP3ME_thid = sceKernelCreateThread("decodeThread", decodeThread, THREAD_PRIORITY, DEFAULT_THREAD_STACK_SIZE, PSP_THREAD_ATTR_USER, NULL);
     if(MP3ME_thid < 0)
         return ERROR_CREATE_THREAD;
 
@@ -519,8 +519,9 @@ void MP3ME_Pause(){
 int MP3ME_Stop(){
     MP3ME_isPlaying = 0;
     MP3ME_threadActive = 0;
-    while (!MP3ME_threadExited)
-        sceKernelDelayThread(100000);
+    /*while (!MP3ME_threadExited)
+        sceKernelDelayThread(100000);*/
+	sceKernelWaitThreadEnd(MP3ME_thid, NULL);
     sceKernelDeleteThread(MP3ME_thid);
     return 0;
 }

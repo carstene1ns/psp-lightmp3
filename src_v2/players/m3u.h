@@ -22,7 +22,7 @@
 struct M3U_songEntry{
 	char fileName[264];
 	int length;
-	char title[260];
+	char title[264];
 };
 
 struct M3U_playList{

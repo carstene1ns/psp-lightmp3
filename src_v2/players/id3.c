@@ -25,7 +25,7 @@ struct genre genreList[] =
    {91 , "Gothic Rock"}, {92 , "Progressive Rock"}, {93 , "Psychedelic Rock"}, {94 , "Symphonic Rock"}, {95 , "Slow Rock"}, {96 , "Big Band"}, {97 , "Chorus"}, {98 , "Easy Listening"}, {99 , "Acoustic"},
    {100 , "Humour"}, {101 , "Speech"}, {102 , "Chanson"}, {103 , "Opera"}, {104 , "Chamber Music"}, {105 , "Sonata"}, {106 , "Symphony"}, {107 , "Booty Bass"}, {108 , "Primus"}, {109 , "Porn Groove"},
    {110 , "Satire"}, {111 , "Slow Jam"}, {112 , "Club"}, {113 , "Tango"}, {114 , "Samba"}, {115 , "Folklore"}, {116 , "Ballad"}, {117 , "Power Ballad"}, {118 , "Rhytmic Soul"}, {119 , "Freestyle"}, {120 , "Duet"},
-   {121 , "Punk Rock"}, {122 , "Drum Solo"}, {123 , "Acapella"}, {124 , "Euro-House"}, {125 , "Dance Hall"}, {126 , "Goa"}, {127 , "Drum & Bass"}, {128 , "Club-House"}, {129 , "Hardcore"}, {130 , "Terror"},
+   {121 , "Punk Rock"}, {122 , "Drum Solo"}, {123 , "A capella"}, {124 , "Euro-House"}, {125 , "Dance Hall"}, {126 , "Goa"}, {127 , "Drum & Bass"}, {128 , "Club-House"}, {129 , "Hardcore"}, {130 , "Terror"},
    {131 , "Indie"}, {132 , "BritPop"}, {133 , "Negerpunk"}, {134 , "Polsk Punk"}, {135 , "Beat"}, {136 , "Christian Gangsta"}, {137 , "Heavy Metal"}, {138 , "Black Metal"}, {139 , "Crossover"}, {140 , "Contemporary C"},
    {141 , "Christian Rock"}, {142 , "Merengue"}, {143 , "Salsa"}, {144 , "Thrash Metal"}, {145 , "Anime"}, {146 , "JPop"}, {147 , "SynthPop"}
 };
@@ -350,7 +350,12 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
             readTagData(fp, tag_length - 1, buffer);
             id3tag->ID3Length = atoi(buffer);
          }
-         else if(!strncmp("COMM",tag,4)) /* Comment */
+         else if(!strncmp("TCON",tag,4)) /* Genre */
+         {
+            fseek(fp, 1, SEEK_CUR);
+            readTagData(fp, tag_length - 1, id3tag->ID3GenreText);
+         }
+		 else if(!strncmp("COMM",tag,4)) /* Comment */
          {
             fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, id3tag->ID3Comment);
@@ -446,6 +451,11 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
             fseek(fp, 1, SEEK_CUR);
             readTagData(fp, tag_length - 1, buffer);
             id3tag->ID3Length = atoi(buffer);
+         }
+         else if(!strncmp("TCON",tag,4)) /* Genre */
+         {
+            fseek(fp, 1, SEEK_CUR);
+            readTagData(fp, tag_length - 1, id3tag->ID3GenreText);
          }
          else if(!strncmp("COMM",tag,4)) /* Comment */
          {
@@ -567,28 +577,27 @@ int ParseID3v1(const char *mp3path, struct ID3Tag *id3tag){
 }
 
 // Main function:
-struct ID3Tag ParseID3(char *mp3path)
+int ParseID3(char *mp3path, struct ID3Tag *target)
 {
-    struct ID3Tag TmpID3;
-    strcpy(TmpID3.ID3Title,"");
-    strcpy(TmpID3.ID3Artist,"");
-    strcpy(TmpID3.ID3Album,"");
-    strcpy(TmpID3.ID3Year,"");
-    strcpy(TmpID3.ID3Comment,"");
-    strcpy(TmpID3.ID3GenreCode,"");
-    strcpy(TmpID3.ID3GenreText,"");
-    strcpy(TmpID3.ID3TrackText, "");
-    strcpy(TmpID3.versionfound, "");
-	TmpID3.ID3Track = 0;
-    strcpy(TmpID3.ID3TrackText, "");
-	TmpID3.ID3EncapsulatedPictureType = 0;
-    TmpID3.ID3EncapsulatedPictureOffset = 0;
-    TmpID3.ID3EncapsulatedPictureLength = 0;
-    TmpID3.ID3Length = 0;
+    strcpy(target->ID3Title,"");
+    strcpy(target->ID3Artist,"");
+    strcpy(target->ID3Album,"");
+    strcpy(target->ID3Year,"");
+    strcpy(target->ID3Comment,"");
+    strcpy(target->ID3GenreCode,"");
+    strcpy(target->ID3GenreText,"");
+    strcpy(target->ID3TrackText, "");
+    strcpy(target->versionfound, "");
+	target->ID3Track = 0;
+    strcpy(target->ID3TrackText, "");
+	target->ID3EncapsulatedPictureType = 0;
+    target->ID3EncapsulatedPictureOffset = 0;
+    target->ID3EncapsulatedPictureLength = 0;
+    target->ID3Length = 0;
 
-    ParseID3v1(mp3path, &TmpID3);
-    ParseID3v2(mp3path, &TmpID3);
-    if (!strlen(TmpID3.ID3Title))
-        getFileName(mp3path, TmpID3.ID3Title);
-    return TmpID3;
+    ParseID3v1(mp3path, target);
+    ParseID3v2(mp3path, target);
+    if (!strlen(target->ID3Title))
+        getFileName(mp3path, target->ID3Title);
+    return 0;
 }

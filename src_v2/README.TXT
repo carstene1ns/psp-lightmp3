@@ -182,4 +182,4 @@ MANY THANKS TO
 -joek2100 for the Media Engine functions (taken from Music prx 0.55 and adapted)
 -JLF65 for the FLAC playback function and testing
 -Ghoti for the libMad streaming code
--fabiom, borgqueenx, Mizou93, G-King, coach777, Magic_PSP for tanslations.
+-fabiom, borgqueenx, Mizou93, G-King, coach777, Magic PSP for tanslations.

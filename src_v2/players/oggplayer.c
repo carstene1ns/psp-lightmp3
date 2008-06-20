@@ -337,7 +337,7 @@ struct fileInfo *OGG_GetInfo(){
 
 
 struct fileInfo OGG_GetTagInfoOnly(char *filename){
-    int tempFile = 0;
+    int tempFile = -1;
     OggVorbis_File vf;
     struct fileInfo tempInfo;
 

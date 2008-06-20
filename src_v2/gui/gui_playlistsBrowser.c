@@ -28,6 +28,7 @@
 #include "settings.h"
 #include "skinsettings.h"
 #include "menu.h"
+#include "../system/clock.h"
 #include "../system/opendir.h"
 #include "../players/m3u.h"
 
@@ -127,6 +128,7 @@ int gui_playlistsBrowser(){
     strcpy(buffer, "");
     exitFlagPlaylistsBrowser = 0;
 	int skip = 0;
+	cpuRestore();
     while(!osl_quit && !exitFlagPlaylistsBrowser){
 		if (!skip){
 			oslStartDrawing();

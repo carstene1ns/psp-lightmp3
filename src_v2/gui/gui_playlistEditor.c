@@ -191,6 +191,7 @@ int gui_playlistEditor(){
 
     exitFlagPlaylistEditor = 0;
 	int skip = 0;
+	cpuRestore();
 
     while(!osl_quit && !exitFlagPlaylistEditor){
 		if (!skip){

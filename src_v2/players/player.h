@@ -52,6 +52,7 @@
 
 #define FASTFORWARD_VOLUME 0x2200
 #define MAX_IMAGE_DIMENSION 150*1024
+#define DEFAULT_THREAD_STACK_SIZE 256*1024
 
 extern char fileTypeDescription[4][20];
 

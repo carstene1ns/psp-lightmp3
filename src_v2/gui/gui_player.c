@@ -17,6 +17,7 @@
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pspkernel.h>
 #include <pspsdk.h>
+#include <psprtc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <oslib/oslib.h>
@@ -456,13 +457,19 @@ int playFile(char *fileName, char *trackMessage){
     flagExit = 0;
 	int skip = 0;
     while(!osl_quit && !flagExit){
-        if (userSettings->displayStatus && !skip)
+        /*if (userSettings->displayStatus && !skip)
 			drawPlayer(status, &libEntry, trackMessage);
         else if (!userSettings->displayStatus)
-			scePowerTick(0);
+			scePowerTick(0);*/
+        if (userSettings->displayStatus && !skip)
+			drawPlayer(status, &libEntry, trackMessage);
 
-        oslEndFrame();
-    	skip = oslSyncFrame();
+        if (!userSettings->displayStatus)
+			scePowerTick(0);
+		else{
+			oslEndFrame();
+			skip = oslSyncFrame();
+		}
 
 		//Metto in pausa se sono state staccate le cuffie:
 		if (headphone && !sceHprmIsHeadphoneExist()){
@@ -625,8 +632,8 @@ int playFile(char *fileName, char *trackMessage){
 
     //Srobbler LOG:
     if (userSettings->SCROBBLER && strlen(info->title)){
-        time_t mytime;
-        time(&mytime);
+		u64 mytime;
+		sceRtcGetCurrentTick(&mytime);
         if (lastPercentage >= 50)
             SCROBBLER_addTrack(*info, info->length, "L", mytime);
         else

@@ -33,7 +33,7 @@
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int AA3ME_threadActive = 0;
-static int AA3ME_threadExited = 1;
+//static int AA3ME_threadExited = 1;
 static char AA3ME_fileName[264];
 static int AA3ME_isPlaying = 0;
 static int AA3ME_thid = -1;
@@ -66,7 +66,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     int tag_size;
 	int offset = 0;
 
-	AA3ME_threadExited = 0;
+	//AA3ME_threadExited = 0;
     AA3ME_threadActive = 1;
 
 	sceAudiocodecReleaseEDRAM(AA3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another file.
@@ -262,7 +262,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 	}
 	sceIoClose(fd);
     fd = -1;
-    AA3ME_threadExited = 1;
+    //AA3ME_threadExited = 1;
 	sceKernelExitThread(0);
     return 0;
 }
@@ -478,7 +478,7 @@ int AA3ME_Load(char *fileName){
 
     AA3ME_thid = -1;
     AA3ME_eof = 0;
-    AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, 0x10000, PSP_THREAD_ATTR_USER, NULL);
+    AA3ME_thid = sceKernelCreateThread("AA3ME_decodeThread", AA3ME_decodeThread, AT3_THREAD_PRIORITY, DEFAULT_THREAD_STACK_SIZE, PSP_THREAD_ATTR_USER, NULL);
     if(AA3ME_thid < 0)
         return ERROR_CREATE_THREAD;
 
@@ -502,8 +502,9 @@ void AA3ME_Pause(){
 int AA3ME_Stop(){
     AA3ME_isPlaying = 0;
     AA3ME_threadActive = 0;
-    while (!AA3ME_threadExited)
-        sceKernelDelayThread(100000);
+    /*while (!AA3ME_threadExited)
+        sceKernelDelayThread(100000);*/
+	sceKernelWaitThreadEnd(AA3ME_thid, NULL);
     sceKernelDeleteThread(AA3ME_thid);
     return 0;
 }

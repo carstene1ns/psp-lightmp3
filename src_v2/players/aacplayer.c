@@ -161,7 +161,7 @@ void getAACTagInfo(char *filename, struct fileInfo *targetInfo){
     //ID3:
     struct ID3Tag ID3;
     strcpy(AAC_fileName, filename);
-    ID3 = ParseID3(filename);
+    ParseID3(filename, &ID3);
     strcpy(targetInfo->title, ID3.ID3Title);
     strcpy(targetInfo->artist, ID3.ID3Artist);
     strcpy(targetInfo->album, ID3.ID3Album);

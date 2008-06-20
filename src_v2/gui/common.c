@@ -267,7 +267,7 @@ int drawToolbars(){
 
 	//Freee memory:
 	sceRtcGetCurrentTick(&currentTime);
-	if (currentTime - lastFreeMemTime >= 1000000){
+	if (currentTime - lastFreeMemTime >= 2000000){
 		freeKMem = sceKernelTotalFreeMemSize();
 		sceRtcGetCurrentTick(&lastFreeMemTime);
 	}
