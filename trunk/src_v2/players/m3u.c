@@ -66,9 +66,9 @@ int splitSongInfo(char *text, char *chrLength, char *title){
 //Open and parse a M3U file:
 int M3U_open(char *fileName){
 	FILE *f;
-	char lineText[256];
-	char chrLength[10];
-	char title[256];
+	char lineText[512];
+	char chrLength[20];
+	char title[264];
 	struct M3U_songEntry singleEntry;
 	int playListCount = lPlayList.songCount;
 
@@ -86,14 +86,16 @@ int M3U_open(char *fileName){
 			//Nothing to do. :)
 		}else if (strlen(lineText) > 2){
 			//Store song info:
-			strcpy(singleEntry.fileName, lineText);
+			strncpy(singleEntry.fileName, lineText, 263);
+			singleEntry.fileName[263] = '\0';
 			if ((int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 10 || (int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 13 ){
 				singleEntry.fileName[strlen(singleEntry.fileName) - 1] = '\0';
 			}
 			if ((int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 10 || (int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 13 ){
 				singleEntry.fileName[strlen(singleEntry.fileName) - 1] = '\0';
 			}
-			strcpy(singleEntry.title, title);
+			strncpy(singleEntry.title, title, 263);
+			singleEntry.title[263] = '\0';
 			singleEntry.length = atoi(chrLength);
 			lPlayList.songs[playListCount++] = singleEntry;
 			if (playListCount == MAX_SONGS){

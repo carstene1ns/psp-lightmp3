@@ -24,7 +24,7 @@
 #define ML_ERROR_OPENDB -2
 #define ML_ERROR_SQL    -3
 
-#define ML_SQLMAXLENGTH 1024*2
+#define ML_SQLMAXLENGTH 1024*3
 #define ML_BUFFERSIZE 100
 #define ML_MAX_RATING 5
 
@@ -44,8 +44,8 @@ struct libraryEntry{
     int bitrate;
 
     //Fields for free sql query:
-    char strField[264];
-    char dataField[512];
+    char strField[1024];
+    char dataField[1024];
     double intField01;
     double intField02;
 };

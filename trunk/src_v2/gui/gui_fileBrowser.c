@@ -191,6 +191,7 @@ int gui_fileBrowser(){
 
     exitFlagFileBrowser = 0;
 	int skip = 0;
+	cpuRestore();
     while(!osl_quit && !exitFlagFileBrowser){
 
 		if (!skip){

@@ -17,9 +17,9 @@
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pspkernel.h>
 #include <pspsdk.h>
+#include <psprtc.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <time.h>
 #include <oslib/oslib.h>
 
 #include "main.h"
@@ -46,8 +46,8 @@
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(12*1024);
-//PSP_HEAP_SIZE_KB(10*1024);
+//PSP_HEAP_SIZE_KB(12*1024);
+PSP_HEAP_SIZE_KB(-4*1024);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -143,7 +143,7 @@ int CallbackThread(SceSize args, void *argp) {
 int SetupCallbacks(void) {
     int thid = 0;
 
-    thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0xFA0, PSP_THREAD_ATTR_USER, 0);
+    thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0x10000, PSP_THREAD_ATTR_USER, 0);
     if(thid >= 0)
         sceKernelStartThread(thid, 0, 0);
     return thid;
@@ -183,6 +183,7 @@ int splashThread(SceSize args, void *argp){
     sceIoChdir(ebootDirectory);
     oslShowSplashScreen(1);
     sceKernelExitDeleteThread(0);
+
     /*OSL_IMAGE *splash;
     splash = oslLoadImageFilePNG("logo/neoflash.png", OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (splash){
@@ -192,7 +193,7 @@ int splashThread(SceSize args, void *argp){
         oslEndFrame();
         oslSyncFrame();
 
-        sceKernelDelayThread(3000000);
+        sceKernelDelayThread(3*1000000);
         oslDeleteImage(splash);
     }
     sceKernelExitDeleteThread(0);*/
@@ -286,7 +287,7 @@ int main(){
     //Splash screen:
 	int splash_thid = 0;
 	if (userSettings->SHOW_SPLASH){
-		splash_thid = sceKernelCreateThread("splash", splashThread, 15, 0x10000, PSP_THREAD_ATTR_USER | THREAD_ATTR_VFPU, NULL);
+		splash_thid = sceKernelCreateThread("splash", splashThread, 15, DEFAULT_THREAD_STACK_SIZE, PSP_THREAD_ATTR_USER | THREAD_ATTR_VFPU, NULL);
 		if(splash_thid >= 0)
 			sceKernelStartThread(splash_thid, 0, NULL);
 	}
@@ -375,7 +376,9 @@ int main(){
     strcpy(userSettings->lastBrowserDir, "");
 
     //Random seed:
-    srand(time(NULL));
+	u64 mytime;
+	sceRtcGetCurrentTick(&mytime);
+    srand(mytime);
 
     //Wait for splash:
 	if (userSettings->SHOW_SPLASH)
@@ -396,6 +399,7 @@ int main(){
     }
 
     while(!osl_quit){
+		cpuBoost();
         switch (currentMode){
             case (MODE_FILEBROWSER):
                 currentMode = gui_fileBrowser();

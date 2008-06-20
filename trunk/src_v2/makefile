@@ -13,9 +13,11 @@ OBJS = prx/supportlib.o \
 #To build for custom firmware:
 BUILD_PRX = 1
 PSP_FW_VERSION=371
+PSP_LARGE_MEMORY=1
 
 #To debug -g
-CFLAGS = -O3 -frename-registers -ffast-math -fomit-frame-pointer -g -G0 -Wall
+#CFLAGS = -O3 -frename-registers -ffast-math -fomit-frame-pointer -g -G0 -Wall
+CFLAGS = -O2 -g -G0 -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LIBDIR =
@@ -26,7 +28,7 @@ LIBDIR =
 LIBS= -lsqlite3 -losl -lpng -lz \
       -lAac -lFLAC -lmad -lvorbisidec \
       -lpsphprm -lpspusb -lpspusbstor -lpspaudio -lpspaudiocodec -lpspkubridge \
-	  -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan -lm
+	  -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgu -lpspgum -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan -lm
 
 LDFLAGS =
 EXTRA_TARGETS = EBOOT.PBP

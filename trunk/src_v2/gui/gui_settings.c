@@ -315,6 +315,7 @@ int gui_settings(){
 
     exitFlagSettings = 0;
 	int skip = 0;
+	cpuRestore();
     while(!osl_quit && !exitFlagSettings){
 		if (!skip){
 			oslStartDrawing();

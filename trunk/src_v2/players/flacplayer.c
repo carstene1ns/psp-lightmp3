@@ -348,7 +348,7 @@ int FLAC_Load(char *filename){
 
 	//Start buffer filling thread:
     bufferThid = -1;
-	bufferThid = sceKernelCreateThread("bufferFilling", flacThread, 0x11, 0x10000, PSP_THREAD_ATTR_USER, NULL);
+	bufferThid = sceKernelCreateThread("bufferFilling", flacThread, 0x11, DEFAULT_THREAD_STACK_SIZE, PSP_THREAD_ATTR_USER, NULL);
 	if(bufferThid < 0)
 		return ERROR_CREATE_THREAD;
 	sceKernelStartThread(bufferThid, 0, NULL);
@@ -377,6 +377,7 @@ int FLAC_Stop(){
 	isPlaying = 0;
     while (outputInProgress == 1)
         sceKernelDelayThread(100000);
+	sceKernelWaitThreadEnd(bufferThid, NULL);
     sceKernelDeleteThread(bufferThid);
 	return 0;
 }

@@ -18,7 +18,7 @@
 
 #include "pspaudiolib.h"
 
-#define THREAD_STACK_SIZE 128*1024
+#define THREAD_STACK_SIZE 256*1024
 
 int setFrequency(unsigned short samples, unsigned short freq, char car){
 	return sceAudioSRCChReserve(samples, freq, car);
@@ -194,7 +194,7 @@ int pspAudioInit()
         audio_terminate=1;
         for (i=0; i<PSP_NUM_AUDIO_CHANNELS; i++) {
             if (AudioStatus[i].threadhandle != -1) {
-                //sceKernelWaitThreadEnd(AudioStatus[i].threadhandle,NULL);
+                sceKernelWaitThreadEnd(AudioStatus[i].threadhandle, NULL);
                 while (AudioStatus[i].threadactive)
                     sceKernelDelayThread(100000);
                 sceKernelDeleteThread(AudioStatus[i].threadhandle);
@@ -224,7 +224,7 @@ void pspAudioEnd()
     for (i=0; i<PSP_NUM_AUDIO_CHANNELS; i++) {
         if (AudioStatus[i].threadhandle != -1) {
             pspReleaseAudio();
-            //sceKernelWaitThreadEnd(AudioStatus[i].threadhandle,NULL);
+            sceKernelWaitThreadEnd(AudioStatus[i].threadhandle,NULL);
             while (AudioStatus[i].threadactive)
                 sceKernelDelayThread(100000);
             sceKernelDeleteThread(AudioStatus[i].threadhandle);

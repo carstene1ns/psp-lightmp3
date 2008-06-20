@@ -730,6 +730,8 @@ int gui_mediaLibrary(){
     buildMainMenu();
     exitFlagMediaLibrary = 0;
 	int skip = 0;
+
+	cpuRestore();
     while(!osl_quit && !exitFlagMediaLibrary){
 		if (!skip){
 			oslStartDrawing();
