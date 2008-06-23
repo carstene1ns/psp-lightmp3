@@ -16,8 +16,8 @@ PSP_FW_VERSION=371
 PSP_LARGE_MEMORY=1
 
 #To debug -g
-#CFLAGS = -O3 -frename-registers -ffast-math -fomit-frame-pointer -g -G0 -Wall
-CFLAGS = -O2 -g -G0 -Wall
+CFLAGS = -O3 -frename-registers -ffast-math -fomit-frame-pointer -g -G0 -Wall
+#CFLAGS = -O2 -g -G0 -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 LIBDIR =

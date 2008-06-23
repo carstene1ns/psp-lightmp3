@@ -439,6 +439,7 @@ int playFile(char *fileName, char *trackMessage){
 
     //Imposto il clock:
     if (userSettings->CLOCK_AUTO){
+		setBusClock(userSettings->BUS);
         if (userSettings->displayStatus)
             setCpuClock(info->defaultCPUClock);
         else
@@ -541,9 +542,13 @@ int playFile(char *fileName, char *trackMessage){
                     ratingChangedCross = 0;
                 else{
                     currentSpeed = (*getPlayingSpeedFunct)();
-                    if (currentSpeed)
+                    if (currentSpeed){
                         (*setPlayingSpeedFunct)(0);
-                    else{
+						if (userSettings->CLOCK_AUTO){
+						    setBusClock(userSettings->BUS);
+							setCpuClock(getCpuClock() - FFWDREW_CPU_BOOST);
+						}
+                    }else{
                         (*pauseFunct)();
                         playerStatus = !playerStatus;
                     }
@@ -562,12 +567,32 @@ int playFile(char *fileName, char *trackMessage){
             			(*setVolumeBoostFunct)(--userSettings->volumeBoost);
             }else if (osl_pad.released.right && playerStatus == 1){
                 currentSpeed = (*getPlayingSpeedFunct)();
-                if (currentSpeed < MAX_PLAYING_SPEED)
-                	(*setPlayingSpeedFunct)(++currentSpeed);
+                if (currentSpeed < MAX_PLAYING_SPEED){
+					(*setPlayingSpeedFunct)(++currentSpeed);
+					if (userSettings->CLOCK_AUTO){
+						if (currentSpeed == 1){
+						    setBusClock(userSettings->BUS);
+							setCpuClock(getCpuClock() + FFWDREW_CPU_BOOST);
+						}else if (currentSpeed == 0){
+						    setBusClock(userSettings->BUS);
+							setCpuClock(getCpuClock() - FFWDREW_CPU_BOOST);
+						}
+					}
+				}
             }else if (osl_pad.released.left && playerStatus == 1){
                 currentSpeed = (*getPlayingSpeedFunct)();
-                if (currentSpeed > MIN_PLAYING_SPEED)
+                if (currentSpeed > MIN_PLAYING_SPEED){
                     (*setPlayingSpeedFunct)(--currentSpeed);
+					if (userSettings->CLOCK_AUTO){
+						if (currentSpeed == -1){
+						    setBusClock(userSettings->BUS);
+							setCpuClock(getCpuClock() + FFWDREW_CPU_BOOST);
+						}else if (currentSpeed == 0){
+						    setBusClock(userSettings->BUS);
+							setCpuClock(getCpuClock() - FFWDREW_CPU_BOOST);
+						}
+					}
+				}
             }else if (osl_pad.analogY < -ANALOG_SENS && !osl_pad.pressed.hold){
                 if (clock < 222)
                     setCpuClock(++clock);

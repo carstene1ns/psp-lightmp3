@@ -30,7 +30,7 @@ extern OSL_FONT *fontMenuNormal;
 struct menuElement{
     char text[264];
     int value;
-    char data[512];
+    char data[1024];
     int (*triggerFunction)();
 };
 

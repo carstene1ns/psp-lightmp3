@@ -14,7 +14,7 @@ USE_KERNEL_LIBS=1
 
 LIBDIR =
 LDFLAGS = -mno-crt0 -nostartfiles
-LIBS = -lpsppower_driver
+LIBS = -lpsppower_driver -lpspsystemctrl_kernel
 
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak

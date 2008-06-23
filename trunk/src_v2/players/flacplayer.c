@@ -375,10 +375,6 @@ void FLAC_Pause(){
 
 int FLAC_Stop(){
 	isPlaying = 0;
-    while (outputInProgress == 1)
-        sceKernelDelayThread(100000);
-	sceKernelWaitThreadEnd(bufferThid, NULL);
-    sceKernelDeleteThread(bufferThid);
 	return 0;
 }
 
@@ -386,6 +382,11 @@ int FLAC_Stop(){
 void FLAC_FreeTune(){
 	kill_flac_thread = 1;
 	sceKernelSignalSema(bufferLow, 1);
+    while (outputInProgress == 1)
+        sceKernelDelayThread(100000);
+	//sceKernelWaitThreadEnd(bufferThid, NULL);
+    sceKernelDeleteThread(bufferThid);
+
 	sceKernelDelayThread(100*1000);
 	sceKernelDeleteSema(bufferLow);
     //FLAC__stream_decoder_delete(decoder);

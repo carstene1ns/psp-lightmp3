@@ -15,37 +15,32 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#ifndef __main_h
-#define __main_h (1)
 
-#include "others/medialibrary.h"
+struct fileInfo{
+    int fileType;
+    int defaultCPUClock;
+    int needsME;
+	double fileSize;
+	char layer[12];
+	int kbit;
+	long instantBitrate;
+	long hz;
+	char mode[52];
+	char emphasis[20];
+	long length;
+	char strLength[12];
+	long frames;
+	long framesDecoded;
+	int  encapsulatedPictureType;
+	int  encapsulatedPictureOffset;
+	int  encapsulatedPictureLength;
+	char coverArtImageName[264];
 
-#define VERSION "2.0.0b2"
-
-#define ML_DB "mediaLibrary.db"
-
-#define DISPLAY_FADE_TIME 0.2
-#define FFWDREW_CPU_BOOST 20
-
-#define MODE_FILEBROWSER 0
-#define MODE_PLAYLISTS 1
-#define MODE_PLAYLIST_EDITOR 2
-#define MODE_MEDIA_LIBRARY 3
-#define MODE_SETTINGS 4
-#define MODE_PLAYER 99
-
-//Shared globals:
-extern struct settings *userSettings;
-extern int fileExtCount;
-extern char fileExt[8][5];
-extern char tempM3Ufile[264];
-extern char MLtempM3Ufile[264];
-extern struct libraryEntry MLresult[ML_BUFFERSIZE];
-extern struct menuElements commonMenu;
-extern struct menuElements commonSubMenu;
-extern int tempPos[2];
-extern int tempColor[4];
-extern int tempColorShadow[4];
-
-extern float defaultTextSize;
-#endif
+    //Tag/comments:
+	char album[260];
+	char title[260];
+	char artist[260];
+	char genre[260];
+    char year[8];
+    char trackNumber[8];
+};
