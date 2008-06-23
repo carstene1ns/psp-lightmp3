@@ -465,9 +465,13 @@ int playFile(char *fileName, char *trackMessage){
         if (userSettings->displayStatus && !skip)
 			drawPlayer(status, &libEntry, trackMessage);
 
-        if (!userSettings->displayStatus)
+        if (!userSettings->displayStatus){
 			scePowerTick(0);
-		else{
+			if (getBrightness()){
+				userSettings->displayStatus = 1;
+				userSettings->curBrightness = getBrightness();
+			}
+		}else{
 			oslEndFrame();
 			skip = oslSyncFrame();
 		}
