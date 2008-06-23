@@ -249,7 +249,7 @@ int decodeThread(SceSize args, void *argp){
 		        //Check for playing speed:
                 if (MP3ME_playingSpeed){
                     long old_start = data_start;
-                    if (sceIoLseek32(MP3ME_handle, frame_size * 6 * MP3ME_playingSpeed, PSP_SEEK_CUR) != old_start){
+                    if (sceIoLseek32(MP3ME_handle, frame_size * 8 * MP3ME_playingSpeed, PSP_SEEK_CUR) != old_start){
                         data_start = SeekNextFrameMP3(MP3ME_handle);
                         if(data_start < 0){
                             MP3ME_eof = 1;

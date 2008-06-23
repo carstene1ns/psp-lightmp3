@@ -632,7 +632,6 @@ int search(){
 		oslEndDrawing();
 		oslSyncFrame();
 
-
 		if (strlen(searchString)){
 			mlQueryType = QUERY_SINGLE_ENTRY;
 			mlQueryCount = -1;

@@ -292,7 +292,8 @@ void setKernelBusClock(int bus){
 void setKernelCpuClock(int cpu){
 	k1 = pspSdkSetK1(0);
     if (cpu <= 333){
-        if (sceKernelDevkitVersion() < 0x03070110){
+		sctrlHENSetSpeed(cpu, cpu/2);
+        /*if (sceKernelDevkitVersion() < 0x03070110){
             scePowerSetCpuClockFrequency(cpu);
             if (scePowerGetCpuClockFrequency() < cpu)
                 scePowerSetCpuClockFrequency(++cpu);
@@ -302,7 +303,7 @@ void setKernelCpuClock(int cpu){
                 cpu++;
                 scePowerSetClockFrequency(cpu, cpu, cpu/2);
             }
-        }
+        }*/
     }
     pspSdkSetK1(k1);
 }
