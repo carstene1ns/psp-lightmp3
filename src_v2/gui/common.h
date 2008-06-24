@@ -24,7 +24,7 @@
 
 #define ANALOG_SENS 80
 
-extern OSL_IMAGE *commonBkg;
+/*extern OSL_IMAGE *commonBkg;
 extern OSL_IMAGE *commonTopToolbar;
 extern OSL_IMAGE *commonBottomToolbar;
 extern OSL_IMAGE *commonButtons[5];
@@ -38,6 +38,9 @@ extern OSL_IMAGE *commonCPU;
 extern OSL_IMAGE *popupBkg;
 extern OSL_IMAGE *star;
 extern OSL_IMAGE *blankStar;
+extern OSL_IMAGE *commonMenuHighlight;*/
+
+extern OSL_IMAGE *popupBkg;
 extern OSL_IMAGE *commonMenuHighlight;
 
 extern OSL_FONT *fontNormal;

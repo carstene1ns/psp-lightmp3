@@ -42,22 +42,22 @@ int readButtons(SceCtrlData *pad_data, int count);
 // Globals
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static char buffer[264];
-OSL_IMAGE *commonBkg;
-OSL_IMAGE *commonTopToolbar;
-OSL_IMAGE *commonBottomToolbar;
-OSL_IMAGE *commonButtons[5];
-OSL_IMAGE *commonButtonsSel[5];
-OSL_IMAGE *commonBattery;
-OSL_IMAGE *commonBatteryLow;
-OSL_IMAGE *commonBatteryCharging;
-OSL_IMAGE *popupBkg;
-OSL_IMAGE *star;
-OSL_IMAGE *blankStar;
-OSL_IMAGE *helpBkg;
-OSL_IMAGE *commonVolume;
-OSL_IMAGE *commonHeadphone;
-OSL_IMAGE *commonCPU;
+static OSL_IMAGE *commonBkg;
+static OSL_IMAGE *commonTopToolbar;
+static OSL_IMAGE *commonBottomToolbar;
+static OSL_IMAGE *commonButtons[5];
+static OSL_IMAGE *commonButtonsSel[5];
+static OSL_IMAGE *commonBattery;
+static OSL_IMAGE *commonBatteryLow;
+static OSL_IMAGE *commonBatteryCharging;
+static OSL_IMAGE *star;
+static OSL_IMAGE *blankStar;
+static OSL_IMAGE *helpBkg;
+static OSL_IMAGE *commonVolume;
+static OSL_IMAGE *commonHeadphone;
+static OSL_IMAGE *commonCPU;
 OSL_IMAGE *commonMenuHighlight;
+OSL_IMAGE *popupBkg;
 
 OSL_FONT *fontNormal;
 
@@ -488,7 +488,7 @@ int drawRating(int startX, int startY, int rating){
         else
             oslDrawImageXY(blankStar, startX + star->sizeX * i, startY);
     }
-    return 0;
+    return startX + star->sizeX * ML_MAX_RATING;
 }
 
 

@@ -75,8 +75,10 @@ void addFileToPlaylist(char *fileName, int save){
 	struct fileInfo *info = NULL;
 	char onlyName[264] = "";
 
-	if (save == 1)
+	if (save == 1){
+		M3U_clear();
 		M3U_open(tempM3Ufile);
+	}
 
     setAudioFunctions(fileName, userSettings->MP3_ME);
 	(*initFunct)(0);
@@ -108,6 +110,7 @@ void addDirectoryToPlaylist(char *dirName){
 
 	char *result = opendir_open(&dirToAdd, dirName, fileExt, fileExtCount, 0);
 	if (result == 0){
+		M3U_clear();
         M3U_open(tempM3Ufile);
 		cpuBoost();
 		for (i = 0; i < dirToAdd.number_of_directory_entries; i++){

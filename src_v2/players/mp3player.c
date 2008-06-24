@@ -212,7 +212,7 @@ static void MP3Callback(void *buffer, unsigned int samplesToWrite, void *pdata){
             const unsigned int samplesAvailable = Synth.pcm.length - samplesRead;
             if (samplesAvailable > samplesToWrite) {
                 convertLeftSamples(destination, destination + samplesToWrite, &Synth.pcm.samples[0][samplesRead]);
-				if 	(MP3_channels == 2)
+				if (MP3_channels == 2)
 	                convertRightSamples(destination, destination + samplesToWrite, &Synth.pcm.samples[1][samplesRead]);
 				else
 	                convertRightSamples(destination, destination + samplesToWrite, &Synth.pcm.samples[0][samplesRead]);

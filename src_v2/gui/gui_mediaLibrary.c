@@ -77,13 +77,13 @@ static char tempSql[ML_SQLMAXLENGTH] = "";
 
 static OSL_IMAGE *coverArt = NULL;
 static int coverArtFailed = 0;
+static struct libraryEntry localResult[ML_BUFFERSIZE];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Add selection to playlist:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uName){
     int offset = 0;
-    struct libraryEntry localResult[ML_BUFFERSIZE];
     struct fileInfo *info = NULL;
     char onlyName[264] = "";
     char message[100] = "";
@@ -91,7 +91,7 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
 	cpuBoost();
     int i = 0;
 	int count = ML_countRecords(where);
-    if (count){
+	if (count > 0){
         M3U_clear();
         M3U_open(m3uName);
         ML_queryDB(where, orderBy, offset, ML_BUFFERSIZE, localResult);
@@ -107,7 +107,7 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
             drawMenu(&commonMenu);
             drawMLinfo();
 
-            snprintf(message, sizeof(message), "%3.3i%% %s", (int)((i+1.0)/count*100.0), langGetString("DONE"));
+            snprintf(message, sizeof(message), "%3.3i%% %s", (int)((i+1.0) / count*100.0), langGetString("DONE"));
             if (!fastMode){
                 drawWait(langGetString("ADDING_PLAYLIST"), message);
 
@@ -442,7 +442,7 @@ void queryDataFeed(int index, struct menuElement *element){
         element->triggerFunction = NULL;
     }else if (mlQueryType == QUERY_COUNT_RATING){
 	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
-		drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
+		int startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
         sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
         oslSetFont(fontMenuNormal);
         if (index == commonMenu.selected){
@@ -453,7 +453,7 @@ void queryDataFeed(int index, struct menuElement *element){
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
         }
 		setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        oslDrawString(commonMenu.xPos + star->sizeX*ML_MAX_RATING + 8, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), buffer);
+        oslDrawString(startX + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), buffer);
 		strcpy(element->text, "");
 		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
         element->triggerFunction = enterSelection;
