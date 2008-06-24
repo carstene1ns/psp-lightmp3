@@ -22,6 +22,7 @@ Version 2.0.0 BETA2
         Works only with folder.jpg and cover.jpg (doesen't read coverart from ID3v2)
 -Added: Display now fades in and out when you toggle economy mode
 -Added: Music pause if you remove the headphones while listening to a track
+-Fixed: Playback of mono MP3 using libMAD
 -Fixed: Faster navigation between functions
 -Fixed: crash in playlist editor when press UP, RIGHT or NOTE on an empty list
 -Fixed: stop FLAC playback
