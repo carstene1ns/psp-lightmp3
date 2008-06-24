@@ -76,6 +76,7 @@ static char previousOrderBy[ML_SQLMAXLENGTH] = "";
 static char tempSql[ML_SQLMAXLENGTH] = "";
 
 static OSL_IMAGE *coverArt = NULL;
+static int coverArtFailed = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Add selection to playlist:
@@ -156,7 +157,8 @@ int backToMainMenu(){
 		oslDeleteImage(coverArt);
 		coverArt = NULL;
 	}
-    return 0;
+	coverArtFailed = 0;
+	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -336,6 +338,7 @@ void drawMLinfo(){
 				oslDeleteImage(coverArt);
 				coverArt = NULL;
 			}
+			coverArtFailed = 0;
 		}else if (!coverArt){
 			u64 currentTime;
 			sceRtcGetCurrentTick(&currentTime);
@@ -361,6 +364,8 @@ void drawMLinfo(){
 				if (coverArt){
 					coverArt->stretchX = skinGetParam("MEDIALIBRARY_COVERART_WIDTH");
 					coverArt->stretchY = skinGetParam("MEDIALIBRARY_COVERART_HEIGHT");
+				}else{
+					coverArtFailed = 1;
 				}
 				cpuRestore();
 			}

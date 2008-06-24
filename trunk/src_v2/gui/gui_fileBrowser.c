@@ -146,6 +146,7 @@ int gui_fileBrowser(){
     int USBactive = 0;
     int status = STATUS_NORMAL;
 	OSL_IMAGE *coverArt = NULL;
+	int coverArtFailed = 0;
 	u64 lastMenuChange = 0;
 	int lastSelected = -1;
 
@@ -228,7 +229,8 @@ int gui_fileBrowser(){
 						oslDeleteImage(coverArt);
 						coverArt = NULL;
 					}
-				}else if (!coverArt){
+					coverArtFailed = 0;
+				}else if (!coverArt && !coverArtFailed){
 					u64 currentTime;
 					sceRtcGetCurrentTick(&currentTime);
 					if (currentTime - lastMenuChange > COVERTART_DELAY){
@@ -257,6 +259,8 @@ int gui_fileBrowser(){
 						if (coverArt){
 							coverArt->stretchX = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
 							coverArt->stretchY = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
+						}else{
+							coverArtFailed = 1;
 						}
 						cpuRestore();
 					}

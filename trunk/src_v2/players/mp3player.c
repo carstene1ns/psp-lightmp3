@@ -54,6 +54,7 @@ static struct mad_frame Frame;
 static struct mad_synth Synth;
 static mad_timer_t Timer;
 static int MP3_outputInProgress = 0;
+static int MP3_channels = 0;
 
 // The following variables are maintained and updated by the tracker during playback
 static int MP3_isPlaying;		// Set to true when a mod is being played
@@ -211,7 +212,10 @@ static void MP3Callback(void *buffer, unsigned int samplesToWrite, void *pdata){
             const unsigned int samplesAvailable = Synth.pcm.length - samplesRead;
             if (samplesAvailable > samplesToWrite) {
                 convertLeftSamples(destination, destination + samplesToWrite, &Synth.pcm.samples[0][samplesRead]);
-                convertRightSamples(destination, destination + samplesToWrite, &Synth.pcm.samples[1][samplesRead]);
+				if 	(MP3_channels == 2)
+	                convertRightSamples(destination, destination + samplesToWrite, &Synth.pcm.samples[1][samplesRead]);
+				else
+	                convertRightSamples(destination, destination + samplesToWrite, &Synth.pcm.samples[0][samplesRead]);
 
                 samplesRead += samplesToWrite;
                 samplesToWrite = 0;
@@ -226,7 +230,10 @@ static void MP3Callback(void *buffer, unsigned int samplesToWrite, void *pdata){
                 }
             }else{
                 convertLeftSamples(destination, destination + samplesAvailable, &Synth.pcm.samples[0][samplesRead]);
-                convertRightSamples(destination, destination + samplesAvailable, &Synth.pcm.samples[1][samplesRead]);
+				if 	(MP3_channels == 2)
+	                convertRightSamples(destination, destination + samplesAvailable, &Synth.pcm.samples[1][samplesRead]);
+				else
+	                convertRightSamples(destination, destination + samplesAvailable, &Synth.pcm.samples[0][samplesRead]);
 
                 samplesRead = 0;
                 decode();
@@ -338,7 +345,8 @@ int MP3getInfo(){
         bufferSize = size;
     localBuffer = (unsigned char *) malloc(bufferSize);
 
-    MP3_info.fileType = MP3_TYPE;
+	MP3_channels = 2;
+	MP3_info.fileType = MP3_TYPE;
     MP3_info.defaultCPUClock = MP3_defaultCPUClock;
     MP3_info.needsME = 0;
 	MP3_info.fileSize = size;
@@ -385,18 +393,23 @@ int MP3getInfo(){
     			switch (header.mode) {
     			case MAD_MODE_SINGLE_CHANNEL:
     				strcpy(MP3_info.mode, "single channel");
+					MP3_channels = 1;
     				break;
     			case MAD_MODE_DUAL_CHANNEL:
     				strcpy(MP3_info.mode, "dual channel");
-    				break;
+					MP3_channels = 2;
+					break;
     			case MAD_MODE_JOINT_STEREO:
     				strcpy(MP3_info.mode, "joint (MS/intensity) stereo");
+					MP3_channels = 2;
     				break;
     			case MAD_MODE_STEREO:
     				strcpy(MP3_info.mode, "normal LR stereo");
+					MP3_channels = 2;
     				break;
     			default:
     				strcpy(MP3_info.mode, "unknown");
+					MP3_channels = 2;
     				break;
     			}
 
