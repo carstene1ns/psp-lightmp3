@@ -112,14 +112,16 @@ int drawMenu(struct menuElements *menu){
         if (menu->dataFeedFunction != NULL)
             menu->dataFeedFunction(i, &menu->elements[i]);
 
-        if (menu->align == ALIGN_LEFT)
-            xPos = menu->xPos + 4;
-        else if (menu->align == ALIGN_RIGHT)
-            xPos = menu->xPos + menu->width - oslGetStringWidth(menu->elements[i].text) - 4;
-        else if (menu->align == ALIGN_CENTER)
-            xPos = menu->xPos + (menu->width - oslGetStringWidth(menu->elements[i].text)) / 2;
+		if (strlen(menu->elements[i].text)){
+			if (menu->align == ALIGN_LEFT)
+				xPos = menu->xPos + 4;
+			else if (menu->align == ALIGN_RIGHT)
+				xPos = menu->xPos + menu->width - oslGetStringWidth(menu->elements[i].text) - 4;
+			else if (menu->align == ALIGN_CENTER)
+				xPos = menu->xPos + (menu->width - oslGetStringWidth(menu->elements[i].text)) / 2;
 
-        oslDrawString(xPos, yPos, menu->elements[i].text);
+	        oslDrawString(xPos, yPos, menu->elements[i].text);
+		}
         count++;
     }
     return 0;

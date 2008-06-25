@@ -626,8 +626,13 @@ int playFile(char *fileName, char *trackMessage){
         		if (userSettings->displayStatus){
         			//Spengo il display:
                     userSettings->curBrightness = getBrightness();
-                    fadeDisplay(0, DISPLAY_FADE_TIME);
-        			displayDisable();
+					if (!info->needsME){
+						cpuBoost();
+						fadeDisplay(0, DISPLAY_FADE_TIME);
+						cpuRestore();
+					}else
+						fadeDisplay(0, DISPLAY_FADE_TIME);
+					displayDisable();
         			imposeSetHomePopup(0);
         			userSettings->displayStatus = 0;
         			//Downclock:
@@ -643,7 +648,12 @@ int playFile(char *fileName, char *trackMessage){
 					displayEnable();
         			setBrightness(0);
         			imposeSetHomePopup(1);
-					fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
+					if (!info->needsME){
+						cpuBoost();
+						fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
+						cpuRestore();
+					}else
+						fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
         			userSettings->displayStatus = 1;
         		}
             }

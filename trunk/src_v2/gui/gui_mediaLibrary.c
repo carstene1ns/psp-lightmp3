@@ -444,7 +444,7 @@ void queryDataFeed(int index, struct menuElement *element){
 	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
 		int startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
         sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
-        oslSetFont(fontMenuNormal);
+        //oslSetFont(fontMenuNormal); //Done in the menu code
         if (index == commonMenu.selected){
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
@@ -594,7 +594,7 @@ void askSearchString(char *message, char *initialValue, char *target){
 	int done = 0;
 
 	cpuBoost();
-	oslInitOsk(message, initialValue, 128, 1);
+	oslInitOsk(message, initialValue, 128, 1, getOSKlang());
     while(!osl_quit && !done){
 		if (!skip){
 			oslStartDrawing();
