@@ -2,6 +2,7 @@
 #By         : Sakya
 #Contacts   : sakya_tg@yahoo.it
 ENCODING=UTF8
+#OSK_LANGUAGE=1
 
 YES=Yes
 NO=No

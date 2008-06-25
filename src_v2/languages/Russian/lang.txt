@@ -1,5 +1,6 @@
 #Language   : Russian
 #By         : coach777
+ENCODING=UTF8
 
 YES=дЮ
 NO=мЕР
@@ -88,19 +89,19 @@ SETTINGS_12=вюярнрю опнжеяянпю: MP3 MEDIA ENGINE
 SETTINGS_13=вюярнрю опнжеяянпю: OGG VORBIS
 SETTINGS_14=вюярнрю опнжеяянпю: FLAC
 SETTINGS_15=вюярнрю опнжеяянпю: ATRAC3
-CONFIRM_APPLY_SETTINGS_TITLE= ондрбепдхре
-CONFIRM_APPLY_SETTINGS=янупюмхрэ мюярпнийх?
+CONFIRM_SAVE_SETTINGS_TITLE= ондрбепдхре
+CONFIRM_SAVE_SETTINGS=янупюмхрэ мюярпнийх?
 
 HELP_PLAYER_TITLE=онлныэ
-HELP_PLAYER_01=R ДКЪ ЯКЕДСЧЫЕЦН РПЕЙЮ
-HELP_PLAYER_02=L ДКЪ ОПЕДШДСЫЕЦН РПЕЙЮ
-HELP_PLAYER_03=X ДКЪ ОЮСГШ/БНЯОПНХГБЕДЕМХЪ
-HELP_PLAYER_04=O ДКЪ НЯРЮМНБЙХ
-HELP_PLAYER_05=ЙБЮДПЮР ДКЪ ОПХЦКСЬЕМХЪ ГБСЙЮ БЙК/НРЙК
-HELP_PLAYER_06=РПЕСЦНКЭМХЙ ЯЛЕМШ ЯОЪЫЕЦН ПЕФХЛЮ
-HELP_PLAYER_07=SELECT ЯЛЕМШ ПЕФХЛЮ БНЯОПНХГБЕДЕМХЪ
-HELP_PLAYER_08=START ДКЪ ЮЙРХБЮЖХХ ЩЙНМНЛХВМНЦН ПЕФХЛЮ
-HELP_PLAYER_09=X + ББЕПУ/БМХГ ДКЪ НЖЕМЙХ РПЕЙЮ
+HELP_PLAYER_01=R - ДКЪ ЯКЕДСЧЫЕЦН РПЕЙЮ
+HELP_PLAYER_02=L - ДКЪ ОПЕДШДСЫЕЦН РПЕЙЮ
+HELP_PLAYER_03=X - ДКЪ ОЮСГШ/БНЯОПНХГБЕДЕМХЪ
+HELP_PLAYER_04=O - ДКЪ НЯРЮМНБЙХ
+HELP_PLAYER_05=ЙБЮДПЮР - ДКЪ ОПХЦКСЬЕМХЪ ГБСЙЮ БЙК/НРЙК
+HELP_PLAYER_06=РПЕСЦНКЭМХЙ - ДКЪ ЯЛЕМШ ЯОЪЫЕЦН ПЕФХЛЮ
+HELP_PLAYER_07=SELECT - ДКЪ ЯЛЕМШ ПЕФХЛЮ БНЯОПНХГБЕДЕМХЪ
+HELP_PLAYER_08=START - ДКЪ ЮЙРХБЮЖХХ ЩЙНМНЛХВМНЦН ПЕФХЛЮ
+HELP_PLAYER_09=X + ББЕПУ/БМХГ - ДКЪ НЖЕМЙХ РПЕЙЮ
 
 BROWSE_ARTIST=онхяй он хяонкмхрекч
 BROWSE_ALBUM=онхяй он юкэанлс
@@ -129,36 +130,51 @@ DONE=
 ALL=бяе
 BOOST_NEW=мНБШИ
 BOOST_OLD=яРЮПШИ
-OSK_LANGUAGE=8
 
 HELP_FILE_BROWSER_TITLE=яохянй тюикнб (онлныэ)
-HELP_FILE_BROWSER_01=X дкъ нрпшрхъ дхпейрнпхх / бняопнхгбедемхъ тюикю
-HELP_FILE_BROWSER_02=O дкъ оепелеыемхъ мю спнбемэ бшье
-HELP_FILE_BROWSER_03=йбюдпюр дкъ бняопнхгбедемхъ дхпейрнпхх
-HELP_FILE_BROWSER_04=START дкъ днаюбкемхъ дхпейрнпхх /тюикю б океикхяр
-HELP_FILE_BROWSER_05=SELECT дкъ юйрхбюжхх пефхлю USB
+HELP_FILE_BROWSER_01=X - дкъ нрпшрхъ дхпейрнпхх / бняопнхгбедемхъ тюикю
+HELP_FILE_BROWSER_02=O - дкъ оепелеыемхъ мю спнбемэ бшье
+HELP_FILE_BROWSER_03=йбюдпюр - дкъ бняопнхгбедемхъ дхпейрнпхх
+HELP_FILE_BROWSER_04=START - дкъ днаюбкемхъ дхпейрнпхх /тюикю б океикхяр
+HELP_FILE_BROWSER_05=SELECT - дкъ юйрхбюжхх пефхлю USB
 
 HELP_PLAYLIST_BROWSER_TITLE=океикхяр (онлныэ)
-HELP_PLAYLIST_BROWSER_01=X дкъ бняопнхгбедемхъ океикхярю
-HELP_PLAYLIST_BROWSER_02=O дкъ сдюкемхъ океикхярю
-HELP_PLAYLIST_BROWSER_03=йбюдпюр дкъ гюцпсгйх океикхярю б педюйрнп
-HELP_PLAYLIST_BROWSER_04=START дкъ днаюбкемхъ океикхярю б педюйрнп
+HELP_PLAYLIST_BROWSER_01=X - дкъ бняопнхгбедемхъ океикхярю
+HELP_PLAYLIST_BROWSER_02=O - дкъ сдюкемхъ океикхярю
+HELP_PLAYLIST_BROWSER_03=йбюдпюр - дкъ гюцпсгйх океикхярю б педюйрнп
+HELP_PLAYLIST_BROWSER_04=START - дкъ днаюбкемхъ океикхярю б педюйрнп
 
 CONFIRM_ADD_PLAYLIST_TITLE=ондрбепдхре
 CONFIRM_ADD_PLAYLIST=днаюбхрэ бшапюммши океикхяр б рейсыхи?
 
 HELP_PLAYLIST_EDITOR_TITLE=педюйрнп океикхярю (онлныэ)
-HELP_PLAYLIST_EDITOR_01=йбюдпюр дкъ оепелеыемхъ рпейю ббепу
-HELP_PLAYLIST_EDITOR_02=X дкъ оепелеыемхъ рпейю бмхг
-HELP_PLAYLIST_EDITOR_03=O дкъ сдюкемхъ рпейю хг океикхярю
-HELP_PLAYLIST_EDITOR_04=START дкъ янупюмемхъ океикхярю
-HELP_PLAYLIST_EDITOR_05=SELECT √ нвхярхрэ океикхяр
-HELP_PLAYLIST_EDITOR_06=мнрю дкъ бняопнхгбедемхъ океикхярю
+HELP_PLAYLIST_EDITOR_01=йбюдпюр - дкъ оепелеыемхъ рпейю ббепу
+HELP_PLAYLIST_EDITOR_02=X - дкъ оепелеыемхъ рпейю бмхг
+HELP_PLAYLIST_EDITOR_03=O - дкъ сдюкемхъ рпейю хг океикхярю
+HELP_PLAYLIST_EDITOR_04=START - дкъ янупюмемхъ океикхярю
+HELP_PLAYLIST_EDITOR_05=SELECT - нвхярхрэ океикхяр
+HELP_PLAYLIST_EDITOR_06=мнрю - дкъ бняопнхгбедемхъ океикхярю
 
 HELP_MEDIALIBRARY_TITLE=ледхю ахакхнрейю (онлныэ)
-HELP_MEDIALIBRARY_01=X дкъ бундю б дхпейрнпхч / бняопнхгбедемхе рпейю
-HELP_MEDIALIBRARY_02=O дкъ оепелеыемхъ мю спнбемэ бшье 
-HELP_MEDIALIBRARY_03=йбюдпюр дкъ бняопнхгбедемхъ бшапюммнцн
-HELP_MEDIALIBRARY_04=START дкъ днаюбкемхъ дхпейрнпхх / рпейю б океикхяр
-HELP_MEDIALIBRARY_05=X + ббепу/бмхг дкъ нжемйх рпейю
+HELP_MEDIALIBRARY_01=X - дкъ бундю б дхпейрнпхч / бняопнхгбедемхе рпейю
+HELP_MEDIALIBRARY_02=O - дкъ оепелеыемхъ мю спнбемэ бшье 
+HELP_MEDIALIBRARY_03=йбюдпюр - дкъ бняопнхгбедемхъ бшапюммнцн
+HELP_MEDIALIBRARY_04=START - дкъ днаюбкемхъ дхпейрнпхх / рпейю б океикхяр
+HELP_MEDIALIBRARY_05=X + ббепу/бмхг - дкъ нжемйх рпейю
 
+HELP_SETTINGS_TITLE=мюярпнийх (онлныэ)
+HELP_SETTINGS_01=бкебн/бопюбн - дкъ ялемш мюярпнийх
+HELP_SETTINGS_02=START - дкъ янупюмемхъ мюярпней
+
+#0=Japanese, 1=English, 2=French, 3=Spanish, 4=German, 5=Italian, 6=Dutch, 7=Portuguese, 8=Russian, 9=Korean, 10-11=Chinese
+OSK_LANGUAGE=8
+
+LOADING_SKIN_TITLE=онфюксиярю онднфдхре
+LOADING_SKIN=гюцпсгйю мнбни релш
+CHECKING_PLAYLIST=опнбепйю тюикнб океикхярю
+
+SETTINGS_16=хмрепбюк онбрнпю йкчвеи
+SETTINGS_17=онйюгшбюрэ гюярюбйс
+
+BROWSE_TOP100=рно 100
+BROWSE_ALL=бшапюрэ бяе

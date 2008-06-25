@@ -197,8 +197,16 @@ int changeSettingVal(int index, int delta){
                 }
             }
             if (current + delta < skinsCount && current + delta >= 0){
+				oslStartDrawing();
+				drawCommonGraphics();
+				drawButtonBar(MODE_SETTINGS);
+				drawMenu(&commonMenu);
+				drawMenu(&commonSubMenu);
                 drawWait(langGetString("LOADING_SKIN_TITLE"), langGetString("LOADING_SKIN"));
-                current += delta;
+				oslEndDrawing();
+				oslEndFrame();
+				oslSyncFrame();
+				current += delta;
                 strcpy(userSettings->skinName, skinsList[current]);
                 sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
                 skinLoad(buffer);

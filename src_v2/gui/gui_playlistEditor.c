@@ -112,7 +112,7 @@ void askPlaylistName(char *message, char *initialValue, char *target){
 	int done = 0;
 
 	cpuBoost();
-	oslInitOsk(message, initialValue, 128, 1);
+	oslInitOsk(message, initialValue, 128, 1, getOSKlang());
     while(!osl_quit && !done){
 		if (!skip){
 			oslStartDrawing();

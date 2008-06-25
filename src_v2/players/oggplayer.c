@@ -29,6 +29,7 @@
 //Globals
 /////////////////////////////////////////////////////////////////////////////////////////
 static int OGG_audio_channel;
+static int OGG_channels = 0;
 static char OGG_fileName[264];
 static int OGG_file = -1;
 static OggVorbis_File OGG_VorbisFile;
@@ -94,10 +95,10 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
                 //Volume boost:
                 if (OGG_volume_boost){
                     *(_buf2) = volume_boost(&OGG_mixBuffer[count2], &OGG_volume_boost);
-                    *(_buf2 + 1) = volume_boost(&OGG_mixBuffer[count2 + 1], &OGG_volume_boost);
+					*(_buf2 + 1) = volume_boost(&OGG_mixBuffer[count2 + 1], &OGG_volume_boost);
                 }else{
                     *(_buf2) = OGG_mixBuffer[count2];
-                    *(_buf2 + 1) = OGG_mixBuffer[count2 + 1];
+					*(_buf2 + 1) = OGG_mixBuffer[count2 + 1];
                 }
 			}
 			//  Move the pointers
@@ -222,10 +223,13 @@ void OGGgetInfo(){
     OGG_info.instantBitrate = vi->bitrate_nominal;
 	OGG_info.hz = vi->rate;
 	OGG_info.length = (long)ov_time_total(&OGG_VorbisFile, -1)/1000;
-    if (vi->channels == 1)
+    if (vi->channels == 1){
         strcpy(OGG_info.mode, "single channel");
-    else if (vi->channels == 2)
+		OGG_channels = 1;
+    }else if (vi->channels == 2){
         strcpy(OGG_info.mode, "normal LR stereo");
+		OGG_channels = 2;
+	}
     strcpy(OGG_info.emphasis, "no");
 
 	int h = 0;
