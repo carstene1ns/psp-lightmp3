@@ -197,6 +197,7 @@ int changeSettingVal(int index, int delta){
                 }
             }
             if (current + delta < skinsCount && current + delta >= 0){
+				cpuBoost();
 				oslStartDrawing();
 				drawCommonGraphics();
 				drawButtonBar(MODE_SETTINGS);
@@ -206,14 +207,18 @@ int changeSettingVal(int index, int delta){
 				oslEndDrawing();
 				oslEndFrame();
 				oslSyncFrame();
+
 				current += delta;
                 strcpy(userSettings->skinName, skinsList[current]);
                 sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
                 skinLoad(buffer);
                 sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
                 unLoadCommonGraphics();
-                loadCommonGraphics();
+				clearMenu(&commonMenu);
+			    clearMenu(&commonSubMenu);
+				loadCommonGraphics();
                 initSettingsMenu();
+				cpuRestore();
             }
             break;
         case 1:

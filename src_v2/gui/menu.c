@@ -83,6 +83,15 @@ int drawMenu(struct menuElements *menu){
     int count = 0;
     int xPos = 0;
     int yPos = 0;
+	int normColor[4];
+	int normColorShadow[4];
+	int selColor[4];
+	int selColorShadow[4];
+
+	skinGetColor("RGBA_MENU_SELECTED_TEXT", selColor);
+	skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", selColorShadow);
+	skinGetColor("RGBA_MENU_TEXT", normColor);
+	skinGetColor("RGBA_MENU_TEXT_SHADOW", normColorShadow);
 
     int startY = menu->yPos + (float)(menu->height -  menu->maxNumberVisible * (fontMenuNormal->charHeight + menu->interline)) / 2.0;
     if (menu->background != NULL){
@@ -100,14 +109,16 @@ int drawMenu(struct menuElements *menu){
         if (i == menu->selected){
             if (menu->highlight != NULL)
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
-			skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
-            skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
-            setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        }else{
-            skinGetColor("RGBA_MENU_TEXT", tempColor);
-            skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
-            setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        }
+			//skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
+            //skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
+            //setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            setFontStyle(fontMenuNormal, defaultTextSize, RGBA(selColor[0], selColor[1], selColor[2], selColor[3]), RGBA(selColorShadow[0], selColorShadow[1], selColorShadow[2], selColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+		}else{
+            //skinGetColor("RGBA_MENU_TEXT", tempColor);
+            //skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
+            //setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            setFontStyle(fontMenuNormal, defaultTextSize, RGBA(normColor[0], normColor[1], normColor[2], normColor[3]), RGBA(normColorShadow[0], normColorShadow[1], normColorShadow[2], normColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+		}
 
         if (menu->dataFeedFunction != NULL)
             menu->dataFeedFunction(i, &menu->elements[i]);
