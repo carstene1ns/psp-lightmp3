@@ -233,7 +233,7 @@ int gui_fileBrowser(){
 						coverArt = NULL;
 					}
 					coverArtFailed = 0;
-				}else if (!coverArt && !coverArtFailed){
+				}else if (!coverArt && !coverArtFailed && commonMenu.numberOfElements){
 					u64 currentTime;
 					sceRtcGetCurrentTick(&currentTime);
 					if (currentTime - lastMenuChange > COVERTART_DELAY){
@@ -272,7 +272,7 @@ int gui_fileBrowser(){
 
             if (!USBactive && osl_pad.held.L && osl_pad.held.R){
                 status = STATUS_HELP;
-            }else if (!USBactive && osl_pad.released.cross){
+            }else if (!USBactive && osl_pad.released.cross && commonMenu.numberOfElements){
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     //Enter directory:
                     if (curDir[strlen(curDir)-1] != '/')
@@ -293,7 +293,7 @@ int gui_fileBrowser(){
                     userSettings->previousMode = MODE_FILEBROWSER;
                     exitFlagFileBrowser = 1;
                 }
-            }else if (!USBactive && osl_pad.released.start){
+            }else if (!USBactive && osl_pad.released.start && commonMenu.numberOfElements){
                 if (curDir[strlen(curDir)-1] != '/')
                     sprintf(buffer, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
                 else
@@ -307,7 +307,7 @@ int gui_fileBrowser(){
                     addFileToPlaylist(buffer, 1);
 					cpuRestore();
                     continue;
-            }else if(!USBactive && osl_pad.released.square){
+            }else if(!USBactive && osl_pad.released.square && commonMenu.numberOfElements){
                 //Play directory:
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     if (curDir[strlen(curDir)-1] != '/')

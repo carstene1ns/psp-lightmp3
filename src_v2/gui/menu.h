@@ -58,5 +58,6 @@ int initMenu();
 int clearMenu(struct menuElements *menu);
 int drawMenu(struct menuElements *menu);
 int processMenuKeys(struct menuElements *menu);
+int endMenu();
 
 #endif

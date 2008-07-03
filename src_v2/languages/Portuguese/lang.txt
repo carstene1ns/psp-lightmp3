@@ -2,6 +2,21 @@
 #By         : fabiom
 #Contacts   : fabiom2@gmail.com
 
+#Language to use in the On Screen Keyboard.
+#			JAPANESE			0
+#			ENGLISH				1
+#			FRENCH				2
+#			SPANISH				3
+#			GERMAN				4
+#			ITALIAN				5
+#			DUTCH				6
+#			PORTUGUESE			7
+#			RUSSIAN				8
+#			KOREAN				9
+#			CHINESE_TRADITIONAL	10
+#			CHINESE_SIMPLIFIED	11
+OSK_LANGUAGE=7
+
 YES=Sim
 NO=Nao
 WAIT=Por favor aguarde...
