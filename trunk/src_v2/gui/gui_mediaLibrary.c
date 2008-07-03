@@ -776,9 +776,9 @@ int gui_mediaLibrary(){
                 confirmStatus = STATUS_HELP;
             }else if(mediaLibraryStatus == STATUS_MAINMENU && osl_pad.released.cross && commonMenu.selected == 7){
                 confirmStatus = STATUS_CONFIRM_SCAN;
-            }else if(osl_pad.released.start && mediaLibraryStatus == STATUS_QUERYMENU){
+            }else if(osl_pad.released.start && mediaLibraryStatus == STATUS_QUERYMENU && commonMenu.numberOfElements){
                 addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, "title", 0, tempM3Ufile);
-            }else if(!ratingChangedUpDown && osl_pad.released.cross && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+            }else if(!ratingChangedUpDown && osl_pad.released.cross && commonMenu.numberOfElements && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                 M3U_clear();
                 M3U_save(MLtempM3Ufile);
                 addSelectionToPlaylist(currentWhere, currentOrderBy, 1, MLtempM3Ufile);
@@ -787,7 +787,7 @@ int gui_mediaLibrary(){
                 mediaLibraryRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_MEDIA_LIBRARY;
                 exitFlagMediaLibrary = 1;
-            }else if(osl_pad.released.square && mediaLibraryStatus == STATUS_QUERYMENU && (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING)){
+            }else if(osl_pad.released.square && mediaLibraryStatus == STATUS_QUERYMENU && commonMenu.numberOfElements && (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING)){
                 M3U_clear();
                 M3U_save(MLtempM3Ufile);
                 addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, "title", 1, MLtempM3Ufile);
@@ -796,13 +796,13 @@ int gui_mediaLibrary(){
                 mediaLibraryRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_MEDIA_LIBRARY;
                 exitFlagMediaLibrary = 1;
-            }else if (osl_pad.held.cross && osl_pad.held.up && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+            }else if (osl_pad.held.cross && osl_pad.held.up && commonMenu.numberOfElements && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                 if (++MLresult[commonMenu.selected - mlBufferPosition].rating > ML_MAX_RATING)
                     MLresult[commonMenu.selected - mlBufferPosition].rating = ML_MAX_RATING;
                 ratingChangedUpDown = 1;
                 ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
-            }else if (osl_pad.held.cross && osl_pad.held.down  && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
+            }else if (osl_pad.held.cross && osl_pad.held.down  && commonMenu.numberOfElements && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                 if (--MLresult[commonMenu.selected - mlBufferPosition].rating < 0)
                     MLresult[commonMenu.selected - mlBufferPosition].rating = 0;
                 ratingChangedUpDown = 1;

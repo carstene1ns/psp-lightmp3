@@ -134,6 +134,12 @@ LightMP3 will look for cover:
 5.For a file named cover.jpg in the same directory
 
 
+SKINS
+-----
+You can find more skins for LightMP3 here:
+http://sakya.altervista.org/new/index.php?mod=none_lightmp3skins
+
+
 DEPENDENCIES
 ------------
 To compile LightMP3 you need:

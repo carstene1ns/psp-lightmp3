@@ -44,7 +44,13 @@ int skinClear(){
     }
     skinParams.paramCount = 0;
 
-    for (i=0; i<skinPositions.positionCount; i++){
+    for (i=0; i<skinStrings.stringCount; i++){
+        strcpy(skinStrings.strings[i].name, "");
+        strcpy(skinStrings.strings[i].value, "");
+	}
+    skinStrings.stringCount = 0;
+
+	for (i=0; i<skinPositions.positionCount; i++){
         strcpy(skinPositions.positions[i].name, "");
         memset(&skinPositions.positions[i].value, 0, sizeof(skinPositions.positions[i].value));
     }

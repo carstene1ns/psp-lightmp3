@@ -217,7 +217,10 @@ int changeSettingVal(int index, int delta){
 				clearMenu(&commonMenu);
 			    clearMenu(&commonSubMenu);
 				loadCommonGraphics();
+				endMenu();
+				initMenu();
                 initSettingsMenu();
+				oslSetFont(fontNormal);
 				cpuRestore();
             }
             break;
