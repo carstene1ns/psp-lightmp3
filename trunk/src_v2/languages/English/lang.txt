@@ -2,7 +2,21 @@
 #By         : Sakya
 #Contacts   : sakya_tg@yahoo.it
 ENCODING=UTF8
-#OSK_LANGUAGE=1
+
+#Language to use in the On Screen Keyboard.
+#			JAPANESE			0
+#			ENGLISH				1
+#			FRENCH				2
+#			SPANISH				3
+#			GERMAN				4
+#			ITALIAN				5
+#			DUTCH				6
+#			PORTUGUESE			7
+#			RUSSIAN				8
+#			KOREAN				9
+#			CHINESE_TRADITIONAL	10
+#			CHINESE_SIMPLIFIED	11
+OSK_LANGUAGE=1
 
 YES=Yes
 NO=No

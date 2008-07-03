@@ -579,21 +579,7 @@ int ParseID3v1(const char *mp3path, struct ID3Tag *id3tag){
 // Main function:
 int ParseID3(char *mp3path, struct ID3Tag *target)
 {
-    strcpy(target->ID3Title,"");
-    strcpy(target->ID3Artist,"");
-    strcpy(target->ID3Album,"");
-    strcpy(target->ID3Year,"");
-    strcpy(target->ID3Comment,"");
-    strcpy(target->ID3GenreCode,"");
-    strcpy(target->ID3GenreText,"");
-    strcpy(target->ID3TrackText, "");
-    strcpy(target->versionfound, "");
-	target->ID3Track = 0;
-    strcpy(target->ID3TrackText, "");
-	target->ID3EncapsulatedPictureType = 0;
-    target->ID3EncapsulatedPictureOffset = 0;
-    target->ID3EncapsulatedPictureLength = 0;
-    target->ID3Length = 0;
+	memset(target, 0, sizeof(struct ID3Tag));
 
     ParseID3v1(mp3path, target);
     ParseID3v2(mp3path, target);

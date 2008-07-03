@@ -458,10 +458,6 @@ int playFile(char *fileName, char *trackMessage){
     flagExit = 0;
 	int skip = 0;
     while(!osl_quit && !flagExit){
-        /*if (userSettings->displayStatus && !skip)
-			drawPlayer(status, &libEntry, trackMessage);
-        else if (!userSettings->displayStatus)
-			scePowerTick(0);*/
         if (userSettings->displayStatus && !skip)
 			drawPlayer(status, &libEntry, trackMessage);
 
@@ -667,7 +663,8 @@ int playFile(char *fileName, char *trackMessage){
         }
     }
 
-    //Srobbler LOG:
+	cpuBoost();
+	//Srobbler LOG:
     if (userSettings->SCROBBLER && strlen(info->title)){
 		u64 mytime;
 		sceRtcGetCurrentTick(&mytime);
@@ -696,6 +693,7 @@ int playFile(char *fileName, char *trackMessage){
       osl_quit = 1;
       userSettings->shutDown = 1;
     }
+	cpuRestore();
     return retValue;
 }
 

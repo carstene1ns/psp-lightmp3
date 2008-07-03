@@ -339,7 +339,7 @@ void drawMLinfo(){
 				coverArt = NULL;
 			}
 			coverArtFailed = 0;
-		}else if (!coverArt){
+		}else if (!coverArt && !coverArtFailed){
 			u64 currentTime;
 			sceRtcGetCurrentTick(&currentTime);
 			if (currentTime - lastMenuChange > COVERTART_DELAY){
@@ -445,15 +445,15 @@ void queryDataFeed(int index, struct menuElement *element){
 		int startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
         sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
         //oslSetFont(fontMenuNormal); //Done in the menu code
-        if (index == commonMenu.selected){
+        /*if (index == commonMenu.selected){
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
         }else{
             skinGetColor("RGBA_MENU_TEXT", tempColor);
             skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
         }
-		setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        oslDrawString(startX + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), buffer);
+		setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);*/
+        //oslDrawString(startX + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), buffer);
 		strcpy(element->text, "");
 		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
         element->triggerFunction = enterSelection;

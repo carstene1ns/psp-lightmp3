@@ -303,7 +303,9 @@ int gui_fileBrowser(){
                     continue;
                 }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
                     drawWait(langGetString("ADDING_PLAYLIST"), langGetString("WAIT"));
+					cpuBoost();
                     addFileToPlaylist(buffer, 1);
+					cpuRestore();
                     continue;
             }else if(!USBactive && osl_pad.released.square){
                 //Play directory:

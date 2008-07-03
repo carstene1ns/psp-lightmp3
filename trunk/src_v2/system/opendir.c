@@ -141,8 +141,8 @@ char *opendir_open(struct opendir_struct *p, char *directory, char extFilter[][5
 void sortDirectory(struct opendir_struct *directory){
 	int n = directory->number_of_directory_entries;
 	int i = 0;
-    char comp1[263];
-    char comp2[263];
+    char comp1[268] = "";
+    char comp2[268] = "";
 
 	while (i < n){
         sprintf(comp1, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i-1].d_stat.st_mode)?"A":"Z", directory->directory_entry[i-1].d_name);
@@ -199,7 +199,6 @@ int directoryUp(char *dirName)
 void getFileName(char *fileName, char *onlyName){
 	int slash = 0;
 
-	strcpy(onlyName, fileName);
 	//Cerco l'ultimo slash:
 	int i = 0;
 	int len = strlen(fileName);
@@ -209,11 +208,10 @@ void getFileName(char *fileName, char *onlyName){
 			break;
 		}
 	}
-	if (slash){
+	if (slash)
 		strcpy(onlyName, fileName + slash + 1);
-	}else{
+	else
 		strcpy(onlyName, fileName);
-	}
 }
 
 //Check if a file esists (return fileSize if exists, -1 if doesen't exists):

@@ -34,32 +34,33 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //Globals
 /////////////////////////////////////////////////////////////////////////////////////////
-int AAC_audio_channel;
-char AAC_fileName[264];
-int AAC_fd = -1;
-int AAC_eos = 0;
-struct fileInfo AAC_info;
-int AAC_isPlaying = 0;
-unsigned int AAC_volume_boost = 0.0;
-int AAC_playingSpeed = 0; // 0 = normal
-long AAC_suspendPosition = -1;
-long AAC_suspendIsPlaying = 0;
-int AAC_defaultCPUClock = 70;
-double AAC_fileSize = 0;
-HAACDecoder *hAACDecoder;
+static int AAC_audio_channel;
+static char AAC_fileName[264];
+static int AAC_fd = -1;
+static int AAC_eos = 0;
+static struct fileInfo AAC_info;
+static int AAC_isPlaying = 0;
+static unsigned int AAC_volume_boost = 0.0;
+static int AAC_playingSpeed = 0; // 0 = normal
+static long AAC_suspendPosition = -1;
+static long AAC_suspendIsPlaying = 0;
+static double AAC_fileSize = 0;
+static HAACDecoder *hAACDecoder;
 
-unsigned char AACfileBuffer[AAC_FILE_BUFFER_SIZE];
-unsigned int samplesAvailable;
-unsigned int AAC_filePos;
+static unsigned char AACfileBuffer[AAC_FILE_BUFFER_SIZE];
+static unsigned int samplesAvailable;
+static unsigned int AAC_filePos;
+int AAC_defaultCPUClock = 70;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Fill file buffer:
 /////////////////////////////////////////////////////////////////////////////////////////
 int AAC_fillFileBuffer(unsigned char *target, unsigned int bytesRequired){
-    int bytesRed = 0;
+    unsigned int bytesRed = 0;
+	unsigned int bytesRead = 0;
 
     while (bytesRequired > 0){
-        const unsigned int bytesRead = sceIoRead(AAC_fd, target, bytesRequired);
+        bytesRead = sceIoRead(AAC_fd, target, bytesRequired);
         // EOF?
         if (bytesRead == 0){
             AAC_eos = 1;
@@ -73,6 +74,7 @@ int AAC_fillFileBuffer(unsigned char *target, unsigned int bytesRequired){
     pspDebugScreenPrintf("File position: %i / %i\n", AAC_filePos, (int)AAC_fileSize);
     return bytesRed;
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Audio callback

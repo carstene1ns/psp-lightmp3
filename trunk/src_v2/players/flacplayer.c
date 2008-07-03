@@ -33,29 +33,29 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //Globals
 /////////////////////////////////////////////////////////////////////////////////////////
-int bufferThid = -1;
-int FLAC_audio_channel;
-char FLAC_fileName[264];
-FILE *FLAC_file = 0;
-int FLAC_eos = 0;
-struct fileInfo FLAC_info;
+static int bufferThid = -1;
+static int FLAC_audio_channel;
+static char FLAC_fileName[264];
+static FILE *FLAC_file = 0;
+static int FLAC_eos = 0;
+static struct fileInfo FLAC_info;
 static int isPlaying = 0;
-unsigned int FLAC_volume_boost = 0;
-int FLAC_playingSpeed = 0; // 0 = normal
-int FLAC_playingDelta = 0;
+static unsigned int FLAC_volume_boost = 0;
+static int FLAC_playingSpeed = 0; // 0 = normal
+static int FLAC_playingDelta = 0;
 static int outputInProgress = 0;
 static long suspendPosition = -1;
 static long suspendIsPlaying = 0;
 int FLAC_defaultCPUClock = 166;
 
-int kill_flac_thread;
-int bufferLow;
+static int kill_flac_thread;
+static int bufferLow;
 
 #define MIX_BUF_SIZE (PSP_NUM_AUDIO_SAMPLES * 2)
 static short FLAC_mixBuffer[MIX_BUF_SIZE * 4]__attribute__ ((aligned(64)));
 
-long FLAC_tempmixleft = 0;
-long samples_played = 0;
+static long FLAC_tempmixleft = 0;
+static long samples_played = 0;
 
 static FLAC__StreamDecoder *decoder = 0;
 
@@ -101,6 +101,8 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
       FLAC_mixBuffer[j + 1] = (short)buffer[1][i];
    }
    FLAC_tempmixleft += frame->header.blocksize; // increment # samples reported in buffer
+
+
 
    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE; // keep going until buffer is full or get killed
 }
@@ -202,12 +204,14 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
                 FLAC__uint64 sample = (FLAC__uint64)(samples_played + numSamples + FLAC_playingDelta);
             	if (sample < 0 || !FLAC__stream_decoder_seek_absolute(decoder, sample)) {
                     FLAC_setPlayingSpeed(0);
-                    if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
-                        FLAC__stream_decoder_flush(decoder);
+                    //if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
+                    //    FLAC__stream_decoder_flush(decoder);
                 } else {
                 	samples_played += FLAC_playingDelta;
                 	//FLAC_tempmixleft = 0; // clear buffer of stale samples
                 }
+				if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
+					FLAC__stream_decoder_flush(decoder);
             }
 		}
 		samples_played += numSamples;
