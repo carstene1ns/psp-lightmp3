@@ -101,18 +101,18 @@ void addFileToPlaylist(char *fileName, int save){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Add a directory to the current playlist:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void addDirectoryToPlaylist(char *dirName){
+void addDirectoryToPlaylist(char *dirName, char *dirNameShort){
 	char fileToAdd[264] = "";
 	char message[100] = "";
 	int i;
 	float perc;
 	struct opendir_struct dirToAdd;
 
-	char *result = opendir_open(&dirToAdd, dirName, fileExt, fileExtCount, 0);
+	cpuBoost();
+	char *result = opendir_open(&dirToAdd, dirName, dirNameShort, fileExt, fileExtCount, 0);
 	if (result == 0){
 		M3U_clear();
         M3U_open(tempM3Ufile);
-		cpuBoost();
 		for (i = 0; i < dirToAdd.number_of_directory_entries; i++){
 			perc = ((float)(i + 1) / (float)dirToAdd.number_of_directory_entries) * 100.0;
 			snprintf(message, sizeof(message), "%3.3i%% %s", (int)perc, langGetString("DONE"));
@@ -133,9 +133,9 @@ void addDirectoryToPlaylist(char *dirName){
 			addFileToPlaylist(fileToAdd, 0);
 		}
 		M3U_save(tempM3Ufile);
-		cpuRestore();
 	}
 	opendir_close(&dirToAdd);
+	cpuRestore();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,8 +143,10 @@ void addDirectoryToPlaylist(char *dirName){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int gui_fileBrowser(){
     char buffer[264];
-    char curDir[264];
-    struct opendir_struct directory;
+    char bufferShort[264];
+	char curDir[264];
+    char curDirShort[264];
+	struct opendir_struct directory;
     char *result;
     int USBactive = 0;
     int status = STATUS_NORMAL;
@@ -173,11 +175,13 @@ int gui_fileBrowser(){
     if (!strlen(userSettings->lastBrowserDir)){
 		//Provo la prima directory:
 		strcpy(curDir, music_directory_1);
-		result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
+		strcpy(curDirShort, music_directory_1);
+		result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
 		if (result){
 			//Provo la seconda directory:
 			strcpy(curDir, music_directory_2);
-			result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
+			strcpy(curDirShort, music_directory_2);
+			result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
 			/*if (result){
                 sprintf(buffer, "\"%s\" and \"%s\" not found or empty", music_directory_1, music_directory_2);
                 debugMessageBox(buffer);
@@ -187,7 +191,8 @@ int gui_fileBrowser(){
 		}
     }else{
 		strcpy(curDir, userSettings->lastBrowserDir);
-		result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
+		strcpy(curDirShort, userSettings->lastBrowserDirShort);
+		result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
     }
     sortDirectory(&directory);
     getFileName(userSettings->selectedBrowserItem, buffer);
@@ -241,10 +246,10 @@ int gui_fileBrowser(){
 					    int size = 0;
 
 						cpuBoost();
-						if (curDir[strlen(curDir)-1] != '/')
-							sprintf(dirName, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+						if (curDirShort[strlen(curDirShort)-1] != '/')
+							sprintf(dirName, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 						else
-							sprintf(dirName, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+							sprintf(dirName, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 						if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
 							directoryUp(dirName);
 						//Look for folder.jpg in the same directory:
@@ -275,31 +280,43 @@ int gui_fileBrowser(){
             }else if (!USBactive && osl_pad.released.cross && commonMenu.numberOfElements){
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     //Enter directory:
-                    if (curDir[strlen(curDir)-1] != '/')
+                    if (curDir[strlen(curDir)-1] != '/'){
                         strcat(curDir, "/");
-                    strcat(curDir, directory.directory_entry[commonMenu.selected].d_name);
-                    opendir_close(&directory);
-                    result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
+                        strcat(curDirShort, "/");
+					}
+                    strcat(curDir, directory.directory_entry[commonMenu.selected].longname);
+                    strcat(curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+					opendir_close(&directory);
+					//debugMessageBox(curDir);
+					cpuBoost();
+                    result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
                     sortDirectory(&directory);
                     buildMenuFromDirectory(&commonMenu, &directory, "");
-                    sceKernelDelayThread(200000);
+					cpuRestore();
+                    //sceKernelDelayThread(200000);
                 }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     //Play file:
-                    if (curDir[strlen(curDir)-1] != '/')
-                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-                    else
-                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                    if (curDir[strlen(curDir)-1] != '/'){
+                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        sprintf(userSettings->selectedBrowserItemShort, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+					}else{
+                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        sprintf(userSettings->selectedBrowserItemShort, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+					}
                     fileBrowserRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_FILEBROWSER;
                     exitFlagFileBrowser = 1;
                 }
             }else if (!USBactive && osl_pad.released.start && commonMenu.numberOfElements){
-                if (curDir[strlen(curDir)-1] != '/')
-                    sprintf(buffer, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-                else
-                    sprintf(buffer, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                if (curDir[strlen(curDir)-1] != '/'){
+                    sprintf(buffer, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                    sprintf(bufferShort, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+				}else{
+                    sprintf(buffer, "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                    sprintf(bufferShort, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+				}
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
-                    addDirectoryToPlaylist(buffer);
+                    addDirectoryToPlaylist(buffer, bufferShort);
                     continue;
                 }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
                     drawWait(langGetString("ADDING_PLAYLIST"), langGetString("WAIT"));
@@ -310,10 +327,13 @@ int gui_fileBrowser(){
             }else if(!USBactive && osl_pad.released.square && commonMenu.numberOfElements){
                 //Play directory:
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
-                    if (curDir[strlen(curDir)-1] != '/')
-                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
-                    else
-                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].d_name);
+                    if (curDir[strlen(curDir)-1] != '/'){
+                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        sprintf(userSettings->selectedBrowserItemShort, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+					}else{
+                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        sprintf(userSettings->selectedBrowserItemShort, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+					}
                     fileBrowserRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_FILEBROWSER;
                     exitFlagFileBrowser = 1;
@@ -323,21 +343,25 @@ int gui_fileBrowser(){
                 char tempDir[264] = "";
                 strcpy(tempDir, curDir);
                 if (directoryUp(curDir) == 0){
+					directoryUp(curDirShort);
                     int i;
                     opendir_close(&directory);
-                    result = opendir_open(&directory, curDir, fileExt, fileExtCount, 1);
+					//debugMessageBox(curDir);
+					cpuBoost();
+                    result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
                     sortDirectory(&directory);
                     buildMenuFromDirectory(&commonMenu, &directory, "");
                     //Mi riposiziono:
                     for (i = 0; i < directory.number_of_directory_entries; i++){
-                        if (strstr(tempDir, directory.directory_entry[i].d_name) != NULL){
+                        if (strstr(tempDir, directory.directory_entry[i].longname) != NULL){
                             commonMenu.first = i;
                             commonMenu.selected = i;
                             break;
                         }
                     }
+					cpuRestore();
                 }
-                sceKernelDelayThread(200000);
+                //sceKernelDelayThread(200000);
             }else if(osl_pad.released.select){
                 //USB activate/deactivate:
                 USBactive = !USBactive;
@@ -347,7 +371,7 @@ int gui_fileBrowser(){
                     int retVal = oslInitUsbStorage();
                     if (retVal){
                         sprintf(buffer, "Error InitUsbStorage: %i", retVal);
-                        debugMessageBox(buffer);
+                        //debugMessageBox(buffer);
                     }else{
                         oslStartUsbStorage();
                     }
@@ -356,7 +380,7 @@ int gui_fileBrowser(){
                     oslDeinitUsbStorage();
 					cpuRestore();
                 }
-                sceKernelDelayThread(200000);
+                //sceKernelDelayThread(200000);
             }else if(!USBactive && osl_pad.released.R){
                 fileBrowserRetValue = nextAppMode(MODE_FILEBROWSER);
                 exitFlagFileBrowser = 1;
@@ -373,5 +397,6 @@ int gui_fileBrowser(){
 	clearMenu(&commonMenu);
 
     strcpy(userSettings->lastBrowserDir, curDir);
-    return fileBrowserRetValue;
+    strcpy(userSettings->lastBrowserDirShort, curDirShort);
+	return fileBrowserRetValue;
 }

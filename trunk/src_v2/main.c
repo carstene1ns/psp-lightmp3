@@ -295,13 +295,23 @@ int main(){
     //Start support prx
 	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
 	if (modid < 0){
-        sprintf(buffer, "Error 0x%08X loading/starting support.prx.\n", modid);
+        sprintf(buffer, "Error 0x%08X loading/starting support.prx!\n", modid);
         debugMessageBox(buffer);
         sceKernelDelayThread(3000000);
         sceKernelExitGame();
         return -1;
 	}
 
+    //Start miniconv.prx
+	modid = pspSdkLoadStartModule("miniconv.prx", PSP_MEMORY_PARTITION_USER);
+	if (modid < 0){
+        char buffer[128];
+        sprintf(buffer, "Error 0x%08X loading/starting miniconv.prx!\n", modid);
+        debugMessageBox(buffer);
+        sceKernelDelayThread(3000000);
+        sceKernelExitGame();
+        return -1;
+	}
 
     oslSetKeyAutorepeatInit(userSettings->KEY_AUTOREPEAT_GUI);
     oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);

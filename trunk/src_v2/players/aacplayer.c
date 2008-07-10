@@ -48,6 +48,7 @@ static double AAC_fileSize = 0;
 static HAACDecoder *hAACDecoder;
 
 static unsigned char AACfileBuffer[AAC_FILE_BUFFER_SIZE];
+static unsigned char *inputBuffer = NULL;
 static unsigned int samplesAvailable;
 static unsigned int AAC_filePos;
 int AAC_defaultCPUClock = 70;
@@ -84,7 +85,6 @@ static void AACDecodeThread(void *buffer, unsigned int samplesToWrite, void *pda
     static short AAC_mixBuffer[PSP_NUM_AUDIO_SAMPLES * 2 * 2]__attribute__ ((aligned(64)));
     AACFrameInfo aacFrameInfo;
     static int AACSourceBufferSize = 0;
-    static unsigned char *inputBuffer = NULL;
     int offset;
 
 	if (AAC_isPlaying) {	// Playing , so mix up a buffer
@@ -210,6 +210,7 @@ int AAC_Load(char *filename){
     AAC_filePos = 0;
     AAC_fileSize = 0;
 
+	inputBuffer = NULL;
     initFileInfo(&AAC_info);
     AAC_fd = sceIoOpen(filename, PSP_O_RDONLY, 0777);
     if (AAC_fd < 0)
@@ -301,6 +302,7 @@ void AAC_End(){
 	pspAudioSetChannelCallback(AAC_audio_channel, 0, 0);
 	AAC_FreeTune();
 	endAudioLib();
+	inputBuffer = NULL;
 }
 
 int AAC_setMute(int onOff){

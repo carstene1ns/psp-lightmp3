@@ -307,6 +307,7 @@ int playFile(char *fileName, char *trackMessage){
     int flagExit = 0;
     int status = STATUS_NORMAL;
 	int headphone = sceHprmIsHeadphoneExist();
+	int skip = 0;
 
     MEEnable();
 
@@ -420,9 +421,7 @@ int playFile(char *fileName, char *trackMessage){
         unsetAudioFunctions();
         return 0;
     }
-
     info = (*getInfoFunct)();
-	cpuRestore();
 
     //Update media library info:
     getExtension(fileName, libEntry.extension, 4);
@@ -436,6 +435,8 @@ int playFile(char *fileName, char *trackMessage){
     libEntry.bitrate = info->kbit;
     libEntry.samplerate = info->hz;
     libEntry.tracknumber = atoi(info->trackNumber);
+
+	cpuRestore();
 
     //Imposto il clock:
     if (userSettings->CLOCK_AUTO){
@@ -456,7 +457,6 @@ int playFile(char *fileName, char *trackMessage){
     playerStatus = 1;
 
     flagExit = 0;
-	int skip = 0;
     while(!osl_quit && !flagExit){
         if (userSettings->displayStatus && !skip)
 			drawPlayer(status, &libEntry, trackMessage);
@@ -834,28 +834,31 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Play a directory:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int playDirectory(char *dirName, char *startFile){
+int playDirectory(char *dirName, char *dirNameShort, char *startFile){
     struct opendir_struct directory;
     int startIndex = -1;
     char onlyName[264] = "";
 
     M3U_clear();
-    char *result = opendir_open(&directory, dirName, fileExt, fileExtCount, 0);
+	cpuBoost();
+    char *result = opendir_open(&directory, dirName, dirNameShort, fileExt, fileExtCount, 0);
+	cpuRestore();
     if (!result){
         sortDirectory(&directory);
         getFileName(startFile, onlyName);
         int i = 0;
         for (i=0; i<directory.number_of_directory_entries; i++){
             if (dirName[strlen(dirName)-1] != '/')
-                sprintf(buffer, "%s/%s", dirName, directory.directory_entry[i].d_name);
+                sprintf(buffer, "%s/%s", dirNameShort, directory.directory_entry[i].d_name);
             else
-                sprintf(buffer, "%s%s", dirName, directory.directory_entry[i].d_name);
+                sprintf(buffer, "%s%s", dirNameShort, directory.directory_entry[i].d_name);
             if (!strcmp(directory.directory_entry[i].d_name, onlyName))
                 startIndex = i;
             M3U_addSong(buffer, 0, buffer);
         }
         opendir_close(&directory);
-        playPlaylist(M3U_getPlaylist(), startIndex);
+		if (M3U_getSongCount())
+	        playPlaylist(M3U_getPlaylist(), startIndex);
     }
     M3U_clear();
     return 0;
@@ -866,7 +869,7 @@ int playDirectory(char *dirName, char *startFile){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int gui_player(){
     SceIoStat stat;
-    sceIoGetstat(userSettings->selectedBrowserItem, &stat);
+    sceIoGetstat(userSettings->selectedBrowserItemShort, &stat);
 
     //Load images:
     sprintf(buffer, "%s/nocoverart.png", userSettings->skinImagesPath);
@@ -932,20 +935,23 @@ int gui_player(){
     oslSetKeyAnalogToDPad(0);
 
     char dir[264] = "";
-    char ext[5] = "";
+    char dirShort[264] = "";
+	char ext[5] = "";
     if (FIO_S_ISREG(stat.st_mode)){
-        getExtension(userSettings->selectedBrowserItem, ext, 4);
+        getExtension(userSettings->selectedBrowserItemShort, ext, 4);
         if (!strcmp(ext, "M3U")){
             M3U_clear();
-            M3U_open(userSettings->selectedBrowserItem);
+            M3U_open(userSettings->selectedBrowserItemShort);
             playPlaylist(M3U_getPlaylist(), userSettings->playlistStartIndex);
         }else{
             strcpy(dir, userSettings->selectedBrowserItem);
-            directoryUp(dir);
-            playDirectory(dir, userSettings->selectedBrowserItem);
+            strcpy(dir, userSettings->selectedBrowserItemShort);
+			directoryUp(dir);
+            directoryUp(dirShort);
+			playDirectory(dir, dirShort, userSettings->selectedBrowserItemShort);
         }
     }else if (FIO_S_ISDIR(stat.st_mode)){
-        playDirectory(userSettings->selectedBrowserItem, "");
+        playDirectory(userSettings->selectedBrowserItem, userSettings->selectedBrowserItemShort, "");
     }
 
     oslDeleteImage(noCoverArt);

@@ -70,8 +70,10 @@ struct settings{
 	//Data to be passed between forms:
     int shutDown;
     char lastBrowserDir[264];
-    char selectedBrowserItem[264];
-    int previousMode;
+    char lastBrowserDirShort[264];
+	char selectedBrowserItem[264];
+	char selectedBrowserItemShort[264];
+	int previousMode;
     char currentPlaylistName[264];
     int playlistStartIndex;
 };
