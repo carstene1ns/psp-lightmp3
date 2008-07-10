@@ -372,9 +372,9 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
     menu->selected = 0;
     for (i=0; i<directory->number_of_directory_entries; i++){
         if (FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode))
-            sprintf(menu->elements[i].text, "/%s", directory->directory_entry[i].d_name);
+            sprintf(menu->elements[i].text, "/%s", directory->directory_entry[i].longname);
         else
-            strcpy(menu->elements[i].text, directory->directory_entry[i].d_name);
+            strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
         menu->elements[i].triggerFunction = NULL;
         if (!strcmp(selected, directory->directory_entry[i].d_name)){
             menu->first = i;

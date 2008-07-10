@@ -121,7 +121,7 @@ int gui_playlistsBrowser(){
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
 
-    result = opendir_open(&directory, playlistsDir, ext, 1, 1);
+    result = opendir_open(&directory, playlistsDir, playlistsDir, ext, 1, 1);
     sortDirectory(&directory);
     buildMenuFromDirectory(&commonMenu, &directory, "");
 
@@ -219,9 +219,11 @@ int gui_playlistsBrowser(){
                 sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                 sceIoRemove(buffer);
                 opendir_close(&directory);
-                result = opendir_open(&directory, playlistsDir, ext, 1, 1);
+				cpuBoost();
+                result = opendir_open(&directory, playlistsDir, playlistsDir, ext, 1, 1);
                 sortDirectory(&directory);
                 buildMenuFromDirectory(&commonMenu, &directory, "");
+				cpuRestore();
                 commonMenu.first = 0;
                 commonMenu.selected = 0;
                 confirmStatus = STATUS_CONFIRM_NONE;

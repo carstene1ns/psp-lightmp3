@@ -21,7 +21,7 @@ hours.
 
 INSTALL
 -------
-Simply copy the LightMP3 directory under ms0:/PSP/GAME3xx
+Simply copy the LightMP3 directory under ms0:/PSP/GAME3xx or ms0:/PSP/GAME4XX
 The src directory contains source code: you don't need it to run the application.
 
 
@@ -134,12 +134,6 @@ LightMP3 will look for cover:
 5.For a file named cover.jpg in the same directory
 
 
-SKINS
------
-You can find more skins for LightMP3 here:
-http://sakya.altervista.org/new/index.php?mod=none_lightmp3skins
-
-
 DEPENDENCIES
 ------------
 To compile LightMP3 you need:
@@ -159,6 +153,9 @@ I often update my sdk so you'll need an updated sdk to compile LightMP3.
 SKINS:
 ------
 LightMP3 is totally skinnable.
+You can find more skins for LightMP3 here:
+http://sakya.altervista.org/new/index.php?mod=none_lightmp3skins
+
 For further informations please refer to this forum:
 http://www.sakya.it/forums/viewforum.php?f=5
 
@@ -191,3 +188,4 @@ MANY THANKS TO
 -Ghoti for the libMad streaming code
 -fabiom, borgqueenx, Mizou93, coach777, Magic PSP for tanslations.
 -nextos for help with unicode and libiconv
+-cooleyes for the fat driver
