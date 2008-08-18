@@ -32,7 +32,7 @@ int MP3ME_EndOfStream();
 struct fileInfo *MP3ME_GetInfo();
 struct fileInfo MP3ME_GetTagInfoOnly(char *filename);
 int MP3ME_GetStatus();
-int MP3ME_GetPercentage();
+float MP3ME_GetPercentage();
 void MP3ME_setVolumeBoostType(char *boostType);
 void MP3ME_setVolumeBoost(int boost);
 int MP3ME_getVolumeBoost();

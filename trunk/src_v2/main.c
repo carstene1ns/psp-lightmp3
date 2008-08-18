@@ -46,7 +46,6 @@
 
 PSP_MODULE_INFO("LightMP3", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
-//PSP_HEAP_SIZE_KB(12*1024);
 PSP_HEAP_SIZE_KB(-4*1024);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -330,6 +329,7 @@ int main(){
     OGG_defaultCPUClock = userSettings->CLOCK_OGG;
     FLAC_defaultCPUClock = userSettings->CLOCK_FLAC;
     AA3ME_defaultCPUClock = userSettings->CLOCK_AA3;
+	CLOCK_WHEN_PAUSE = getMinCPUClock();
 
     //Load language file:
     sprintf(buffer, "%slanguages/", userSettings->ebootPath);

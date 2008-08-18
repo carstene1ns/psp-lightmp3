@@ -33,7 +33,7 @@ int AA3ME_EndOfStream();
 struct fileInfo *AA3ME_GetInfo();
 struct fileInfo AA3ME_GetTagInfoOnly(char *filename);
 int AA3ME_GetStatus();
-int AA3ME_GetPercentage();
+float AA3ME_GetPercentage();
 void AA3ME_setVolumeBoostType(char *boostType);
 void AA3ME_setVolumeBoost(int boost);
 int AA3ME_getVolumeBoost();

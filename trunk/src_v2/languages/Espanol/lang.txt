@@ -1,0 +1,195 @@
+#Language   : Español
+#By         : Danixu
+#Contacts   : 
+ENCODING=UTF-8
+
+#Language to use in the On Screen Keyboard.
+#			JAPANESE			0
+#			ENGLISH				1
+#			FRENCH				2
+#			SPANISH				3
+#			GERMAN				4
+#			ITALIAN				5
+#			DUTCH				6
+#			PORTUGUESE			7
+#			RUSSIAN				8
+#			KOREAN				9
+#			CHINESE_TRADITIONAL	10
+#			CHINESE_SIMPLIFIED	11
+OSK_LANGUAGE=3
+
+YES=Si
+NO=No
+WAIT=Por favor espere...
+CHECK_BRIGHTNESS_TITLE=Aviso de brillo
+CHECK_BRIGHTNESS=¿Bajar el brillo de la pantalla?
+BRIGHTNESS_NO=No
+BRIGHTNESS_YES_WARNING=Si, con aviso
+BRIGHTNESS_YES=Si, sin aviso
+FREE_MEMORY=Mem. libre:
+
+USB_ACTIVE=USB activo
+USB_MESSAGE=Pulsa SELECT para desactivar el USB.
+TITLE=Título
+ARTIST=Artista
+ALBUM=Album
+GENRE=Género
+YEAR=Año
+TIME=Tiempo
+TRACK=Pista
+ADDING_PLAYLIST=Añadiendo pistas a la lista de reproducción
+RATING=Puntuación
+PLAYED=Veces Repr.
+NOT_SUPPORTED=No soportado
+
+MODE=Modo
+BITRATE=Bitrate
+SAMPLERATE=Muestreo
+LAYER=Layer
+FILE_FORMAT=Formato
+EMPHASIS=Enfasis
+SLEEP_MODE=Modo suspender
+PLAY_MODE=Modo de Repr.
+STATUS=Estado
+VOLUME_BOOST=Ganancia
+EQUALIZER=Equalizador
+NOCOVER=Sin carátula
+BUTTON_1=Explorador
+BUTTON_2=Listas
+BUTTON_3=Editor de listas
+BUTTON_4=Biblioteca
+BUTTON_5=Opciones
+
+SLEEP_MODE_0=Desactivado
+SLEEP_MODE_1=Final de pista
+SLEEP_MODE_2=Final de carpeta/lista
+
+PLAY_MODE_0=Normal
+PLAY_MODE_1=Repetir todas
+PLAY_MODE_2=Repetir pista
+PLAY_MODE_3=Aleatorio
+PLAY_MODE_4=Aleatorio/repetir
+
+PLAYER_STATUS_0=Abriendo archivo
+PLAYER_STATUS_1=Pausado
+PLAYER_STATUS_2=Reproduciendo
+
+CONFIRM_MESSAGE=Pulsa X para confirmar, O para cancelar
+CONFIRM_LOAD_TITLE=Confirmar
+CONFIRM_LOAD=¿Cargar lista seleccionada?
+
+CONFIRM_REMOVE_TITLE=Confirmar
+CONFIRM_REMOVE=¿Eliminar lista seleccionada?
+ASK_PLAYLIST_NAME=Introduce el nombre de la lista
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=Confirmar
+CONFIRM_CLEAR_PLAYLIST=¿Limpiar esta lista?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Confirmar
+CONFIRM_REMOVE_FROM_PLAYLIST=¿Eliminar las pistas seleccionadas de la lista?
+PLAYLIST_NAME=Nombre
+TOTAL_TRACKS=Pistas en total
+
+SETTINGS_01=Piel
+SETTINGS_02=Idioma
+SETTINGS_03=Guardar log de Scrobbler de audio
+SETTINGS_04=Desvanecimiento al saltar pista
+SETTINGS_05=Volumen del mute
+SETTINGS_06=Comprobar Brillo
+SETTINGS_07=Reproducir MP3 usando Media Engine
+SETTINGS_08=Tipo de ganancia en MP3 usando libMAD
+SETTINGS_09=Reloj de CPU automático
+SETTINGS_10=Reloj de CPU: GUI
+SETTINGS_11=Reloj de CPU: MP3 libMAD
+SETTINGS_12=Reloj de CPU: MP3 Media Engine
+SETTINGS_13=Reloj de CPU: OGG Vorbis
+SETTINGS_14=Reloj de CPU: Flac
+SETTINGS_15=Reloj de CPU: ATRAC3
+CONFIRM_SAVE_SETTINGS_TITLE=Confirmar
+CONFIRM_SAVE_SETTINGS=¿Guardar opciones?
+
+HELP_PLAYER_TITLE=Ayuda del reproductor
+HELP_PLAYER_01=R: Pista siguiente
+HELP_PLAYER_02=L: Pista anterior
+HELP_PLAYER_03=Equis: Pausa/reproducir
+HELP_PLAYER_04=Circulo: Parar
+HELP_PLAYER_05=Cuadrado: Encender/apagar MUTE
+HELP_PLAYER_06=Triangulo: Cambiar modo sleep
+HELP_PLAYER_07=Select: Cambiar modo de reproducción
+HELP_PLAYER_08=Start: Activar modo economía
+HELP_PLAYER_09=Equis + Arriba/Abajo: Puntuar pista
+
+BROWSE_ARTIST=Explorar por Artista
+BROWSE_ALBUM=Explorar por Album
+BROWSE_GENRE=Explorar por Género
+BROWSE_RATING=Explorar por Puntuación
+SEARCH=Buscar
+SCAN_MS=Escanear MS buscando música
+
+CONFIRM_SCAN_MS_TITLE=Confirmar
+CONFIRM_SCAN_MS=¿Escanear la Memory Stick buscando musica?
+CHECKING_FILE=Comprobando archivos en la Memory Stick
+SCANNING=Escaneando Memory Stick buscando música
+MESSAGEBOX_CONTINUE=Pulsa X para continuar
+SCAN_FINISHED=Memory stick escaneada
+MEDIA_FOUND=Encontrados XX archivos.
+ASK_SEARCH_STRING=Insertar palabra a buscar
+QUERY_RUNNING_TITLE=Por favor espere
+QUERY_RUNNING=Ejecutando consulta
+TOTAL_TIME=Tiempo Total
+WORKING=Trabajando
+
+#This is used for the message "xx% done"
+DONE=completo
+
+################################################################################
+#2.0.0 BETA2
+################################################################################
+ALL=Todo
+BOOST_NEW=Nuevo
+BOOST_OLD=Antiguo
+
+HELP_FILE_BROWSER_TITLE=Ayuda del explorador de archivos
+HELP_FILE_BROWSER_01=Equis: Entrar a la carpeta/reproducir archivo
+HELP_FILE_BROWSER_02=Circulo: Subir un nivel
+HELP_FILE_BROWSER_03=Cuadrado: reproducir carpeta
+HELP_FILE_BROWSER_04=Start: Añadir carpeta/archivo a lista de reproducción
+HELP_FILE_BROWSER_05=Select: Activar modo USB
+
+HELP_PLAYLIST_BROWSER_TITLE=Ayuda del explorador de listas
+HELP_PLAYLIST_BROWSER_01=Equis: Reproducir lista
+HELP_PLAYLIST_BROWSER_02=Circulo: Eliminar lista
+HELP_PLAYLIST_BROWSER_03=Cuadrado: Cargar lista en el editor
+HELP_PLAYLIST_BROWSER_04=Start: Añadir lista al editor
+
+CONFIRM_ADD_PLAYLIST_TITLE=Confirmar
+CONFIRM_ADD_PLAYLIST=¿Anadir la lista seleccionada a la lista actual?
+
+HELP_PLAYLIST_EDITOR_TITLE=Ayuda del editor de listas
+HELP_PLAYLIST_EDITOR_01=Cuadrado: Mover pista hacia arriba
+HELP_PLAYLIST_EDITOR_02=Equis: Mover pista hacia abajo
+HELP_PLAYLIST_EDITOR_03=Circulo: Eliminar pista de la lista
+HELP_PLAYLIST_EDITOR_04=Triangulo: Comprobar archivos de la lista
+HELP_PLAYLIST_EDITOR_05=Start: Guardar lista
+HELP_PLAYLIST_EDITOR_06=Select: Limpiar lista
+HELP_PLAYLIST_EDITOR_07=Nota: Reproducir lista
+
+HELP_MEDIALIBRARY_TITLE=Ayuda de la biblioteca
+HELP_MEDIALIBRARY_01=Equis: Entrar en la seleccion/reproducir pista
+HELP_MEDIALIBRARY_02=Circulo: Para subir un nivel
+HELP_MEDIALIBRARY_03=Cuadrado: Reproducir selección
+HELP_MEDIALIBRARY_04=Start: Añadir seleccion/pista a lista de reproduc...
+HELP_MEDIALIBRARY_05=Equis + Arriba/Abajo: Puntuar la pista
+
+HELP_SETTINGS_TITLE=Ayuda de Opciones
+HELP_SETTINGS_01=Izquierda/Derecha: Cambiar la opción
+HELP_SETTINGS_02=Start: Guardar opciones
+
+LOADING_SKIN_TITLE=Por favor espere
+LOADING_SKIN=Cargando nueva piel
+CHECKING_PLAYLIST=Comprobando archivos de la lista de reproducción
+
+SETTINGS_16=Intervalo de repetición de teclas
+SETTINGS_17=Mostrar pantalla de bienvenida
+
+BROWSE_TOP100=Top 100
+BROWSE_ALL=Explorar todo

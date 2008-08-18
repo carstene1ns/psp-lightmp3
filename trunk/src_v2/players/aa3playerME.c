@@ -523,8 +523,11 @@ struct fileInfo *AA3ME_GetInfo(){
 }
 
 
-int AA3ME_GetPercentage(){
-    return (int)(AA3ME_playingTime/(double)AA3ME_info.length*100.0);
+float AA3ME_GetPercentage(){
+    float perc = (float)(AA3ME_playingTime/(double)AA3ME_info.length*100.0);
+    if (perc > 100)
+        perc = 100;
+	return perc;
 }
 
 

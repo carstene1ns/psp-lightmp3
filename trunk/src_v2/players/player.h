@@ -54,6 +54,9 @@
 #define MAX_IMAGE_DIMENSION 150*1024
 #define DEFAULT_THREAD_STACK_SIZE 256*1024
 
+
+extern int CLOCK_WHEN_PAUSE;
+
 extern char fileTypeDescription[4][20];
 
 extern int MUTED_VOLUME;
@@ -103,7 +106,7 @@ extern void (*setVolumeBoostFunct)(int);
 extern struct fileInfo *(*getInfoFunct)();
 extern struct fileInfo (*getTagInfoFunct)();
 extern void (*getTimeStringFunct)();
-extern int (*getPercentageFunct)();
+extern float (*getPercentageFunct)();
 extern int (*getPlayingSpeedFunct)();
 extern int (*setPlayingSpeedFunct)(int);
 extern int (*endOfStreamFunct)();

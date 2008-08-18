@@ -1,0 +1,170 @@
+YES=Oui
+NO=Non
+WAIT=Veuillez patienter...
+CHECK_BRIGHTNESS_TITLE=Avertissement luminosité
+CHECK_BRIGHTNESS=Réduire la luminosité de l'écran ?
+BRIGHTNESS_NO=Non
+BRIGHTNESS_YES_WARNING=Oui, en m'avertissant
+BRIGHTNESS_YES=Oui, sans m'avertir
+
+USB_ACTIVE=USB actif
+USB_MESSAGE=SELECT pour désactiver USB
+TITLE=Titre
+ARTIST=Artiste
+ALBUM=Album
+GENRE=Genre
+YEAR=Année
+TIME=Temps
+TRACK=Piste
+ADDING_PLAYLIST=Ajout de pistes a la playlist
+RATING=Class.
+PLAYED=Jouée(s)
+NOT_SUPPORTED=Non supporté
+
+MODE=Mode
+BITRATE=Fréquence
+SAMPLERATE=Echant.
+LAYER=Couche
+FILE_FORMAT=Format
+EMPHASIS=Emhasis
+SLEEP_MODE=Mode veille
+PLAY_MODE=Mode lecture
+STATUS=Statut
+VOLUME_BOOST=Volume Boost
+EQUALIZER=Egaliseur
+
+BUTTON_1=Expl. de fichiers
+BUTTON_2=Playlists
+BUTTON_3=Editeur de playlists
+BUTTON_4=Lib. de médias
+BUTTON_5=Paramètres
+
+SLEEP_MODE_0=Désactivé
+SLEEP_MODE_1=Fin de la piste
+SLEEP_MODE_2=Fin du répértoire/playlist
+
+PLAY_MODE_0=Normal
+PLAY_MODE_1=Répéter tout
+PLAY_MODE_2=Répéter la piste
+PLAY_MODE_3=Aléatoire
+
+PLAYER_STATUS_0=Ouvérture du fichier
+PLAYER_STATUS_1=En pause
+PLAYER_STATUS_2=Lecture
+
+CONFIRM_MESSAGE=X pour confirmer, O pour annuler
+CONFIRM_LOAD_TITLE=Confirmer
+CONFIRM_LOAD=Charger la liste de lecture selectionnee ?
+
+CONFIRM_REMOVE_TITLE=Confirmer
+CONFIRM_REMOVE=Supprimer la liste de lecture selectionnée ?
+ASK_PLAYLIST_NAME=Entrez un nom pour la liste de lecture
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=Confirmer
+CONFIRM_CLEAR_PLAYLIST=Vider cette liste de lecture?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Confirmer
+CONFIRM_REMOVE_FROM_PLAYLIST=Supprimer cette piste de la liste de lecture ?
+PLAYLIST_NAME=Nom
+TOTAL_TRACKS=Nombre de pistes au total
+
+SETTINGS_01=Skin
+SETTINGS_02=Langue
+SETTINGS_03=Ecrire le log du scrobbler audio
+SETTINGS_04=Fondu entre deux morceaux
+SETTINGS_05=Volume muet
+SETTINGS_06=Vérification de la luminosité
+SETTINGS_07=Lire les MP3 avec MediaEngine
+SETTINGS_08=Booster les MP3 en utilisant libMAD
+SETTINGS_09=Vitesse CPU automatique
+SETTINGS_10=Vitesse CPU: GUI
+SETTINGS_11=Vitesse CPU: MP3 libMAD
+SETTINGS_12=Vitesse CPU: MP3 Media Engine
+SETTINGS_13=Vitesse CPU: OGG Vorbis
+SETTINGS_14=Vitesse CPU: Flac
+SETTINGS_15=Vitesse CPU: ATRAC3
+CONFIRM_APPLY_SETTINGS_TITLE=Confirmer
+CONFIRM_APPLY_SETTINGS=Appliquer ces paramètres maintenant ?
+
+HELP_PLAYER_TITLE=Aide du lecteur
+HELP_PLAYER_01=R pour la piste suivante 
+HELP_PLAYER_02=L pour la piste précédente
+HELP_PLAYER_03=CROIX pour mettre en pause/lecture
+HELP_PLAYER_04=ROND pour arrêter la lecture
+HELP_PLAYER_05=CARRE pour activer/désactiver MUTE
+HELP_PLAYER_06=TRIANGLE pour passer en mode veille
+HELP_PLAYER_07=SELECT pour changer de mode de lecture
+HELP_PLAYER_08=START pour activer le mode économie
+HELP_PLAYER_09=CROSS + HAUT/BAS pour noter la piste
+
+BROWSE_ARTIST=Classer par Artiste
+BROWSE_ALBUM=Classer par Album
+BROWSE_GENRE=Classer par Genre
+BROWSE_RATING=Classer par note
+SEARCH=Chercher
+SCAN_MS=Scaner la MS
+
+CONFIRM_SCAN_MS_TITLE=Confirmer
+CONFIRM_SCAN_MS=Scaner la MS pour rechercher des medias?
+CHECKING_FILE=Verification des fichiers sur la MS
+SCANNING=Scan de la MS à la recherche de médias
+MESSAGEBOX_CONTINUE=Appuyez sur X pour continuer
+SCAN_FINISHED=Memory Stick scanné
+MEDIA_FOUND=Touvés XX fichiers medias.
+ASK_SEARCH_STRING=Inserer une expression à rechercher
+QUERY_RUNNING_TITLE=Veuillez patienter
+QUERY_RUNNING=Query en cours
+TOTAL_TIME=Temps total
+WORKING=En marche
+
+#This is used for the message "xx% done"
+DONE=Finit
+
+################################################################################
+#2.0.0 BETA2
+################################################################################
+ALL=Tout
+BOOST_NEW=Nouveau
+BOOST_OLD=Ancien
+
+HELP_FILE_BROWSER_TITLE=Aide de l'explorateur
+HELP_FILE_BROWSER_01=X pour entrer dans le dossier/jouer le fichier
+HELP_FILE_BROWSER_02=Rond pour remonter d'un niveau
+HELP_FILE_BROWSER_03=Carré pour jouer le repertoire
+HELP_FILE_BROWSER_04=Start pour ajouter un dossier/fichier à la playlist
+HELP_FILE_BROWSER_05=Select pour activer l'USB
+
+HELP_PLAYLIST_BROWSER_TITLE=Aide de l'explorateur de Playlist
+HELP_PLAYLIST_BROWSER_01=X pour lire la Playlist
+HELP_PLAYLIST_BROWSER_02=Rond pour supprimer la Playlist
+HELP_PLAYLIST_BROWSER_03=Carré pour charger une Playlist dans l'éditeur
+HELP_PLAYLIST_BROWSER_04=Start pour ajouter une Playlist à l'éditeur
+
+CONFIRM_ADD_PLAYLIST_TITLE=Confirmer
+CONFIRM_ADD_PLAYLIST=Ajouter cette Playlist à la Playlist courante?
+
+HELP_PLAYLIST_EDITOR_TITLE=Aide de l'editeur de Playlist
+HELP_PLAYLIST_EDITOR_01=Carré pour monter une piste
+HELP_PLAYLIST_EDITOR_02=X pour descendre une piste
+HELP_PLAYLIST_EDITOR_03=Rond pour supprimer une piste de la Playlist
+HELP_PLAYLIST_EDITOR_04=Triangle pour vérifier les fichiers
+HELP_PLAYLIST_EDITOR_05=Start pour enregistrer la Playlist
+HELP_PLAYLIST_EDITOR_06=Select pour vider la Playlist
+HELP_PLAYLIST_EDITOR_07=Note pour lire la Playlist
+
+HELP_MEDIALIBRARY_TITLE=Aide de la bibliothèque média
+HELP_MEDIALIBRARY_01=X pour entrer dans une Playlist/lire un fichier
+HELP_MEDIALIBRARY_02=Rond pour remonter d'un niveau
+HELP_MEDIALIBRARY_03=Rond pour lire la sélection
+HELP_MEDIALIBRARY_04=Start pour ajouter une sélection/piste à la playlist
+HELP_MEDIALIBRARY_05=Cross + Up/Down to rate the track
+
+HELP_SETTINGS_TITLE=Settings help
+HELP_SETTINGS_01=Left/Right to cange setting
+HELP_SETTINGS_02=Start to save settings
+
+LOADING_SKIN_TITLE=Please Wait
+LOADING_SKIN=Loading new skin
+CHECKING_PLAYLIST=Checking playlist's files
+
+SETTINGS_16=Keys repeat interval
+SETTINGS_17=Show splash screen

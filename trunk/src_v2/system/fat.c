@@ -489,8 +489,10 @@ u32 fat_readdir(const char * dir, char * sdir, p_fat_info * info)
 			inf->filename[0] = 0xE5;
 		if(!fat_get_longname(entrys, i, inf->longname))
 			strcpy(inf->longname, inf->filename);
-		strcpy(inf->filename, sid.d_name);
-		inf->filesize = entrys[i].norm.filesize;
+		strcpy(inf->shortname, inf->filename);
+        strcpy(inf->filename, sid.d_name);
+
+        inf->filesize = entrys[i].norm.filesize;
 		inf->cdate = entrys[i].norm.cr_date;
 		inf->ctime = entrys[i].norm.cr_time;
 		inf->mdate = entrys[i].norm.last_mod_date;

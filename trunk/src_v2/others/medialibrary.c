@@ -24,6 +24,7 @@
 #include <stdlib.h>
 
 #include "../others/strreplace.h"
+#include "../system/opendir.h"
 #include "../players/player.h"
 #include "medialibrary.h"
 
@@ -37,6 +38,8 @@ static char sql[ML_SQLMAXLENGTH] = "";
 static sqlite3_stmt *stmt;
 static char *zErr = 0;
 static long recordsCount = 0;
+static char dirToScan[500][264];
+static char dirToScanShort[500][264];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private functions:
@@ -69,7 +72,7 @@ int clearBuffer(struct libraryEntry *resultBuffer){
 // Fix string field for SQL:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int ML_fixStringField(char *fieldStr){
-    char *repStr;
+    char *repStr = NULL;
     repStr = replace(fieldStr, "'", "''");
     if (repStr != NULL){
         strcpy(fieldStr, repStr);
@@ -209,83 +212,69 @@ int ML_scanMS(char extFilter[][5], int extNumber,
               int (*scanDir)(char *dirName),
               int (*scanFile)(char *fileName, int errorCode)){
     int mediaFound = 0;
-    int invalidFound = 0;
-    int openedDir, errorCode;
-    static SceIoDirent oneDir;
-    char dirToScan[500][264];
-    char fullName[264];
+    int errorCode;
+    //char dirToScan[500][264];
+    //char dirToScanShort[500][264];
+    char fullName[264] = "";
+    char fullNameShort[264] = "";
+    char ext[5] = "";
     int dirScanned = 0;
     int dirToScanNumber = 1;
     struct fileInfo info;
+	struct opendir_struct openedDir;
+    char *result = NULL;
+    int i = 0;
 
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
+    //FILE *log = fopen("ML_scan.txt", "w");
+
     strcpy(dirToScan[0], "ms0:/");
+    strcpy(dirToScanShort[0], "ms0:/");
     while (dirScanned < dirToScanNumber){
+        //fwrite("Scanning: ", sizeof(char), strlen("Scanning: "), log);
+        //fwrite(dirToScan[dirScanned], sizeof(char), strlen(dirToScan[dirScanned]), log);
+
         //Directory callback:
         if (scanDir != NULL)
             if ((*scanDir)(dirToScan[dirScanned]) < 0)
                 break;
-        openedDir = sceIoDopen(dirToScan[dirScanned]);
-        if (openedDir < 0)
-            break;
 
-        while (1){
-            memset(&oneDir, 0, sizeof(SceIoDirent));
-            if (sceIoDread(openedDir, &oneDir) <= 0)
-                break;
-            if (!strcmp(oneDir.d_name, ".") || !strcmp(oneDir.d_name, ".."))
-                continue;
+    	result = opendir_open(&openedDir, dirToScan[dirScanned], dirToScanShort[dirScanned], extFilter, extNumber, 1);
+    	if (result == 0){
+            for (i = 0; i < openedDir.number_of_directory_entries; i++){
+                if (!strcmp(openedDir.directory_entry[i].d_name, ".") || !strcmp(openedDir.directory_entry[i].d_name, ".."))
+                    continue;
 
-        	if (dirToScan[dirScanned][strlen(dirToScan[dirScanned])-1] != '/')
-                sprintf(fullName, "%s/%s", dirToScan[dirScanned], oneDir.d_name);
-            else
-                sprintf(fullName, "%s%s", dirToScan[dirScanned], oneDir.d_name);
+                //fwrite("  ", sizeof(char), strlen("  "), log);
+                //fwrite(openedDir.directory_entry[i].longname, sizeof(char), strlen(openedDir.directory_entry[i].longname), log);
 
-            if (FIO_S_ISREG(oneDir.d_stat.st_mode)){
-                //Check extension filter:
-				int extOK = 0;
-				int i, j;
-				char ext[5] = "";
-				if (oneDir.d_name[strlen(oneDir.d_name) - 4] == '.')
-					j = 3;
-				else if (oneDir.d_name[strlen(oneDir.d_name) - 5] == '.')
-					j = 4;
-                else
-                    j = 0;
-				for (i = strlen(oneDir.d_name) - j; i < strlen(oneDir.d_name); i++)
-					ext[i - strlen(oneDir.d_name) + j] = toupper(oneDir.d_name[i]);
+                if (dirToScan[dirScanned][strlen(dirToScan[dirScanned])-1] != '/'){
+                    sprintf(fullName, "%s/%s", dirToScan[dirScanned], openedDir.directory_entry[i].longname);
+                    sprintf(fullNameShort, "%s/%s", dirToScanShort[dirScanned], openedDir.directory_entry[i].d_name);
+                }else{
+                    sprintf(fullName, "%s%s", dirToScan[dirScanned], openedDir.directory_entry[i].longname);
+                    sprintf(fullNameShort, "%s%s", dirToScanShort[dirScanned], openedDir.directory_entry[i].d_name);
+                }
 
-				extOK = 0;
-				for (i = 0; i < extNumber; i++){
-					if (!strcmp(ext, extFilter[i])){
-						extOK = 1;
-						break;
-					}
-				}
-				if (!extOK)
-					continue;
-                //Media found:
-                setAudioFunctions(fullName, 1);
-                //(*initFunct)(0);
-                info = (*getTagInfoFunct)(fullName);
-                //int loadRetValue = (*loadFunct)(fullName);
-                int loadRetValue = OPENING_OK;
-            	if (loadRetValue == OPENING_OK){
+                if (FIO_S_ISREG(openedDir.directory_entry[i].d_stat.st_mode)){
+                    //Media found:
+                    setAudioFunctions(fullNameShort, 1);
+                    info = (*getTagInfoFunct)(fullNameShort);
                     errorCode = 0;
-                    //info = (*getInfoFunct)();
+                    getExtension(fullNameShort, ext, 4);
                     ML_fixStringField(info.artist);
                     ML_fixStringField(info.album);
                     ML_fixStringField(info.title);
                     ML_fixStringField(info.genre);
-                    ML_fixStringField(oneDir.d_name);
-                    ML_fixStringField(fullName);
+                    //ML_fixStringField(fullName);
+                    ML_fixStringField(fullNameShort);
                     sprintf(sql, "insert into media (artist, album, title, genre, year, path, realpath, \
                                                      extension, seconds, samplerate, bitrate, tracknumber) \
                                   values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %li, %li, %i, %i);",
                                   info.artist, info.album, info.title, info.genre, info.year,
-                                  fullName, fullName, ext,
+                                  fullNameShort, fullNameShort, ext,
                                   info.length, info.hz, info.kbit, atoi(info.trackNumber));
                     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
                     if (retValue != SQLITE_OK){
@@ -299,26 +288,25 @@ int ML_scanMS(char extFilter[][5], int extNumber,
                     }
                     sqlite3_finalize(stmt);
                     mediaFound++;
-                }else{
-                    errorCode = loadRetValue;
-                    invalidFound++;
-                }
-                //(*endFunct)();
-                unsetAudioFunctions();
+                    unsetAudioFunctions();
 
-                //File callback:
-                if (scanFile != NULL)
-                    if ((*scanFile)(oneDir.d_name, errorCode) < 0){
-                        dirScanned = dirToScanNumber;
-                        break;
-                    }
-            }else if (FIO_S_ISDIR(oneDir.d_stat.st_mode)){
-                strcpy(dirToScan[dirToScanNumber++], fullName);
+                    //File callback:
+                    if (scanFile != NULL)
+                        if ((*scanFile)(openedDir.directory_entry[i].longname, errorCode) < 0){
+                            dirScanned = dirToScanNumber;
+                            break;
+                        }
+                }else if (FIO_S_ISDIR(openedDir.directory_entry[i].d_stat.st_mode)){
+                    strcpy(dirToScan[dirToScanNumber], fullName);
+                    strcpy(dirToScanShort[dirToScanNumber], fullNameShort);
+                    dirToScanNumber++;
+                }
             }
         }
-        sceIoDclose(openedDir);
+    	opendir_close(&openedDir);
         dirScanned++;
     }
+    //fclose(log);
 
     ML_INTERNAL_closeDB();
     return mediaFound;

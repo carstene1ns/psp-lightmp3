@@ -371,8 +371,11 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
 }
 
 
-int OGG_GetPercentage(){
-	return (int)(OGG_milliSeconds/1000.0/(double)OGG_info.length*100.0);
+float OGG_GetPercentage(){
+    float perc = (float)(OGG_milliSeconds/1000.0/(double)OGG_info.length*100.0);
+    if (perc > 100)
+        perc = 100;
+	return perc;
 }
 
 void OGG_End(){
