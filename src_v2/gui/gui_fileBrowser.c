@@ -126,7 +126,7 @@ void addDirectoryToPlaylist(char *dirName, char *dirNameShort){
             oslEndFrame();
         	oslSyncFrame();
 
-			strcpy(fileToAdd, dirName);
+			strcpy(fileToAdd, dirNameShort);
 			if (fileToAdd[strlen(fileToAdd)-1] != '/')
 				strcat(fileToAdd, "/");
 			strcat(fileToAdd, dirToAdd.directory_entry[i].d_name);
@@ -195,7 +195,7 @@ int gui_fileBrowser(){
 		result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
     }
     sortDirectory(&directory);
-    getFileName(userSettings->selectedBrowserItem, buffer);
+    getFileName(userSettings->selectedBrowserItemShort, buffer);
     buildMenuFromDirectory(&commonMenu, &directory, buffer);
 
     exitFlagFileBrowser = 0;
@@ -287,7 +287,7 @@ int gui_fileBrowser(){
                     strcat(curDir, directory.directory_entry[commonMenu.selected].longname);
                     strcat(curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 					opendir_close(&directory);
-					//debugMessageBox(curDir);
+					//debugMessageBox(curDirShort);
 					cpuBoost();
                     result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
                     sortDirectory(&directory);

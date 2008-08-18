@@ -30,7 +30,7 @@ int OGG_EndOfStream();
 struct fileInfo *OGG_GetInfo();
 struct fileInfo OGG_GetTagInfoOnly(char *filename);
 int OGG_GetStatus();
-int OGG_GetPercentage();
+float OGG_GetPercentage();
 void OGG_setVolumeBoostType(char *boostType);
 void OGG_setVolumeBoost(int boost);
 int OGG_getVolumeBoost();

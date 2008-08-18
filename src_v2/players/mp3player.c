@@ -224,7 +224,7 @@ static void MP3Callback(void *buffer, unsigned int samplesToWrite, void *pdata){
                 if (MP3_playingSpeed){
                     if (sceIoLseek32(MP3_fd, 2 * INPUT_BUFFER_SIZE * MP3_playingSpeed, PSP_SEEK_CUR) != MP3_filePos){
                         MP3_filePos += 2 * INPUT_BUFFER_SIZE * MP3_playingSpeed;
-                        mad_timer_set(&Timer, (int)((float)MP3_info.length / 100.0 * (float)MP3_GetPercentage()), 1, 1);
+                        mad_timer_set(&Timer, (int)((float)MP3_info.length / 100.0 * MP3_GetPercentage()), 1, 1);
                     }else
                         MP3_setPlayingSpeed(0);
                 }
@@ -572,16 +572,18 @@ void MP3_GetTimeString(char *dest){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Get Percentage
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int MP3_GetPercentage(){
+float MP3_GetPercentage(){
 	//Calcolo posizione in %:
 	float perc;
 
     if (fileSize > 0){
         perc = (float)MP3_filePos / (float)fileSize * 100.0;
+        if (perc > 100)
+            perc = 100;
     }else{
         perc = 0;
     }
-    return((int)perc);
+    return(perc);
 }
 
 
@@ -775,7 +777,7 @@ int MP3_resume(){
         if (MP3_Load(MP3_fileName) == OPENING_OK){
             MP3_filePos = MP3_suspendPosition;
             sceIoLseek32(MP3_fd, MP3_filePos, PSP_SEEK_SET);
-            mad_timer_set(&Timer, (int)((float)MP3_info.length / 100.0 * (float)MP3_GetPercentage()), 1, 1);
+            mad_timer_set(&Timer, (int)((float)MP3_info.length / 100.0 * MP3_GetPercentage()), 1, 1);
             MP3_isPlaying = MP3_suspendIsPlaying;
         }
         MP3_suspendPosition = -1;

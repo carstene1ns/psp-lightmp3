@@ -540,16 +540,18 @@ struct fileInfo *MP3ME_GetInfo(){
 }
 
 
-int MP3ME_GetPercentage(){
+float MP3ME_GetPercentage(){
 	//Calcolo posizione in %:
 	float perc;
 
     if (MP3ME_filesize > 0){
         perc = (float)MP3ME_filePos / (float)MP3ME_filesize * 100.0;
+        if (perc > 100)
+            perc = 100;
     }else{
         perc = 0;
     }
-    return((int)perc);
+    return(perc);
 }
 
 

@@ -30,7 +30,7 @@ int AAC_EndOfStream();
 struct fileInfo *AAC_GetInfo();
 struct fileInfo AAC_GetTagInfoOnly(char *filename);
 int AAC_GetStatus();
-int AAC_GetPercentage();
+float AAC_GetPercentage();
 void AAC_setVolumeBoostType(char *boostType);
 void AAC_setVolumeBoost(int boost);
 int AAC_getVolumeBoost();

@@ -38,6 +38,7 @@ int MIN_VOLUME_BOOST=-15;
 int MIN_PLAYING_SPEED=0;
 int MAX_PLAYING_SPEED=9;
 int currentVolume = 0;
+int CLOCK_WHEN_PAUSE = 0;
 
 //shared global vars for ME
 int HW_ModulesInit = 0;
@@ -70,7 +71,7 @@ void (*setVolumeBoostFunct)(int);
 struct fileInfo *(*getInfoFunct)();
 struct fileInfo (*getTagInfoFunct)();
 void (*getTimeStringFunct)();
-int (*getPercentageFunct)();
+float (*getPercentageFunct)();
 int (*getPlayingSpeedFunct)();
 int (*setPlayingSpeedFunct)(int);
 int (*endOfStreamFunct)();

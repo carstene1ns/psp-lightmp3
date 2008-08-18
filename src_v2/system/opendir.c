@@ -120,9 +120,8 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 			}
 		}
 		//Elemento ok:
-		//strcpy(p->directory_entry[p->number_of_directory_entries].d_name, finfo[i].filename);
-		strcpy(p->directory_entry[p->number_of_directory_entries].d_name, finfo[i].filename);
-		strcpy(p->directory_entry[p->number_of_directory_entries].longname, finfo[i].longname);
+		strcpy(p->directory_entry[p->number_of_directory_entries].d_name, finfo[i].shortname);
+        strcpy(p->directory_entry[p->number_of_directory_entries].longname, finfo[i].longname);
 		//fwrite(" OK\n", sizeof(char), strlen(" OK\n"), log);
 		p->number_of_directory_entries++;
 	}

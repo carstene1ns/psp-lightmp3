@@ -30,7 +30,7 @@ int FLAC_EndOfStream();
 struct fileInfo *FLAC_GetInfo();
 struct fileInfo FLAC_GetTagInfoOnly(char *filename);
 int FLAC_GetStatus();
-int FLAC_GetPercentage();
+float FLAC_GetPercentage();
 void FLAC_setVolumeBoostType(char *boostType);
 void FLAC_setVolumeBoost(int boost);
 int FLAC_getVolumeBoost();

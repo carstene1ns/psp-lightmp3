@@ -1,0 +1,194 @@
+#Language   : German
+#By         : booder
+#Contacts   : http://www.pspsource.de
+ENCODING=UTF8
+
+#Language to use in the On Screen Keyboard.
+#			JAPANESE			0
+#			ENGLISH				1
+#			FRENCH				2
+#			SPANISH				3
+#			GERMAN				4
+#			ITALIAN				5
+#			DUTCH				6
+#			PORTUGUESE			7
+#			RUSSIAN				8
+#			KOREAN				9
+#			CHINESE_TRADITIONAL	10
+#			CHINESE_SIMPLIFIED	11
+OSK_LANGUAGE=4
+
+YES=Ja
+NO=Nein
+WAIT=Bitte warten...
+CHECK_BRIGHTNESS_TITLE=Hohe Beleuchtungsstufe
+CHECK_BRIGHTNESS=Niedrigere Stufe?
+BRIGHTNESS_NO=Nein
+BRIGHTNESS_YES_WARNING=Ja, mit Warnung
+BRIGHTNESS_YES=Ja, ohne Warnung
+FREE_MEMORY=RAM Frei:
+
+USB_ACTIVE=USB verbunden
+USB_MESSAGE=SELECT Verbindung trennen.
+TITLE=Titel
+ARTIST=Artist
+ALBUM=Album
+GENRE=Genre
+YEAR=Jahr
+TIME=Zeit
+TRACK=Datei
+ADDING_PLAYLIST=Datei zur Wiedergabelise hinzufügen
+RATING=Bewertung
+PLAYED=Gespielt
+NOT_SUPPORTED=Nicht unterstützt
+
+MODE=Modus
+BITRATE=Bitrate
+SAMPLERATE=Samplerate
+LAYER=Layer
+FILE_FORMAT=Format
+EMPHASIS=Emphasis
+SLEEP_MODE=Schlafmodus
+PLAY_MODE=Abspielmodus
+STATUS=Status
+VOLUME_BOOST=Ton intensivieren
+EQUALIZER=Equalizer
+NOCOVER=Kein Cover
+BUTTON_1=Datei Explorer
+BUTTON_2=Wiedergabelisten
+BUTTON_3=Wiedergabe Editor
+BUTTON_4=Medienbibliothek
+BUTTON_5=Einstellungen
+
+SLEEP_MODE_0=Aus
+SLEEP_MODE_1=Nach Ende von Titel
+SLEEP_MODE_2=Nach Verzeichnis/W.Liste
+
+PLAY_MODE_0=Normal
+PLAY_MODE_1=Alles wiederholen
+PLAY_MODE_2=Titel wiederholen
+PLAY_MODE_3=Zufall
+PLAY_MODE_4=Zufall in Endlosschleife
+
+PLAYER_STATUS_0=Lade Datei
+PLAYER_STATUS_1=Pause
+PLAYER_STATUS_2=Spielt...
+
+CONFIRM_MESSAGE=X Ja, O Abbruch
+CONFIRM_LOAD_TITLE=Achtung
+CONFIRM_LOAD=Markierte Wiedergabeliste laden?
+
+CONFIRM_REMOVE_TITLE=Achtung
+CONFIRM_REMOVE=Markierte Wiedergabeliste entfernen?
+ASK_PLAYLIST_NAME=Name für Wiedergabeliste
+CONFIRM_CLEAR_PLAYLIST_TITLE=Achtung
+CONFIRM_CLEAR_PLAYLIST=Wiedergabeliste wird entfernt!
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Achtung
+CONFIRM_REMOVE_FROM_PLAYLIST=Markierten Titel entfernen?
+PLAYLIST_NAME=Name
+TOTAL_TRACKS=Alle Titel
+
+SETTINGS_01=Skin
+SETTINGS_02=Sprache
+SETTINGS_03=Schreibe Audio Scrobbler Log
+SETTINGS_04=Titel ausblenden
+SETTINGS_05=Gedaempfte Lautstaerke
+SETTINGS_06=Helligkeitsueberpruefung
+SETTINGS_07=Spiele MP3 unter Nutzung der Media Engine
+SETTINGS_08=Tonintensivierung von MP3 unter Nutzung libMAD
+SETTINGS_09=Automatische CPU Taktung
+SETTINGS_10=CPU Takt: GUI
+SETTINGS_11=CPU Takt: MP3 libMAD
+SETTINGS_12=CPU Takt: MP3 Media Engine
+SETTINGS_13=CPU Takt: OGG Vorbis
+SETTINGS_14=CPU Takt: Flac
+SETTINGS_15=CPU Takt: ATRAC3
+CONFIRM_SAVE_SETTINGS_TITLE=Achtung
+CONFIRM_SAVE_SETTINGS=Einstellungen speichern?
+
+HELP_PLAYER_TITLE=Player Hilfe
+HELP_PLAYER_01=R naechster Titel
+HELP_PLAYER_02=L vorheriger Titel
+HELP_PLAYER_03=X Pause/Abspielen
+HELP_PLAYER_04=O zum stoppen
+HELP_PLAYER_05=[] MUTE an/aus
+HELP_PLAYER_06=^ Schlafmodus
+HELP_PLAYER_07=SELECT Abspielmodus aendern
+HELP_PLAYER_08=START Stromsparmodus
+HELP_PLAYER_09=X + HOCH/RUNTER Titel bewerten
+
+BROWSE_ARTIST=Suche nach Artist
+BROWSE_ALBUM=Suche nach Album
+BROWSE_GENRE=Suche nach Genre
+BROWSE_RATING=Suche nach Bewertung
+SEARCH=Suche...
+SCAN_MS=Scanne MS nach Medien
+
+CONFIRM_SCAN_MS_TITLE=Achtung
+CONFIRM_SCAN_MS=Memorystick nach Medien durchsuchen?
+CHECKING_FILE=Pruefe Datein auf Memorystick
+SCANNING=Suche Medien auf Memorystick
+MESSAGEBOX_CONTINUE=Presse X zum fortfahren
+SCAN_FINISHED=Memorystick gescannt
+MEDIA_FOUND=Gefunden: XX Medien.
+ASK_SEARCH_STRING=Suchparameter eingeben
+QUERY_RUNNING_TITLE=Bitte warten
+QUERY_RUNNING=Durchsuche...
+TOTAL_TIME=Gesamtspielzeit
+WORKING=Arbeitet
+
+#This is used for the message "xx% done"
+DONE=fertig
+
+################################################################################
+#2.0.0 BETA2
+################################################################################
+ALL=Alle
+BOOST_NEW=Neu
+BOOST_OLD=Alt
+
+HELP_FILE_BROWSER_TITLE=Datei Explorer Hilfe
+HELP_FILE_BROWSER_01=X Oeffne Datei/Verzeichnis
+HELP_FILE_BROWSER_02=o Verzeichnis nach oben
+HELP_FILE_BROWSER_03=[] Verzeichnis abspielen
+HELP_FILE_BROWSER_04=START Datei/Verzeichnis in W.-liste einreihen
+HELP_FILE_BROWSER_05=SELECT starte USB Verbindung
+
+HELP_PLAYLIST_BROWSER_TITLE=Wiedergabelisten Hilfe
+HELP_PLAYLIST_BROWSER_01=X Abspielen der Liste
+HELP_PLAYLIST_BROWSER_02=o aus Liste entfernen
+HELP_PLAYLIST_BROWSER_03=[] Liste in den Editor Laden
+HELP_PLAYLIST_BROWSER_04=START Liste im Editor einreihen
+
+CONFIRM_ADD_PLAYLIST_TITLE=Achtung
+CONFIRM_ADD_PLAYLIST=Markierte Liste im Editor einreihen?
+
+HELP_PLAYLIST_EDITOR_TITLE=Wiedergabe Editor Hilfe
+HELP_PLAYLIST_EDITOR_01=[] Titel nach oben verschieben
+HELP_PLAYLIST_EDITOR_02=X Titel nach unten verschieben
+HELP_PLAYLIST_EDITOR_03=o aus Wiedergabeliste entfernen
+HELP_PLAYLIST_EDITOR_04=^ Datein untersuchen
+HELP_PLAYLIST_EDITOR_05=START Wiedergabeliste speichern
+HELP_PLAYLIST_EDITOR_06=SELECT Wiedergabeliste entfernen
+HELP_PLAYLIST_EDITOR_07=NOTE Wiedergabeliste starten
+
+HELP_MEDIALIBRARY_TITLE=Medienbibliothek Hilfe
+HELP_MEDIALIBRARY_01=X Oeffne Auswahl/Spiel Titel
+HELP_MEDIALIBRARY_02=o Verzeichnis nach oben gehen
+HELP_MEDIALIBRARY_03=[] Auswahl abspielen
+HELP_MEDIALIBRARY_04=START Auswahl in Wiedergabeliste einreihen
+HELP_MEDIALIBRARY_05=X + HOCH/RUNTER Titel bewerten
+
+HELP_SETTINGS_TITLE=Hilfe Einstellungen
+HELP_SETTINGS_01=LINKS/RECHTS Einstellung wechseln
+HELP_SETTINGS_02=START Einstellung speichern
+
+LOADING_SKIN_TITLE=Bitte Warten
+LOADING_SKIN=Lade neues Thema
+CHECKING_PLAYLIST=Untersuche Datein in Wiedergabeliste
+
+SETTINGS_16=Tastenwiederholungsintervall
+SETTINGS_17=Zeige Intro
+
+BROWSE_TOP100=Top 100
+BROWSE_ALL=Alles durchsuchen

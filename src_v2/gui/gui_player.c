@@ -256,11 +256,14 @@ int drawPlayerStatus(){
 // Draws progress bar:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawProgressBar(){
-    int perc = (*getPercentageFunct)();
+    float perc = (*getPercentageFunct)();
     skinGetPosition("POS_PROGRESS", tempPos);
     oslDrawImageXY(progressBkg, tempPos[0], tempPos[1]);
-    progress->stretchX = (int)((float)progress->sizeX / 100.00 * (float)perc);
-    oslDrawImageXY(progress, tempPos[0], tempPos[1] + 2);
+    OSL_IMAGE *imageTile = oslCreateImageTile(progress, 0, 0, (int)((float)progress->sizeX / 100.00 * perc), progress->sizeY);
+    oslDrawImageXY(imageTile, tempPos[0], tempPos[1] + 2);
+    oslDeleteImage(imageTile);
+    //progress->stretchX = (int)((float)progress->sizeX / 100.00 * perc);
+    //oslDrawImageXY(progress, tempPos[0], tempPos[1] + 2);
     return 0;
 }
 
@@ -300,7 +303,7 @@ int playFile(char *fileName, char *trackMessage){
     struct libraryEntry libEntry;
     int currentSpeed = 0;
     int clock = 0;
-    int lastPercentage = 0;
+    float lastPercentage = 0.0;
     int ratingChangedUpDown = 0;
     int ratingChangedCross = 0;
     int helpShown = 0;
@@ -475,6 +478,8 @@ int playFile(char *fileName, char *trackMessage){
 			if (playerStatus == 1){
 				(*pauseFunct)();
 				playerStatus = !playerStatus;
+				if (userSettings->CLOCK_AUTO)
+					setCpuClock(CLOCK_WHEN_PAUSE);
 			}
 		}
 		headphone = sceHprmIsHeadphoneExist();
@@ -549,6 +554,12 @@ int playFile(char *fileName, char *trackMessage){
                     }else{
                         (*pauseFunct)();
                         playerStatus = !playerStatus;
+						if (userSettings->CLOCK_AUTO){
+							if (playerStatus == 1)
+								setCpuClock(info->defaultCPUClock);
+							else
+								setCpuClock(CLOCK_WHEN_PAUSE);
+						}
                     }
                 }
             }else if (osl_pad.released.up){
@@ -945,7 +956,7 @@ int gui_player(){
             playPlaylist(M3U_getPlaylist(), userSettings->playlistStartIndex);
         }else{
             strcpy(dir, userSettings->selectedBrowserItem);
-            strcpy(dir, userSettings->selectedBrowserItemShort);
+            strcpy(dirShort, userSettings->selectedBrowserItemShort);
 			directoryUp(dir);
             directoryUp(dirShort);
 			playDirectory(dir, dirShort, userSettings->selectedBrowserItemShort);

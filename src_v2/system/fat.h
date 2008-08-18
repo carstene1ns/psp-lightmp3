@@ -105,7 +105,8 @@ typedef union _fat_entry t_fat_entry, * p_fat_entry;
 typedef struct {
 	char filename[256];
 	char longname[256];
-	u32 filesize;
+	char shortname[16];
+    u32 filesize;
 	u16 cdate;
 	u16 ctime;
 	u16 mdate;

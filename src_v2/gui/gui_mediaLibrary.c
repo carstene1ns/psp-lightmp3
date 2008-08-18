@@ -225,8 +225,7 @@ int scanMS(){
 	cpuBoost();
 	ML_checkFiles(checkFileCallback);
     int found = ML_scanMS(fileExt, fileExtCount-1, scanDirCallback, NULL);
-    setBusClock(userSettings->BUS);
-    setCpuClock(userSettings->CLOCK_GUI);
+    cpuRestore();
 
     sprintf(strFound, "%i", found);
 
@@ -444,7 +443,6 @@ void queryDataFeed(int index, struct menuElement *element){
 	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
 		int startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
         sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
-        //oslSetFont(fontMenuNormal); //Done in the menu code
         /*if (index == commonMenu.selected){
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
@@ -783,6 +781,7 @@ int gui_mediaLibrary(){
                 M3U_save(MLtempM3Ufile);
                 addSelectionToPlaylist(currentWhere, currentOrderBy, 1, MLtempM3Ufile);
                 sprintf(userSettings->selectedBrowserItem, "%s", MLtempM3Ufile);
+                sprintf(userSettings->selectedBrowserItemShort, "%s", MLtempM3Ufile);
                 userSettings->playlistStartIndex = commonMenu.selected;
                 mediaLibraryRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_MEDIA_LIBRARY;
@@ -792,6 +791,7 @@ int gui_mediaLibrary(){
                 M3U_save(MLtempM3Ufile);
                 addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, "title", 1, MLtempM3Ufile);
                 sprintf(userSettings->selectedBrowserItem, "%s", MLtempM3Ufile);
+                sprintf(userSettings->selectedBrowserItemShort, "%s", MLtempM3Ufile);
                 userSettings->playlistStartIndex = -1;
                 mediaLibraryRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_MEDIA_LIBRARY;

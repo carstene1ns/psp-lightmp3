@@ -432,8 +432,12 @@ struct fileInfo FLAC_GetTagInfoOnly(char *filename){
 }
 
 
-int FLAC_GetPercentage(){
-	return (int)((float)(samples_played / FLAC_info.hz) / (float)FLAC_info.length * 100.0);
+float FLAC_GetPercentage(){
+    float perc = (float)(samples_played / FLAC_info.hz) / (float)FLAC_info.length * 100.0;
+    if (perc > 100)
+        perc = 100;
+	return perc;
+
 }
 
 

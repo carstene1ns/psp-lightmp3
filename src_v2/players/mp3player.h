@@ -32,7 +32,7 @@ int MP3_EndOfStream();
 struct fileInfo *MP3_GetInfo();
 struct fileInfo MP3_GetTagInfoOnly(char *filename);
 int MP3_GetStatus();
-int MP3_GetPercentage();
+float MP3_GetPercentage();
 void MP3_setVolumeBoostType(char *boostType);
 void MP3_setVolumeBoost(int boost);
 int MP3_getVolumeBoost();

@@ -5,6 +5,9 @@ Version 2.0.0 RC1
 -----------------
 -Added: support for filename with foreign characters (אטלעש...)
         Many thanks to cooleyes for the FAT driver
+-Added: cpu clock set to minimum value when music is paused
+-Added: French, German, Polish, Spanish language
+-Added: Smoother progress bar
 
 
 
