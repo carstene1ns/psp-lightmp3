@@ -171,6 +171,7 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     for (i=0; i<menu->numberOfElements; i++){
         sprintf(name, "SETTINGS_%2.2i", i + 1);
         strcpy(tMenuEl.text, langGetString(name));
+        tMenuEl.icon = NULL;
         tMenuEl.triggerFunction = NULL;
         menu->elements[i] = tMenuEl;
         getSettingVal(i, settingVal);

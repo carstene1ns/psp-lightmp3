@@ -90,7 +90,8 @@ static int MP3_fd = -1;
 static unsigned char fileBuffer[INPUT_BUFFER_SIZE];
 static unsigned int samplesRead;
 static unsigned int MP3_filePos;
-static double fileSize;
+static double fileSize = 0;
+static double tagsize = 0;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -500,9 +501,9 @@ int MP3_Load(char *filename){
         return ERROR_OPENING;
     fileSize = sceIoLseek32(MP3_fd, 0, PSP_SEEK_END);
 	sceIoLseek32(MP3_fd, 0, PSP_SEEK_SET);
-	int startPos = ID3v2TagSize(filename);
-	sceIoLseek32(MP3_fd, startPos, PSP_SEEK_SET);
-    startPos = SeekNextFrameMP3(MP3_fd);
+	tagsize = ID3v2TagSize(filename);
+	sceIoLseek32(MP3_fd, tagsize, PSP_SEEK_SET);
+    SeekNextFrameMP3(MP3_fd);
 
     MP3_isPlaying = FALSE;
 
@@ -577,7 +578,7 @@ float MP3_GetPercentage(){
 	float perc;
 
     if (fileSize > 0){
-        perc = (float)MP3_filePos / (float)fileSize * 100.0;
+        perc = ((float)MP3_filePos - (float)tagsize) / ((float)fileSize - (float)tagsize) * 100.0;
         if (perc > 100)
             perc = 100;
     }else{

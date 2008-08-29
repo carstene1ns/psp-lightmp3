@@ -72,6 +72,7 @@ static short *OutputPtrME = OutputBuffer[0];
 static long MP3ME_suspendPosition = -1;
 static long MP3ME_suspendIsPlaying = 0;
 static double MP3ME_filesize = 0;
+static double MP3ME_tagsize = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Private functions:
@@ -342,6 +343,7 @@ int MP3MEgetInfo(){
 	MP3ME_info.fileSize = size;
 	MP3ME_filesize = size;
     MP3ME_info.framesDecoded = 0;
+    MP3ME_tagsize = ID3v2TagSize(MP3ME_fileName);
 
     double totalBitrate = 0;
     int i = 0;
@@ -545,7 +547,7 @@ float MP3ME_GetPercentage(){
 	float perc;
 
     if (MP3ME_filesize > 0){
-        perc = (float)MP3ME_filePos / (float)MP3ME_filesize * 100.0;
+        perc = ((float)MP3ME_filePos - (float)MP3ME_tagsize) / ((float)MP3ME_filesize - (float)MP3ME_tagsize) * 100.0;
         if (perc > 100)
             perc = 100;
     }else{

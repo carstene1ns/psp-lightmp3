@@ -75,6 +75,7 @@ int clearMenu(struct menuElements *menu){
     if (menu->highlight && menu->highlight != commonMenuHighlight)
         oslDeleteImage(menu->highlight);
     for (i=0; i < menu->numberOfElements; i++){
+        menu->elements[i].icon = NULL;
         strcpy(menu->elements[i].text, "");
         menu->elements[i].triggerFunction = NULL;
     }
@@ -93,11 +94,13 @@ int drawMenu(struct menuElements *menu){
     int i = 0;
     int count = 0;
     int xPos = 0;
+    int xPosIcon = 0;
     int yPos = 0;
 	int normColor[4];
 	int normColorShadow[4];
 	int selColor[4];
 	int selColorShadow[4];
+    int iconWidth = 0;
 
 	skinGetColor("RGBA_MENU_SELECTED_TEXT", selColor);
 	skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", selColorShadow);
@@ -120,14 +123,8 @@ int drawMenu(struct menuElements *menu){
         if (i == menu->selected){
             if (menu->highlight != NULL)
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
-			//skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
-            //skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
-            //setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
             setFontStyle(fontMenuNormal, defaultTextSize, RGBA(selColor[0], selColor[1], selColor[2], selColor[3]), RGBA(selColorShadow[0], selColorShadow[1], selColorShadow[2], selColorShadow[3]), INTRAFONT_ALIGN_LEFT);
 		}else{
-            //skinGetColor("RGBA_MENU_TEXT", tempColor);
-            //skinGetColor("RGBA_MENU_TEXT_SHADOW", tempColorShadow);
-            //setFontStyle(fontMenuNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
             setFontStyle(fontMenuNormal, defaultTextSize, RGBA(normColor[0], normColor[1], normColor[2], normColor[3]), RGBA(normColorShadow[0], normColorShadow[1], normColorShadow[2], normColorShadow[3]), INTRAFONT_ALIGN_LEFT);
 		}
 
@@ -135,13 +132,23 @@ int drawMenu(struct menuElements *menu){
             menu->dataFeedFunction(i, &menu->elements[i]);
 
 		if (strlen(menu->elements[i].text)){
-			if (menu->align == ALIGN_LEFT)
-				xPos = menu->xPos + 4;
-			else if (menu->align == ALIGN_RIGHT)
-				xPos = menu->xPos + menu->width - oslGetStringWidth(menu->elements[i].text) - 4;
-			else if (menu->align == ALIGN_CENTER)
-				xPos = menu->xPos + (menu->width - oslGetStringWidth(menu->elements[i].text)) / 2;
+            if (menu->elements[i].icon != NULL)
+                iconWidth = menu->elements[i].icon->sizeX;
+            else
+                iconWidth = 0;
 
+			if (menu->align == ALIGN_LEFT){
+				xPos = menu->xPos + iconWidth + 4;
+                xPosIcon = menu->xPos + 4;
+			}else if (menu->align == ALIGN_RIGHT){
+				xPos = menu->xPos + menu->width - oslGetStringWidth(menu->elements[i].text) - iconWidth - 4;
+                xPosIcon = menu->xPos + menu->width -  iconWidth - 4;
+            }else if (menu->align == ALIGN_CENTER){
+				xPos = menu->xPos + (menu->width - (oslGetStringWidth(menu->elements[i].text) + iconWidth)) / 2;
+                xPosIcon = xPos - iconWidth;
+            }
+            if (menu->elements[i].icon)
+                oslDrawImageXY(menu->elements[i].icon, xPosIcon, yPos);
 	        oslDrawString(xPos, yPos, menu->elements[i].text);
 		}
         count++;

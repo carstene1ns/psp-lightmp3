@@ -42,6 +42,8 @@ extern OSL_IMAGE *commonMenuHighlight;*/
 
 extern OSL_IMAGE *popupBkg;
 extern OSL_IMAGE *commonMenuHighlight;
+extern OSL_IMAGE *folderIcon;
+extern OSL_IMAGE *musicIcon;
 
 extern OSL_FONT *fontNormal;
 

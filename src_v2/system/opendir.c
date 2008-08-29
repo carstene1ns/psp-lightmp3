@@ -75,9 +75,9 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 	for (i = 0; i < number_of_directory_entries; i++){
 		char fileName[264] = "";
 		if (directoryShort[strlen(directoryShort)-1] != '/')
-			sprintf(fileName, "%s/%s", directoryShort, finfo[i].filename);
+			sprintf(fileName, "%s/%s", directoryShort, finfo[i].shortname);
 		else
-			sprintf(fileName, "%s%s", directoryShort, finfo[i].filename);
+			sprintf(fileName, "%s%s", directoryShort, finfo[i].shortname);
         //fwrite(fileName, sizeof(char), strlen(fileName), log);
 		//Filtro le dir "." e "..":
 		if (finfo[i].filename[0] == '.'){
