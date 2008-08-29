@@ -824,7 +824,9 @@ int gui_mediaLibrary(){
     clearMenu(&commonMenu);
     oslDeleteImage(scanBkg);
     oslDeleteImage(infoBkg);
-	if (coverArt)
+	if (coverArt){
 		oslDeleteImage(coverArt);
+        coverArt = NULL;
+    }
 	return mediaLibraryRetValue;
 }

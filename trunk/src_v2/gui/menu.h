@@ -28,6 +28,7 @@
 extern OSL_FONT *fontMenuNormal;
 
 struct menuElement{
+    OSL_IMAGE *icon;
     char text[264];
     int value;
     char data[1024];

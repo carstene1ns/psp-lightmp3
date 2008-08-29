@@ -255,8 +255,7 @@ int drawPlayerStatus(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draws progress bar:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int drawProgressBar(){
-    float perc = (*getPercentageFunct)();
+int drawProgressBar(float perc){
     skinGetPosition("POS_PROGRESS", tempPos);
     oslDrawImageXY(progressBkg, tempPos[0], tempPos[1]);
     OSL_IMAGE *imageTile = oslCreateImageTile(progress, 0, 0, (int)((float)progress->sizeX / 100.00 * perc), progress->sizeY);
@@ -280,7 +279,7 @@ int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
 	drawFileInfo(info, libEntry, trackMessage);
 	drawFileSpecs(info);
 	drawPlayerStatus();
-	drawProgressBar();
+	drawProgressBar((*getPercentageFunct)());
 	drawCoverArt();
 	if (status == STATUS_HELP)
 		drawHelp("PLAYER");
@@ -409,6 +408,7 @@ int playFile(char *fileName, char *trackMessage){
         drawFileInfo(&tagInfo, &libEntry, trackMessage);
         drawFileSpecs(&tagInfo);
         drawPlayerStatus();
+        drawProgressBar(0.0);
         drawCoverArt();
     	oslEndDrawing();
         oslEndFrame();

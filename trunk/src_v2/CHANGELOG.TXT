@@ -8,7 +8,7 @@ Version 2.0.0 RC1
 -Added: cpu clock set to minimum value when music is paused
 -Added: French, German, Polish, Spanish language
 -Added: Smoother progress bar
-
+-Added: Icons for folder/music in file browser
 
 
 Version 2.0.0 BETA2

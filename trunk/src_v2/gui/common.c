@@ -58,6 +58,9 @@ static OSL_IMAGE *commonHeadphone;
 static OSL_IMAGE *commonCPU;
 OSL_IMAGE *commonMenuHighlight;
 OSL_IMAGE *popupBkg;
+OSL_IMAGE *folderIcon;
+OSL_IMAGE *musicIcon;
+
 
 OSL_FONT *fontNormal;
 
@@ -149,6 +152,24 @@ int loadCommonGraphics(){
     if (!commonMenuHighlight)
         errorLoadImage(buffer);
 
+    sprintf(buffer, "%s/folder.png", userSettings->skinImagesPath);
+    folderIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+    if (!folderIcon){
+        sprintf(buffer, "%sskins/%s/images/folder.png", userSettings->ebootPath, "default");
+        commonBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+        if (!folderIcon)
+            errorLoadImage(buffer);
+    }
+
+    sprintf(buffer, "%s/music.png", userSettings->skinImagesPath);
+    musicIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+    if (!musicIcon){
+        sprintf(buffer, "%sskins/%s/images/music.png", userSettings->ebootPath, "default");
+        commonBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+        if (!musicIcon)
+            errorLoadImage(buffer);
+    }
+
     //sprintf(buffer, "flash0:/font/ltn0.pgf");
 	skinGetString("STR_FONT_NORMAL_NAME", buffer);
     //sprintf(buffer, "%s/fontNormal.pgf", userSettings->skinImagesPath);
@@ -184,6 +205,9 @@ int unLoadCommonGraphics(){
     oslDeleteImage(blankStar);
     oslDeleteImage(helpBkg);
     oslDeleteImage(commonMenuHighlight);
+    oslDeleteImage(folderIcon);
+    oslDeleteImage(musicIcon);
+
     oslDeleteFont(fontNormal);
     return 0;
 }
@@ -371,10 +395,11 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
     menu->first = 0;
     menu->selected = 0;
     for (i=0; i<directory->number_of_directory_entries; i++){
+        strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
         if (FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode))
-            sprintf(menu->elements[i].text, "/%s", directory->directory_entry[i].longname);
+            menu->elements[i].icon = folderIcon;
         else
-            strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
+            menu->elements[i].icon = musicIcon;
         menu->elements[i].triggerFunction = NULL;
         if (!strcmp(selected, directory->directory_entry[i].d_name)){
             menu->first = i;
