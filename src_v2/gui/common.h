@@ -67,4 +67,6 @@ int formatHHMMSS(int seconds, char *timeString);
 int initFonts();
 void setFontStyle(OSL_FONT *f, float size, unsigned int color, unsigned int shadowColor, unsigned int options);
 int getOSKlang();
+int limitString(const char *string, const int width, char *target);
+
 #endif

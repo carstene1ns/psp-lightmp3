@@ -156,7 +156,7 @@ int loadCommonGraphics(){
     folderIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!folderIcon){
         sprintf(buffer, "%sskins/%s/images/folder.png", userSettings->ebootPath, "default");
-        commonBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+        folderIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         if (!folderIcon)
             errorLoadImage(buffer);
     }
@@ -165,7 +165,7 @@ int loadCommonGraphics(){
     musicIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!musicIcon){
         sprintf(buffer, "%sskins/%s/images/music.png", userSettings->ebootPath, "default");
-        commonBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+        musicIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         if (!musicIcon)
             errorLoadImage(buffer);
     }
@@ -187,28 +187,46 @@ int loadCommonGraphics(){
 int unLoadCommonGraphics(){
     int i = 0;
     oslDeleteImage(commonBkg);
+    commonBkg = NULL;
     oslDeleteImage(commonTopToolbar);
+    commonTopToolbar = NULL;
     oslDeleteImage(commonBottomToolbar);
+    commonBottomToolbar = NULL;
     for (i=0; i<5; i++){
         oslDeleteImage(commonButtons[i]);
+        commonButtons[i] = NULL;
         oslDeleteImage(commonButtonsSel[i]);
+        commonButtonsSel[i] = NULL;
     }
     oslDeleteImage(commonBattery);
+    commonBattery = NULL;
     oslDeleteImage(commonBatteryLow);
+    commonBatteryLow = NULL;
     oslDeleteImage(commonBatteryCharging);
+    commonBatteryCharging = NULL;
     oslDeleteImage(commonVolume);
+    commonVolume = NULL;
     oslDeleteImage(commonHeadphone);
+    commonHeadphone = NULL;
     oslDeleteImage(commonCPU);
+    commonCPU = NULL;
 
     oslDeleteImage(popupBkg);
+    popupBkg = NULL;
     oslDeleteImage(star);
+    star = NULL;
     oslDeleteImage(blankStar);
+    blankStar = NULL;
     oslDeleteImage(helpBkg);
+    helpBkg = NULL;
     oslDeleteImage(commonMenuHighlight);
+    commonMenuHighlight = NULL;
     oslDeleteImage(folderIcon);
+    folderIcon = NULL;
     oslDeleteImage(musicIcon);
-
+    musicIcon = NULL;
     oslDeleteFont(fontNormal);
+    fontNormal = NULL;
     return 0;
 }
 
@@ -571,4 +589,18 @@ int getOSKlang(){
 	if (strlen(langCode))
 		retValue = atoi(langCode);
 	return retValue;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Limit a string to the passed maximum width:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int limitString(const char *string, const int width, char *target){
+    strcpy(target, string);
+    int inLen = strlen(target);
+
+    while (oslGetStringWidth(target) > width){
+        target[--inLen] = '\0';
+    }
+    return 0;
 }

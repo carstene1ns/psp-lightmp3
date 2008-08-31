@@ -261,6 +261,7 @@ int drawProgressBar(float perc){
     OSL_IMAGE *imageTile = oslCreateImageTile(progress, 0, 0, (int)((float)progress->sizeX / 100.00 * perc), progress->sizeY);
     oslDrawImageXY(imageTile, tempPos[0], tempPos[1] + 2);
     oslDeleteImage(imageTile);
+    imageTile = NULL;
     //progress->stretchX = (int)((float)progress->sizeX / 100.00 * perc);
     //oslDrawImageXY(progress, tempPos[0], tempPos[1] + 2);
     return 0;
@@ -688,8 +689,10 @@ int playFile(char *fileName, char *trackMessage){
     unsetAudioFunctions();
 
     //Unload images:
-    if (coverArt)
+    if (coverArt){
         oslDeleteImage(coverArt);
+        coverArt = NULL;
+    }
 
     //Update media Library info:
     if (lastPercentage >= 50)
@@ -966,11 +969,17 @@ int gui_player(){
     }
 
     oslDeleteImage(noCoverArt);
+    noCoverArt = NULL;
     oslDeleteImage(fileInfoBkg);
+    fileInfoBkg = NULL;
     oslDeleteImage(fileSpecsBkg);
+    fileSpecsBkg = NULL;
     oslDeleteImage(playerStatusBkg);
+    playerStatusBkg = NULL;
     oslDeleteImage(progressBkg);
+    progressBkg = NULL;
     oslDeleteImage(progress);
+    progress = NULL;
 
     if (userSettings->CLOCK_AUTO)
       setCpuClock(userSettings->CLOCK_GUI);

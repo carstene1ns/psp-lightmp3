@@ -194,6 +194,7 @@ int splashThread(SceSize args, void *argp){
 
         sceKernelDelayThread(3*1000000);
         oslDeleteImage(splash);
+        splash = NULL;
     }
     sceKernelExitDeleteThread(0);*/
     return 0;
