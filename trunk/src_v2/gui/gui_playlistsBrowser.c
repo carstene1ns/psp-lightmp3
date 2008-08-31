@@ -237,6 +237,7 @@ int gui_playlistsBrowser(){
     //unLoad images:
     clearMenu(&commonMenu);
     oslDeleteImage(playlistInfoBkg);
+    playlistInfoBkg = NULL;
 
     return playlistsBrowserRetValue;
 }

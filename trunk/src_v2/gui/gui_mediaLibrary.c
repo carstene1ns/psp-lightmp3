@@ -433,11 +433,13 @@ void queryDataFeed(int index, struct menuElement *element){
         sprintf(buffer, "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
         strcpy(element->text, buffer);
         strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+        element->icon = folderIcon;
         element->triggerFunction = enterSelection;
     }else if (mlQueryType == QUERY_SINGLE_ENTRY){
         strcpy(element->text, MLresult[index - mlBufferPosition].strField);
         //sprintf(element->text, "%i.%s", index, MLresult[index - mlBufferPosition].strField);
 		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+        element->icon = musicIcon;
         element->triggerFunction = NULL;
     }else if (mlQueryType == QUERY_COUNT_RATING){
 	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
@@ -823,7 +825,9 @@ int gui_mediaLibrary(){
 
     clearMenu(&commonMenu);
     oslDeleteImage(scanBkg);
+    scanBkg = NULL;
     oslDeleteImage(infoBkg);
+    infoBkg = NULL;
 	if (coverArt){
 		oslDeleteImage(coverArt);
         coverArt = NULL;

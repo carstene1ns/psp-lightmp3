@@ -213,11 +213,15 @@ int changeSettingVal(int index, int delta){
                 strcpy(userSettings->skinName, skinsList[current]);
                 sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
                 skinLoad(buffer);
+                //debugMessageBox("skin's settings loaded");
                 sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
-                unLoadCommonGraphics();
 				clearMenu(&commonMenu);
 			    clearMenu(&commonSubMenu);
-				loadCommonGraphics();
+                //debugMessageBox("cleared menues");
+                unLoadCommonGraphics();
+                //debugMessageBox("unloaded common");
+                loadCommonGraphics();
+                //debugMessageBox("loaded common");
 				endMenu();
 				initMenu();
                 initSettingsMenu();

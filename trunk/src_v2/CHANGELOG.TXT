@@ -9,6 +9,7 @@ Version 2.0.0 RC1
 -Added: French, German, Polish, Spanish language
 -Added: Smoother progress bar
 -Added: Icons for folder/music in file browser
+-Added: New icon and PIC1.PNG (many thanks to dario1crisafulli)
 
 
 Version 2.0.0 BETA2

@@ -64,6 +64,7 @@ int buildMenuFromPlaylist(struct menuElements *menu){
         //else
         //    sprintf(tMenuEl.text, "**%s", entry->title);
         tMenuEl.triggerFunction = NULL;
+        tMenuEl.icon = musicIcon;
         menu->elements[i] = tMenuEl;
     }
     return 0;
@@ -339,6 +340,7 @@ int gui_playlistEditor(){
     //unLoad images:
     clearMenu(&commonMenu);
     oslDeleteImage(trackInfoBkg);
+    trackInfoBkg = NULL;
 
     return playlistEditorRetValue;
 }

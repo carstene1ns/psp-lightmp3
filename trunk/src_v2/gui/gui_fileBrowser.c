@@ -392,8 +392,10 @@ int gui_fileBrowser(){
     }
     opendir_close(&directory);
     //unLoad images:
-	if (coverArt)
+	if (coverArt){
 		oslDeleteImage(coverArt);
+        coverArt = NULL;
+    }
 	clearMenu(&commonMenu);
 
     strcpy(userSettings->lastBrowserDir, curDir);
