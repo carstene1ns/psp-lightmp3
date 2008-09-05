@@ -59,10 +59,8 @@ int buildMenuFromPlaylist(struct menuElements *menu){
     menu->numberOfElements = M3U_getSongCount();
     for (i=0; i<menu->numberOfElements; i++){
         entry = M3U_getSong(i);
-        //if (fileExists(entry->fileName) >= 0)
-            strcpy(tMenuEl.text, entry->title);
-        //else
-        //    sprintf(tMenuEl.text, "**%s", entry->title);
+        limitString(entry->title, menu->width, tMenuEl.text);
+        //strcpy(tMenuEl.text, entry->title);
         tMenuEl.triggerFunction = NULL;
         tMenuEl.icon = musicIcon;
         menu->elements[i] = tMenuEl;

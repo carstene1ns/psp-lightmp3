@@ -303,7 +303,7 @@ int playFile(char *fileName, char *trackMessage){
     struct libraryEntry libEntry;
     int currentSpeed = 0;
     int clock = 0;
-    float lastPercentage = 0.0;
+    float lastPercentage = 0.0f;
     int ratingChangedUpDown = 0;
     int ratingChangedCross = 0;
     int helpShown = 0;

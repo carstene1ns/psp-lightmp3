@@ -67,7 +67,7 @@ struct menuElements commonSubMenu;
 int tempPos[2];
 int tempColor[4];
 int tempColorShadow[4];
-float defaultTextSize;
+float defaultTextSize = 0.0f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions imported from prx:

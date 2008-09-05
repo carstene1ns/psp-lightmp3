@@ -314,7 +314,7 @@ int MP3MEgetInfo(){
 	struct mad_stream stream;
 	struct mad_header header;
     int timeFromID3 = 0;
-    float mediumBitrate = 0;
+    float mediumBitrate = 0.0f;
 
     getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
 
@@ -544,7 +544,7 @@ struct fileInfo *MP3ME_GetInfo(){
 
 float MP3ME_GetPercentage(){
 	//Calcolo posizione in %:
-	float perc;
+	float perc = 0.0f;
 
     if (MP3ME_filesize > 0){
         perc = ((float)MP3ME_filePos - (float)MP3ME_tagsize) / ((float)MP3ME_filesize - (float)MP3ME_tagsize) * 100.0;
