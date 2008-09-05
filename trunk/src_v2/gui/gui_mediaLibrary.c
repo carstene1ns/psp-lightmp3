@@ -430,17 +430,22 @@ void queryDataFeed(int index, struct menuElement *element){
     }
 
     if (mlQueryType == QUERY_COUNT){
-        sprintf(buffer, "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
-        strcpy(element->text, buffer);
-        strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
-        element->icon = folderIcon;
-        element->triggerFunction = enterSelection;
+        if (!strlen(element->text)){
+            sprintf(buffer, "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
+            //strcpy(element->text, buffer);
+            strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+            element->icon = folderIcon;
+            limitString(buffer, commonMenu.width - element->icon->sizeX - 6, element->text);
+            element->triggerFunction = enterSelection;
+        }
     }else if (mlQueryType == QUERY_SINGLE_ENTRY){
-        strcpy(element->text, MLresult[index - mlBufferPosition].strField);
-        //sprintf(element->text, "%i.%s", index, MLresult[index - mlBufferPosition].strField);
-		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
-        element->icon = musicIcon;
-        element->triggerFunction = NULL;
+        if (!strlen(element->text)){
+            //strcpy(element->text, MLresult[index - mlBufferPosition].strField);
+            strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+            element->icon = musicIcon;
+            limitString(MLresult[index - mlBufferPosition].strField, commonMenu.width - element->icon->sizeX - 6, element->text);
+            element->triggerFunction = NULL;
+        }
     }else if (mlQueryType == QUERY_COUNT_RATING){
 	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
 		int startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));

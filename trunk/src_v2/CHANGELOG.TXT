@@ -10,6 +10,7 @@ Version 2.0.0 RC1
 -Added: Smoother progress bar
 -Added: Icons for folder/music in file browser
 -Added: New icon and PIC1.PNG (many thanks to dario1crisafulli)
+-Fixed: Strings are limited inside the menu area.
 
 
 Version 2.0.0 BETA2

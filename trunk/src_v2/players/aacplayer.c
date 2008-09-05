@@ -287,7 +287,7 @@ struct fileInfo AAC_GetTagInfoOnly(char *filename){
 
 
 float AAC_GetPercentage(){
-	float perc;
+	float perc = 0.0f;
 
     if (AAC_fileSize > 0){
         perc = (float)AAC_filePos / (float)AAC_fileSize * 100.0;

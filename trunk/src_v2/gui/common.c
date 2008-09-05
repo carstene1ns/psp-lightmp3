@@ -412,13 +412,17 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
 
     menu->first = 0;
     menu->selected = 0;
+    oslSetFont(fontMenuNormal);
+
     for (i=0; i<directory->number_of_directory_entries; i++){
-        strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
+        //strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
         if (FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode))
             menu->elements[i].icon = folderIcon;
         else
             menu->elements[i].icon = musicIcon;
         menu->elements[i].triggerFunction = NULL;
+        limitString(directory->directory_entry[i].longname, menu->width - menu->elements[i].icon->sizeX - 6, menu->elements[i].text);
+
         if (!strcmp(selected, directory->directory_entry[i].d_name)){
             menu->first = i;
             menu->selected = i;
@@ -599,8 +603,7 @@ int limitString(const char *string, const int width, char *target){
     strcpy(target, string);
     int inLen = strlen(target);
 
-    while (oslGetStringWidth(target) > width){
+    while (oslGetStringWidth(target) > width)
         target[--inLen] = '\0';
-    }
     return 0;
 }

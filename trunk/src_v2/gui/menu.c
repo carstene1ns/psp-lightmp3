@@ -58,6 +58,19 @@ int endMenu(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// clearPage: clear elements currently visualized:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int clearPage(struct menuElements *menu){
+    int i = 0;
+    for (i=menu->first; i<menu->first + menu->maxNumberVisible; i++){
+        if (i >= menu->numberOfElements)
+            break;
+        strcpy(menu->elements[i].text, "");
+    }
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // clearMenu: clear menu data:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int clearMenu(struct menuElements *menu){
@@ -90,6 +103,7 @@ int clearMenu(struct menuElements *menu){
     menu->dataFeedFunction = NULL;
     return 0;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // drawMenu: draws a menu on video
@@ -170,26 +184,38 @@ int processMenuKeys(struct menuElements *menu){
     if (menu->numberOfElements && osl_pad.pressed.down){
         if (menu->selected < menu->numberOfElements - 1){
             menu->selected++;
-            if (menu->selected >= menu->first + menu->maxNumberVisible)
+            if (menu->selected >= menu->first + menu->maxNumberVisible){
                 menu->first++;
+                if (menu->dataFeedFunction != NULL)
+                    strcpy(menu->elements[menu->first + menu->maxNumberVisible].text, "");
+            }
         }else{
             menu->selected = 0;
             menu->first = 0;
+            if (menu->dataFeedFunction != NULL)
+                clearPage(menu);
         }
     }else if (menu->numberOfElements && osl_pad.pressed.up){
         if (menu->selected > 0){
             menu->selected--;
-            if (menu->selected < menu->first)
+            if (menu->selected < menu->first){
                 menu->first--;
+                if (menu->dataFeedFunction != NULL)
+                    strcpy(menu->elements[menu->first].text, "");
+            }
         }else{
             menu->selected = menu->numberOfElements - 1;
             menu->first = menu->selected - menu->maxNumberVisible + 1;
             if (menu->first < 0)
                 menu->first = 0;
+            if (menu->dataFeedFunction != NULL)
+                clearPage(menu);
         }
     }else if (menu->numberOfElements && menu->fastScrolling && osl_pad.pressed.right){
     	if (menu->first + menu->maxNumberVisible < menu->numberOfElements){
     		menu->first = menu->first + menu->maxNumberVisible;
+            if (menu->dataFeedFunction != NULL)
+                clearPage(menu);
     		menu->selected += menu->maxNumberVisible;
     		if (menu->selected > menu->numberOfElements - 1){
     			menu->selected = menu->numberOfElements - 1;
@@ -205,6 +231,8 @@ int processMenuKeys(struct menuElements *menu){
     		menu->first = 0;
     		menu->selected = 0;
     	}
+        if (menu->dataFeedFunction != NULL)
+            clearPage(menu);
     }else if (menu->numberOfElements && osl_pad.pressed.cross){
         selected = menu->elements[menu->selected];
         if (selected.triggerFunction != NULL)

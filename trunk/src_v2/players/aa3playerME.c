@@ -40,7 +40,7 @@ static int AA3ME_thid = -1;
 static int AA3ME_audio_channel = 0;
 static int AA3ME_eof = 0;
 static struct fileInfo AA3ME_info;
-static float AA3ME_playingTime = 0;
+static float AA3ME_playingTime = 0.0f;
 static int AA3ME_volume = 0;
 static int AA3ME_playingSpeed = 0; // 0 = normal
 int AA3ME_defaultCPUClock = 20;
@@ -364,7 +364,7 @@ int AA3MEgetInfo(){
 
     u8 ea3_header[0x60];
     int tag_size;
-    float totalPlayingTime = 0;
+    float totalPlayingTime = 0.0f;
 
     tag_size = GetID3TagSize(AA3ME_fileName);
     fd = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);

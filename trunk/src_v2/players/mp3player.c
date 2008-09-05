@@ -323,7 +323,7 @@ int MP3getInfo(){
 	struct mad_stream stream;
 	struct mad_header header;
     int timeFromID3 = 0;
-    float mediumBitrate = 0;
+    float mediumBitrate = 0.0f;
 
     getMP3TagInfo(MP3_fileName, &MP3_info);
 
@@ -575,7 +575,7 @@ void MP3_GetTimeString(char *dest){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float MP3_GetPercentage(){
 	//Calcolo posizione in %:
-	float perc;
+	float perc = 0.0f;
 
     if (fileSize > 0){
         perc = ((float)MP3_filePos - (float)tagsize) / ((float)fileSize - (float)tagsize) * 100.0;

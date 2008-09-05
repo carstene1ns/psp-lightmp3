@@ -105,7 +105,7 @@ void addDirectoryToPlaylist(char *dirName, char *dirNameShort){
 	char fileToAdd[264] = "";
 	char message[100] = "";
 	int i;
-	float perc;
+	float perc = 0.0f;
 	struct opendir_struct dirToAdd;
 
 	cpuBoost();
