@@ -105,7 +105,8 @@ void addDirectoryToPlaylist(char *dirName, char *dirNameShort){
 	char fileToAdd[264] = "";
 	char message[100] = "";
 	int i;
-	float perc = 0.0f;
+	int perc = 0;
+    int oldPerc = -1;
 	struct opendir_struct dirToAdd;
 
 	cpuBoost();
@@ -114,18 +115,21 @@ void addDirectoryToPlaylist(char *dirName, char *dirNameShort){
 		M3U_clear();
         M3U_open(tempM3Ufile);
 		for (i = 0; i < dirToAdd.number_of_directory_entries; i++){
-			perc = ((float)(i + 1) / (float)dirToAdd.number_of_directory_entries) * 100.0;
-			snprintf(message, sizeof(message), "%3.3i%% %s", (int)perc, langGetString("DONE"));
+			perc = (int)((i+1.0) / dirToAdd.number_of_directory_entries * 100.0);
 
-            oslStartDrawing();
-            drawCommonGraphics();
-            drawButtonBar(MODE_FILEBROWSER);
-            drawMenu(&commonMenu);
-			drawWait(langGetString("ADDING_PLAYLIST"), message);
-        	oslEndDrawing();
-            oslEndFrame();
-        	oslSyncFrame();
+            if (perc != oldPerc){
+                oldPerc = perc;
+                snprintf(message, sizeof(message), "%3.3i%% %s", perc, langGetString("DONE"));
 
+                oslStartDrawing();
+                drawCommonGraphics();
+                drawButtonBar(MODE_FILEBROWSER);
+                drawMenu(&commonMenu);
+                drawWait(langGetString("ADDING_PLAYLIST"), message);
+                oslEndDrawing();
+                oslEndFrame();
+                oslSyncFrame();
+            }
 			strcpy(fileToAdd, dirNameShort);
 			if (fileToAdd[strlen(fileToAdd)-1] != '/')
 				strcat(fileToAdd, "/");

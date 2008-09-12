@@ -189,3 +189,4 @@ MANY THANKS TO
 -fabiom, borgqueenx, Mizou93, coach777, Magic PSP for tanslations.
 -nextos for help with unicode and libiconv
 -cooleyes for the fat driver
+-dario1crisafulli for the skins, ICON0 and PIC1 images.
