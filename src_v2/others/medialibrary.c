@@ -142,7 +142,36 @@ int ML_createEmptyDB(char *directory, char *fileName){
     }
 
 
-	sprintf(sql, "create index media_idx_01 on media (artist, album);");
+	char indexes[20][100] = {
+							 "artist, album", 
+							 "genre",
+							 "rating", 
+							 "played desc, rating desc, title", 
+							 "title, artist",
+ 							 "artist, album, tracknumber",
+                             "artist, album, title",
+                             "artist, title",
+                             "title",
+                             "year, title",
+                             "year, artist, album, tracknumber",
+                             "year, artist, album, title",
+                             "rating desc, artist, album, tracknumber",
+                             "rating desc, artist, album, title"
+							};
+
+	int i = 0;
+	for (i=0; i<20; i++){
+		if (!strlen(indexes[i]))
+			break;
+		sprintf(sql, "create index media_idx_%2.2i on media (%s);", i + 1, indexes[i]);
+		result = sqlite3_exec(db, sql, NULL, 0, &zErr);
+		if (result != SQLITE_OK){
+			ML_INTERNAL_closeDB();
+			return ML_ERROR_SQL;
+		}
+	}
+
+	/*sprintf(sql, "create index media_idx_01 on media (artist, album);");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
@@ -175,7 +204,7 @@ int ML_createEmptyDB(char *directory, char *fileName){
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
-    }
+    }*/
 
 	ML_INTERNAL_closeDB();
     return 0;

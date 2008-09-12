@@ -47,8 +47,9 @@
 #define QUERY_COUNT_RATING 2
 
 int buildMainMenu();
-int buildQueryMenu(char *select, int (*cancelFunction)());
+int buildQueryMenu(char *select, char *where, char *orderBy, int (*cancelFunction)());
 void drawMLinfo();
+int (*currentCancelFunction)() = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -67,8 +68,8 @@ static int mlBufferPosition = 0;
 static OSL_IMAGE *scanBkg;
 static OSL_IMAGE *infoBkg;
 
-static char currentSql[ML_SQLMAXLENGTH] = "";
-static char previousSql[ML_SQLMAXLENGTH] = "";
+static char currentSelect[ML_SQLMAXLENGTH] = "";
+static char previousSelect[ML_SQLMAXLENGTH] = "";
 static char currentWhere[ML_SQLMAXLENGTH] = "";
 static char currentOrderBy[ML_SQLMAXLENGTH] = "";
 static char previousWhere[ML_SQLMAXLENGTH] = "";
@@ -78,6 +79,20 @@ static char tempSql[ML_SQLMAXLENGTH] = "";
 static OSL_IMAGE *coverArt = NULL;
 static int coverArtFailed = 0;
 static struct libraryEntry localResult[ML_BUFFERSIZE];
+
+#define MAX_ORDER_BY 9
+static int selectedOrderBy = 0;
+static char orderBy[MAX_ORDER_BY][100] = {
+                                          "artist, album, tracknumber",
+                                          "artist, album, title",
+                                          "artist, title",
+                                          "title",
+                                          "year, title",
+                                          "year, artist, album, tracknumber",
+                                          "year, artist, album, title",
+                                          "rating desc, artist, album, tracknumber",
+                                          "rating desc, artist, album, title"
+                                         };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Add selection to playlist:
@@ -92,6 +107,9 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
     int i = 0;
 	int count = ML_countRecords(where);
 	if (count > 0){
+        int perc = 0;
+        int oldPerc = -1;
+
         M3U_clear();
         M3U_open(m3uName);
         ML_queryDB(where, orderBy, offset, ML_BUFFERSIZE, localResult);
@@ -101,16 +119,28 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
                 ML_queryDB(where, orderBy, offset, ML_BUFFERSIZE, localResult);
             }
 
-            oslStartDrawing();
-            drawCommonGraphics();
-            drawButtonBar(MODE_MEDIA_LIBRARY);
-            drawMenu(&commonMenu);
-            drawMLinfo();
+            perc = (int)((i+1.0) / count*100.0);
 
-            snprintf(message, sizeof(message), "%3.3i%% %s", (int)((i+1.0) / count*100.0), langGetString("DONE"));
+            if (oldPerc != perc){
+                oldPerc = perc;
+                oslStartDrawing();
+                drawCommonGraphics();
+                drawButtonBar(MODE_MEDIA_LIBRARY);
+                drawMenu(&commonMenu);
+                drawMLinfo();
+                snprintf(message, sizeof(message), "%3.3i%% %s", perc, langGetString("DONE"));
+
+                if (!fastMode)
+                    drawWait(langGetString("ADDING_PLAYLIST"), message);
+                else
+                    drawWait(langGetString("WORKING"), message);
+
+                oslEndDrawing();
+                oslEndFrame();
+                oslSyncFrame();
+            }
+
             if (!fastMode){
-                drawWait(langGetString("ADDING_PLAYLIST"), message);
-
         	    if (localResult[i - offset].seconds > 0){
                     M3U_addSong(localResult[i - offset].path, localResult[i - offset].seconds, localResult[i - offset].title);
                 }else{
@@ -131,14 +161,9 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
                     unsetAudioFunctions();
                 }
             }else{
-                drawWait(langGetString("WORKING"), message);
-
                 getFileName(localResult[i - offset].path, onlyName);
                 M3U_addSong(localResult[i - offset].path, 0, onlyName);
             }
-        	oslEndDrawing();
-            oslEndFrame();
-        	oslSyncFrame();
         }
         M3U_save(m3uName);
     }
@@ -382,10 +407,7 @@ void drawMLinfo(){
 // Exit from current selection:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int exitSelection(){
-    strcpy(tempSql, previousSql);
-    buildQueryMenu(tempSql, backToMainMenu);
-    strcpy(currentWhere, previousWhere);
-    strcpy(currentOrderBy, previousOrderBy);
+    buildQueryMenu(previousSelect, previousWhere, previousOrderBy, backToMainMenu);
 	mlQueryType = mlPrevQueryType;
     return 0;
 }
@@ -394,18 +416,16 @@ int exitSelection(){
 // Enter in current selection:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int enterSelection(){
-    sprintf(tempSql, "Select media.*, \
-                             title || ' - ' || artist || ' (' || album || ')' as strfield,  \
-                             'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-                      From media \
-                      Where %s \
-                      Order by title ", commonMenu.elements[commonMenu.selected].data);
-    strcpy(previousSql, currentSql);
+    strcpy(previousSelect, currentSelect);
     strcpy(previousWhere, currentWhere);
     strcpy(previousOrderBy, currentOrderBy);
-	strcpy(currentWhere, commonMenu.elements[commonMenu.selected].data);
-    strcpy(currentOrderBy, "title");
-	buildQueryMenu(tempSql, exitSelection);
+
+	buildQueryMenu("Select media.*, \
+								   title || ' - ' || artist || ' (' || album || ')' as strfield,  \
+								   'path = ''' || replace(path, '''', '''''') || '''' as datafield \
+							From media ", 
+				    commonMenu.elements[commonMenu.selected].data, 
+					"title", exitSelection);
     mlPrevQueryType = mlQueryType;
     mlQueryType = QUERY_SINGLE_ENTRY;
     oslReadKeys(); //To avoid reread the CROSS button after entering selection
@@ -425,7 +445,7 @@ void queryDataFeed(int index, struct menuElement *element){
                 mlBufferPosition = 0;
         }
 		cpuBoost();
-		ML_queryDBSelect(currentSql, mlBufferPosition, ML_BUFFERSIZE, MLresult);
+		ML_queryDBSelect(currentSelect, mlBufferPosition, ML_BUFFERSIZE, MLresult);
         cpuRestore();
     }
 
@@ -465,17 +485,29 @@ void queryDataFeed(int index, struct menuElement *element){
     }
 }
 
-int buildQueryMenu(char *select, int (*cancelFunction)()){
+int buildQueryMenu(char *select, char *where, char *orderBy, int (*cancelFunction)()){
     drawQueryRunning();
     mediaLibraryStatus = STATUS_QUERYMENU;
 
 	cpuBoost();
-    mlQueryCount = ML_countRecordsSelect(select);
+
+	if (strlen(where) && strlen(orderBy))
+		sprintf(tempSql, "%s Where %s Order By %s", select, where, orderBy);
+	else
+		sprintf(tempSql, "%s", select);
+    mlQueryCount = ML_countRecordsSelect(tempSql);
 	if (mlQueryCount > MENU_MAX_ELEMENTS)
 		mlQueryCount = MENU_MAX_ELEMENTS;
-    ML_queryDBSelect(select, 0, ML_BUFFERSIZE, MLresult);
+    ML_queryDBSelect(tempSql, 0, ML_BUFFERSIZE, MLresult);
 	cpuRestore();
-	strcpy(currentSql, select);
+
+	if (select != currentSelect)
+		strcpy(currentSelect, select);
+	if (where != currentWhere)
+		strcpy(currentWhere, where);
+	if (orderBy != currentOrderBy)
+		strcpy(currentOrderBy, orderBy);
+	currentCancelFunction = cancelFunction;
 
     clearMenu(&commonMenu);
     commonMenu.numberOfElements = mlQueryCount;
@@ -509,15 +541,13 @@ int browseAll(){
     mlQueryType = QUERY_SINGLE_ENTRY;
     mlQueryCount = -1;
     mlBufferPosition = 0;
-    sprintf(tempSql, "Select media.*, \
-                             title || ' - ' || artist || ' (' || album || ')' as strfield,  \
-                             'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-                      From media \
-                      Order by title, artist");
-
-	strcpy(currentWhere, "1=1");
-	strcpy(currentOrderBy, "title, artist");
-	buildQueryMenu(tempSql, backToMainMenu);
+	buildQueryMenu("Select media.*, \
+                           title || ' - ' || artist || ' (' || album || ')' as strfield,  \
+                           'path = ''' || replace(path, '''', '''''') || '''' as datafield \
+                    From media ", 
+					"1=1",
+					"title, artist",
+					backToMainMenu);
     oslReadKeys(); //To avoid reread the CROSS button after entering selection
 	return 0;
 }
@@ -530,7 +560,7 @@ int browseByArtist(){
     mlQueryType = QUERY_COUNT;
     mlQueryCount = -1;
     mlBufferPosition = 0;
-    buildQueryMenu("Select artist as strfield, 'artist = ''' || replace(artist, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by artist order by upper(artist)", backToMainMenu);
+    buildQueryMenu("Select artist as strfield, 'artist = ''' || replace(artist, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by artist order by upper(artist)", "", "", backToMainMenu);
     return 0;
 }
 
@@ -542,7 +572,7 @@ int browseByAlbum(){
     mlQueryType = QUERY_COUNT;
     mlQueryCount = -1;
     mlBufferPosition = 0;
-    buildQueryMenu("Select album || ' - ' || artist as strfield, 'artist = ''' || replace(artist, '''', '''''') || ''' and album = ''' || replace(album, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by artist, album order by upper(album), upper(artist)", backToMainMenu);
+    buildQueryMenu("Select album || ' - ' || artist as strfield, 'artist = ''' || replace(artist, '''', '''''') || ''' and album = ''' || replace(album, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by artist, album order by upper(album), upper(artist)", "", "", backToMainMenu);
     return 0;
 }
 
@@ -553,7 +583,7 @@ int browseByGenre(){
     mlQueryType = QUERY_COUNT;
     mlQueryCount = -1;
     mlBufferPosition = 0;
-    buildQueryMenu("Select genre as strfield, 'genre = ''' || replace(genre, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by genre order by upper(genre)", backToMainMenu);
+    buildQueryMenu("Select genre as strfield, 'genre = ''' || replace(genre, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by genre order by upper(genre)", "", "", backToMainMenu);
     return 0;
 }
 
@@ -564,7 +594,7 @@ int browseByRating(){
     mlQueryType = QUERY_COUNT_RATING;
     mlQueryCount = -1;
     mlBufferPosition = 0;
-    buildQueryMenu("Select cast(coalesce(rating, 0) as varchar) as strfield, 'rating = ' || cast(coalesce(rating, 0) as varchar) as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by coalesce(rating, 0) order by coalesce(rating, 0) desc", backToMainMenu);
+    buildQueryMenu("Select cast(coalesce(rating, 0) as varchar) as strfield, 'rating = ' || cast(coalesce(rating, 0) as varchar) as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by coalesce(rating, 0) order by coalesce(rating, 0) desc", "", "", backToMainMenu);
     return 0;
 }
 
@@ -576,17 +606,13 @@ int browseTop100(){
     mlQueryType = QUERY_SINGLE_ENTRY;
     mlQueryCount = -1;
     mlBufferPosition = 0;
-    sprintf(tempSql, "Select media.*, \
-                             title || ' - ' || artist || ' (' || album || ')' as strfield,  \
-                             'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-                      From media \
-                      Order by played desc, rating desc, title LIMIT 100");
-
-	sprintf(currentWhere, "path in (Select path \
-						   From media \
-						   Order by played desc, rating desc, title LIMIT 100)");
-	strcpy(currentOrderBy, "played desc, rating desc, title");
-	buildQueryMenu(tempSql, backToMainMenu);
+	buildQueryMenu("Select media.*, \
+                           title || ' - ' || artist || ' (' || album || ')' as strfield,  \
+                           'path = ''' || replace(path, '''', '''''') || '''' as datafield \
+                    From media",
+					"1=1",
+					"played desc, rating desc, title LIMIT 100",
+					backToMainMenu);
     oslReadKeys(); //To avoid reread the CROSS button after entering selection
     return 0;
 }
@@ -642,25 +668,21 @@ int search(){
 		oslEndDrawing();
 		oslSyncFrame();
 
-		if (strlen(searchString)){
-			mlQueryType = QUERY_SINGLE_ENTRY;
-			mlQueryCount = -1;
-			mlBufferPosition = 0;
-			sprintf(tempSql, "Select media.*, title || ' - ' || artist as strfield, \
-									'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-						 	  From media \
-							  Where title like '%%%s%%' \
-								 or artist like '%%%s%%' \
-								 or album like '%%%s%%' \
-							  Order by title, artist, album",
-							  searchString, searchString, searchString);
-			buildQueryMenu(tempSql, backToMainMenu);
-		    sprintf(currentWhere, " title like '%%%s%%' \
-								    or artist like '%%%s%%' \
-									or album like '%%%s%%' ",
-								   searchString, searchString, searchString);
-			strcpy(currentOrderBy, "title, artist, album");
-		}
+        mlQueryType = QUERY_SINGLE_ENTRY;
+        mlQueryCount = -1;
+        mlBufferPosition = 0;
+
+		char tempWhere[512] = "";
+		sprintf(tempWhere, "title like '%%%s%%' \
+                            or artist like '%%%s%%' \
+                            or album like '%%%s%%' ",
+                            searchString, searchString, searchString);
+        buildQueryMenu("Select media.*, title || ' - ' || artist as strfield, \
+                               'path = ''' || replace(path, '''', '''''') || '''' as datafield \
+                        From media", 
+						tempWhere,
+						"title, artist, album",
+						backToMainMenu);
 	}
     return 0;
 }
@@ -718,6 +740,71 @@ int buildMainMenu(){
     return 0;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Build order by Menu:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int buildOrderByMenu(){
+    skinGetPosition("POS_MEDIALIBRARY_QUERY", tempPos);
+    commonSubMenu.yPos = tempPos[1];
+    commonSubMenu.xPos = tempPos[0];
+    commonSubMenu.fastScrolling = 0;
+    commonSubMenu.align = ALIGN_LEFT;
+    sprintf(buffer, "%s/medialibraryquerybkg.png", userSettings->skinImagesPath);
+    commonSubMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+    if (!commonSubMenu.background)
+        errorLoadImage(buffer);
+    commonSubMenu.highlight = commonMenuHighlight;
+    commonSubMenu.width = commonMenu.background->sizeX;
+    commonSubMenu.height = commonMenu.background->sizeY;
+    commonSubMenu.interline = skinGetParam("MENU_INTERLINE");
+    commonSubMenu.maxNumberVisible = commonSubMenu.background->sizeY / (fontMenuNormal->charHeight + commonSubMenu.interline);
+    commonSubMenu.cancelFunction = NULL;
+
+    commonSubMenu.first = 0;
+    commonSubMenu.selected = 0;
+    commonSubMenu.numberOfElements = MAX_ORDER_BY;
+
+    int i = 0;
+    for (i=0; i<MAX_ORDER_BY; i++){
+        commonSubMenu.elements[i].icon = NULL;
+        commonSubMenu.elements[i].triggerFunction = NULL;
+        sprintf(buffer, "ORDER_BY_%2.2i", i + 1);
+        limitString(langGetString(buffer), commonSubMenu.width - 2, commonSubMenu.elements[i].text);
+    }
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Order by Menu:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int showOrderByMenu(){
+    while(!osl_quit && !exitFlagMediaLibrary){
+        oslStartDrawing();
+        drawCommonGraphics();
+        drawButtonBar(MODE_MEDIA_LIBRARY);
+        //drawMenu(&commonMenu);
+        if (mediaLibraryStatus == STATUS_QUERYMENU)
+            drawMLinfo();
+        drawMenu(&commonSubMenu);
+        oslEndDrawing();
+        oslEndFrame();
+        oslSyncFrame();
+
+        oslReadKeys();
+        if (osl_pad.released.circle)
+            break;
+		else if (osl_pad.released.cross){
+			selectedOrderBy = commonSubMenu.selected;
+			buildQueryMenu(currentSelect, currentWhere, orderBy[selectedOrderBy], currentCancelFunction);
+			break;
+		}
+        processMenuKeys(&commonSubMenu);
+    }
+
+    return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Media Library:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -737,6 +824,8 @@ int gui_mediaLibrary(){
 
     //Build menu:
     buildMainMenu();
+    buildOrderByMenu();
+
     exitFlagMediaLibrary = 0;
 	int skip = 0;
 
@@ -779,6 +868,8 @@ int gui_mediaLibrary(){
 
             if (osl_pad.held.L && osl_pad.held.R){
                 confirmStatus = STATUS_HELP;
+            }else if(mediaLibraryStatus == STATUS_QUERYMENU && osl_pad.released.triangle && mlQueryType == QUERY_SINGLE_ENTRY){
+                showOrderByMenu();
             }else if(mediaLibraryStatus == STATUS_MAINMENU && osl_pad.released.cross && commonMenu.selected == 7){
                 confirmStatus = STATUS_CONFIRM_SCAN;
             }else if(osl_pad.released.start && mediaLibraryStatus == STATUS_QUERYMENU && commonMenu.numberOfElements){
@@ -829,6 +920,8 @@ int gui_mediaLibrary(){
     }
 
     clearMenu(&commonMenu);
+    clearMenu(&commonSubMenu);
+
     oslDeleteImage(scanBkg);
     scanBkg = NULL;
     oslDeleteImage(infoBkg);
