@@ -492,6 +492,7 @@ void MP3_End(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int MP3_Load(char *filename){
     eos = 0;
+	MP3_outputInProgress = 0;
     MP3_filePos = 0;
     fileSize = 0;
     samplesRead = 0;
@@ -581,8 +582,6 @@ float MP3_GetPercentage(){
         perc = ((float)MP3_filePos - (float)tagsize) / ((float)fileSize - (float)tagsize) * 100.0;
         if (perc > 100)
             perc = 100;
-    }else{
-        perc = 0;
     }
     return(perc);
 }
@@ -593,7 +592,7 @@ float MP3_GetPercentage(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int MP3_EndOfStream(){
     if (eos == 1)
-	return 1;
+		return 1;
     return 0;
 }
 
@@ -763,12 +762,38 @@ void MP3_fadeOut(float seconds){
 int MP3_suspend(){
     MP3_suspendPosition = MP3_filePos;
     MP3_suspendIsPlaying = MP3_isPlaying;
-    MP3_Stop();
-    MP3_FreeTune();
+	/*MP3_Stop();
+    MP3_FreeTune();*/
+
+	MP3_isPlaying = FALSE;
+    mad_synth_finish(&Synth);
+    mad_header_finish(&Header);
+    mad_frame_finish(&Frame);
+    mad_stream_finish(&Stream);
+
+    sceIoClose(MP3_fd);
+	MP3_fd = -1;
     return 0;
 }
 
 int MP3_resume(){
+	if (MP3_suspendPosition >= 0){
+		mad_stream_init(&Stream);
+		mad_header_init(&Header);
+		mad_frame_init(&Frame);
+		mad_synth_init(&Synth);
+		mad_timer_reset(&Timer);
+		MP3_fd = sceIoOpen(MP3_fileName, PSP_O_RDONLY, 0777);
+		if (MP3_fd >= 0){
+			MP3_filePos = MP3_suspendPosition;
+			sceIoLseek32(MP3_fd, MP3_filePos, PSP_SEEK_SET);
+			mad_timer_set(&Timer, (int)((float)MP3_info.length / 100.0 * MP3_GetPercentage()), 1, 1);
+			MP3_isPlaying = MP3_suspendIsPlaying;
+		}
+	}
+	MP3_suspendPosition = -1;
+    return 0;
+
     /*if (MP3_suspendPosition >= 0){
         mad_stream_init(&Stream);
         mad_header_init(&Header);

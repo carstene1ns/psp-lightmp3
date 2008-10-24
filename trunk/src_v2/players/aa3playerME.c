@@ -32,6 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+SceUID AA3ME_handle;
 static int AA3ME_threadActive = 0;
 //static int AA3ME_threadExited = 1;
 static char AA3ME_fileName[264];
@@ -74,13 +75,13 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     AT3_OutputPtr = AT3_OutputBuffer[0];
 
     tag_size = GetID3TagSize(AA3ME_fileName);
-    fd = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
-    if (fd < 0)
+    AA3ME_handle = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
+    if (AA3ME_handle < 0)
         AA3ME_threadActive = 0;
 
-    sceIoLseek32(fd, tag_size, PSP_SEEK_SET);//not all omg files have a fixed header
+    sceIoLseek32(AA3ME_handle, tag_size, PSP_SEEK_SET);//not all omg files have a fixed header
 
-    if ( sceIoRead( fd, ea3_header, 0x60 ) != 0x60 )
+    if ( sceIoRead( AA3ME_handle, ea3_header, 0x60 ) != 0x60 )
         AA3ME_threadActive = 0;
 
     if ( ea3_header[0] != 0x45 || ea3_header[1] != 0x41 || ea3_header[2] != 0x33 )
@@ -100,9 +101,9 @@ int AA3ME_decodeThread(SceSize args, void *argp){
         data_align = (ea3_header[0x23]+1)*8;
 
     data_start = tag_size+0x60;
-    data_size = sceIoLseek32(fd, 0, PSP_SEEK_END) - data_start;
+    data_size = sceIoLseek32(AA3ME_handle, 0, PSP_SEEK_END) - data_start;
 
-    sceIoLseek32(fd, data_start, PSP_SEEK_SET);
+    sceIoLseek32(AA3ME_handle, data_start, PSP_SEEK_SET);
 
     memset(AA3ME_codec_buffer, 0, sizeof(AA3ME_codec_buffer));
 
@@ -162,7 +163,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 	while (AA3ME_threadActive){
 		while( !AA3ME_eof && AA3ME_isPlaying )
 		{
-			data_start = sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+			data_start = sceIoLseek32(AA3ME_handle, 0, PSP_SEEK_CUR);
             AA3ME_filePos = data_start;
 
 			if (data_start < 0){
@@ -174,7 +175,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 			if ( at3_type == TYPE_ATRAC3 ) {
 				memset( AA3ME_input_buffer, 0, 0x180);
 
-				res = sceIoRead( fd, AA3ME_input_buffer, data_align );
+				res = sceIoRead( AA3ME_handle, AA3ME_input_buffer, data_align );
 
 				if (res < 0){//error reading suspend/usb problem
 					AA3ME_isPlaying = 0;
@@ -199,7 +200,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				AA3ME_input_buffer[2] = at3_at3plus_flagdata[0];
 				AA3ME_input_buffer[3] = at3_at3plus_flagdata[1];
 
-				res = sceIoRead( fd, AA3ME_input_buffer+8, data_align );
+				res = sceIoRead( AA3ME_handle, AA3ME_input_buffer+8, data_align );
 
 				if (res < 0){//error reading suspend/usb problem
 					AA3ME_isPlaying = 0;
@@ -253,15 +254,15 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				AT3_OutputPtr = AT3_OutputBuffer[OutputBuffer_flip];
 		        //Check for playing speed:
                 if (AA3ME_playingSpeed){
-                    sceIoLseek32(fd, sceIoLseek32(fd, 0, PSP_SEEK_CUR) + data_align * 3 * AA3ME_playingSpeed, PSP_SEEK_SET);
+                    sceIoLseek32(AA3ME_handle, sceIoLseek32(AA3ME_handle, 0, PSP_SEEK_CUR) + data_align * 3 * AA3ME_playingSpeed, PSP_SEEK_SET);
                     AA3ME_playingTime += (float)(data_align * 3 * AA3ME_playingSpeed) / (float)data_align * (float)sample_per_frame/(float)samplerate;
                 }
 			}
 		}
 		sceKernelDelayThread(10000);
 	}
-	sceIoClose(fd);
-    fd = -1;
+	sceIoClose(AA3ME_handle);
+    AA3ME_handle = -1;
     //AA3ME_threadExited = 1;
 	sceKernelExitThread(0);
     return 0;
@@ -367,6 +368,7 @@ int AA3MEgetInfo(){
     float totalPlayingTime = 0.0f;
 
     tag_size = GetID3TagSize(AA3ME_fileName);
+	SceUID fd;
     fd = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
     if (fd < 0)
         return -1;
@@ -541,18 +543,24 @@ int AA3ME_isFilterSupported(){
 int AA3ME_suspend(){
     AA3ME_suspendPosition = AA3ME_filePos;
     AA3ME_suspendIsPlaying = AA3ME_isPlaying;
-    AA3ME_Stop();
+
+	AA3ME_isPlaying = 0;
+    sceIoClose(AA3ME_handle);
+    AA3ME_handle = -1;
+
     return 0;
 }
 
 int AA3ME_resume(){
-    if (AA3ME_Load(AA3ME_fileName) == OPENING_OK){
-        sceKernelDelayThread(500000);
-        if (AA3ME_suspendPosition >= 0)
-            sceIoLseek32(fd, AA3ME_suspendPosition, PSP_SEEK_SET);
-        AA3ME_isPlaying = AA3ME_suspendIsPlaying;
-    }
-    AA3ME_suspendPosition = -1;
+	if (AA3ME_suspendPosition >= 0){
+		AA3ME_handle = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
+		if (AA3ME_handle >= 0){
+			AA3ME_filePos = AA3ME_suspendPosition;
+			sceIoLseek32(AA3ME_handle, AA3ME_filePos, PSP_SEEK_SET);
+			AA3ME_isPlaying = AA3ME_suspendIsPlaying;
+		}
+	}
+	AA3ME_suspendPosition = -1;
     return 0;
 }
 

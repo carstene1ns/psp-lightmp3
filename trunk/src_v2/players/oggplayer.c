@@ -89,18 +89,22 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
 		if (OGG_tempmixleft >= numSamples) {	//  Buffer has enough, so copy across
 			int count, count2;
 			short *_buf2;
-			for (count = 0; count < numSamples; count++) {
-				count2 = count + count;
-				_buf2 = _buf + count2;
-                //Volume boost:
-                if (OGG_volume_boost){
-                    *(_buf2) = volume_boost(&OGG_mixBuffer[count2], &OGG_volume_boost);
-					*(_buf2 + 1) = volume_boost(&OGG_mixBuffer[count2 + 1], &OGG_volume_boost);
-                }else{
+            //Volume boost:
+            if (!OGG_volume_boost){
+                for (count = 0; count < PSP_NUM_AUDIO_SAMPLES; count++) {
+                    count2 = count + count;
+                    _buf2 = _buf + count2;
                     *(_buf2) = OGG_mixBuffer[count2];
-					*(_buf2 + 1) = OGG_mixBuffer[count2 + 1];
+                    *(_buf2 + 1) = OGG_mixBuffer[count2 + 1];
                 }
-			}
+            }else{
+                for (count = 0; count < PSP_NUM_AUDIO_SAMPLES; count++) {
+                    count2 = count + count;
+                    _buf2 = _buf + count2;
+                    *(_buf2) = volume_boost(&OGG_mixBuffer[count2], &OGG_volume_boost);
+                    *(_buf2 + 1) = volume_boost(&OGG_mixBuffer[count2 + 1], &OGG_volume_boost);
+                }
+            }
 			//  Move the pointers
 			OGG_tempmixleft -= numSamples;
 			//  Now shuffle the buffer along
@@ -372,9 +376,12 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
 
 
 float OGG_GetPercentage(){
-    float perc = (float)(OGG_milliSeconds/1000.0/(double)OGG_info.length*100.0);
-    if (perc > 100)
-        perc = 100;
+    float perc = 0.0f;
+    if (OGG_info.length){
+        perc = (float)(OGG_milliSeconds/1000.0/(double)OGG_info.length*100.0);
+        if (perc > 100)
+            perc = 100;
+    }
 	return perc;
 }
 
@@ -458,12 +465,14 @@ int OGG_isFilterEnabled(){
 int OGG_suspend(){
     OGG_suspendPosition = ov_raw_tell(&OGG_VorbisFile);
     OGG_suspendIsPlaying = OGG_isPlaying;
-    OGG_Stop();
-    OGG_FreeTune();
+    //OGG_Stop();
+    //OGG_FreeTune();
+    OGG_End();
     return 0;
 }
 
 int OGG_resume(){
+    OGG_Init(OGG_audio_channel);
     if (OGG_suspendPosition >= 0){
        if (OGG_Load(OGG_fileName) == OPENING_OK){
            if (ov_raw_seek(&OGG_VorbisFile, OGG_suspendPosition))

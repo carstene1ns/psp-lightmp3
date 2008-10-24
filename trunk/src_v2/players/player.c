@@ -42,7 +42,6 @@ int CLOCK_WHEN_PAUSE = 0;
 
 //shared global vars for ME
 int HW_ModulesInit = 0;
-SceUID fd;
 u16 data_align;
 u32 sample_per_frame;
 u16 channel_mode;

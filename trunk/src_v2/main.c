@@ -90,8 +90,7 @@ int readButtons(SceCtrlData *pad_data, int count);
 // Power Callback:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int powerCallback(int unknown, int powerInfo, void *common){
-    //if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_STANDBY) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
-    if (powerInfo & PSP_POWER_CB_SUSPENDING){
+    if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
        if (!suspended){
            resuming = 1;
            //Suspend
