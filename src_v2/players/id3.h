@@ -1,3 +1,6 @@
+#ifndef __id3_h
+#define __id3_h (1)
+
 #include <stdio.h>
 
 #define JPEG_IMAGE 1
@@ -27,3 +30,5 @@ int ParseID3(char *mp3path, struct ID3Tag *target);
 void readTagData(FILE *fp, int tagLength, char *tagValue);
 int swapInt32BigToHost(int arg);
 //short int swapInt16BigToHost(short int arg);
+
+#endif

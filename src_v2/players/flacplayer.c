@@ -531,6 +531,8 @@ int FLAC_resume(){
 	   FLAC__uint64 sample = (FLAC__uint64)suspendPosition;
        FLAC_Load(FLAC_fileName);
        if (FLAC__stream_decoder_seek_absolute(decoder, sample)){
+		  if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
+			  FLAC__stream_decoder_flush(decoder);
           samples_played = suspendPosition;
           if (suspendIsPlaying)
              FLAC_Play();

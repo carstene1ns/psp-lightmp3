@@ -635,21 +635,23 @@ void MP3ME_fadeOut(float seconds){
 int MP3ME_suspend(){
     MP3ME_suspendPosition = MP3ME_filePos;
     MP3ME_suspendIsPlaying = MP3ME_isPlaying;
-    MP3ME_Stop();
+
+	MP3ME_isPlaying = 0;
+    sceIoClose(MP3ME_handle);
+    MP3ME_handle = -1;
     return 0;
 }
 
 int MP3ME_resume(){
-    /*if (MP3ME_Load(MP3ME_fileName) == OPENING_OK){
-        sceKernelDelayThread(500000);
-        if (MP3ME_suspendPosition >= 0){
-            MP3ME_filePos = MP3ME_suspendPosition;
-            sceIoLseek32(MP3ME_handle, MP3ME_filePos, PSP_SEEK_SET);
-        }
-        //MP3ME_playingTime = 0;
-        MP3ME_isPlaying = MP3ME_suspendIsPlaying;
-    }
-    MP3ME_suspendPosition = -1;*/
+	if (MP3ME_suspendPosition >= 0){
+		MP3ME_handle = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
+		if (MP3ME_handle >= 0){
+			MP3ME_filePos = MP3ME_suspendPosition;
+			sceIoLseek32(MP3ME_handle, MP3ME_filePos, PSP_SEEK_SET);
+			MP3ME_isPlaying = MP3ME_suspendIsPlaying;
+		}
+	}
+	MP3ME_suspendPosition = -1;
     return 0;
 }
 

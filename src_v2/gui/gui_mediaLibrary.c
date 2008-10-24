@@ -105,18 +105,21 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
 
 	cpuBoost();
     int i = 0;
-	int count = ML_countRecords(where);
+	sprintf(tempSql, "%s Where %s Order By %s", "Select media.* from media", where, orderBy);
+    int count = ML_countRecordsSelect(tempSql);
+
 	if (count > 0){
         int perc = 0;
         int oldPerc = -1;
 
         M3U_clear();
         M3U_open(m3uName);
-        ML_queryDB(where, orderBy, offset, ML_BUFFERSIZE, localResult);
+	    ML_queryDBSelect(tempSql, 0, ML_BUFFERSIZE, localResult);
+
         for (i=0; i<count; i++){
             if (i >= offset + ML_BUFFERSIZE){
                 offset += ML_BUFFERSIZE;
-                ML_queryDB(where, orderBy, offset, ML_BUFFERSIZE, localResult);
+				ML_queryDBSelect(tempSql, 0, ML_BUFFERSIZE, localResult);
             }
 
             perc = (int)((i+1.0) / count*100.0);

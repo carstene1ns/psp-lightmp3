@@ -453,9 +453,10 @@ int playFile(char *fileName, char *trackMessage){
     }else
         clock = getCpuClock();
 
+    //COMMENTED BECAUSE IT PREVENTS TO GO IN SLEEP MODE
     //Disable media engine if safe and unused
-    if (!info->needsME && sceKernelDevkitVersion() < 0x03070110 && !getModel())
-        MEDisable();
+    /*if (!info->needsME && sceKernelDevkitVersion() < 0x03070110 && !getModel())
+        MEDisable();*/
 
     (*playFunct)();
     playerStatus = 1;
