@@ -98,6 +98,12 @@ Player:
     CROSS + DPAD DOWN   = Lower track rating
 
 
+VOLUME BOOST
+------------
+Please note that by using volume boost (DPAD UP while listening to a track) to raise too much the volume you can damage the psp speakers.
+Use it at your own risk.
+
+
 LIBMAD EQUALIZERS
 -----------------
 Equalizer works only with MP3s played through libMAD!

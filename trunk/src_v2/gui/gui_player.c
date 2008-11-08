@@ -679,8 +679,8 @@ int playFile(char *fileName, char *trackMessage){
 	cpuBoost();
 	//Srobbler LOG:
     if (userSettings->SCROBBLER && strlen(info->title)){
-		u64 mytime;
-		sceRtcGetCurrentTick(&mytime);
+        time_t mytime;
+        sceKernelLibcTime(&mytime);
         if (lastPercentage >= 50)
             SCROBBLER_addTrack(*info, info->length, "L", mytime);
         else

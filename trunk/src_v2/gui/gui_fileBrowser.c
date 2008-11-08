@@ -156,7 +156,7 @@ int gui_fileBrowser(){
     int status = STATUS_NORMAL;
 	OSL_IMAGE *coverArt = NULL;
 	int coverArtFailed = 0;
-	u64 lastMenuChange = 0;
+	time_t lastMenuChange = 0;
 	int lastSelected = -1;
 
     fileBrowserRetValue = -1;
@@ -235,7 +235,7 @@ int gui_fileBrowser(){
                 processMenuKeys(&commonMenu);
 				//Coverart:
 				if (commonMenu.selected != lastSelected){
-					sceRtcGetCurrentTick(&lastMenuChange);
+					sceKernelLibcTime(&lastMenuChange);
 					lastSelected = commonMenu.selected;
 					if (coverArt){
 						oslDeleteImage(coverArt);
@@ -243,8 +243,8 @@ int gui_fileBrowser(){
 					}
 					coverArtFailed = 0;
 				}else if (!coverArt && !coverArtFailed && commonMenu.numberOfElements){
-					u64 currentTime;
-					sceRtcGetCurrentTick(&currentTime);
+					time_t currentTime = 0;
+					sceKernelLibcTime(&currentTime);
 					if (currentTime - lastMenuChange > COVERTART_DELAY){
 						char dirName[264];
 					    int size = 0;

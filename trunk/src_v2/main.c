@@ -386,8 +386,8 @@ int main(){
     strcpy(userSettings->lastBrowserDir, "");
 
     //Random seed:
-	u64 mytime;
-	sceRtcGetCurrentTick(&mytime);
+	time_t mytime = 0;
+	sceKernelLibcTime(&mytime);
     srand(mytime);
 
     //Wait for splash:

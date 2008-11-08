@@ -1,20 +1,20 @@
-/*
+/* 
  *	Copyright (C) 2008 cooleyes
- *	eyes.cooleyes@gmail.com
+ *	eyes.cooleyes@gmail.com 
  *
  *  This Program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2, or (at your option)
  *  any later version.
- *
+ *   
  *  This Program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
- *
+ *   
  *  You should have received a copy of the GNU General Public License
  *  along with GNU Make; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA. 
  *  http://www.gnu.org/copyleft/gpl.html
  *
  */
@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 #include "miniconv.h"
 
 
@@ -66,6 +65,9 @@ static convertor_t convertors[] = {
 #ifdef MS_CYRL_CONV
 	{"MS-CYRL", ms_cyrl_to_utf8},
 #endif
+#ifdef ISO8859_1_CONV
+	{"ISO-8859-1", iso8859_1_to_utf8},
+#endif
 #ifdef ISO8859_2_CONV
 	{"ISO-8859-2", iso8859_2_to_utf8},
 #endif
@@ -98,7 +100,7 @@ void miniConvSetFileSystemConv(const char* charset) {
 		}
 		p++;
 	}
-	sub_convertor = NULL;
+	fs_convertor = NULL;
 };
 
 int miniConvHaveFileSystemConv() {
@@ -109,7 +111,7 @@ char* miniConvFileSystemConv(const unsigned char* s) {
 	return fs_convertor(s);
 }
 
-void miniConvSetSubtitleConv(const char* charset) {
+void miniConvSetDefaultSubtitleConv(const char* charset) {
 	convertor_t *p = convertors;
 	while( p->charset != NULL ) {
 		if (stricmp(charset, p->charset) == 0) {
@@ -121,13 +123,41 @@ void miniConvSetSubtitleConv(const char* charset) {
 	sub_convertor = NULL;
 };
 
-int miniConvHaveSubtitleConv() {
+int miniConvHaveDefaultSubtitleConv() {
 	return ( (sub_convertor == NULL) ? 0 : 1 );
 };
 
-char* miniConvSubtitleConv(const unsigned char* s) {
+int miniConvHaveSubtitleConv(const char* charset) {
+	convertor_t *p = convertors;
+	while( p->charset != NULL ) {
+		if (stricmp(charset, p->charset) == 0) {
+			if ( p->convertor )
+				return 1;
+			else
+				return 0;
+		}
+		p++;
+	}
+	return 0;
+};
+
+char* miniConvDefaultSubtitleConv(const unsigned char* s) {
 	return sub_convertor(s);
-}
+};
+
+char* miniConvSubtitleConv(const unsigned char* s, const char* charset) {
+	convertor_t *p = convertors;
+	while( p->charset != NULL ) {
+		if (stricmp(charset, p->charset) == 0) {
+			if ( p->convertor )
+				return p->convertor(s);
+			else
+				return 0;
+		}
+		p++;
+	}
+	return 0;
+};
 
 void miniConvFreeMemory(void* mem) {
 	free(mem);

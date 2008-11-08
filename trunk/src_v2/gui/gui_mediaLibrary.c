@@ -297,7 +297,7 @@ void drawQueryRunning(){
 // Draw info on selected item:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void drawMLinfo(){
-	static u64 lastMenuChange = 0;
+	static time_t lastMenuChange = 0;
 	static int lastSelected = -1;
 
 	OSL_FONT *font = fontNormal;
@@ -359,7 +359,7 @@ void drawMLinfo(){
 		oslDrawString(tempPos[0], tempPos[1], buffer);
 
 		if (commonMenu.selected != lastSelected){
-			sceRtcGetCurrentTick(&lastMenuChange);
+			sceKernelLibcTime(&lastMenuChange);
 			lastSelected = commonMenu.selected;
 			if (coverArt){
 				oslDeleteImage(coverArt);
@@ -367,8 +367,8 @@ void drawMLinfo(){
 			}
 			coverArtFailed = 0;
 		}else if (!coverArt && !coverArtFailed){
-			u64 currentTime;
-			sceRtcGetCurrentTick(&currentTime);
+			time_t currentTime;
+			sceKernelLibcTime(&currentTime);
 			if (currentTime - lastMenuChange > COVERTART_DELAY){
 				char dirName[264];
 				int size = 0;
