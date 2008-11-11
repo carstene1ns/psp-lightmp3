@@ -263,6 +263,7 @@ int gui_playlistEditor(){
                 confirmStatus = STATUS_HELP;
             }else if(osl_pad.pressed.note && M3U_getSongCount()){
                 sprintf(userSettings->selectedBrowserItem, "%s", tempM3Ufile);
+                sprintf(userSettings->selectedBrowserItemShort, "%s", tempM3Ufile);
                 userSettings->playlistStartIndex = -1;
                 playlistEditorRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_PLAYLIST_EDITOR;

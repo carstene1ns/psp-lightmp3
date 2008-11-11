@@ -236,9 +236,9 @@ int unLoadCommonGraphics(){
 int drawToolbars(){
     int m, h, btrh, btrm, btr, rh, battPerc;
     char remote[3] = "";
-	static time_t lastFreeMemTime = 0;
+	static u64 lastFreeMemTime = 0;
 	static SceSize freeKMem = 0;
-	time_t currentTime = 0;
+	u64 currentTime = 0;
 
     skinGetPosition("POS_TOOLBAR_1", tempPos);
     oslDrawImageXY(commonTopToolbar, tempPos[0], tempPos[1]);
@@ -308,10 +308,10 @@ int drawToolbars(){
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
 	//Freee memory:
-	sceKernelLibcTime(&currentTime);
+	sceRtcGetCurrentTick(&currentTime);
 	if (currentTime - lastFreeMemTime >= 2000000){
 		freeKMem = sceKernelTotalFreeMemSize();
-		sceKernelLibcTime(&lastFreeMemTime);
+		sceRtcGetCurrentTick (&lastFreeMemTime);
 	}
     skinGetPosition("POS_FREE_MEMORY_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("FREE_MEMORY"));

@@ -122,7 +122,6 @@ int gui_playlistsBrowser(){
     commonMenu.cancelFunction = NULL;
 
     result = opendir_open(&directory, playlistsDir, playlistsDir, ext, 1, 1);
-    sortDirectory(&directory);
     buildMenuFromDirectory(&commonMenu, &directory, "");
 
     strcpy(buffer, "");
@@ -221,7 +220,6 @@ int gui_playlistsBrowser(){
                 opendir_close(&directory);
 				cpuBoost();
                 result = opendir_open(&directory, playlistsDir, playlistsDir, ext, 1, 1);
-                sortDirectory(&directory);
                 buildMenuFromDirectory(&commonMenu, &directory, "");
 				cpuRestore();
                 commonMenu.first = 0;
