@@ -21,7 +21,7 @@ hours.
 
 INSTALL
 -------
-Simply copy the LightMP3 directory under ms0:/PSP/GAME3xx or ms0:/PSP/GAME4XX
+Simply copy the LightMP3 directory under ms0:/PSP/GAME3xx, ms0:/PSP/GAME4XX or ms0:/PSP/GAME5XX depending on your custom firmware.
 The src directory contains source code: you don't need it to run the application.
 
 

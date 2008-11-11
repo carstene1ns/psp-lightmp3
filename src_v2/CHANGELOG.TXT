@@ -10,10 +10,11 @@ Version 2.0.0 RC1
 -Added: French, German, Polish, Spanish language
 -Added: Smoother progress bar
 -Added: Icons for folder/music in file browser and media library
--Added: New icon and PIC1.PNG (many thanks to dario1crisafulli)
+-Added: New ICON0.PNG and PIC1.PNG (many thanks to dario1crisafulli)
 -Fixed: Strings are limited inside the menu area.
 -Fixed: Sleep bug for MP3 and ATRAC3+ files (doesen't work with OGG)
 -Fixed: Some crash in the Media Library.
+-Fixed: Bug in audioscrobbler log (wrong time was logged)
 
 
 Version 2.0.0 BETA2

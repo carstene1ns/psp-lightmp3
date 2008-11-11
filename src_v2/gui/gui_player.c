@@ -859,7 +859,6 @@ int playDirectory(char *dirName, char *dirNameShort, char *startFile){
     char *result = opendir_open(&directory, dirName, dirNameShort, fileExt, fileExtCount, 0);
 	cpuRestore();
     if (!result){
-        sortDirectory(&directory);
         getFileName(startFile, onlyName);
         int i = 0;
         for (i=0; i<directory.number_of_directory_entries; i++){

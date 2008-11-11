@@ -127,6 +127,8 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 	}
 	//fclose(log);
 	free((void *)finfo);
+
+	sortDirectory(p);
 	return(0);
 }
 
@@ -139,8 +141,8 @@ void sortDirectory(struct opendir_struct *directory){
     char comp2[268] = "";
 
 	while (i < n){
-        sprintf(comp1, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i-1].d_stat.st_mode)?"A":"Z", directory->directory_entry[i-1].d_name);
-        sprintf(comp2, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode)?"A":"Z", directory->directory_entry[i].d_name);
+        sprintf(comp1, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i-1].d_stat.st_mode)?"A":"Z", directory->directory_entry[i-1].longname);
+        sprintf(comp2, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode)?"A":"Z", directory->directory_entry[i].longname);
 
 		if (i == 0 || stricmp(comp1, comp2) <= 0) i++;
 		else {struct dirElement tmp = directory->directory_entry[i]; directory->directory_entry[i] = directory->directory_entry[i-1]; directory->directory_entry[--i] = tmp;}

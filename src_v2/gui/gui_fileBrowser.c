@@ -156,7 +156,7 @@ int gui_fileBrowser(){
     int status = STATUS_NORMAL;
 	OSL_IMAGE *coverArt = NULL;
 	int coverArtFailed = 0;
-	time_t lastMenuChange = 0;
+	u64 lastMenuChange = 0;
 	int lastSelected = -1;
 
     fileBrowserRetValue = -1;
@@ -198,7 +198,6 @@ int gui_fileBrowser(){
 		strcpy(curDirShort, userSettings->lastBrowserDirShort);
 		result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
     }
-    sortDirectory(&directory);
     getFileName(userSettings->selectedBrowserItemShort, buffer);
     buildMenuFromDirectory(&commonMenu, &directory, buffer);
 
@@ -235,7 +234,7 @@ int gui_fileBrowser(){
                 processMenuKeys(&commonMenu);
 				//Coverart:
 				if (commonMenu.selected != lastSelected){
-					sceKernelLibcTime(&lastMenuChange);
+					sceRtcGetCurrentTick(&lastMenuChange);
 					lastSelected = commonMenu.selected;
 					if (coverArt){
 						oslDeleteImage(coverArt);
@@ -243,8 +242,8 @@ int gui_fileBrowser(){
 					}
 					coverArtFailed = 0;
 				}else if (!coverArt && !coverArtFailed && commonMenu.numberOfElements){
-					time_t currentTime = 0;
-					sceKernelLibcTime(&currentTime);
+					u64 currentTime = 0;
+					sceRtcGetCurrentTick(&currentTime);
 					if (currentTime - lastMenuChange > COVERTART_DELAY){
 						char dirName[264];
 					    int size = 0;
@@ -294,10 +293,8 @@ int gui_fileBrowser(){
 					//debugMessageBox(curDirShort);
 					cpuBoost();
                     result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
-                    sortDirectory(&directory);
                     buildMenuFromDirectory(&commonMenu, &directory, "");
 					cpuRestore();
-                    //sceKernelDelayThread(200000);
                 }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     //Play file:
                     if (curDir[strlen(curDir)-1] != '/'){
@@ -353,7 +350,6 @@ int gui_fileBrowser(){
 					//debugMessageBox(curDir);
 					cpuBoost();
                     result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
-                    sortDirectory(&directory);
                     buildMenuFromDirectory(&commonMenu, &directory, "");
                     //Mi riposiziono:
                     for (i = 0; i < directory.number_of_directory_entries; i++){
@@ -365,7 +361,6 @@ int gui_fileBrowser(){
                     }
 					cpuRestore();
                 }
-                //sceKernelDelayThread(200000);
             }else if(osl_pad.released.select){
                 //USB activate/deactivate:
                 USBactive = !USBactive;
@@ -382,9 +377,14 @@ int gui_fileBrowser(){
                 }else{
                     oslStopUsbStorage();
                     oslDeinitUsbStorage();
+
+					char tempDir[264] = "";
+					strcpy(tempDir, directory.directory_entry[commonMenu.selected].d_name);
+					opendir_close(&directory);
+					result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
+					buildMenuFromDirectory(&commonMenu, &directory, tempDir);
 					cpuRestore();
                 }
-                //sceKernelDelayThread(200000);
             }else if(!USBactive && osl_pad.released.R){
                 fileBrowserRetValue = nextAppMode(MODE_FILEBROWSER);
                 exitFlagFileBrowser = 1;
