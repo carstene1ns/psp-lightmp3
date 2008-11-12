@@ -59,20 +59,20 @@ void ExceptionHandler(PspDebugRegBlock * regs)
             FILE *log = fopen("exception.log", "w");
             if (log != NULL){
                 char testo[512];
-                sprintf(testo, "Exception details:\n\n");
+                snprintf(testo, sizeof(testo), "Exception details:\n\n");
                 fwrite(testo, 1, strlen(testo), log);
-                sprintf(testo, "Exception - %s\n", codeTxt[(regs->cause >> 2) & 31]);
+                snprintf(testo, sizeof(testo), "Exception - %s\n", codeTxt[(regs->cause >> 2) & 31]);
                 fwrite(testo, 1, strlen(testo), log);
-                sprintf(testo, "EPC       - %08X / %s.text + %08X\n", (int)regs->epc, module_info.modname, (unsigned int)(regs->epc-(int)&_ftext));
+                snprintf(testo, sizeof(testo), "EPC       - %08X / %s.text + %08X\n", (int)regs->epc, module_info.modname, (unsigned int)(regs->epc-(int)&_ftext));
                 fwrite(testo, 1, strlen(testo), log);
-                sprintf(testo, "Cause     - %08X\n", (int)regs->cause);
+                snprintf(testo, sizeof(testo), "Cause     - %08X\n", (int)regs->cause);
                 fwrite(testo, 1, strlen(testo), log);
-                sprintf(testo, "Status    - %08X\n", (int)regs->status);
+                snprintf(testo, sizeof(testo), "Status    - %08X\n", (int)regs->status);
                 fwrite(testo, 1, strlen(testo), log);
-                sprintf(testo, "BadVAddr  - %08X\n", (int)regs->badvaddr);
+                snprintf(testo, sizeof(testo), "BadVAddr  - %08X\n", (int)regs->badvaddr);
                 fwrite(testo, 1, strlen(testo), log);
                 for(i=0; i<32; i+=4){
-                    sprintf(testo, "%s:%08X %s:%08X %s:%08X %s:%08X\n", regName[i], (int)regs->r[i], regName[i+1], (int)regs->r[i+1], regName[i+2], (int)regs->r[i+2], regName[i+3], (int)regs->r[i+3]);
+                    snprintf(testo, sizeof(testo), "%s:%08X %s:%08X %s:%08X %s:%08X\n", regName[i], (int)regs->r[i], regName[i+1], (int)regs->r[i+1], regName[i+2], (int)regs->r[i+2], regName[i+3], (int)regs->r[i+3]);
                     fwrite(testo, 1, strlen(testo), log);
                 }
                 fclose(log);

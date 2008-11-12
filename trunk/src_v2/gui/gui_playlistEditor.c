@@ -152,7 +152,7 @@ int gui_playlistEditor(){
     int confirmStatus = STATUS_CONFIRM_NONE;
 
     //Load images:
-    sprintf(buffer, "%s/trackinfobkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/trackinfobkg.png", userSettings->skinImagesPath);
     trackInfoBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!trackInfoBkg)
         errorLoadImage(buffer);
@@ -176,7 +176,7 @@ int gui_playlistEditor(){
     commonMenu.yPos = tempPos[1];
     commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 1;
-    sprintf(buffer, "%s/menuplaylistbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/menuplaylistbkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
@@ -251,7 +251,6 @@ int gui_playlistEditor(){
         }else{
             oldSelected = commonMenu.selected;
             processMenuKeys(&commonMenu);
-            //Check if user changed track:
             if (commonMenu.selected != oldSelected){
                 song = M3U_getSong(commonMenu.selected);
                 setAudioFunctions(song->fileName, userSettings->MP3_ME);
@@ -262,8 +261,8 @@ int gui_playlistEditor(){
             if (osl_pad.held.L && osl_pad.held.R){
                 confirmStatus = STATUS_HELP;
             }else if(osl_pad.pressed.note && M3U_getSongCount()){
-                sprintf(userSettings->selectedBrowserItem, "%s", tempM3Ufile);
-                sprintf(userSettings->selectedBrowserItemShort, "%s", tempM3Ufile);
+                snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s", tempM3Ufile);
+                snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s", tempM3Ufile);
                 userSettings->playlistStartIndex = -1;
                 playlistEditorRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_PLAYLIST_EDITOR;
@@ -315,9 +314,9 @@ int gui_playlistEditor(){
 					getExtension(newName, ext, 3);
 					if (strlen(newName)){
 						if (strcmp(ext, "M3U"))
-							sprintf(buffer, "%s%s/%s.m3u", userSettings->ebootPath, "playLists", newName);
+							snprintf(buffer, sizeof(buffer), "%s%s/%s.m3u", userSettings->ebootPath, "playLists", newName);
 						else
-						sprintf(buffer, "%s%s/%s", userSettings->ebootPath, "playLists", newName);
+						snprintf(buffer, sizeof(buffer), "%s%s/%s", userSettings->ebootPath, "playLists", newName);
 						strcpy(userSettings->currentPlaylistName, buffer);
 						M3U_save(userSettings->currentPlaylistName);
 					}
