@@ -123,7 +123,7 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
     skinGetPosition("POS_YEAR_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->year);
     skinGetPosition("POS_PLAYED_VALUE", tempPos);
-    sprintf(buffer, "%i", libEntry->played);
+    snprintf(buffer, sizeof(buffer), "%i", libEntry->played);
     oslDrawString(tempPos[0], tempPos[1], buffer);
     skinGetPosition("POS_RATING_VALUE", tempPos);
     drawRating(tempPos[0], tempPos[1], libEntry->rating);
@@ -131,7 +131,7 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
     (*getTimeStringFunct)(timestring);
     if (!strlen(info->strLength))
         strcpy(info->strLength, "00:00:00");
-    sprintf(buffer, "%s / %s", timestring, info->strLength);
+    snprintf(buffer, sizeof(buffer), "%s / %s", timestring, info->strLength);
     skinGetPosition("POS_TIME_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
     skinGetPosition("POS_TRACK_VALUE", tempPos);
@@ -180,16 +180,16 @@ int drawFileSpecs(struct fileInfo *info){
     skinGetPosition("POS_MODE_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->mode);
     skinGetPosition("POS_BITRATE_VALUE", tempPos);
-    sprintf(buffer, "%3.3i [%3.3i] kbit", info->kbit, (int)(info->instantBitrate / 1000));
+    snprintf(buffer, sizeof(buffer), "%3.3i [%3.3i] kbit", info->kbit, (int)(info->instantBitrate / 1000));
     oslDrawString(tempPos[0], tempPos[1], buffer);
     skinGetPosition("POS_SAMPLERATE_VALUE", tempPos);
-    sprintf(buffer, "%li Hz", info->hz);
+    snprintf(buffer, sizeof(buffer), "%li Hz", info->hz);
     oslDrawString(tempPos[0], tempPos[1], buffer);
     skinGetPosition("POS_FILE_FORMAT_VALUE", tempPos);
     if (info->fileType == MP3_TYPE)
-        sprintf(buffer, "%s %s %s", fileTypeDescription[info->fileType], langGetString("LAYER"), info->layer);
+        snprintf(buffer, sizeof(buffer), "%s %s %s", fileTypeDescription[info->fileType], langGetString("LAYER"), info->layer);
     else if (info->fileType >= 0)
-        sprintf(buffer, "%s", fileTypeDescription[info->fileType]);
+        snprintf(buffer, sizeof(buffer), "%s", fileTypeDescription[info->fileType]);
     oslDrawString(tempPos[0], tempPos[1], buffer);
     skinGetPosition("POS_EMPHASIS_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->emphasis);
@@ -230,9 +230,9 @@ int drawPlayerStatus(){
         oslDrawString(tempPos[0], tempPos[1], playerStatusDesc[playerStatus+1]);
     else{
         if (currentSpeed > 0)
-            sprintf(buffer, "%s %ix", playerStatusDesc[playerStatus+1], currentSpeed + 1);
+            snprintf(buffer, sizeof(buffer), "%s %ix", playerStatusDesc[playerStatus+1], currentSpeed + 1);
         else
-            sprintf(buffer, "%s %ix", playerStatusDesc[playerStatus+1], currentSpeed - 1);
+            snprintf(buffer, sizeof(buffer), "%s %ix", playerStatusDesc[playerStatus+1], currentSpeed - 1);
         oslDrawString(tempPos[0], tempPos[1], buffer);
     }
 
@@ -240,7 +240,7 @@ int drawPlayerStatus(){
     if (!MAX_VOLUME_BOOST)
         oslDrawString(tempPos[0], tempPos[1], langGetString("NOT_SUPPORTED"));
     else{
-        sprintf(buffer, "%i", userSettings->volumeBoost);
+        snprintf(buffer, sizeof(buffer), "%i", userSettings->volumeBoost);
         oslDrawString(tempPos[0], tempPos[1], buffer);
     }
 
@@ -359,7 +359,7 @@ int playFile(char *fileName, char *trackMessage){
     char fixedName[264] = "";
     strcpy(fixedName, fileName);
     ML_fixStringField(fixedName);
-    sprintf(whereCond, "path = upper('%s')", fixedName);
+    snprintf(whereCond, sizeof(whereCond), "path = upper('%s')", fixedName);
     int update = ML_countRecords(whereCond);
     if (update > 0){
         ML_queryDB(whereCond, "path", 0, 1, MLresult);
@@ -372,9 +372,9 @@ int playFile(char *fileName, char *trackMessage){
     if (tagInfo.encapsulatedPictureOffset && tagInfo.encapsulatedPictureLength <= MAX_IMAGE_DIMENSION){
         FILE *in = fopen(fileName, "rb");
         if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
-            sprintf(buffer, "%scoverart.jpg", userSettings->ebootPath);
+            snprintf(buffer, sizeof(buffer), "%scoverart.jpg", userSettings->ebootPath);
         else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
-            sprintf(buffer, "%scoverart.png", userSettings->ebootPath);
+            snprintf(buffer, sizeof(buffer), "%scoverart.png", userSettings->ebootPath);
         FILE *out = fopen(buffer, "wb");
         int buffSize = 4*1024;
         unsigned char cover[4*1024] = "";
@@ -419,7 +419,7 @@ int playFile(char *fileName, char *trackMessage){
     //Apro il file:
     int retLoad = (*loadFunct)(fileName);
     if (retLoad != OPENING_OK){
-        sprintf(buffer, "Error %i opening file:\n%s", retLoad, fileName);
+        snprintf(buffer, sizeof(buffer), "Error %i opening file:\n%s", retLoad, fileName);
         debugMessageBox(buffer);
         (*endFunct)();
         unsetAudioFunctions();
@@ -760,7 +760,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 	currentTrack = 0;
 	while(!osl_quit){
 		song = M3U_getSong(i);
-		sprintf(message, "%i / %i", i + 1, songCount);
+		snprintf(message, sizeof(message), "%i / %i", i + 1, songCount);
 		int playerReturn = playFile(song->fileName, message);
 		//Played tracks:
 		int found = 0;
@@ -863,9 +863,9 @@ int playDirectory(char *dirName, char *dirNameShort, char *startFile){
         int i = 0;
         for (i=0; i<directory.number_of_directory_entries; i++){
             if (dirName[strlen(dirName)-1] != '/')
-                sprintf(buffer, "%s/%s", dirNameShort, directory.directory_entry[i].d_name);
+                snprintf(buffer, sizeof(buffer), "%s/%s", dirNameShort, directory.directory_entry[i].d_name);
             else
-                sprintf(buffer, "%s%s", dirNameShort, directory.directory_entry[i].d_name);
+                snprintf(buffer, sizeof(buffer), "%s%s", dirNameShort, directory.directory_entry[i].d_name);
             if (!strcmp(directory.directory_entry[i].d_name, onlyName))
                 startIndex = i;
             M3U_addSong(buffer, 0, buffer);
@@ -886,32 +886,32 @@ int gui_player(){
     sceIoGetstat(userSettings->selectedBrowserItemShort, &stat);
 
     //Load images:
-    sprintf(buffer, "%s/nocoverart.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/nocoverart.png", userSettings->skinImagesPath);
     noCoverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!noCoverArt)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/fileinfobkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/fileinfobkg.png", userSettings->skinImagesPath);
     fileInfoBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!fileInfoBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/filespecsbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/filespecsbkg.png", userSettings->skinImagesPath);
     fileSpecsBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!fileSpecsBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/playerstatusbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/playerstatusbkg.png", userSettings->skinImagesPath);
     playerStatusBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!playerStatusBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/progressbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/progressbkg.png", userSettings->skinImagesPath);
     progressBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!progressBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/progress.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/progress.png", userSettings->skinImagesPath);
     progress = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!progress)
         errorLoadImage(buffer);

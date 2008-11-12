@@ -52,7 +52,7 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 	}
 
 	char sdir[264] = "";
-	strcpy(sdir, directory);
+	strcpy(sdir, directoryShort);
 	opendir_safe_constructor(p);
 
 	p_fat_info finfo;
@@ -75,9 +75,9 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 	for (i = 0; i < number_of_directory_entries; i++){
 		char fileName[264] = "";
 		if (directoryShort[strlen(directoryShort)-1] != '/')
-			sprintf(fileName, "%s/%s", directoryShort, finfo[i].shortname);
+			snprintf(fileName, sizeof(fileName), "%s/%s", directoryShort, finfo[i].shortname);
 		else
-			sprintf(fileName, "%s%s", directoryShort, finfo[i].shortname);
+			snprintf(fileName, sizeof(fileName), "%s%s", directoryShort, finfo[i].shortname);
         //fwrite(fileName, sizeof(char), strlen(fileName), log);
 		//Filtro le dir "." e "..":
 		if (finfo[i].filename[0] == '.'){
@@ -141,8 +141,8 @@ void sortDirectory(struct opendir_struct *directory){
     char comp2[268] = "";
 
 	while (i < n){
-        sprintf(comp1, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i-1].d_stat.st_mode)?"A":"Z", directory->directory_entry[i-1].longname);
-        sprintf(comp2, "%s-%s", FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode)?"A":"Z", directory->directory_entry[i].longname);
+        snprintf(comp1, sizeof(comp1), "%s-%s", FIO_S_ISDIR(directory->directory_entry[i-1].d_stat.st_mode)?"A":"Z", directory->directory_entry[i-1].longname);
+        snprintf(comp2, sizeof(comp2), "%s-%s", FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode)?"A":"Z", directory->directory_entry[i].longname);
 
 		if (i == 0 || stricmp(comp1, comp2) <= 0) i++;
 		else {struct dirElement tmp = directory->directory_entry[i]; directory->directory_entry[i] = directory->directory_entry[i-1]; directory->directory_entry[--i] = tmp;}

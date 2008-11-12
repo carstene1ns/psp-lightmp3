@@ -105,7 +105,7 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
 
 	cpuBoost();
     int i = 0;
-	sprintf(tempSql, "%s Where %s Order By %s", "Select media.* from media", where, orderBy);
+	snprintf(tempSql, sizeof(tempSql), "%s Where %s Order By %s", "Select media.* from media", where, orderBy);
     int count = ML_countRecordsSelect(tempSql);
 
 	if (count > 0){
@@ -255,7 +255,7 @@ int scanMS(){
     int found = ML_scanMS(fileExt, fileExtCount-1, scanDirCallback, NULL);
     cpuRestore();
 
-    sprintf(strFound, "%i", found);
+    snprintf(strFound, sizeof(strFound), "%i", found);
 
     while(!osl_quit && !exitFlagMediaLibrary){
         oslStartDrawing();
@@ -320,7 +320,7 @@ void drawMLinfo(){
         skinGetColor("RGBA_TEXT", tempColor);
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
         setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        sprintf(buffer, "%.f", MLresult[commonMenu.selected - mlBufferPosition].intField01);
+        snprintf(buffer, sizeof(buffer), "%.f", MLresult[commonMenu.selected - mlBufferPosition].intField01);
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
 
@@ -355,7 +355,7 @@ void drawMLinfo(){
         drawRating(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].rating);
 
 		skinGetPosition("POS_MEDIALIBRARY_PLAYED_VALUE", tempPos);
-		sprintf(buffer, "%i", MLresult[commonMenu.selected - mlBufferPosition].played);
+		snprintf(buffer, sizeof(buffer), "%i", MLresult[commonMenu.selected - mlBufferPosition].played);
 		oslDrawString(tempPos[0], tempPos[1], buffer);
 
 		if (commonMenu.selected != lastSelected){
@@ -374,16 +374,16 @@ void drawMLinfo(){
 				int size = 0;
 
 				cpuBoost();
-				sprintf(dirName, "%s", MLresult[commonMenu.selected - mlBufferPosition].path);
+				snprintf(dirName, sizeof(dirName), "%s", MLresult[commonMenu.selected - mlBufferPosition].path);
 				directoryUp(dirName);
 				//Look for folder.jpg in the same directory:
-				sprintf(buffer, "%s/%s", dirName, "folder.jpg");
+				snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
 				size = fileExists(buffer);
 				if (size > 0 && size <= MAX_IMAGE_DIMENSION)
 					coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 				else{
 					//Look for cover.jpg in same directory:
-					sprintf(buffer, "%s/%s", dirName, "cover.jpg");
+					snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "cover.jpg");
 					size = fileExists(buffer);
 					if (size > 0 && size <= MAX_IMAGE_DIMENSION)
 						coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
@@ -454,7 +454,7 @@ void queryDataFeed(int index, struct menuElement *element){
 
     if (mlQueryType == QUERY_COUNT){
         if (!strlen(element->text)){
-            sprintf(buffer, "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
+            snprintf(buffer, sizeof(buffer), "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
             //strcpy(element->text, buffer);
             strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
             element->icon = folderIcon;
@@ -472,7 +472,7 @@ void queryDataFeed(int index, struct menuElement *element){
     }else if (mlQueryType == QUERY_COUNT_RATING){
 	    int startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
 		int startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
-        sprintf(buffer, "(%.f)", MLresult[index - mlBufferPosition].intField01);
+        snprintf(buffer, sizeof(buffer), "(%.f)", MLresult[index - mlBufferPosition].intField01);
         /*if (index == commonMenu.selected){
             skinGetColor("RGBA_MENU_SELECTED_TEXT", tempColor);
             skinGetColor("RGBA_MENU_SELECTED_TEXT_SHADOW", tempColorShadow);
@@ -495,9 +495,9 @@ int buildQueryMenu(char *select, char *where, char *orderBy, int (*cancelFunctio
 	cpuBoost();
 
 	if (strlen(where) && strlen(orderBy))
-		sprintf(tempSql, "%s Where %s Order By %s", select, where, orderBy);
+		snprintf(tempSql, sizeof(tempSql), "%s Where %s Order By %s", select, where, orderBy);
 	else
-		sprintf(tempSql, "%s", select);
+		snprintf(tempSql, sizeof(tempSql), "%s", select);
     mlQueryCount = ML_countRecordsSelect(tempSql);
 	if (mlQueryCount > MENU_MAX_ELEMENTS)
 		mlQueryCount = MENU_MAX_ELEMENTS;
@@ -520,7 +520,7 @@ int buildQueryMenu(char *select, char *where, char *orderBy, int (*cancelFunctio
     commonMenu.xPos = tempPos[0];
     commonMenu.yPos = tempPos[1];
     commonMenu.fastScrolling = 1;
-    sprintf(buffer, "%s/medialibraryquerybkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/medialibraryquerybkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
@@ -676,7 +676,7 @@ int search(){
         mlBufferPosition = 0;
 
 		char tempWhere[512] = "";
-		sprintf(tempWhere, "title like '%%%s%%' \
+		snprintf(tempWhere, sizeof(tempWhere), "title like '%%%s%%' \
                             or artist like '%%%s%%' \
                             or album like '%%%s%%' ",
                             searchString, searchString, searchString);
@@ -700,7 +700,7 @@ int buildMainMenu(){
     commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 0;
     commonMenu.align = ALIGN_CENTER;
-    sprintf(buffer, "%s/medialibrarybkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/medialibrarybkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
@@ -753,7 +753,7 @@ int buildOrderByMenu(){
     commonSubMenu.xPos = tempPos[0];
     commonSubMenu.fastScrolling = 0;
     commonSubMenu.align = ALIGN_LEFT;
-    sprintf(buffer, "%s/medialibraryquerybkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/medialibraryquerybkg.png", userSettings->skinImagesPath);
     commonSubMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonSubMenu.background)
         errorLoadImage(buffer);
@@ -772,7 +772,7 @@ int buildOrderByMenu(){
     for (i=0; i<MAX_ORDER_BY; i++){
         commonSubMenu.elements[i].icon = NULL;
         commonSubMenu.elements[i].triggerFunction = NULL;
-        sprintf(buffer, "ORDER_BY_%2.2i", i + 1);
+        snprintf(buffer, sizeof(buffer), "ORDER_BY_%2.2i", i + 1);
         limitString(langGetString(buffer), commonSubMenu.width - 2, commonSubMenu.elements[i].text);
     }
     return 0;
@@ -815,12 +815,12 @@ int gui_mediaLibrary(){
     int ratingChangedUpDown = 0;
 
     //Load images:
-    sprintf(buffer, "%s/medialibraryscanbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/medialibraryscanbkg.png", userSettings->skinImagesPath);
     scanBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!scanBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/medialibraryinfobkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/medialibraryinfobkg.png", userSettings->skinImagesPath);
     infoBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!infoBkg)
         errorLoadImage(buffer);
@@ -881,8 +881,8 @@ int gui_mediaLibrary(){
                 M3U_clear();
                 M3U_save(MLtempM3Ufile);
                 addSelectionToPlaylist(currentWhere, currentOrderBy, 1, MLtempM3Ufile);
-                sprintf(userSettings->selectedBrowserItem, "%s", MLtempM3Ufile);
-                sprintf(userSettings->selectedBrowserItemShort, "%s", MLtempM3Ufile);
+                snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s", MLtempM3Ufile);
+                snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s", MLtempM3Ufile);
                 userSettings->playlistStartIndex = commonMenu.selected;
                 mediaLibraryRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_MEDIA_LIBRARY;
@@ -891,8 +891,8 @@ int gui_mediaLibrary(){
                 M3U_clear();
                 M3U_save(MLtempM3Ufile);
                 addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, "title", 1, MLtempM3Ufile);
-                sprintf(userSettings->selectedBrowserItem, "%s", MLtempM3Ufile);
-                sprintf(userSettings->selectedBrowserItemShort, "%s", MLtempM3Ufile);
+                snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s", MLtempM3Ufile);
+                snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s", MLtempM3Ufile);
                 userSettings->playlistStartIndex = -1;
                 mediaLibraryRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_MEDIA_LIBRARY;

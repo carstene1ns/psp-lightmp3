@@ -71,108 +71,108 @@ int loadCommonGraphics(){
     int i = 0;
 
     //Load images:
-    sprintf(buffer, "%s/bkg_default.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/bkg_default.png", userSettings->skinImagesPath);
     commonBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/toptoolbar.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/toptoolbar.png", userSettings->skinImagesPath);
     commonTopToolbar = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonTopToolbar)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/bottomtoolbar.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/bottomtoolbar.png", userSettings->skinImagesPath);
     commonBottomToolbar = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonBottomToolbar)
         errorLoadImage(buffer);
 
     for (i=0; i<5; i++){
-        sprintf(buffer, "%s/button%i.png", userSettings->skinImagesPath, i + 1);
+        snprintf(buffer, sizeof(buffer), "%s/button%i.png", userSettings->skinImagesPath, i + 1);
         commonButtons[i] = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         if (!commonButtons[i])
             errorLoadImage(buffer);
-        sprintf(buffer, "%s/buttonsel%i.png", userSettings->skinImagesPath, i + 1);
+        snprintf(buffer, sizeof(buffer), "%s/buttonsel%i.png", userSettings->skinImagesPath, i + 1);
         commonButtonsSel[i] = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         if (!commonButtonsSel[i])
             errorLoadImage(buffer);
     }
 
-    sprintf(buffer, "%s/battery.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/battery.png", userSettings->skinImagesPath);
     commonBattery = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonBattery)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/batterylow.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/batterylow.png", userSettings->skinImagesPath);
     commonBatteryLow = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonBatteryLow)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/batterycharging.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/batterycharging.png", userSettings->skinImagesPath);
     commonBatteryCharging = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonBatteryCharging)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/volume.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/volume.png", userSettings->skinImagesPath);
     commonVolume = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonVolume)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/headphone.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/headphone.png", userSettings->skinImagesPath);
     commonHeadphone = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonHeadphone)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/cpu.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/cpu.png", userSettings->skinImagesPath);
     commonCPU = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonCPU)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/popupbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/popupbkg.png", userSettings->skinImagesPath);
     popupBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!popupBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/star.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/star.png", userSettings->skinImagesPath);
     star = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!star)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/blankstar.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/blankstar.png", userSettings->skinImagesPath);
     blankStar = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!blankStar)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/helpbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/helpbkg.png", userSettings->skinImagesPath);
     helpBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!helpBkg)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/menuhighlight.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/menuhighlight.png", userSettings->skinImagesPath);
     commonMenuHighlight = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenuHighlight)
         errorLoadImage(buffer);
 
-    sprintf(buffer, "%s/folder.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/folder.png", userSettings->skinImagesPath);
     folderIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!folderIcon){
-        sprintf(buffer, "%sskins/%s/images/folder.png", userSettings->ebootPath, "default");
+        snprintf(buffer, sizeof(buffer), "%sskins/%s/images/folder.png", userSettings->ebootPath, "default");
         folderIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         if (!folderIcon)
             errorLoadImage(buffer);
     }
 
-    sprintf(buffer, "%s/music.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/music.png", userSettings->skinImagesPath);
     musicIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!musicIcon){
-        sprintf(buffer, "%sskins/%s/images/music.png", userSettings->ebootPath, "default");
+        snprintf(buffer, sizeof(buffer), "%sskins/%s/images/music.png", userSettings->ebootPath, "default");
         musicIcon = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         if (!musicIcon)
             errorLoadImage(buffer);
     }
 
-    //sprintf(buffer, "flash0:/font/ltn0.pgf");
+    //snprintf(buffer, sizeof(buffer), "flash0:/font/ltn0.pgf");
 	skinGetString("STR_FONT_NORMAL_NAME", buffer);
-    //sprintf(buffer, "%s/fontNormal.pgf", userSettings->skinImagesPath);
+    //snprintf(buffer, sizeof(buffer), "%s/fontNormal.pgf", userSettings->skinImagesPath);
 	fontNormal = oslLoadFontFile(buffer);
     if (!fontNormal)
         errorLoadImage(buffer);
@@ -270,7 +270,7 @@ int drawToolbars(){
     skinGetColor("RGBA_TOOLBAR_TEXT_SHADOW", tempColorShadow);
     setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
 
-    sprintf(buffer, "LightMP3 v. %s by Sakya", VERSION);
+    snprintf(buffer, sizeof(buffer), "LightMP3 v. %s by Sakya", VERSION);
     skinGetPosition("POS_APP_NAME_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
@@ -282,7 +282,7 @@ int drawToolbars(){
         oslDrawImageXY(commonBattery, tempPos[0], tempPos[1]);
     else
         oslDrawImageXY(commonBatteryLow, tempPos[0], tempPos[1]);
-    sprintf(buffer, "%i%% - %2.2i:%2.2i", battPerc, btrh, btrm);
+    snprintf(buffer, sizeof(buffer), "%i%% - %2.2i:%2.2i", battPerc, btrh, btrm);
     skinGetPosition("POS_BATTERY_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
@@ -290,7 +290,7 @@ int drawToolbars(){
 	int percentage = (int)((double)imposeGetVolume() / 30.0 * 100.0);
     skinGetPosition("POS_VOLUME_ICON", tempPos);
     oslDrawImageXY(commonVolume, tempPos[0], tempPos[1]);
-    sprintf(buffer, "%i%%", percentage);
+    snprintf(buffer, sizeof(buffer), "%i%%", percentage);
     skinGetPosition("POS_VOLUME_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
@@ -303,7 +303,7 @@ int drawToolbars(){
     //Clock:
     skinGetPosition("POS_CPU_ICON", tempPos);
     oslDrawImageXY(commonCPU, tempPos[0], tempPos[1]);
-    sprintf(buffer, "%i / %i", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency());
+    snprintf(buffer, sizeof(buffer), "%i / %i", scePowerGetCpuClockFrequency(), scePowerGetBusClockFrequency());
     skinGetPosition("POS_CPU_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
@@ -315,14 +315,14 @@ int drawToolbars(){
 	}
     skinGetPosition("POS_FREE_MEMORY_LABEL", tempPos);
     oslDrawString(tempPos[0], tempPos[1], langGetString("FREE_MEMORY"));
-    sprintf(buffer, "%i kb", freeKMem / 1024);
+    snprintf(buffer, sizeof(buffer), "%i kb", freeKMem / 1024);
     skinGetPosition("POS_FREE_MEMORY_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
 	//Time:
     pspTime currTime;
     sceRtcGetCurrentClockLocalTime(&currTime);
-	sprintf(buffer, "%2.2d/%2.2d/%4.4d %2.2d:%2.2d", currTime.day, currTime.month, currTime.year, currTime.hour, currTime.minutes);
+	snprintf(buffer, sizeof(buffer), "%2.2d/%2.2d/%4.4d %2.2d:%2.2d", currTime.day, currTime.month, currTime.year, currTime.hour, currTime.minutes);
     skinGetPosition("POS_CLOCK_TEXT", tempPos);
     oslDrawString(tempPos[0], tempPos[1], buffer);
 
@@ -348,8 +348,8 @@ int drawButtonBar(int selectedButton){
 
     oslSetFont(fontNormal);
     for (i=0; i<5; i++){
-        sprintf(langString, "BUTTON_%i", i + 1);
-        sprintf(posName, "POS_BUTTON_%i", i + 1);
+        snprintf(langString, sizeof(langString), "BUTTON_%i", i + 1);
+        snprintf(posName, sizeof(posName), "POS_BUTTON_%i", i + 1);
         skinGetPosition(posName, tempPos);
         int stringX = tempPos[0] + (commonButtons[i]->sizeX - oslGetStringWidth(langGetString(langString))) / 2.0;
 
@@ -512,13 +512,13 @@ int drawHelp(char *help){
     skinGetColor("RGBA_HELP_TITLE_TEXT", tempColor);
     skinGetColor("RGBA_HELP_TITLE_TEXT_SHADOW", tempColorShadow);
     setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-    sprintf(buffer, "HELP_%s_TITLE", help);
+    snprintf(buffer, sizeof(buffer), "HELP_%s_TITLE", help);
     oslDrawString((480 - oslGetStringWidth(langGetString(buffer))) / 2, startY + 3, langGetString(buffer));
     skinGetColor("RGBA_HELP_TEXT", tempColor);
     skinGetColor("RGBA_HELP_TEXT_SHADOW", tempColorShadow);
     setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     for (i=1; i<11; i++){
-        sprintf(buffer, "HELP_%s_%2.2i", help, i);
+        snprintf(buffer, sizeof(buffer), "HELP_%s_%2.2i", help, i);
         oslDrawString(startX + 2, startY + 3 + i * 15, langGetString(buffer));
     }
     return 0;
@@ -607,3 +607,20 @@ int limitString(const char *string, const int width, char *target){
         target[--inLen] = '\0';
     return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Init time zone:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void initTimezone(){
+    int tzOffset = 0;
+    sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_TIMEZONE, &tzOffset);
+    int tzOffsetAbs = tzOffset < 0 ? -tzOffset : tzOffset;
+    int hours = tzOffsetAbs / 60;
+    int minutes = tzOffsetAbs - hours * 60;
+    int pspDaylight = 0;
+    sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_DAYLIGHTSAVINGS, &pspDaylight);
+    static char tz[18];
+    snprintf(tz, sizeof(tz), "GMT%s%02i:%02i%s", tzOffset < 0 ? "+" : "-", hours, minutes, pspDaylight ? " DST" : "");
+    setenv("TZ", tz, 1);
+    tzset();
+} 

@@ -593,7 +593,7 @@ void getCovertArtImageName(char *fileName, struct fileInfo *info){
     directoryUp(dirName);
 
     //Look for fileName.jpg in the same directory:
-    sprintf(buffer, "%s.jpg", fileName);
+    snprintf(buffer, sizeof(buffer), "%s.jpg", fileName);
     size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){
         strcpy(info->coverArtImageName, buffer);
@@ -601,7 +601,7 @@ void getCovertArtImageName(char *fileName, struct fileInfo *info){
     }
 
     //Look for albumName.jpg in the same directory:
-    sprintf(buffer, "%s/%s.jpg", dirName, info->album);
+    snprintf(buffer, sizeof(buffer), "%s/%s.jpg", dirName, info->album);
     size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){
         strcpy(info->coverArtImageName, buffer);
@@ -609,7 +609,7 @@ void getCovertArtImageName(char *fileName, struct fileInfo *info){
     }
 
     //Look for folder.jpg in the same directory:
-    sprintf(buffer, "%s/%s", dirName, "folder.jpg");
+    snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
     size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){
         strcpy(info->coverArtImageName, buffer);
@@ -617,7 +617,7 @@ void getCovertArtImageName(char *fileName, struct fileInfo *info){
     }
 
     //Look for cover.jpg in same directory:
-    sprintf(buffer, "%s/%s", dirName, "cover.jpg");
+    snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "cover.jpg");
     size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){
         strcpy(info->coverArtImageName, buffer);

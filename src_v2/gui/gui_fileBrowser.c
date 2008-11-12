@@ -166,7 +166,7 @@ int gui_fileBrowser(){
     commonMenu.yPos = tempPos[1];
     commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 1;
-    sprintf(buffer, "%s/menubkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/menubkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
@@ -187,7 +187,7 @@ int gui_fileBrowser(){
 			strcpy(curDirShort, music_directory_2);
 			result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
 			/*if (result){
-                sprintf(buffer, "\"%s\" and \"%s\" not found or empty", music_directory_1, music_directory_2);
+                snprintf(buffer, sizeof(buffer), "\"%s\" and \"%s\" not found or empty", music_directory_1, music_directory_2);
                 debugMessageBox(buffer);
                 oslQuit();
 				return -1;
@@ -250,19 +250,19 @@ int gui_fileBrowser(){
 
 						cpuBoost();
 						if (curDirShort[strlen(curDirShort)-1] != '/')
-							sprintf(dirName, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+							snprintf(dirName, sizeof(dirName), "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 						else
-							sprintf(dirName, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+							snprintf(dirName, sizeof(dirName), "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 						if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode))
 							directoryUp(dirName);
 						//Look for folder.jpg in the same directory:
-						sprintf(buffer, "%s/%s", dirName, "folder.jpg");
+						snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
 						size = fileExists(buffer);
 						if (size > 0 && size <= MAX_IMAGE_DIMENSION)
 				            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 						else{
 							//Look for cover.jpg in same directory:
-							sprintf(buffer, "%s/%s", dirName, "cover.jpg");
+							snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "cover.jpg");
 							size = fileExists(buffer);
 							if (size > 0 && size <= MAX_IMAGE_DIMENSION)
 					            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
@@ -298,11 +298,11 @@ int gui_fileBrowser(){
                 }else if (FIO_S_ISREG(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     //Play file:
                     if (curDir[strlen(curDir)-1] != '/'){
-                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
-                        sprintf(userSettings->selectedBrowserItemShort, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+                        snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 					}else{
-                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
-                        sprintf(userSettings->selectedBrowserItemShort, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+                        snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 					}
                     fileBrowserRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_FILEBROWSER;
@@ -310,11 +310,11 @@ int gui_fileBrowser(){
                 }
             }else if (!USBactive && osl_pad.released.start && commonMenu.numberOfElements){
                 if (curDir[strlen(curDir)-1] != '/'){
-                    sprintf(buffer, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
-                    sprintf(bufferShort, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+                    snprintf(buffer, sizeof(buffer), "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                    snprintf(bufferShort, sizeof(bufferShort), "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 				}else{
-                    sprintf(buffer, "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
-                    sprintf(bufferShort, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+                    snprintf(buffer, sizeof(buffer), "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                    snprintf(bufferShort, sizeof(bufferShort), "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 				}
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     addDirectoryToPlaylist(buffer, bufferShort);
@@ -329,11 +329,11 @@ int gui_fileBrowser(){
                 //Play directory:
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     if (curDir[strlen(curDir)-1] != '/'){
-                        sprintf(userSettings->selectedBrowserItem, "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
-                        sprintf(userSettings->selectedBrowserItemShort, "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+                        snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s/%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s/%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 					}else{
-                        sprintf(userSettings->selectedBrowserItem, "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
-                        sprintf(userSettings->selectedBrowserItemShort, "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
+                        snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s%s", curDir, directory.directory_entry[commonMenu.selected].longname);
+                        snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s%s", curDirShort, directory.directory_entry[commonMenu.selected].d_name);
 					}
                     fileBrowserRetValue = MODE_PLAYER;
                     userSettings->previousMode = MODE_FILEBROWSER;
@@ -369,7 +369,7 @@ int gui_fileBrowser(){
 
                     int retVal = oslInitUsbStorage();
                     if (retVal){
-                        sprintf(buffer, "Error InitUsbStorage: %i", retVal);
+                        snprintf(buffer, sizeof(buffer), "Error InitUsbStorage: %i", retVal);
                         //debugMessageBox(buffer);
                     }else{
                         oslStartUsbStorage();

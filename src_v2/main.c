@@ -261,6 +261,7 @@ int main(){
     int currentMode = MODE_FILEBROWSER;
 
     initExceptionHandler();
+	initTimezone();
     //openLog("lightMP3.log", 0);
 
     //Init:
@@ -271,7 +272,7 @@ int main(){
 	//Full name for settings' file:
 	if (ebootDirectory[strlen(ebootDirectory)-1] != '/')
 		strcat(ebootDirectory, "/");
-    sprintf(buffer, "%s%s", ebootDirectory, "settings");
+    snprintf(buffer, sizeof(buffer), "%s%s", ebootDirectory, "settings");
 
 	//Carico le opzioni:
 	if (!SETTINGS_load(buffer))
@@ -294,7 +295,7 @@ int main(){
     //Start support prx
 	SceUID modid = pspSdkLoadStartModule("support.prx", PSP_MEMORY_PARTITION_KERNEL);
 	if (modid < 0){
-        sprintf(buffer, "Error 0x%08X loading/starting support.prx!\n", modid);
+        snprintf(buffer, sizeof(buffer), "Error 0x%08X loading/starting support.prx!\n", modid);
         debugMessageBox(buffer);
         sceKernelDelayThread(3000000);
         sceKernelExitGame();
@@ -305,7 +306,7 @@ int main(){
 	modid = pspSdkLoadStartModule("miniconv.prx", PSP_MEMORY_PARTITION_USER);
 	if (modid < 0){
         char buffer[128];
-        sprintf(buffer, "Error 0x%08X loading/starting miniconv.prx!\n", modid);
+        snprintf(buffer, sizeof(buffer), "Error 0x%08X loading/starting miniconv.prx!\n", modid);
         debugMessageBox(buffer);
         sceKernelDelayThread(3000000);
         sceKernelExitGame();
@@ -318,8 +319,8 @@ int main(){
     //oslSetRemoteKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_PLAYER);
 
     //Temp m3u filename:
-    sprintf(MLtempM3Ufile, "%s%s", userSettings->ebootPath, "MLtemp.m3u");
-    sprintf(tempM3Ufile, "%s%s", userSettings->ebootPath, "temp.m3u");
+    snprintf(MLtempM3Ufile, sizeof(MLtempM3Ufile), "%s%s", userSettings->ebootPath, "MLtemp.m3u");
+    snprintf(tempM3Ufile, sizeof(tempM3Ufile), "%s%s", userSettings->ebootPath, "temp.m3u");
     M3U_clear();
     M3U_save(tempM3Ufile);
 
@@ -332,9 +333,9 @@ int main(){
 	CLOCK_WHEN_PAUSE = getMinCPUClock();
 
     //Load language file:
-    sprintf(buffer, "%slanguages/", userSettings->ebootPath);
+    snprintf(buffer, sizeof(buffer), "%slanguages/", userSettings->ebootPath);
     langLoadList(buffer);
-    sprintf(buffer, "%slanguages/%s/lang.txt", userSettings->ebootPath, userSettings->lang);
+    snprintf(buffer, sizeof(buffer), "%slanguages/%s/lang.txt", userSettings->ebootPath, userSettings->lang);
     if (langLoad(buffer)){
         debugMessageBox("Error loading language file.");
     	sceKernelExitGame();
@@ -343,13 +344,13 @@ int main(){
 
 	initFonts();
 
-    sprintf(buffer, "%sskins/", userSettings->ebootPath);
+    snprintf(buffer, sizeof(buffer), "%sskins/", userSettings->ebootPath);
     skinLoadList(buffer);
-    sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
+    snprintf(buffer, sizeof(buffer), "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
     skinLoad(buffer);
 
     //Skin's s images path:
-    sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
+    snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
 	//Default text size:
 	defaultTextSize = skinGetParam("FONT_NORMAL_SIZE") / 100.0;
 
@@ -371,7 +372,7 @@ int main(){
 
 	//AudioScrobbler:
 	if (userSettings->SCROBBLER){
-        sprintf(buffer, "%s%s", ebootDirectory, ".scrobbler.log");
+        snprintf(buffer, sizeof(buffer), "%s%s", ebootDirectory, ".scrobbler.log");
 		SCROBBLER_init(buffer);
 	}
 

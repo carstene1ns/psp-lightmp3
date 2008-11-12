@@ -80,7 +80,7 @@ int getSettingVal(int index, char *value){
             sprintf(value, "%s", yesNo[userSettings->MP3_ME]);
             break;
         case 7:
-            sprintf(buffer, "BOOST_%s", userSettings->BOOST);
+            snprintf(buffer, sizeof(buffer), "BOOST_%s", userSettings->BOOST);
             sprintf(value, "%s", langGetString(buffer));
             break;
         case 8:
@@ -127,7 +127,7 @@ int initSettingsMenu(){
     commonMenu.xPos = tempPos[0];
     commonMenu.fastScrolling = 0;
     commonMenu.align = ALIGN_LEFT;
-    sprintf(buffer, "%s/menubkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/menubkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
@@ -160,7 +160,7 @@ int initSettingsMenu(){
 int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     int i = 0;
     char name[100] = "";
-    char settingVal[10] = "";
+    char settingVal[50] = "";
     struct menuElement tMenuEl;
 
     menu->numberOfElements = 17;
@@ -169,7 +169,7 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     values->selected = menu->selected;
     values->numberOfElements = menu->numberOfElements;
     for (i=0; i<menu->numberOfElements; i++){
-        sprintf(name, "SETTINGS_%2.2i", i + 1);
+        snprintf(name, sizeof(name), "SETTINGS_%2.2i", i + 1);
         strcpy(tMenuEl.text, langGetString(name));
         tMenuEl.icon = NULL;
         tMenuEl.triggerFunction = NULL;
@@ -211,10 +211,10 @@ int changeSettingVal(int index, int delta){
 
 				current += delta;
                 strcpy(userSettings->skinName, skinsList[current]);
-                sprintf(buffer, "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
+                snprintf(buffer, sizeof(buffer), "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
                 skinLoad(buffer);
                 //debugMessageBox("skin's settings loaded");
-                sprintf(userSettings->skinImagesPath, "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
+                snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
 				clearMenu(&commonMenu);
 			    clearMenu(&commonSubMenu);
                 //debugMessageBox("cleared menues");
@@ -240,7 +240,7 @@ int changeSettingVal(int index, int delta){
                 current += delta;
                 strcpy(userSettings->lang, languagesList[current]);
             }
-            sprintf(buffer, "%slanguages/%s/lang.txt", userSettings->ebootPath, userSettings->lang);
+            snprintf(buffer, sizeof(buffer), "%slanguages/%s/lang.txt", userSettings->ebootPath, userSettings->lang);
             if (langLoad(buffer)){
                 debugMessageBox("Error loading language file.");
             	oslQuit ();
@@ -256,7 +256,7 @@ int changeSettingVal(int index, int delta){
             userSettings->SCROBBLER = !userSettings->SCROBBLER;
             //AudioScrobbler:
             if (userSettings->SCROBBLER){
-                sprintf(buffer, "%s%s", userSettings->ebootPath, ".scrobbler.log");
+                snprintf(buffer, sizeof(buffer), "%s%s", userSettings->ebootPath, ".scrobbler.log");
                 SCROBBLER_init(buffer);
             }
             break;

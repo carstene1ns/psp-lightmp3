@@ -93,9 +93,9 @@ int ML_fixStringField(char *fieldStr){
 int ML_existsDB(char *directory, char *fileName){
     char buffer[264] = "";
     if (directory[strlen(directory)-1] != '/')
-        sprintf(buffer, "%s/%s", directory, fileName);
+        snprintf(buffer, sizeof(buffer), "%s/%s", directory, fileName);
     else
-        sprintf(buffer, "%s%s", directory, fileName);
+        snprintf(buffer, sizeof(buffer), "%s%s", directory, fileName);
     FILE *test = fopen(buffer, "r");
     if (test == NULL)
         return 0;
@@ -115,7 +115,7 @@ int ML_createEmptyDB(char *directory, char *fileName){
     if (result)
         return ML_ERROR_OPENDB;
 
-    sprintf(sql, "create table media (artist varchar(256), album varchar(256), \
+    snprintf(sql, sizeof(sql), "create table media (artist varchar(256), album varchar(256), \
                                       title varchar(256), genre varchar(256), year varchar(4), \
                                       path varchar(264), realpath varchar(264), extension varchar(4), \
                                       seconds integer, tracknumber integer, rating integer, \
@@ -127,14 +127,14 @@ int ML_createEmptyDB(char *directory, char *fileName){
         return ML_ERROR_SQL;
     }
 
-    sprintf(sql, "create table sysvars (varname varchar(256), varvalue varchar(256), \
+    snprintf(sql, sizeof(sql), "create table sysvars (varname varchar(256), varvalue varchar(256), \
                                         PRIMARY KEY (varname));");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
-	sprintf(sql, "Insert into sysvars(varname, varvalue) values('DB_VERSION', '%s');", ML_DB_VERSION);
+	snprintf(sql, sizeof(sql), "Insert into sysvars(varname, varvalue) values('DB_VERSION', '%s');", ML_DB_VERSION);
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
@@ -163,7 +163,7 @@ int ML_createEmptyDB(char *directory, char *fileName){
 	for (i=0; i<20; i++){
 		if (!strlen(indexes[i]))
 			break;
-		sprintf(sql, "create index media_idx_%2.2i on media (%s);", i + 1, indexes[i]);
+		snprintf(sql, sizeof(sql), "create index media_idx_%2.2i on media (%s);", i + 1, indexes[i]);
 		result = sqlite3_exec(db, sql, NULL, 0, &zErr);
 		if (result != SQLITE_OK){
 			ML_INTERNAL_closeDB();
@@ -171,35 +171,35 @@ int ML_createEmptyDB(char *directory, char *fileName){
 		}
 	}
 
-	/*sprintf(sql, "create index media_idx_01 on media (artist, album);");
+	/*snprintf(sql, sizeof(sql), "create index media_idx_01 on media (artist, album);");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
 
-    sprintf(sql, "create index media_idx_02 on media (genre);");
+    snprintf(sql, sizeof(sql), "create index media_idx_02 on media (genre);");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
 
-    sprintf(sql, "create index media_idx_03 on media (rating);");
+    snprintf(sql, sizeof(sql), "create index media_idx_03 on media (rating);");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
 
-    sprintf(sql, "create index media_idx_04 on media (played desc, rating desc, title);");
+    snprintf(sql, sizeof(sql), "create index media_idx_04 on media (played desc, rating desc, title);");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
 
-    sprintf(sql, "create index media_idx_05 on media (title, artist);");
+    snprintf(sql, sizeof(sql), "create index media_idx_05 on media (title, artist);");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
         ML_INTERNAL_closeDB();
@@ -280,11 +280,11 @@ int ML_scanMS(char extFilter[][5], int extNumber,
                 //fwrite(openedDir.directory_entry[i].longname, sizeof(char), strlen(openedDir.directory_entry[i].longname), log);
 
                 if (dirToScan[dirScanned][strlen(dirToScan[dirScanned])-1] != '/'){
-                    sprintf(fullName, "%s/%s", dirToScan[dirScanned], openedDir.directory_entry[i].longname);
-                    sprintf(fullNameShort, "%s/%s", dirToScanShort[dirScanned], openedDir.directory_entry[i].d_name);
+                    snprintf(fullName, sizeof(fullName), "%s/%s", dirToScan[dirScanned], openedDir.directory_entry[i].longname);
+                    snprintf(fullNameShort, sizeof(fullNameShort), "%s/%s", dirToScanShort[dirScanned], openedDir.directory_entry[i].d_name);
                 }else{
-                    sprintf(fullName, "%s%s", dirToScan[dirScanned], openedDir.directory_entry[i].longname);
-                    sprintf(fullNameShort, "%s%s", dirToScanShort[dirScanned], openedDir.directory_entry[i].d_name);
+                    snprintf(fullName, sizeof(fullName), "%s%s", dirToScan[dirScanned], openedDir.directory_entry[i].longname);
+                    snprintf(fullNameShort, sizeof(fullNameShort), "%s%s", dirToScanShort[dirScanned], openedDir.directory_entry[i].d_name);
                 }
 
                 if (FIO_S_ISREG(openedDir.directory_entry[i].d_stat.st_mode)){
@@ -299,7 +299,7 @@ int ML_scanMS(char extFilter[][5], int extNumber,
                     ML_fixStringField(info.genre);
                     //ML_fixStringField(fullName);
                     ML_fixStringField(fullNameShort);
-                    sprintf(sql, "insert into media (artist, album, title, genre, year, path, realpath, \
+                    snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, realpath, \
                                                      extension, seconds, samplerate, bitrate, tracknumber) \
                                   values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %li, %li, %i, %i);",
                                   info.artist, info.album, info.title, info.genre, info.year,
@@ -347,7 +347,7 @@ int ML_scanMS(char extFilter[][5], int extNumber,
 int ML_countRecords(char *whereCondition){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
-    sprintf(sql, "Select count(*) \
+    snprintf(sql, sizeof(sql), "Select count(*) \
                   From media \
                   Where %s;", whereCondition);
     recordsCount = 0;
@@ -370,7 +370,7 @@ int ML_countRecords(char *whereCondition){
 int ML_countRecordsSelect(char *select){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
-    sprintf(sql, "%s", select);
+    snprintf(sql, sizeof(sql), "%s", select);
     recordsCount = 0;
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
@@ -391,7 +391,7 @@ int ML_countRecordsSelect(char *select){
 int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int limit, struct libraryEntry *resultBuffer){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
-    sprintf(sql, "Select coalesce(artist, ''), coalesce(album, ''), coalesce(title, ''), coalesce(genre, ''), coalesce(year, ''), \
+    snprintf(sql, sizeof(sql), "Select coalesce(artist, ''), coalesce(album, ''), coalesce(title, ''), coalesce(genre, ''), coalesce(year, ''), \
                          path, coalesce(extension, ''), seconds, rating, \
                          samplerate, bitrate, played, coalesce(realpath, '') \
                   From media \
@@ -444,9 +444,9 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 	if (strstr(select, " LIMIT "))
-	    sprintf(sql, "%s OFFSET %i", select, offset);
+	    snprintf(sql, sizeof(sql), "%s OFFSET %i", select, offset);
 	else
-	    sprintf(sql, "%s LIMIT %i OFFSET %i", select, limit, offset);
+	    snprintf(sql, sizeof(sql), "%s LIMIT %i OFFSET %i", select, limit, offset);
 
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
@@ -525,7 +525,7 @@ int ML_addEntry(struct libraryEntry entry){
     else if (entry.rating < 0)
         entry.rating = 0;
 
-    sprintf(sql, "insert into media (artist, album, title, genre, year, path, realpath, \
+    snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, realpath, \
                                      extension, seconds, samplerate, bitrate, tracknumber, \
                                      rating, played) \
                   values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %i, %i, %i, %i, %i, %i);",
@@ -561,7 +561,7 @@ int ML_updateEntry(struct libraryEntry entry){
     else if (entry.rating < 0)
         entry.rating = 0;
 
-    sprintf(sql, "update media \
+    snprintf(sql, sizeof(sql), "update media \
                   set artist = '%s', album = '%s', title = '%s', genre = '%s', \
                       year = '%s', extension = '%s', \
                       seconds = %i, samplerate = %i, bitrate = %i, tracknumber = %i, \
@@ -600,7 +600,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
-    sprintf(sql, "Select path, coalesce(realpath, '') From media Order by path");
+    snprintf(sql, sizeof(sql), "Select path, coalesce(realpath, '') From media Order by path");
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
@@ -621,7 +621,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
         test = fopen(fileName, "r");
         if (test == NULL){
             ML_fixStringField(fileName);
-            sprintf(sql, "Delete From media Where path = upper('%s');", path);
+            snprintf(sql, sizeof(sql), "Delete From media Where path = upper('%s');", path);
             int retValue = sqlite3_prepare(db, sql, -1, &del, 0);
             if (retValue != SQLITE_OK)
                 continue;
@@ -652,7 +652,7 @@ int ML_vacuum(){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
-    sprintf(sql, "VACUUM");
+    snprintf(sql, sizeof(sql), "VACUUM");
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();

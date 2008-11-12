@@ -74,7 +74,7 @@ int drawPlaylistInfo(){
         skinGetPosition("POS_PLAYLIST_NAME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], commonMenu.elements[commonMenu.selected].text);
         skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_VALUE", tempPos);
-        sprintf(tBuffer, "%i", M3U_getSongCount());
+        snprintf(tBuffer, sizeof(tBuffer), "%i", M3U_getSongCount());
         oslDrawString(tempPos[0], tempPos[1], tBuffer);
 
         formatHHMMSS(M3U_getTotalLength(), tBuffer);
@@ -96,11 +96,11 @@ int gui_playlistsBrowser(){
     int confirmStatus = STATUS_CONFIRM_NONE;
 
     //Create plylists directory:
-    sprintf(playlistsDir, "%s%s", userSettings->ebootPath, "playLists");
+    snprintf(playlistsDir, sizeof(playlistsDir), "%s%s", userSettings->ebootPath, "playLists");
 	sceIoMkdir(playlistsDir, 0777);
 
     //Load images:
-    sprintf(buffer, "%s/playlistinfobkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/playlistinfobkg.png", userSettings->skinImagesPath);
     playlistInfoBkg = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!playlistInfoBkg)
         errorLoadImage(buffer);
@@ -110,7 +110,7 @@ int gui_playlistsBrowser(){
     commonMenu.xPos = tempPos[0];
     commonMenu.yPos = tempPos[1];
     commonMenu.fastScrolling = 1;
-    sprintf(buffer, "%s/menuplaylistbkg.png", userSettings->skinImagesPath);
+    snprintf(buffer, sizeof(buffer), "%s/menuplaylistbkg.png", userSettings->skinImagesPath);
     commonMenu.background = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
     if (!commonMenu.background)
         errorLoadImage(buffer);
@@ -133,7 +133,7 @@ int gui_playlistsBrowser(){
 			oslStartDrawing();
 
 			if (commonMenu.selected >= 0 && strcmp(buffer, commonMenu.elements[commonMenu.selected].text)){
-				sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+				snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
 				M3U_clear();
 				M3U_open(buffer);
 				strcpy(buffer, commonMenu.elements[commonMenu.selected].text);
@@ -168,8 +168,9 @@ int gui_playlistsBrowser(){
         if (!confirmStatus){
             processMenuKeys(&commonMenu);
             if(osl_pad.released.cross && commonMenu.numberOfElements){
-                sprintf(userSettings->selectedBrowserItem, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
-                userSettings->playlistStartIndex = -1;
+				snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s/%s", playlistsDir, directory.directory_entry[commonMenu.selected].longname);
+				snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s/%s", playlistsDir, directory.directory_entry[commonMenu.selected].d_name);
+				userSettings->playlistStartIndex = -1;
                 playlistsBrowserRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_PLAYLISTS;
                 exitFlagPlaylistsBrowser = 1;
@@ -193,7 +194,7 @@ int gui_playlistsBrowser(){
                 confirmStatus = STATUS_CONFIRM_NONE;
         }else if (confirmStatus == STATUS_CONFIRM_LOAD){
             if(osl_pad.released.cross){
-                sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                 M3U_clear();
                 M3U_open(buffer);
                 M3U_save(tempM3Ufile);
@@ -206,7 +207,7 @@ int gui_playlistsBrowser(){
             if(osl_pad.released.cross){
                 M3U_clear();
                 M3U_open(tempM3Ufile);
-                sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                 M3U_open(buffer);
                 M3U_save(tempM3Ufile);
                 confirmStatus = STATUS_CONFIRM_NONE;
@@ -215,7 +216,7 @@ int gui_playlistsBrowser(){
             }
         }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
             if(osl_pad.released.cross){
-                sprintf(buffer, "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                 sceIoRemove(buffer);
                 opendir_close(&directory);
 				cpuBoost();
