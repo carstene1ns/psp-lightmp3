@@ -324,7 +324,7 @@ void drawMLinfo(){
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
 
-        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].intField02, buffer);
+        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].intField02, buffer, sizeof(buffer));
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TIME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
     }else if (mlQueryType == QUERY_SINGLE_ENTRY){
@@ -347,7 +347,7 @@ void drawMLinfo(){
         skinGetPosition("POS_MEDIALIBRARY_YEAR_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].year);
 
-        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].seconds, buffer);
+        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].seconds, buffer, sizeof(buffer));
         skinGetPosition("POS_MEDIALIBRARY_TIME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
 
@@ -412,6 +412,10 @@ void drawMLinfo(){
 int exitSelection(){
     buildQueryMenu(previousSelect, previousWhere, previousOrderBy, backToMainMenu);
 	mlQueryType = mlPrevQueryType;
+	if (coverArt){
+		oslDeleteImage(coverArt);
+		coverArt = NULL;
+	}
     return 0;
 }
 

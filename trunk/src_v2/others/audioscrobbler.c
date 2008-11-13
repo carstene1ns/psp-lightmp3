@@ -20,6 +20,7 @@
 #include <string.h>
 #include "../players/player.h"
 #include "audioscrobbler.h"
+#include "../main.h"
 
 char SCROBBLER_fileName[264];
 
@@ -42,6 +43,7 @@ int SCROBBLER_init(char *fileName){
 //Write header:
 int SCROBBLER_writeHeader(){
 	FILE *f;
+	char buffer[260] = "";
 
 	f = fopen(SCROBBLER_fileName, "w");
 	if (f == NULL){
@@ -50,7 +52,8 @@ int SCROBBLER_writeHeader(){
 	}
     fwrite("#AUDIOSCROBBLER/1.0\n", 1, strlen("#AUDIOSCROBBLER/1.0\n"), f);
     fwrite("#TZ/UTC\n", 1, strlen("#TZ/UTC\n"), f);
-    fwrite("#CLIENT/PSP LightMP3\n", 1, strlen("#CLIENT/PSP LightMP3\n"), f);
+	snprintf(buffer, sizeof(buffer), "#CLIENT/PSP LightMP3 v%s\n", VERSION);
+    fwrite(buffer, 1, strlen(buffer), f);
 	fclose(f);
     return(0);
 }

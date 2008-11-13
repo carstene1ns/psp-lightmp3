@@ -77,7 +77,7 @@ int drawPlaylistInfo(){
         snprintf(tBuffer, sizeof(tBuffer), "%i", M3U_getSongCount());
         oslDrawString(tempPos[0], tempPos[1], tBuffer);
 
-        formatHHMMSS(M3U_getTotalLength(), tBuffer);
+        formatHHMMSS(M3U_getTotalLength(), tBuffer, sizeof(tBuffer));
         skinGetPosition("POS_PLAYLIST_TOTAL_TIME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], tBuffer);
     }

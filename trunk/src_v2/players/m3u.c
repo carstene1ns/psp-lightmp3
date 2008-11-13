@@ -94,7 +94,11 @@ int M3U_open(char *fileName){
 			if ((int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 10 || (int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 13 ){
 				singleEntry.fileName[strlen(singleEntry.fileName) - 1] = '\0';
 			}
-			strncpy(singleEntry.title, title, 263);
+			if (strlen(title)){
+				strncpy(singleEntry.title, title, 263);
+			}else{
+				getFileName(singleEntry.fileName, singleEntry.title);
+			}
 			singleEntry.title[263] = '\0';
 			singleEntry.length = atoi(chrLength);
 			lPlayList.songs[playListCount++] = singleEntry;

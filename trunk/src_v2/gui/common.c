@@ -542,11 +542,11 @@ int drawRating(int startX, int startY, int rating){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Format seconds ina string HH:MM:SS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int formatHHMMSS(int seconds, char *timeString){
+int formatHHMMSS(int seconds, char *timeString, int stringLimit){
     int hh = seconds / 3600;
     int mm = (seconds - hh * 3600) / 60;
     int ss = seconds - hh * 3600 - mm * 60;
-    sprintf(timeString, "%2.2i:%2.2i:%2.2i", hh, mm, ss);
+    snprintf(timeString, stringLimit, "%2.2i:%2.2i:%2.2i", hh, mm, ss);
     return 0;
 }
 
@@ -612,15 +612,21 @@ int limitString(const char *string, const int width, char *target){
 // Init time zone:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void initTimezone(){
-    int tzOffset = 0;
-    sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_TIMEZONE, &tzOffset);
-    int tzOffsetAbs = tzOffset < 0 ? -tzOffset : tzOffset;
-    int hours = tzOffsetAbs / 60;
-    int minutes = tzOffsetAbs - hours * 60;
-    int pspDaylight = 0;
-    sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_DAYLIGHTSAVINGS, &pspDaylight);
-    static char tz[18];
-    snprintf(tz, sizeof(tz), "GMT%s%02i:%02i%s", tzOffset < 0 ? "+" : "-", hours, minutes, pspDaylight ? " DST" : "");
-    setenv("TZ", tz, 1);
-    tzset();
+   int tzOffset = 0;
+   int dst = 0;
+   sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_TIMEZONE, &tzOffset);
+   sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_DAYLIGHTSAVINGS, &dst);
+   int tzOffsetAbs = tzOffset < 0 ? -tzOffset : tzOffset;
+   int hours = tzOffsetAbs / 60;
+   int minutes = tzOffsetAbs - hours * 60;
+   char *tz;
+   if (dst == 1) {
+      tz = malloc(14*sizeof(char));
+      sprintf(tz, "GMT%s%02i:%02i DST", tzOffset < 0 ? "+" : "-", hours, minutes);
+   } else {
+      tz = malloc(10*sizeof(char));
+      sprintf(tz, "GMT%s%02i:%02i", tzOffset < 0 ? "+" : "-", hours, minutes);
+   }   
+   setenv("TZ", tz, 1);
+   tzset(); 
 } 
