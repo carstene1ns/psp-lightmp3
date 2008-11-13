@@ -30,6 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "opendir.h"
 #include "fat.h"
 #include "libminiconv.h"
+#include <pspsysmem.h>
 
 static int FATinit = 0;
 
@@ -47,7 +48,7 @@ void opendir_close(struct opendir_struct *p){
 
 char *opendir_open(struct opendir_struct *p, const char *directory, const char *directoryShort, char extFilter[][5], int extNumber, int includeDirs){
 	if (!FATinit){
-		fat_init();
+		fat_init(sceKernelDevkitVersion());
 		FATinit = 1;
 	}
 
@@ -75,9 +76,9 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 	for (i = 0; i < number_of_directory_entries; i++){
 		char fileName[264] = "";
 		if (directoryShort[strlen(directoryShort)-1] != '/')
-			snprintf(fileName, sizeof(fileName), "%s/%s", directoryShort, finfo[i].shortname);
+			snprintf(fileName, sizeof(fileName), "%s/%s", directoryShort, finfo[i].filename);
 		else
-			snprintf(fileName, sizeof(fileName), "%s%s", directoryShort, finfo[i].shortname);
+			snprintf(fileName, sizeof(fileName), "%s%s", directoryShort, finfo[i].filename);
         //fwrite(fileName, sizeof(char), strlen(fileName), log);
 		//Filtro le dir "." e "..":
 		if (finfo[i].filename[0] == '.'){
@@ -120,7 +121,7 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 			}
 		}
 		//Elemento ok:
-		strcpy(p->directory_entry[p->number_of_directory_entries].d_name, finfo[i].shortname);
+		strcpy(p->directory_entry[p->number_of_directory_entries].d_name, finfo[i].filename);
         strcpy(p->directory_entry[p->number_of_directory_entries].longname, finfo[i].longname);
 		//fwrite(" OK\n", sizeof(char), strlen(" OK\n"), log);
 		p->number_of_directory_entries++;
@@ -172,7 +173,7 @@ void getExtension(char *fileName, char *extension, int extMaxLength){
 //Get directory up one level:
 int directoryUp(char *dirName)
 {
-	if (dirName != "ms0:/"){
+	if (strcmp(dirName, "ms0:/")){
 		//Cerco l'ultimo slash:
 		int i = 0;
 		for (i = strlen(dirName) - 1; i >= 0; i--){

@@ -126,6 +126,7 @@ To enable scrobbler go to the options screen.
 
 You can upload the log through this page (remember to delete the .scrobbler.log file after uploading it):
 http://paulstead.com/scrob/
+Time in the .scrobbler.log is UTC, so submit your log choosing UTC.
 
 
 COVERART
