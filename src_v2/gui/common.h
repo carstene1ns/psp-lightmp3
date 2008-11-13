@@ -63,7 +63,7 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
 int drawHelp(char *help);
 int drawRating(int startX, int startY, int rating);
 
-int formatHHMMSS(int seconds, char *timeString);
+int formatHHMMSS(int seconds, char *timeString, int stringLimit);
 int initFonts();
 void setFontStyle(OSL_FONT *f, float size, unsigned int color, unsigned int shadowColor, unsigned int options);
 int getOSKlang();

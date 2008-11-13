@@ -46,7 +46,7 @@ char buffer[264] = "";
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Get a settings value from menu index:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int getSettingVal(int index, char *value){
+int getSettingVal(int index, char *value, int valueLimit){
     char yesNo[2][20];
     char bCheck[3][50];
 
@@ -59,56 +59,56 @@ int getSettingVal(int index, char *value){
 
     switch(index){
         case 0:
-            sprintf(value, "%s", userSettings->skinName);
+            snprintf(value, valueLimit, "%s", userSettings->skinName);
             break;
         case 1:
-            sprintf(value, "%s", userSettings->lang);
+            snprintf(value, valueLimit, "%s", userSettings->lang);
             break;
         case 2:
-            sprintf(value, "%s", yesNo[userSettings->SCROBBLER]);
+            snprintf(value, valueLimit, "%s", yesNo[userSettings->SCROBBLER]);
             break;
         case 3:
-            sprintf(value, "%s", yesNo[userSettings->FADE_OUT]);
+            snprintf(value, valueLimit, "%s", yesNo[userSettings->FADE_OUT]);
             break;
         case 4:
-            sprintf(value, "%i", userSettings->MUTED_VOLUME);
+            snprintf(value, valueLimit, "%i", userSettings->MUTED_VOLUME);
             break;
         case 5:
-            sprintf(value, "%s", bCheck[userSettings->BRIGHTNESS_CHECK]);
+            snprintf(value, valueLimit, "%s", bCheck[userSettings->BRIGHTNESS_CHECK]);
             break;
         case 6:
-            sprintf(value, "%s", yesNo[userSettings->MP3_ME]);
+            snprintf(value, valueLimit, "%s", yesNo[userSettings->MP3_ME]);
             break;
         case 7:
             snprintf(buffer, sizeof(buffer), "BOOST_%s", userSettings->BOOST);
-            sprintf(value, "%s", langGetString(buffer));
+            snprintf(value, valueLimit, "%s", langGetString(buffer));
             break;
         case 8:
-            sprintf(value, "%s", yesNo[userSettings->CLOCK_AUTO]);
+            snprintf(value, valueLimit, "%s", yesNo[userSettings->CLOCK_AUTO]);
             break;
         case 9:
-            sprintf(value, "%i", userSettings->CLOCK_GUI);
+            snprintf(value, valueLimit, "%i", userSettings->CLOCK_GUI);
             break;
         case 10:
-            sprintf(value, "%i", userSettings->CLOCK_MP3);
+            snprintf(value, valueLimit, "%i", userSettings->CLOCK_MP3);
             break;
         case 11:
-            sprintf(value, "%i", userSettings->CLOCK_MP3ME);
+            snprintf(value, valueLimit, "%i", userSettings->CLOCK_MP3ME);
             break;
         case 12:
-            sprintf(value, "%i", userSettings->CLOCK_OGG);
+            snprintf(value, valueLimit, "%i", userSettings->CLOCK_OGG);
             break;
         case 13:
-            sprintf(value, "%i", userSettings->CLOCK_FLAC);
+            snprintf(value, valueLimit, "%i", userSettings->CLOCK_FLAC);
             break;
         case 14:
-            sprintf(value, "%i", userSettings->CLOCK_AA3);
+            snprintf(value, valueLimit, "%i", userSettings->CLOCK_AA3);
             break;
         case 15:
-            sprintf(value, "%i", userSettings->KEY_AUTOREPEAT_GUI);
+            snprintf(value, valueLimit, "%i", userSettings->KEY_AUTOREPEAT_GUI);
             break;
         case 16:
-            sprintf(value, "%s", yesNo[userSettings->SHOW_SPLASH]);
+            snprintf(value, valueLimit, "%s", yesNo[userSettings->SHOW_SPLASH]);
             break;
 	}
 
@@ -174,7 +174,7 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
         tMenuEl.icon = NULL;
         tMenuEl.triggerFunction = NULL;
         menu->elements[i] = tMenuEl;
-        getSettingVal(i, settingVal);
+        getSettingVal(i, settingVal, sizeof(settingVal));
         strcpy(tMenuEl.text, settingVal);
         tMenuEl.triggerFunction = NULL;
         values->elements[i] = tMenuEl;
