@@ -5,6 +5,7 @@
 #include "fat.h"
 #include "libminiconv.h"
 
+static int fwVersion;
 static int fatfd = -1;
 static t_fat_dbr dbr;
 static t_fat_mbr mbr;
@@ -21,8 +22,9 @@ static enum {
 	fat32
 } fat_type = fat16;
 
-int fat_init()
+int fat_init(int devkitVersion)
 {
+	fwVersion = devkitVersion;
 	fatfd = sceIoOpen("msstor:", PSP_O_RDONLY, 0777);
 	if(fatfd < 0)
 		return 0;
@@ -32,26 +34,26 @@ int fat_init()
 		fatfd = -1;
 		return 0;
 	}
-
+	
 	dbr_pos = mbr.dpt[0].start_sec * 0x200;
-
+	
 	if(sceIoLseek32(fatfd, dbr_pos, PSP_SEEK_SET) != dbr_pos || sceIoRead(fatfd, &dbr, sizeof(dbr)) < sizeof(dbr))
 	{
 		dbr_pos = 0;
-		if(sceIoLseek32(fatfd, dbr_pos, PSP_SEEK_SET) != dbr_pos || sceIoRead(fatfd, &dbr, sizeof(dbr)) < sizeof(dbr))
+		if(sceIoLseek32(fatfd, dbr_pos, PSP_SEEK_SET) != dbr_pos || sceIoRead(fatfd, &dbr, sizeof(dbr)) < sizeof(dbr)) 
 		{
 			sceIoClose(fatfd);
 			fatfd = -1;
 			return 0;
 		}
 	}
-
+	
 	u64 total_sec = ( dbr.total_sec == 0 ) ? dbr.big_total_sec : dbr.total_sec;
 	u64 fat_sec = (dbr.sec_per_fat == 0 ) ? dbr.ufat.fat32.sec_per_fat : dbr.sec_per_fat;
-	u64 root_sec = ( dbr.root_entry * 32 + dbr.bytes_per_sec - 1 ) / dbr.bytes_per_sec;
+	u64 root_sec = ( dbr.root_entry * 32 + dbr.bytes_per_sec - 1 ) / dbr.bytes_per_sec; 
 	u64 data_sec = total_sec - dbr.reserved_sec - ( dbr.num_fats * fat_sec ) - root_sec;
 	u64 data_clus = data_sec / dbr.sec_per_clus ;
-
+	
 	if ( data_clus < 4085 )
 	{
 		fat_type = fat12;
@@ -67,7 +69,7 @@ int fat_init()
 		fat_type = fat32;
 		clus_max = 0x0FFFFFF0;
 	}
-
+	
 //	if ( dbr.root_entry == 0 )
 //	{
 //		fat_type = fat32;
@@ -83,7 +85,7 @@ int fat_init()
 //		fat_type = fat16;
 //		clus_max = 0xFFF0;
 //	}
-
+	
 	bytes_per_clus = 1ull * dbr.sec_per_clus * dbr.bytes_per_sec;
 	if(fat_type == fat32)
 	{
@@ -158,7 +160,7 @@ static int fat_load_table()
 	fatfd = sceIoOpen("msstor:", PSP_O_RDONLY, 0777);
 	if(fatfd < 0)
 		return 0;
-
+		
 	u32 fat_table_size = ((fat_type == fat32) ? dbr.ufat.fat32.sec_per_fat : dbr.sec_per_fat) * dbr.bytes_per_sec;
 	if(sceIoLseek32(fatfd, dbr_pos + dbr.reserved_sec * dbr.bytes_per_sec, PSP_SEEK_SET) != dbr_pos + dbr.reserved_sec * dbr.bytes_per_sec || (fat_table = (u32 *)malloc(fat_table_size)) == NULL)
 	{
@@ -278,6 +280,7 @@ static int fat_get_longname(p_fat_entry entrys, u32 cur, char * longnamestr)
 		return 0;
 	longname[255] = 0;
 	memset(longnamestr, 0, 256);
+
 	char* temp = miniConvUTF16LEConv(longname);
 	if(temp) {
 		strncpy(longnamestr, temp, 255);
@@ -369,8 +372,15 @@ int fat_locate(const char * name, char * sname, u32 clus, p_fat_entry info)
 					entrys[i].norm.filename[0] = 0x05;
 				memcpy(info, &entrys[i], sizeof(t_fat_entry));
 				free((void *)entrys);
-				strcat(sname, sid.d_name);
-				if((entrys[i].norm.attr & FAT_FILEATTR_DIRECTORY) > 0)
+				if (fwVersion < 0x04000110)
+					strcat(sname, sid.d_name);
+				else {
+					char short_name[256];
+					memset(short_name, 0, 256);
+                                        fat_get_shortname(info, short_name);
+                                        strcat(sname, short_name);
+				}
+				if((info->norm.attr & FAT_FILEATTR_DIRECTORY) > 0)
 					strcat(sname, "/");
 				sceIoDclose(dl);
 				return 1;
@@ -384,8 +394,15 @@ int fat_locate(const char * name, char * sname, u32 clus, p_fat_entry info)
 			{
 				memcpy(info, &entrys[i], sizeof(t_fat_entry));
 				free((void *)entrys);
-				strcat(sname, sid.d_name);
-				if((entrys[i].norm.attr & FAT_FILEATTR_DIRECTORY) > 0)
+				if (fwVersion < 0x04000110)
+					strcat(sname, sid.d_name);
+				else {
+					char short_name[256];
+					memset(short_name, 0, 256);
+                                        fat_get_shortname(info, short_name);
+                                        strcat(sname, short_name);
+				}
+				if((info->norm.attr & FAT_FILEATTR_DIRECTORY) > 0)
 					strcat(sname, "/");
 				sceIoDclose(dl);
 				return 1;
@@ -489,10 +506,9 @@ u32 fat_readdir(const char * dir, char * sdir, p_fat_info * info)
 			inf->filename[0] = 0xE5;
 		if(!fat_get_longname(entrys, i, inf->longname))
 			strcpy(inf->longname, inf->filename);
-		strcpy(inf->shortname, inf->filename);
-        strcpy(inf->filename, sid.d_name);
-
-        inf->filesize = entrys[i].norm.filesize;
+		if (fwVersion < 0x04000110)
+			strcpy(inf->filename, sid.d_name);
+		inf->filesize = entrys[i].norm.filesize;
 		inf->cdate = entrys[i].norm.cr_date;
 		inf->ctime = entrys[i].norm.cr_time;
 		inf->mdate = entrys[i].norm.last_mod_date;

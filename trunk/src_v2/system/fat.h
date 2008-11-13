@@ -105,8 +105,7 @@ typedef union _fat_entry t_fat_entry, * p_fat_entry;
 typedef struct {
 	char filename[256];
 	char longname[256];
-	char shortname[16];
-    u32 filesize;
+	u32 filesize;
 	u16 cdate;
 	u16 ctime;
 	u16 mdate;
@@ -119,7 +118,7 @@ typedef struct {
 extern "C" {
 #endif
 
-int fat_init();
+int fat_init(int devkitVersion);
 int fat_locate(const char * name, char * sname, u32 clus, p_fat_entry info);
 u32 fat_readdir(const char * dir, char * sdir, p_fat_info * info);
 void fat_free();

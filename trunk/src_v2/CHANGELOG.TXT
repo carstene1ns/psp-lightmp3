@@ -14,7 +14,7 @@ Version 2.0.0 RC1
 -Fixed: Strings are limited inside the menu area.
 -Fixed: Sleep bug for MP3 and ATRAC3+ files (doesen't work with OGG)
 -Fixed: Some crash in the Media Library.
--Fixed: Bug in audioscrobbler log (wrong time)
+-Fixed: Bug in audioscrobbler log (wrong UTC time)
 
 
 Version 2.0.0 BETA2
