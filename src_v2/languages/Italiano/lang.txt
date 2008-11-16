@@ -1,7 +1,7 @@
 #Language   : Italiano
 #By         : Magic PSP
-#Contacts   : aliquo93@live.it (MSN)/aliquo93@hotmail.it (email)
-ENCODING=UTF8
+#Contacts   : aliquo93@hotmail.it
+ENCODING=ANSI
 
 #Language to use in the On Screen Keyboard.
 #			JAPANESE			0
@@ -104,8 +104,8 @@ SETTINGS_12=Frequenza CPU: MP3 Media Engine
 SETTINGS_13=Frequenza CPU: OGG Vorbis
 SETTINGS_14=Frequenza CPU: Flac
 SETTINGS_15=Frequenza CPU: ATRAC3
-CONFIRM_APPLY_SETTINGS_TITLE=Conferma
-CONFIRM_APPLY_SETTINGS=Applicare queste impostazioni?
+CONFIRM_SAVE_SETTINGS_TITLE=Conferma
+CONFIRM_SAVE_SETTINGS=Applicare queste impostazioni?
 
 HELP_PLAYER_TITLE=Aiuto player
 HELP_PLAYER_01=Premi R per la traccia successiva
@@ -178,3 +178,17 @@ HELP_MEDIALIBRARY_02=O per tornare indietro
 HELP_MEDIALIBRARY_03=[] per riprodurre selezionati
 HELP_MEDIALIBRARY_04=START per aggiungere selez./traccia nella playlist
 HELP_MEDIALIBRARY_05=X + SU/GIU per valutare la traccia
+
+HELP_SETTINGS_TITLE=Impostazioni
+HELP_SETTINGS_01=Sinistra/Destra per cambiare le impostazioni
+HELP_SETTINGS_02=Start per salvare le impostazioni
+
+LOADING_SKIN_TITLE=Attendere...
+LOADING_SKIN=Caricamento della nuova skin...
+CHECKING_PLAYLIST=Controllo files della playlist... 
+
+SETTINGS_16=Intervallo ripetiz. tasti
+SETTINGS_17=Mostra splash screen
+
+BROWSE_TOP100=Top 100
+BROWSE_ALL=Visualizza tutti

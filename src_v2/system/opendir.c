@@ -98,7 +98,7 @@ char *opendir_open(struct opendir_struct *p, const char *directory, const char *
 			int extOK = 0;
 			char ext[5] = "";
 
-			getExtension(finfo[i].filename, ext, 4);
+			getExtension(finfo[i].longname, ext, 4);
 			extOK = 0;
 			int j = 0;
 			for (j = 0; j < extNumber; j++){

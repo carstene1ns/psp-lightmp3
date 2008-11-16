@@ -377,8 +377,8 @@ int fat_locate(const char * name, char * sname, u32 clus, p_fat_entry info)
 				else {
 					char short_name[256];
 					memset(short_name, 0, 256);
-                                        fat_get_shortname(info, short_name);
-                                        strcat(sname, short_name);
+                    fat_get_shortname(info, short_name);
+                    strcat(sname, short_name);
 				}
 				if((info->norm.attr & FAT_FILEATTR_DIRECTORY) > 0)
 					strcat(sname, "/");
@@ -399,8 +399,8 @@ int fat_locate(const char * name, char * sname, u32 clus, p_fat_entry info)
 				else {
 					char short_name[256];
 					memset(short_name, 0, 256);
-                                        fat_get_shortname(info, short_name);
-                                        strcat(sname, short_name);
+                    fat_get_shortname(info, short_name);
+                    strcat(sname, short_name);
 				}
 				if((info->norm.attr & FAT_FILEATTR_DIRECTORY) > 0)
 					strcat(sname, "/");
@@ -506,8 +506,8 @@ u32 fat_readdir(const char * dir, char * sdir, p_fat_info * info)
 			inf->filename[0] = 0xE5;
 		if(!fat_get_longname(entrys, i, inf->longname))
 			strcpy(inf->longname, inf->filename);
-		if (fwVersion < 0x04000110)
-			strcpy(inf->filename, sid.d_name);
+		//if (fwVersion < 0x04000110)
+		//	strcpy(inf->filename, sid.d_name);
 		inf->filesize = entrys[i].norm.filesize;
 		inf->cdate = entrys[i].norm.cr_date;
 		inf->ctime = entrys[i].norm.cr_time;

@@ -291,6 +291,7 @@ int setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = OGG_suspend;
         resumeFunct = OGG_resume;
         fadeOutFunct = OGG_fadeOut;
+		return 0;
     } else if (!stricmp(ext, "MP3") && useME_MP3){
         //MP3 via Media Engine
 		initFunct = MP3ME_Init;
@@ -318,6 +319,7 @@ int setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = MP3ME_suspend;
         resumeFunct = MP3ME_resume;
         fadeOutFunct = MP3ME_fadeOut;
+		return 0;
     } else if (!stricmp(ext, "MP3")){
         //MP3 via LibMad
 		initFunct = MP3_Init;
@@ -374,7 +376,7 @@ int setAudioFunctions(char *filename, int useME_MP3){
         resumeFunct = AA3ME_resume;
         fadeOutFunct = AA3ME_fadeOut;
 		return 0;
-    } else if (!stricmp(ext, "FLAC")){
+    } else if (!stricmp(ext, "FLAC") || !stricmp(ext, "FLA")){
         //FLAC
 		initFunct = FLAC_Init;
 		loadFunct = FLAC_Load;

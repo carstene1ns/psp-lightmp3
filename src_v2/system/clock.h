@@ -21,6 +21,7 @@ void setCpuClock(int cpu);
 int getCpuClock();
 int getBusClock();
 int getMinCPUClock();
+int getMinBUSClock();
 int getModel();
 int cpuBoost();
 int cpuRestore();

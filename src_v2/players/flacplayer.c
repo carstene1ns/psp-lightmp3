@@ -132,7 +132,8 @@ int flacThread(SceSize args, void *argp)
    if((decoder = FLAC__stream_decoder_new()) == NULL)
       sceKernelExitDeleteThread(0);
 
-   (void)FLAC__stream_decoder_set_md5_checking(decoder, true);
+   //(void)FLAC__stream_decoder_set_md5_checking(decoder, true);
+   (void)FLAC__stream_decoder_set_md5_checking(decoder, false);
 
    init_status = FLAC__stream_decoder_init_file(decoder, FLAC_fileName, write_callback, metadata_callback, error_callback, FLAC_file);
    if(init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK) {
@@ -204,8 +205,6 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
                 FLAC__uint64 sample = (FLAC__uint64)(samples_played + numSamples + FLAC_playingDelta);
             	if (sample < 0 || !FLAC__stream_decoder_seek_absolute(decoder, sample)) {
                     FLAC_setPlayingSpeed(0);
-                    //if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
-                    //    FLAC__stream_decoder_flush(decoder);
                 } else {
                 	samples_played += FLAC_playingDelta;
                 	//FLAC_tempmixleft = 0; // clear buffer of stale samples
