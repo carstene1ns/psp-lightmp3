@@ -39,7 +39,10 @@ int getBusClock(){
 }
 
 void setBusClock(int bus){
-    if (bus >= 54 && bus <= 111 && sceKernelDevkitVersion() < 0x03070110){
+    if (bus < getMinBUSClock())
+        bus = getMinBUSClock();
+
+    if (bus >= getMinBUSClock() && bus <= 111 && sceKernelDevkitVersion() < 0x03070110){
         scePowerSetBusClockFrequency(bus);
 		if (getBusClock() < bus)
 			scePowerSetBusClockFrequency(++bus);
@@ -47,6 +50,9 @@ void setBusClock(int bus){
 }
 
 void setCpuClock(int cpu){
+    if (cpu < getMinCPUClock())
+        cpu = getMinCPUClock();
+
     if (cpu >= getMinCPUClock() && cpu <= 266){
         if (sceKernelDevkitVersion() < 0x03070110){
             scePowerSetCpuClockFrequency(cpu);
@@ -72,6 +78,16 @@ int getMinCPUClock(){
         return 10;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Velocità minima di bus in base al modello (FAT/SLIM):
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int getMinBUSClock(){
+    if (getModel() == PSP_MODEL_SLIM_AND_LITE || sceKernelDevkitVersion() >= 0x03070110)
+        return 95;
+    else
+        return 54;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Restituisce il modello (FAT = 0/SLIM = 1):

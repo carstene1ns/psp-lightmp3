@@ -325,7 +325,12 @@ int playFile(char *fileName, char *trackMessage){
     }
 
     setVolume(0,0x8000);
-    setAudioFunctions(fileName, userSettings->MP3_ME);
+    if (setAudioFunctions(fileName, userSettings->MP3_ME)){
+        snprintf(buffer, sizeof(buffer), "Unknown audio format");
+        debugMessageBox(buffer);
+		return 0;
+	}
+
     //Tipo di volume boost:
     if (strcmp(userSettings->BOOST, "OLD") == 0)
         (*setVolumeBoostTypeFunct)("OLD");
