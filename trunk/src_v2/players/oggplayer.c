@@ -262,6 +262,7 @@ void OGG_Init(int channel){
 
 
 int OGG_Load(char *filename){
+	outputInProgress = 0;
 	OGG_isPlaying = 0;
 	OGG_milliSeconds = 0;
 	OGG_eos = 0;

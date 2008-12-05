@@ -34,6 +34,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //Globals
 /////////////////////////////////////////////////////////////////////////////////////////
+int AAC_defaultCPUClock = 60;
+
 static int AAC_audio_channel;
 static char AAC_fileName[264];
 static int AAC_fd = -1;
@@ -51,7 +53,6 @@ static unsigned char AACfileBuffer[AAC_FILE_BUFFER_SIZE];
 static unsigned char *inputBuffer = NULL;
 static unsigned int samplesAvailable;
 static unsigned int AAC_filePos;
-int AAC_defaultCPUClock = 70;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Fill file buffer:
@@ -274,6 +275,7 @@ int AAC_EndOfStream(){
 }
 
 struct fileInfo *AAC_GetInfo(){
+	AAC_info.defaultCPUClock = AAC_defaultCPUClock;
 	return &AAC_info;
 }
 

@@ -326,6 +326,7 @@ int main(){
     OGG_defaultCPUClock = userSettings->CLOCK_OGG;
     FLAC_defaultCPUClock = userSettings->CLOCK_FLAC;
     AA3ME_defaultCPUClock = userSettings->CLOCK_AA3;
+    AAC_defaultCPUClock = userSettings->CLOCK_AAC;
 	CLOCK_WHEN_PAUSE = getMinCPUClock();
 
     //Load language file:
@@ -337,7 +338,6 @@ int main(){
     	sceKernelExitGame();
         return 0;
     }
-
 	initFonts();
 
     snprintf(buffer, sizeof(buffer), "%sskins/", userSettings->ebootPath);

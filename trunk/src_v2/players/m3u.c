@@ -69,7 +69,7 @@ int M3U_open(char *fileName){
 	char lineText[512];
 	char chrLength[20];
 	char title[264];
-	struct M3U_songEntry singleEntry;
+	struct M3U_songEntry *singleEntry;
 	int playListCount = lPlayList.songCount;
 
 	f = fopen(fileName, "rt");
@@ -86,23 +86,24 @@ int M3U_open(char *fileName){
 			//Nothing to do. :)
 		}else if (strlen(lineText) > 2){
 			//Store song info:
-			strncpy(singleEntry.fileName, lineText, 263);
-			singleEntry.fileName[263] = '\0';
-			if ((int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 10 || (int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 13 ){
-				singleEntry.fileName[strlen(singleEntry.fileName) - 1] = '\0';
+			singleEntry = &lPlayList.songs[playListCount++];
+			strncpy(singleEntry->fileName, lineText, 263);
+			singleEntry->fileName[263] = '\0';
+			if ((int)singleEntry->fileName[strlen(singleEntry->fileName) - 1] == 10 || (int)singleEntry->fileName[strlen(singleEntry->fileName) - 1] == 13 ){
+				singleEntry->fileName[strlen(singleEntry->fileName) - 1] = '\0';
 			}
-			if ((int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 10 || (int)singleEntry.fileName[strlen(singleEntry.fileName) - 1] == 13 ){
-				singleEntry.fileName[strlen(singleEntry.fileName) - 1] = '\0';
+			if ((int)singleEntry->fileName[strlen(singleEntry->fileName) - 1] == 10 || (int)singleEntry->fileName[strlen(singleEntry->fileName) - 1] == 13 ){
+				singleEntry->fileName[strlen(singleEntry->fileName) - 1] = '\0';
 			}
 
 			if (strlen(title)){
-				strncpy(singleEntry.title, title, 263);
+				strncpy(singleEntry->title, title, 263);
 			}else{
-				getFileName(singleEntry.fileName, singleEntry.title);
+				getFileName(singleEntry->fileName, singleEntry->title);
 			}
-			singleEntry.title[263] = '\0';
-			singleEntry.length = atoi(chrLength);
-			lPlayList.songs[playListCount++] = singleEntry;
+			singleEntry->title[263] = '\0';
+			singleEntry->length = atoi(chrLength);
+			//lPlayList.songs[playListCount++] = singleEntry;
 			if (playListCount == MAX_SONGS){
 				break;
 			}
