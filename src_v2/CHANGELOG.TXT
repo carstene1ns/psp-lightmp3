@@ -11,10 +11,12 @@ Version 2.0.0 RC1
 -Added: Smoother progress bar
 -Added: Icons for folder/music in file browser and media library
 -Added: New ICON0.PNG and PIC1.PNG (many thanks to dario1crisafulli)
+-Added: Display will turn off when HOLD is set to ON, and will turn on when HOLD is set to off
 -Fixed: Strings are limited inside the menu area.
 -Fixed: Sleep bug for MP3 and ATRAC3+ files (doesen't work with OGG)
 -Fixed: Some crash in the Media Library.
 -Fixed: Bug in audioscrobbler log (wrong UTC time)
+-Fixed: Crash with ffwd/rew with flac files
 
 
 Version 2.0.0 BETA2

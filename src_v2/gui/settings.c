@@ -164,6 +164,7 @@ struct settings *SETTINGS_default(){
 	localSettings.CLOCK_OGG = 70;
 	localSettings.CLOCK_FLAC = 166;
 	localSettings.CLOCK_AA3 = 40;
+	localSettings.CLOCK_AAC = 60;
 	localSettings.CLOCK_DELTA_ECONOMY_MODE = 1;
 	localSettings.USE_OSK = 1;
     localSettings.playMode = 0;

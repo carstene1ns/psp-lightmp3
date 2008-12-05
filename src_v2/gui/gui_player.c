@@ -38,12 +38,12 @@
 #include "../players/id3.h"
 #include "../others/audioscrobbler.h"
 #include "../others/medialibrary.h"
+//#include <jpeglib.h>
 
 #define PLAYER_STOP 2
 #define PLAYER_NEXT 1
 #define PLAYER_END 0
 #define PLAYER_PREVIOUS -1
-
 
 #define STATUS_NORMAL 0
 #define STATUS_HELP 1
@@ -291,10 +291,10 @@ int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Play a single file:
-//		 Returns 1 if user pressed NEXT
-//				 0 if song ended
-//				-1 if user pressed PREVIOUS
-//				 2 if user pressed STOP
+//		 Returns PLAYER_NEXT     if user pressed NEXT
+//				 PLAYER_END      if song ended
+//				 PLAYER_PREVIOUS if user pressed PREVIOUS
+//				 PLAYER_STOP     if user pressed STOP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int playFile(char *fileName, char *trackMessage){
     int retValue = PLAYER_END;
@@ -326,7 +326,7 @@ int playFile(char *fileName, char *trackMessage){
 
     setVolume(0,0x8000);
     if (setAudioFunctions(fileName, userSettings->MP3_ME)){
-        snprintf(buffer, sizeof(buffer), "Unknown audio format");
+        snprintf(buffer, sizeof(buffer), "Unknown audio format for file\n%s", fileName);
         debugMessageBox(buffer);
 		return 0;
 	}
@@ -395,7 +395,50 @@ int playFile(char *fileName, char *trackMessage){
         fclose(out);
         fclose(in);
         if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
+		{
             coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+			//Using libjpeg:
+			/*int width = 1600;
+			int height = 1200;
+			unsigned char *raw_image = NULL;
+			struct jpeg_decompress_struct cinfo;
+			struct jpeg_error_mgr jerr;
+			JSAMPROW row_pointer[1];
+
+			FILE *infile = fopen( buffer, "rb" );
+			unsigned long location = 0;
+			int i = 0;
+			
+			if ( infile )
+			{
+				cinfo.err = jpeg_std_error( &jerr );
+				jpeg_create_decompress( &cinfo );
+				jpeg_stdio_src( &cinfo, infile );
+				jpeg_read_header( &cinfo, TRUE );
+				width = cinfo.image_width;
+				height = cinfo.image_height;
+				jpeg_start_decompress( &cinfo );
+				raw_image = (unsigned char*)malloc( cinfo.output_width*cinfo.output_height*cinfo.num_components );
+				row_pointer[0] = (unsigned char *)malloc( cinfo.output_width*cinfo.num_components );
+				while( cinfo.output_scanline < cinfo.image_height )
+				{
+					jpeg_read_scanlines( &cinfo, row_pointer, 1 );
+					for( i=0; i<cinfo.image_width*cinfo.num_components;i++) 
+						raw_image[location++] = row_pointer[0][i];
+				}
+				jpeg_finish_decompress( &cinfo );
+				jpeg_destroy_decompress( &cinfo );
+				free( row_pointer[0] );
+				fclose( infile );
+
+				coverArt = oslCreateImage(width, height, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+				coverArt->data = raw_image;
+				if (oslImageLocationIsSwizzled(location))
+					oslSwizzleImage(coverArt);
+
+				oslUncacheImage(coverArt);
+			}*/
+		}
         else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
             coverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         sceIoRemove(buffer);
@@ -428,6 +471,11 @@ int playFile(char *fileName, char *trackMessage){
         debugMessageBox(buffer);
         (*endFunct)();
         unsetAudioFunctions();
+		//Unload images:
+		if (coverArt){
+			oslDeleteImage(coverArt);
+			coverArt = NULL;
+		}
         return 0;
     }
     info = (*getInfoFunct)();
@@ -490,6 +538,44 @@ int playFile(char *fileName, char *trackMessage){
 			}
 		}
 		headphone = sceHprmIsHeadphoneExist();
+
+		//Spengo il display se HOLD:
+        if (osl_pad.pressed.hold && userSettings->displayStatus){
+			//Spengo il display:
+			userSettings->curBrightness = getBrightness();
+			if (!info->needsME){
+				cpuBoost();
+				fadeDisplay(0, DISPLAY_FADE_TIME);
+				cpuRestore();
+			}else
+				fadeDisplay(0, DISPLAY_FADE_TIME);
+			displayDisable();
+			imposeSetHomePopup(0);
+			userSettings->displayStatus = 0;
+			//Downclock:
+			if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
+				setCpuClock(clock - userSettings->CLOCK_DELTA_ECONOMY_MODE);
+		}
+
+		//Accendo il display al release di hold:
+		if (osl_pad.released.hold && !userSettings->displayStatus){
+			//Accendo il display:
+			if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
+				setCpuClock(clock);
+			drawPlayer(status, &libEntry, trackMessage);
+			oslEndFrame();
+			skip = oslSyncFrame();
+			displayEnable();
+			setBrightness(0);
+			imposeSetHomePopup(1);
+			if (!info->needsME){
+				cpuBoost();
+				fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
+				cpuRestore();
+			}else
+				fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
+			userSettings->displayStatus = 1;
+		}
 
         lastPercentage = (*getPercentageFunct)();
         oslReadKeys();

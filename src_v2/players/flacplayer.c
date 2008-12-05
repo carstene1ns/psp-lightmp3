@@ -102,8 +102,6 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
    }
    FLAC_tempmixleft += frame->header.blocksize; // increment # samples reported in buffer
 
-
-
    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE; // keep going until buffer is full or get killed
 }
 
@@ -151,6 +149,8 @@ int flacThread(SceSize args, void *argp)
    //printf("    state: %s\n", FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
    FLAC_eos = 1;
 
+   if(FLAC__stream_decoder_get_state(decoder) != FLAC__STREAM_DECODER_UNINITIALIZED) 
+		FLAC__stream_decoder_finish(decoder);
    FLAC__stream_decoder_delete(decoder);
 
    sceKernelExitDeleteThread(0);
@@ -202,6 +202,7 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 			}
             //Check for playing speed:
             if (FLAC_playingSpeed){
+				FLAC__stream_decoder_flush(decoder);
                 FLAC__uint64 sample = (FLAC__uint64)(samples_played + numSamples + FLAC_playingDelta);
             	if (sample < 0 || !FLAC__stream_decoder_seek_absolute(decoder, sample)) {
                     FLAC_setPlayingSpeed(0);
@@ -209,8 +210,7 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
                 	samples_played += FLAC_playingDelta;
                 	//FLAC_tempmixleft = 0; // clear buffer of stale samples
                 }
-				if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
-					FLAC__stream_decoder_flush(decoder);
+				FLAC__stream_decoder_flush(decoder);
             }
 		}
 		samples_played += numSamples;
@@ -333,6 +333,7 @@ void FLAC_Init(int channel){
 int FLAC_Load(char *filename){
 	int file = -1;
 	samples_played = 0;
+	outputInProgress = 0;
 	isPlaying = 0;
 	FLAC_eos = 0;
     FLAC_playingSpeed = 0;
@@ -471,12 +472,12 @@ int FLAC_getVolumeBoost(){
 
 int FLAC_setPlayingSpeed(int playingSpeed){
 	if (playingSpeed >= MIN_PLAYING_SPEED && playingSpeed <= MAX_PLAYING_SPEED){
-		FLAC_playingSpeed = playingSpeed;
 		if (playingSpeed == 0)
 			setVolume(FLAC_audio_channel, 0x8000);
 		else
 			setVolume(FLAC_audio_channel, FASTFORWARD_VOLUME);
-        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * 2 * FLAC_playingSpeed;
+        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * 5 * playingSpeed;
+		FLAC_playingSpeed = playingSpeed;
 		return 0;
 	}else{
 		return -1;
