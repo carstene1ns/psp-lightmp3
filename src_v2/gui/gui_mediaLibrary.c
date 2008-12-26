@@ -32,6 +32,7 @@
 #include "../others/strreplace.h"
 #include "../others/medialibrary.h"
 #include "../system/clock.h"
+#include "../system/libminiconv.h"
 #include "../players/player.h"
 #include "../players/m3u.h"
 
@@ -301,7 +302,8 @@ void drawMLinfo(){
 	static int lastSelected = -1;
 
 	OSL_FONT *font = fontNormal;
-
+	OSL_IMAGE *tmpCoverArt = NULL;
+	
     if (mediaLibraryStatus != STATUS_QUERYMENU)
         return;
 
@@ -380,17 +382,23 @@ void drawMLinfo(){
 				snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
 				size = fileExists(buffer);
 				if (size > 0 && size <= MAX_IMAGE_DIMENSION)
-					coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+					tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 				else{
 					//Look for cover.jpg in same directory:
 					snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "cover.jpg");
 					size = fileExists(buffer);
 					if (size > 0 && size <= MAX_IMAGE_DIMENSION)
-						coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+						tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 				}
-				if (coverArt){
-					coverArt->stretchX = skinGetParam("MEDIALIBRARY_COVERART_WIDTH");
-					coverArt->stretchY = skinGetParam("MEDIALIBRARY_COVERART_HEIGHT");
+				if (tmpCoverArt){
+    				int coverArtWidth  = skinGetParam("MEDIALIBRARY_COVERART_WIDTH");
+    				int coverArtHeight = skinGetParam("MEDIALIBRARY_COVERART_HEIGHT");
+    	
+					coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
+					oslDeleteImage(tmpCoverArt);
+
+        			coverArt->stretchX = coverArtWidth;
+        			coverArt->stretchY = coverArtHeight;
 				}else{
 					coverArtFailed = 1;
 				}
@@ -630,7 +638,9 @@ int browseTop100(){
 void askSearchString(char *message, char *initialValue, char *target){
 	int skip = 0;
 	int done = 0;
-
+	unsigned short carattere16[129];
+	char* utf8Str;
+	
 	cpuBoost();
 	oslInitOsk(message, initialValue, 128, 1, getOSKlang());
     while(!osl_quit && !done){
@@ -647,7 +657,13 @@ void askSearchString(char *message, char *initialValue, char *target){
 					strcpy(target, "");
 					done = 1;
 				}else{
-					oslOskGetText(target);
+					oslOskGetTextUCS2(carattere16);
+					utf8Str = miniConvUTF16LEConv(carattere16);
+					target[0] = '\0';
+					if ( utf8Str != NULL ) {
+						strncpy(target, utf8Str, 128);
+						target[128] = '\0';
+					}
 					done = 1;
 				}
 				oslEndOsk();

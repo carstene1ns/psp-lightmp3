@@ -30,6 +30,7 @@
 #include "../main.h"
 #include "../system/freeMem.h"
 #include "../system/opendir.h"
+#include "../system/libminiconv.h"
 #include "../others/medialibrary.h"
 #include "settings.h"
 #include "skinsettings.h"
@@ -176,6 +177,8 @@ int loadCommonGraphics(){
 	fontNormal = oslLoadFontFile(buffer);
     if (!fontNormal)
         errorLoadImage(buffer);
+	if ( skinGetString("STR_FONT_ALT_NAME", buffer) == 0 )
+		oslLoadAltIntraFontFile(fontNormal, buffer);
     setFontStyle(fontNormal, defaultTextSize,0xFFFFFFFF,0xFF000000,INTRAFONT_ALIGN_LEFT);
 
 	return 0;
@@ -557,14 +560,24 @@ int formatHHMMSS(int seconds, char *timeString, int stringLimit){
 int initFonts(){
 	//Init intraFont based on language settings:
 	char encoding[10];
+	char* temp;
+	
 	strncpy(encoding, langGetString("ENCODING"), 9);
 	encoding[9] = '\0';
 	if (!strcmp(encoding, "UTF8"))
-	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_UTF8);
+	    oslIntraFontInit(INTRAFONT_CACHE_LARGE | INTRAFONT_STRING_UTF8);
 	else if (!strcmp(encoding, "SJIS"))
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_SJIS);
 	else
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL);
+	temp = langGetString("TAG_ENCODING");
+	if ( temp != NULL )
+	{
+		strncpy(encoding, temp, 9);
+		encoding[9] = '\0';
+		miniConvSetDefaultSubtitleConv(encoding);
+	}
+	
 	return 0;
 }
 

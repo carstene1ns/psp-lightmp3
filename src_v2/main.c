@@ -19,7 +19,6 @@
 #include <pspsdk.h>
 #include <psprtc.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <oslib/oslib.h>
 
 #include "main.h"
@@ -344,9 +343,15 @@ int main(){
     skinLoadList(buffer);
     snprintf(buffer, sizeof(buffer), "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
     skinLoad(buffer);
-
-    //Skin's s images path:
-    snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
+    
+   	//Skin's s images path:
+	if ( skinGetString("STR_IMAGE_PATH", buffer) == 0 ) {
+    	snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, buffer);
+	}
+	else {
+    	snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
+	}
+	
 	//Default text size:
 	defaultTextSize = skinGetParam("FONT_NORMAL_SIZE") / 100.0;
 
@@ -385,7 +390,7 @@ int main(){
     //Random seed:
 	u64 mytime = 0;
 	sceRtcGetCurrentTick (&mytime);
-    srand(mytime);
+    oslSrand(mytime);
 
     //Wait for splash:
 	if (userSettings->SHOW_SPLASH)

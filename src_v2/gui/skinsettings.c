@@ -73,6 +73,14 @@ int sortParams(){
 	int n = 0;
 	int i = 0;
 
+	//Strings:
+    i = 0;
+    n = skinStrings.stringCount;
+	while (i < n){
+		if (i == 0 || strcmp(skinStrings.strings[i-1].name, skinStrings.strings[i].name) <= 0) i++;
+		else {struct intSkinString tmp = skinStrings.strings[i]; skinStrings.strings[i] = skinStrings.strings[i-1]; skinStrings.strings[--i] = tmp;}
+	}
+
     //Params:
     i = 0;
     n = skinParams.paramCount;
@@ -188,6 +196,13 @@ int skinLoad(char *fileName){
                                     skinPositions.positionCount++;
                                 }
                             }else if (!strncmp(name, "STR_", 4)){
+                            	if (!strcmp(name, "STR_IMAGE_PATH")){
+									strcpy(imagePath, fileName);
+									directoryUp(imagePath);
+									directoryUp(imagePath);
+									strcat(imagePath, "result");
+									strcat(imagePath, "/images");
+								}
                                 if (skinStrings.stringCount < MAX_SKINSTRINGS){
                                     strcpy(skinStrings.strings[skinStrings.stringCount].name, name);
 									char *repStr = replace(result, "$skinimage", imagePath);
