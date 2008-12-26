@@ -311,7 +311,8 @@ int playFile(char *fileName, char *trackMessage){
     int status = STATUS_NORMAL;
 	int headphone = sceHprmIsHeadphoneExist();
 	int skip = 0;
-
+	OSL_IMAGE* tmpCoverArt;
+	
     MEEnable();
 
 	cpuBoost();
@@ -374,6 +375,7 @@ int playFile(char *fileName, char *trackMessage){
 
     //Save temp coverart file:
     coverArt = NULL;
+    tmpCoverArt = NULL;
     if (tagInfo.encapsulatedPictureOffset && tagInfo.encapsulatedPictureLength <= MAX_IMAGE_DIMENSION){
         FILE *in = fopen(fileName, "rb");
         if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
@@ -396,7 +398,7 @@ int playFile(char *fileName, char *trackMessage){
         fclose(in);
         if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
 		{
-            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+            tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 			//Using libjpeg:
 			/*int width = 1600;
 			int height = 1200;
@@ -440,14 +442,20 @@ int playFile(char *fileName, char *trackMessage){
 			}*/
 		}
         else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
-            coverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+            tmpCoverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
         sceIoRemove(buffer);
     }else if (strlen(tagInfo.coverArtImageName))
-        coverArt = oslLoadImageFileJPG(tagInfo.coverArtImageName, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+        tmpCoverArt = oslLoadImageFileJPG(tagInfo.coverArtImageName, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 
-    if (coverArt){
-        coverArt->stretchX = skinGetParam("COVERART_WIDTH");
-        coverArt->stretchY = skinGetParam("COVERART_HEIGHT");
+    if (tmpCoverArt){
+    	int coverArtWidth  = skinGetParam("COVERART_WIDTH");
+    	int coverArtHeight = skinGetParam("COVERART_HEIGHT");
+    	
+		coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
+		oslDeleteImage(tmpCoverArt);
+
+        coverArt->stretchX = coverArtWidth;
+        coverArt->stretchY = coverArtHeight;
     }
 
     playerStatus = -1;
@@ -815,7 +823,7 @@ int randomTrack(int max, unsigned int played, unsigned int used[]){
 
 	found = 1;
 	while (found == 1){
-		random = rand()%max;
+		random = (int)oslRandf(0, max);
 		//Controllo se l'ho già suonata:
 		int i;
 		found = 0;

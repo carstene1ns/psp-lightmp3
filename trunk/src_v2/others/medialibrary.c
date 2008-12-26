@@ -171,41 +171,6 @@ int ML_createEmptyDB(char *directory, char *fileName){
 		}
 	}
 
-	/*snprintf(sql, sizeof(sql), "create index media_idx_01 on media (artist, album);");
-    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
-    if (result != SQLITE_OK){
-        ML_INTERNAL_closeDB();
-        return ML_ERROR_SQL;
-    }
-
-    snprintf(sql, sizeof(sql), "create index media_idx_02 on media (genre);");
-    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
-    if (result != SQLITE_OK){
-        ML_INTERNAL_closeDB();
-        return ML_ERROR_SQL;
-    }
-
-    snprintf(sql, sizeof(sql), "create index media_idx_03 on media (rating);");
-    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
-    if (result != SQLITE_OK){
-        ML_INTERNAL_closeDB();
-        return ML_ERROR_SQL;
-    }
-
-    snprintf(sql, sizeof(sql), "create index media_idx_04 on media (played desc, rating desc, title);");
-    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
-    if (result != SQLITE_OK){
-        ML_INTERNAL_closeDB();
-        return ML_ERROR_SQL;
-    }
-
-    snprintf(sql, sizeof(sql), "create index media_idx_05 on media (title, artist);");
-    result = sqlite3_exec(db, sql, NULL, 0, &zErr);
-    if (result != SQLITE_OK){
-        ML_INTERNAL_closeDB();
-        return ML_ERROR_SQL;
-    }*/
-
 	ML_INTERNAL_closeDB();
     return 0;
 }

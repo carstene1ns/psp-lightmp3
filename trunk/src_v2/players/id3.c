@@ -3,6 +3,7 @@
 #include <pspkernel.h>
 #include <stdlib.h>
 #include "../system/opendir.h"
+#include "../system/libminiconv.h"
 
 #include "id3.h"
 struct genre
@@ -125,17 +126,40 @@ int swapInt32BigToHost(int arg)
 void readTagData(FILE *fp, int tagLength, char *tagValue){
     int i;
     int count = 0;
-    unsigned char carattere[tagLength];
-
+    unsigned short carattere16[tagLength/2+2];
+    unsigned char* carattere = (unsigned char*)carattere16;
+	char* utf8Tag;
+	
     strcpy(tagValue, "");
     tagValue[0] = '\0';
 
     fread(carattere, sizeof(char), tagLength, fp);
-    for (i=0; i<tagLength; i++){
-        if (carattere[i] >= 0x20 && carattere[i] <= 0xfd) //<= 0x7f
-            tagValue[count++] = carattere[i];
+    carattere[tagLength] = '\0';
+    carattere[tagLength+1] = '\0';
+
+    // unicode tag
+    if ( carattere16[0] == 0xFEFF ) {
+    	utf8Tag = miniConvUTF16LEConv( carattere16 + 1 );
     }
-    tagValue[count] = '\0';
+    // encode to utf8
+    else {
+    	if ( miniConvHaveDefaultSubtitleConv() )
+    		utf8Tag = miniConvDefaultSubtitleConv( carattere );
+    	else
+    		utf8Tag = (char*)carattere;
+	}
+	if ( utf8Tag == NULL ) {
+	    for (i=0; i<tagLength; i++){
+    	    if (carattere[i] >= 0x20 && carattere[i] <= 0xfd) //<= 0x7f
+        	    tagValue[count++] = carattere[i];
+    	}
+    	tagValue[count] = '\0';
+	}
+	else
+	{
+		strcpy( tagValue, utf8Tag );
+	}
+	
 }
 
 int ID3v2TagSize(const char *mp3path)

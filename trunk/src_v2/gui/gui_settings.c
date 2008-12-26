@@ -213,8 +213,19 @@ int changeSettingVal(int index, int delta){
                 strcpy(userSettings->skinName, skinsList[current]);
                 snprintf(buffer, sizeof(buffer), "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
                 skinLoad(buffer);
+
                 //debugMessageBox("skin's settings loaded");
-                snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
+   				//Skin's s images path:
+				if ( skinGetString("STR_IMAGE_PATH", buffer) == 0 ) {
+    				snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, buffer);
+				}
+				else {
+    				snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
+				}
+
+				//Default text size:
+				defaultTextSize = skinGetParam("FONT_NORMAL_SIZE") / 100.0;
+
 				clearMenu(&commonMenu);
 			    clearMenu(&commonSubMenu);
                 //debugMessageBox("cleared menues");
