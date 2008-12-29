@@ -377,69 +377,29 @@ int playFile(char *fileName, char *trackMessage){
     coverArt = NULL;
     tmpCoverArt = NULL;
     if (tagInfo.encapsulatedPictureOffset && tagInfo.encapsulatedPictureLength <= MAX_IMAGE_DIMENSION){
-        FILE *in = fopen(fileName, "rb");
+		int in = sceIoOpen(fileName, PSP_O_RDONLY, 0777);
         if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
             snprintf(buffer, sizeof(buffer), "%scoverart.jpg", userSettings->ebootPath);
         else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
             snprintf(buffer, sizeof(buffer), "%scoverart.png", userSettings->ebootPath);
-        FILE *out = fopen(buffer, "wb");
-        int buffSize = 4*1024;
+		int out = sceIoOpen(buffer, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
+
+		int buffSize = 4*1024;
         unsigned char cover[4*1024] = "";
-        fseek(in, tagInfo.encapsulatedPictureOffset, SEEK_SET);
+		sceIoLseek(in, tagInfo.encapsulatedPictureOffset, PSP_SEEK_SET);
         int remaining = tagInfo.encapsulatedPictureLength;
         while (remaining > 0){
             if (remaining < buffSize)
                 buffSize = remaining;
-            int write = fread(cover, sizeof(char), buffSize, in);
-            fwrite(cover, sizeof(char), buffSize, out);
+			int write = sceIoRead(in, cover, buffSize);
+			sceIoWrite(out, cover, write);
             remaining -= write;
         }
-        fclose(out);
-        fclose(in);
-        if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
+		sceIoClose(out);
+		sceIoClose(in);
+		if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
 		{
             tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-			//Using libjpeg:
-			/*int width = 1600;
-			int height = 1200;
-			unsigned char *raw_image = NULL;
-			struct jpeg_decompress_struct cinfo;
-			struct jpeg_error_mgr jerr;
-			JSAMPROW row_pointer[1];
-
-			FILE *infile = fopen( buffer, "rb" );
-			unsigned long location = 0;
-			int i = 0;
-			
-			if ( infile )
-			{
-				cinfo.err = jpeg_std_error( &jerr );
-				jpeg_create_decompress( &cinfo );
-				jpeg_stdio_src( &cinfo, infile );
-				jpeg_read_header( &cinfo, TRUE );
-				width = cinfo.image_width;
-				height = cinfo.image_height;
-				jpeg_start_decompress( &cinfo );
-				raw_image = (unsigned char*)malloc( cinfo.output_width*cinfo.output_height*cinfo.num_components );
-				row_pointer[0] = (unsigned char *)malloc( cinfo.output_width*cinfo.num_components );
-				while( cinfo.output_scanline < cinfo.image_height )
-				{
-					jpeg_read_scanlines( &cinfo, row_pointer, 1 );
-					for( i=0; i<cinfo.image_width*cinfo.num_components;i++) 
-						raw_image[location++] = row_pointer[0][i];
-				}
-				jpeg_finish_decompress( &cinfo );
-				jpeg_destroy_decompress( &cinfo );
-				free( row_pointer[0] );
-				fclose( infile );
-
-				coverArt = oslCreateImage(width, height, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-				coverArt->data = raw_image;
-				if (oslImageLocationIsSwizzled(location))
-					oslSwizzleImage(coverArt);
-
-				oslUncacheImage(coverArt);
-			}*/
 		}
         else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
             tmpCoverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
@@ -453,6 +413,7 @@ int playFile(char *fileName, char *trackMessage){
     	
 		coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
 		oslDeleteImage(tmpCoverArt);
+		tmpCoverArt = NULL;
 
         coverArt->stretchX = coverArtWidth;
         coverArt->stretchY = coverArtHeight;

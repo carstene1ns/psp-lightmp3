@@ -602,14 +602,6 @@ void getCovertArtImageName(char *fileName, struct fileInfo *info){
         return;
     }
 
-    //Look for albumName.jpg in the same directory:
-    snprintf(buffer, sizeof(buffer), "%s/%s.jpg", dirName, info->album);
-    size = fileExists(buffer);
-    if (size > 0 && size <= MAX_IMAGE_DIMENSION){
-        strcpy(info->coverArtImageName, buffer);
-        return;
-    }
-
     //Look for folder.jpg in the same directory:
     snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
     size = fileExists(buffer);
@@ -620,6 +612,14 @@ void getCovertArtImageName(char *fileName, struct fileInfo *info){
 
     //Look for cover.jpg in same directory:
     snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "cover.jpg");
+    size = fileExists(buffer);
+    if (size > 0 && size <= MAX_IMAGE_DIMENSION){
+        strcpy(info->coverArtImageName, buffer);
+        return;
+    }
+
+    //Look for albumName.jpg in the same directory:
+    snprintf(buffer, sizeof(buffer), "%s/%s.jpg", dirName, info->album);
     size = fileExists(buffer);
     if (size > 0 && size <= MAX_IMAGE_DIMENSION){
         strcpy(info->coverArtImageName, buffer);

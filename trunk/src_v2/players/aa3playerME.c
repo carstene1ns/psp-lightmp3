@@ -272,7 +272,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 //Get tag info:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
-    FILE *fp = NULL;
+    int fp = 0;
 
     int size;
     int tag_length;
@@ -281,20 +281,20 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
     strcpy(AA3ME_fileName, filename);
     size = GetID3TagSize(filename);
 
-    fp = fopen(filename, "rb");
-    if (fp == NULL) return;
-    fseek(fp, 10, SEEK_SET);
+	fp = sceIoOpen(filename, PSP_O_RDONLY, 0777);
+    if (fp < 0) return;
+	sceIoLseek(fp, 10, PSP_SEEK_SET);
 
     while (size != 0) {
-        fread(tag, sizeof(char), 4, fp);
+		sceIoRead(fp, tag, 4);
         size -= 4;
 
         /* read 4 byte big endian tag length */
-        fread(&tag_length, sizeof(unsigned int), 1, fp);
+		sceIoRead(fp, &tag_length, sizeof(unsigned int));
         tag_length = (unsigned int) swapInt32BigToHost((int)tag_length);
         size -= 4;
 
-        fseek(fp, 2, SEEK_CUR);
+		sceIoLseek(fp, 2, PSP_SEEK_CUR);
         size -= 2;
 
         /* Perform checks for end of tags and tag length overflow or zero */
@@ -302,37 +302,37 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
 
         if(!strncmp("TPE1",tag,4)) /* Artist */
         {
-            fseek(fp, 1, SEEK_CUR);
+			sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->artist);
         }
         else if(!strncmp("TIT2",tag,4)) /* Title */
         {
-            fseek(fp, 1, SEEK_CUR);
-            readTagData(fp, tag_length - 1, targetInfo->title);
+			sceIoLseek(fp, 1, PSP_SEEK_CUR);
+			readTagData(fp, tag_length - 1, targetInfo->title);
         }
         else if(!strncmp("TALB",tag,4)) /* Album */
         {
-            fseek(fp, 1, SEEK_CUR);
+            sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->album);
         }
         else if(!strncmp("TRCK",tag,4)) /* Track No. */
         {
-            fseek(fp, 1, SEEK_CUR);
+            sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->trackNumber);
         }
         else if(!strncmp("TYER",tag,4)) /* Year */
         {
-            fseek(fp, 1, SEEK_CUR);
+            sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->year);
         }
         else if(!strncmp("TCON",tag,4)) /* Genre */
         {
-            fseek(fp, 1, SEEK_CUR);
+            sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, targetInfo->genre);
         }
         else if(!strncmp("APIC",tag,4)) /* Picture */
         {
-            /*fseek(fp, 1, SEEK_CUR);
+            /*sceIoLseek(fp, 1, PSP_SEEK_CUR);
             fseek(fp, 13, SEEK_CUR);
             targetInfo->encapsulatedPictureOffset = ftell(fp);
             targetInfo->encapsulatedPictureLength = tag_length-14;
@@ -340,13 +340,13 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
         }
         else
         {
-            fseek(fp, tag_length, SEEK_CUR);
+			sceIoLseek(fp, tag_length, PSP_SEEK_CUR);
         }
         size -= tag_length;
 	}
     if (!strlen(targetInfo->title))
         getFileName(AA3ME_fileName, targetInfo->title);
-	fclose(fp);
+	sceIoClose(fp);
 }
 
 struct fileInfo AA3ME_GetTagInfoOnly(char *filename){

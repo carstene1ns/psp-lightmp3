@@ -457,10 +457,10 @@ int MP3getInfo(){
     	free(localBuffer);
     sceIoClose(fd);
 
-    mediumBitrate = totalBitrate / (float)FrameCount;
     int secs = 0;
     if (!MP3_info.length){
-        secs = size * 8 / mediumBitrate;
+		mediumBitrate = totalBitrate / (float)FrameCount;
+		secs = size * 8 / mediumBitrate;
         MP3_info.length = secs;
     }else{
         secs = MP3_info.length;
