@@ -26,6 +26,7 @@
 #include <malloc.h>
 
 #include "id3.h"
+#include "mp3xing.h"
 #include "player.h"
 #include "mp3playerME.h"
 
@@ -315,6 +316,10 @@ int MP3MEgetInfo(){
 	struct mad_header header;
     int timeFromID3 = 0;
     float mediumBitrate = 0.0f;
+    int has_xing = 0;
+    int is_vbr = 0;
+    struct xing xing;
+	memset(&xing, 0, sizeof xing);
 
     getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
 
@@ -330,7 +335,7 @@ int MP3MEgetInfo(){
 
 	double startPos = ID3v2TagSize(MP3ME_fileName);
 	sceIoLseek32(fd, startPos, PSP_SEEK_SET);
-    startPos = SeekNextFrameMP3(fd);
+    //startPos = SeekNextFrameMP3(fd);
     size -= startPos;
 
     if (size < bufferSize * 3)
@@ -419,15 +424,32 @@ int MP3MEgetInfo(){
     				break;
     			}
 
+				//Check for xing frame:
+	            if(parse_xing(&xing, stream.anc_ptr, stream.anc_bitlen))
+				{
+					is_vbr = 1;
+	                
+					if (xing.flags & XING_FRAMES)
+					{
+						/* We use the Xing tag only for frames. If it doesn't have that
+						   information, it's useless to us and we have to treat it as a
+						   normal VBR file */
+						has_xing = 1;
+						FrameCount = xing.frames;
+						timeFromID3 = 1;
+						break;
+					}
+				}
+
     			//Check if lenght found in tag info:
                 if (MP3ME_info.length > 0){
                     timeFromID3 = 1;
                     break;
                 }
             }
-    		//Controllo il cambio di sample rate (ma non dovrebbe succedere)
-    		//if (header.samplerate > MP3ME_info.hz)
-      		//   MP3ME_info.hz = header.samplerate;
+
+			if (timeFromID3)
+				break;
 
             totalBitrate += header.bitrate;
             if (size == bufferSize)
@@ -444,10 +466,16 @@ int MP3MEgetInfo(){
     	free(localBuffer);
     sceIoClose(fd);
 
-    mediumBitrate = totalBitrate / (float)FrameCount;
     int secs = 0;
+    if (has_xing)
+    {
+        /* modify header.duration since we don't need it anymore */
+        mad_timer_multiply(&header.duration, FrameCount);
+        secs = mad_timer_count(header.duration, MAD_UNITS_SECONDS);
+	}
     if (!MP3ME_info.length){
-        secs = size * 8 / mediumBitrate;
+		mediumBitrate = totalBitrate / (float)FrameCount;
+		secs = size * 8 / mediumBitrate;
         MP3ME_info.length = secs;
     }else{
         secs = MP3ME_info.length;

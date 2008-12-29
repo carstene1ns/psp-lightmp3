@@ -396,6 +396,7 @@ void drawMLinfo(){
     	
 					coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
 					oslDeleteImage(tmpCoverArt);
+					tmpCoverArt = NULL;
 
         			coverArt->stretchX = coverArtWidth;
         			coverArt->stretchY = coverArtHeight;
@@ -516,11 +517,11 @@ int buildQueryMenu(char *select, char *where, char *orderBy, int (*cancelFunctio
     ML_queryDBSelect(tempSql, 0, ML_BUFFERSIZE, MLresult);
 	cpuRestore();
 
-	if (select != currentSelect)
+	//if (select != currentSelect)
 		strcpy(currentSelect, select);
-	if (where != currentWhere)
+	//if (where != currentWhere)
 		strcpy(currentWhere, where);
-	if (orderBy != currentOrderBy)
+	//if (orderBy != currentOrderBy)
 		strcpy(currentOrderBy, orderBy);
 	currentCancelFunction = cancelFunction;
 
