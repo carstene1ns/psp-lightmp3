@@ -309,6 +309,7 @@ void getMP3TagInfo(char *filename, struct fileInfo *targetInfo){
     strcpy(targetInfo->year, ID3.ID3Year);
     strcpy(targetInfo->genre, ID3.ID3GenreText);
     strcpy(targetInfo->trackNumber, ID3.ID3TrackText);
+	targetInfo->length = ID3.ID3Length;
     targetInfo->encapsulatedPictureType = ID3.ID3EncapsulatedPictureType;
     targetInfo->encapsulatedPictureOffset = ID3.ID3EncapsulatedPictureOffset;
     targetInfo->encapsulatedPictureLength = ID3.ID3EncapsulatedPictureLength;
@@ -438,9 +439,8 @@ int MP3getInfo(){
                     break;
                 }
             }
-    		//Controllo il cambio di sample rate (ma non dovrebbe succedere)
-    		//if (header.samplerate > MP3_info.hz)
-      		//   MP3_info.hz = header.samplerate;
+			if (timeFromID3)
+				break;
 
             totalBitrate += header.bitrate;
             if (size == bufferSize)

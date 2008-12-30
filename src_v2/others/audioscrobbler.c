@@ -26,15 +26,15 @@ char SCROBBLER_fileName[264];
 
 //Init scrobbler logging:
 int SCROBBLER_init(char *fileName){
-	FILE *f;
+	int f = 0;
 
 	strcpy(SCROBBLER_fileName, fileName);
-	f = fopen(SCROBBLER_fileName, "rt");
-	if (f == NULL){
+    f = sceIoOpen(SCROBBLER_fileName, PSP_O_RDONLY, 0777);
+	if (f < 0){
 		//Create empty file:
 		SCROBBLER_writeHeader();
 	}else{
-        fclose(f);
+        sceIoClose(f);
     }
 	return 0;
 }
@@ -42,38 +42,38 @@ int SCROBBLER_init(char *fileName){
 
 //Write header:
 int SCROBBLER_writeHeader(){
-	FILE *f;
+	int f = 0;
 	char buffer[260] = "";
 
-	f = fopen(SCROBBLER_fileName, "w");
-	if (f == NULL){
+	f = sceIoOpen(SCROBBLER_fileName, PSP_O_WRONLY | PSP_O_CREAT, 0777);
+	if (f < 0){
 		//Error opening file:
 		return(-1);
 	}
-    fwrite("#AUDIOSCROBBLER/1.0\n", 1, strlen("#AUDIOSCROBBLER/1.0\n"), f);
-    fwrite("#TZ/UTC\n", 1, strlen("#TZ/UTC\n"), f);
+	sceIoWrite(f, "#AUDIOSCROBBLER/1.0\n", strlen("#AUDIOSCROBBLER/1.0\n"));
+	sceIoWrite(f, "#TZ/UTC\n", strlen("#TZ/UTC\n"));
 	snprintf(buffer, sizeof(buffer), "#CLIENT/PSP LightMP3 v%s\n", VERSION);
-    fwrite(buffer, 1, strlen(buffer), f);
-	fclose(f);
-    return(0);
+	sceIoWrite(f, buffer, strlen(buffer));
+	sceIoClose(f);
+	return(0);
 }
 
 
 //Add a track to logfile:
 int SCROBBLER_addTrack(struct fileInfo tag, long duration, char *rating, long timestamp){
-	FILE *f;
+	int f = 0;
 	char testo[1024*2] = "";
 
     SCROBBLER_init(SCROBBLER_fileName);
-	f = fopen(SCROBBLER_fileName, "a");
-	if (f == NULL){
+	f = sceIoOpen(SCROBBLER_fileName, PSP_O_WRONLY | PSP_O_APPEND, 0777);
+	if (f < 0){
 		//Error opening file:
 		return(-1);
 	}
 
 	snprintf(testo, sizeof(testo), "%s\t%s\t%s\t%s\t%li\t%s\t%li\n", tag.artist, tag.album, tag.title, "", duration, rating, timestamp);
-    fwrite(testo, 1, strlen(testo), f);
-	fclose(f);
+	sceIoWrite(f, testo, strlen(testo));
+	sceIoClose(f);
     return(0);
 }
 
