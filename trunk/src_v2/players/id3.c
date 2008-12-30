@@ -368,11 +368,11 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
-         else if(!strncmp("TLEN",tag,4)) /* Length */
+         else if(!strncmp("TLEN",tag,4)) /* Length in milliseconds */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, buffer);
-            id3tag->ID3Length = atoi(buffer);
+            id3tag->ID3Length = atol(buffer) / 1000;
          }
          else if(!strncmp("TCON",tag,4)) /* Genre */
          {
@@ -470,11 +470,11 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
-         else if(!strncmp("TLEN",tag,4)) /* Length */
+         else if(!strncmp("TLEN",tag,4)) /* Length in milliseconds */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, buffer);
-            id3tag->ID3Length = atoi(buffer);
+            id3tag->ID3Length = atol(buffer) / 1000;
          }
          else if(!strncmp("TCON",tag,4)) /* Genre */
          {

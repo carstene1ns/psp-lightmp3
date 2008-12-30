@@ -296,7 +296,7 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
     strcpy(targetInfo->year, ID3.ID3Year);
     strcpy(targetInfo->genre, ID3.ID3GenreText);
     strcpy(targetInfo->trackNumber, ID3.ID3TrackText);
-    targetInfo->length = ID3.ID3Length / 1000;
+    targetInfo->length = ID3.ID3Length;
     targetInfo->encapsulatedPictureType = ID3.ID3EncapsulatedPictureType;
     targetInfo->encapsulatedPictureOffset = ID3.ID3EncapsulatedPictureOffset;
     targetInfo->encapsulatedPictureLength = ID3.ID3EncapsulatedPictureLength;
@@ -317,7 +317,6 @@ int MP3MEgetInfo(){
     int timeFromID3 = 0;
     float mediumBitrate = 0.0f;
     int has_xing = 0;
-    int is_vbr = 0;
     struct xing xing;
 	memset(&xing, 0, sizeof xing);
 
@@ -427,8 +426,6 @@ int MP3MEgetInfo(){
 				//Check for xing frame:
 	            if(parse_xing(&xing, stream.anc_ptr, stream.anc_bitlen))
 				{
-					is_vbr = 1;
-	                
 					if (xing.flags & XING_FRAMES)
 					{
 						/* We use the Xing tag only for frames. If it doesn't have that
@@ -472,8 +469,9 @@ int MP3MEgetInfo(){
         /* modify header.duration since we don't need it anymore */
         mad_timer_multiply(&header.duration, FrameCount);
         secs = mad_timer_count(header.duration, MAD_UNITS_SECONDS);
+		MP3ME_info.length = secs;
 	}
-    if (!MP3ME_info.length){
+    else if (!MP3ME_info.length){
 		mediumBitrate = totalBitrate / (float)FrameCount;
 		secs = size * 8 / mediumBitrate;
         MP3ME_info.length = secs;
