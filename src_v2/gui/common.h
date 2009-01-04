@@ -53,6 +53,7 @@ int drawCommonGraphics();
 int drawButtonBar(int selectedButton);
 void errorLoadImage(char *imageName);
 void debugMessageBox(char *message);
+unsigned int errorMessageBox(char *message, int yesNo);
 int drawConfirm(char *title, char *message);
 int drawWait(char *title, char *message);
 int drawMessageBox(char *title, char *message);

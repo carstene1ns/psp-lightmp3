@@ -161,8 +161,8 @@ int gui_playlistEditor(){
     M3U_open(tempM3Ufile);
     if (M3U_getSongCount()){
         song = M3U_getSong(0);
-        setAudioFunctions(song->fileName, userSettings->MP3_ME);
-        tagInfo = (*getTagInfoFunct)(song->fileName);
+        if (!setAudioFunctions(song->fileName, userSettings->MP3_ME))
+			tagInfo = (*getTagInfoFunct)(song->fileName);
         unsetAudioFunctions();
     }else{
         strcpy(tagInfo.title, "");
