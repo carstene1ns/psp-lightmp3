@@ -37,7 +37,6 @@
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int MP3ME_threadActive = 0;
-//static int MP3ME_threadExited = 1;
 static char MP3ME_fileName[264];
 static int MP3ME_isPlaying = 0;
 static int MP3ME_thid = -1;
@@ -93,7 +92,6 @@ int decodeThread(SceSize args, void *argp){
 
 	sceAudiocodecReleaseEDRAM(MP3ME_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another mp3.
 	MP3ME_threadActive = 1;
-    //MP3ME_threadExited = 0;
     OutputBuffer_flip = 0;
     OutputPtrME = OutputBuffer[0];
 
@@ -279,7 +277,6 @@ int decodeThread(SceSize args, void *argp){
       sceIoClose(MP3ME_handle);
       MP3ME_handle = -1;
     }
-    //MP3ME_threadExited = 1;
 	sceKernelExitThread(0);
     return 0;
 }
@@ -547,8 +544,6 @@ void MP3ME_Pause(){
 int MP3ME_Stop(){
     MP3ME_isPlaying = 0;
     MP3ME_threadActive = 0;
-    /*while (!MP3ME_threadExited)
-        sceKernelDelayThread(100000);*/
 	sceKernelWaitThreadEnd(MP3ME_thid, NULL);
     sceKernelDeleteThread(MP3ME_thid);
     return 0;

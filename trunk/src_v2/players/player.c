@@ -292,61 +292,65 @@ int setAudioFunctions(char *filename, int useME_MP3){
         resumeFunct = OGG_resume;
         fadeOutFunct = OGG_fadeOut;
 		return 0;
-    } else if (!stricmp(ext, "MP3") && useME_MP3){
-        //MP3 via Media Engine
-		initFunct = MP3ME_Init;
-		loadFunct = MP3ME_Load;
-		playFunct = MP3ME_Play;
-		pauseFunct = MP3ME_Pause;
-		endFunct = MP3ME_End;
-        setVolumeBoostTypeFunct = MP3ME_setVolumeBoostType;
-        setVolumeBoostFunct = MP3ME_setVolumeBoost;
-        getInfoFunct = MP3ME_GetInfo;
-        getTagInfoFunct = MP3ME_GetTagInfoOnly;
-        getTimeStringFunct = MP3ME_GetTimeString;
-        getPercentageFunct = MP3ME_GetPercentage;
-        getPlayingSpeedFunct = MP3ME_getPlayingSpeed;
-        setPlayingSpeedFunct = MP3ME_setPlayingSpeed;
-        endOfStreamFunct = MP3ME_EndOfStream;
-
-        setMuteFunct = MP3ME_setMute;
-        setFilterFunct = MP3ME_setFilter;
-        enableFilterFunct = MP3ME_enableFilter;
-        disableFilterFunct = MP3ME_disableFilter;
-        isFilterEnabledFunct = MP3ME_isFilterEnabled;
-        isFilterSupportedFunct = MP3ME_isFilterSupported;
-
-        suspendFunct = MP3ME_suspend;
-        resumeFunct = MP3ME_resume;
-        fadeOutFunct = MP3ME_fadeOut;
-		return 0;
     } else if (!stricmp(ext, "MP3")){
-        //MP3 via LibMad
-		initFunct = MP3_Init;
-		loadFunct = MP3_Load;
-		playFunct = MP3_Play;
-		pauseFunct = MP3_Pause;
-		endFunct = MP3_End;
-        setVolumeBoostTypeFunct = MP3_setVolumeBoostType;
-        setVolumeBoostFunct = MP3_setVolumeBoost;
-        getInfoFunct = MP3_GetInfo;
-        getTagInfoFunct = MP3_GetTagInfoOnly;
-        getTimeStringFunct = MP3_GetTimeString;
-        getPercentageFunct = MP3_GetPercentage;
-        getPlayingSpeedFunct = MP3_getPlayingSpeed;
-        setPlayingSpeedFunct = MP3_setPlayingSpeed;
-        endOfStreamFunct = MP3_EndOfStream;
+		if (useME_MP3)
+		{
+			//MP3 via Media Engine
+			initFunct = MP3ME_Init;
+			loadFunct = MP3ME_Load;
+			playFunct = MP3ME_Play;
+			pauseFunct = MP3ME_Pause;
+			endFunct = MP3ME_End;
+			setVolumeBoostTypeFunct = MP3ME_setVolumeBoostType;
+			setVolumeBoostFunct = MP3ME_setVolumeBoost;
+			getInfoFunct = MP3ME_GetInfo;
+			getTagInfoFunct = MP3ME_GetTagInfoOnly;
+			getTimeStringFunct = MP3ME_GetTimeString;
+			getPercentageFunct = MP3ME_GetPercentage;
+			getPlayingSpeedFunct = MP3ME_getPlayingSpeed;
+			setPlayingSpeedFunct = MP3ME_setPlayingSpeed;
+			endOfStreamFunct = MP3ME_EndOfStream;
 
-        setMuteFunct = MP3_setMute;
-        setFilterFunct = MP3_setFilter;
-        enableFilterFunct = MP3_enableFilter;
-        disableFilterFunct = MP3_disableFilter;
-        isFilterEnabledFunct = MP3_isFilterEnabled;
-        isFilterSupportedFunct = MP3_isFilterSupported;
+			setMuteFunct = MP3ME_setMute;
+			setFilterFunct = MP3ME_setFilter;
+			enableFilterFunct = MP3ME_enableFilter;
+			disableFilterFunct = MP3ME_disableFilter;
+			isFilterEnabledFunct = MP3ME_isFilterEnabled;
+			isFilterSupportedFunct = MP3ME_isFilterSupported;
 
-        suspendFunct = MP3_suspend;
-        resumeFunct = MP3_resume;
-        fadeOutFunct = MP3_fadeOut;
+			suspendFunct = MP3ME_suspend;
+			resumeFunct = MP3ME_resume;
+			fadeOutFunct = MP3ME_fadeOut;
+		}
+		else
+		{
+			//MP3 via LibMad
+			initFunct = MP3_Init;
+			loadFunct = MP3_Load;
+			playFunct = MP3_Play;
+			pauseFunct = MP3_Pause;
+			endFunct = MP3_End;
+			setVolumeBoostTypeFunct = MP3_setVolumeBoostType;
+			setVolumeBoostFunct = MP3_setVolumeBoost;
+			getInfoFunct = MP3_GetInfo;
+			getTagInfoFunct = MP3_GetTagInfoOnly;
+			getTimeStringFunct = MP3_GetTimeString;
+			getPercentageFunct = MP3_GetPercentage;
+			getPlayingSpeedFunct = MP3_getPlayingSpeed;
+			setPlayingSpeedFunct = MP3_setPlayingSpeed;
+			endOfStreamFunct = MP3_EndOfStream;
+
+			setMuteFunct = MP3_setMute;
+			setFilterFunct = MP3_setFilter;
+			enableFilterFunct = MP3_enableFilter;
+			disableFilterFunct = MP3_disableFilter;
+			isFilterEnabledFunct = MP3_isFilterEnabled;
+			isFilterSupportedFunct = MP3_isFilterSupported;
+
+			suspendFunct = MP3_suspend;
+			resumeFunct = MP3_resume;
+			fadeOutFunct = MP3_fadeOut;
+		}
 		return 0;
     } else if (!stricmp(ext, "AA3") || !stricmp(ext, "OMA") || !stricmp(ext, "OMG")){
         //AA3

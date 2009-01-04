@@ -1,6 +1,8 @@
 #Language   : English
 #By         : Sakya
 #Contacts   : sakya_tg@yahoo.it
+
+#Encoding is one of: UTF-8, GBK, BIG5, SHIFT-JIS, EUC-KR, MS-EE, MS-CYRL, ISO-8859-1, ISO-8859-2
 ENCODING=UTF8
 
 #Language to use in the On Screen Keyboard.
