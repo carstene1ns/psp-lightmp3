@@ -254,7 +254,8 @@ int ML_scanMS(char extFilter[][5], int extNumber,
 
                 if (FIO_S_ISREG(openedDir.directory_entry[i].d_stat.st_mode)){
                     //Media found:
-                    setAudioFunctions(fullNameShort, 1);
+                    if (setAudioFunctions(fullNameShort, 1))
+						continue;
                     info = (*getTagInfoFunct)(fullNameShort);
                     errorCode = 0;
                     getExtension(fullNameShort, ext, 4);
@@ -394,7 +395,7 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
     }
     sqlite3_finalize(stmt);
     ML_INTERNAL_closeDB();
-    return 0;
+    return count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,7 +471,7 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
     }
     sqlite3_finalize(stmt);
     ML_INTERNAL_closeDB();
-    return 0;
+    return count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -526,16 +527,18 @@ int ML_updateEntry(struct libraryEntry entry){
     else if (entry.rating < 0)
         entry.rating = 0;
 
-    snprintf(sql, sizeof(sql), "update media \
+    snprintf(sql, sizeof(sql), 
+				 "update media \
                   set artist = '%s', album = '%s', title = '%s', genre = '%s', \
                       year = '%s', extension = '%s', \
                       seconds = %i, samplerate = %i, bitrate = %i, tracknumber = %i, \
                       rating = %i, played = %i \
                   where path = upper('%s');",
-                  entry.artist, entry.album, entry.title, entry.genre, entry.year,
-                  entry.extension,
-                  entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber, entry.rating,
-                  entry.played, entry.path);
+                  entry.artist, entry.album, entry.title, entry.genre, 
+				  entry.year, entry.extension,
+                  entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber, 
+				  entry.rating, entry.played, 
+				  entry.path);
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
