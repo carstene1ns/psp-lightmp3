@@ -312,7 +312,7 @@ int playFile(char *fileName, char *trackMessage){
 	int headphone = sceHprmIsHeadphoneExist();
 	int skip = 0;
 	OSL_IMAGE* tmpCoverArt;
-	
+
     MEEnable();
 
 	cpuBoost();
@@ -329,6 +329,8 @@ int playFile(char *fileName, char *trackMessage){
     if (setAudioFunctions(fileName, userSettings->MP3_ME)){
         snprintf(buffer, sizeof(buffer), "Unknown audio format for file\n%s", fileName);
         debugMessageBox(buffer);
+        oslReadKeys();
+		cpuRestore();
 		return 0;
 	}
 
@@ -366,11 +368,10 @@ int playFile(char *fileName, char *trackMessage){
     strcpy(fixedName, fileName);
     ML_fixStringField(fixedName);
     snprintf(whereCond, sizeof(whereCond), "path = upper('%s')", fixedName);
-    int update = ML_countRecords(whereCond);
-    if (update > 0){
-        ML_queryDB(whereCond, "path", 0, 1, MLresult);
+    int update = ML_queryDB(whereCond, "path", 0, 1, MLresult);
+    if (update > 0)
         libEntry = MLresult[0];
-    }else
+    else
         ML_clearEntry(&libEntry);
 
     //Save temp coverart file:
@@ -410,7 +411,7 @@ int playFile(char *fileName, char *trackMessage){
     if (tmpCoverArt){
     	int coverArtWidth  = skinGetParam("COVERART_WIDTH");
     	int coverArtHeight = skinGetParam("COVERART_HEIGHT");
-    	
+
 		coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
 		oslDeleteImage(tmpCoverArt);
 		tmpCoverArt = NULL;
@@ -436,8 +437,10 @@ int playFile(char *fileName, char *trackMessage){
     //Apro il file:
     int retLoad = (*loadFunct)(fileName);
     if (retLoad != OPENING_OK){
-        snprintf(buffer, sizeof(buffer), "Error %i opening file:\n%s", retLoad, fileName);
-        debugMessageBox(buffer);
+		char tempDir[256] = "";
+		getcwd(tempDir, 256);
+		snprintf(buffer, sizeof(buffer), "Error %i opening file:\n%s\nCwd: %s\n\nContinue with next file?", retLoad, fileName, tempDir);
+        int response = errorMessageBox(buffer, 1);
         (*endFunct)();
         unsetAudioFunctions();
 		//Unload images:
@@ -445,7 +448,12 @@ int playFile(char *fileName, char *trackMessage){
 			oslDeleteImage(coverArt);
 			coverArt = NULL;
 		}
-        return 0;
+		oslReadKeys();
+
+		if (response == OSL_MB_YES)
+			return PLAYER_END;
+		else
+			return PLAYER_STOP;
     }
     info = (*getInfoFunct)();
 
@@ -810,6 +818,15 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
     int i = 0;
     char message[20] = "";
 
+	//Chdir for playlist with relative paths:
+	if (strlen(playList->fileName))
+	{
+		char onlyDir[256] = "";
+		strcpy(onlyDir, playList->fileName);
+		directoryUp(onlyDir);
+		sceIoChdir(onlyDir);
+	}
+
     if (startIndex >= 0)
         i = startIndex;
 	else if (userSettings->playMode == MODE_SHUFFLE || userSettings->playMode == MODE_SHUFFLE_REPEAT)
@@ -916,7 +933,7 @@ int playDirectory(char *dirName, char *dirNameShort, char *startFile){
 
     M3U_clear();
 	cpuBoost();
-    char *result = opendir_open(&directory, dirName, dirNameShort, fileExt, fileExtCount, 0);
+    char *result = opendir_open(&directory, dirName, dirNameShort, fileExt, fileExtCount - 1, 0);
 	cpuRestore();
     if (!result){
         getFileName(startFile, onlyName);
