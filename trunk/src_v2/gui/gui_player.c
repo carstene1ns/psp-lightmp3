@@ -38,7 +38,6 @@
 #include "../players/id3.h"
 #include "../others/audioscrobbler.h"
 #include "../others/medialibrary.h"
-//#include <jpeglib.h>
 
 #define PLAYER_STOP 2
 #define PLAYER_NEXT 1
@@ -296,7 +295,7 @@ int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
 //				 PLAYER_PREVIOUS if user pressed PREVIOUS
 //				 PLAYER_STOP     if user pressed STOP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int playFile(char *fileName, char *trackMessage){
+int playFile(char *fileName, char *shortName, char *trackMessage){
     int retValue = PLAYER_END;
     struct fileInfo tagInfo;
 	struct fileInfo *info = NULL;
@@ -314,7 +313,7 @@ int playFile(char *fileName, char *trackMessage){
 	OSL_IMAGE* tmpCoverArt;
 
     MEEnable();
-
+    
 	cpuBoost();
 
     if (userSettings->displayStatus){
@@ -736,7 +735,7 @@ int playFile(char *fileName, char *trackMessage){
             }
         }
 
-        //Controllo se la riproduzione Ë finita:
+        //Controllo se la riproduzione √® finita:
         if (!flagExit && (*endOfStreamFunct)() == 1) {
             (*endFunct)();
             retValue = PLAYER_END;
@@ -793,7 +792,7 @@ int randomTrack(int max, unsigned int played, unsigned int used[]){
 	found = 1;
 	while (found == 1){
 		random = (int)oslRandf(0, max);
-		//Controllo se l'ho gi‡ suonata:
+		//Controllo se l'ho gi√† suonata:
 		int i;
 		found = 0;
 		for (i=0; i<played; i++){
@@ -838,7 +837,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 	while(!osl_quit){
 		song = M3U_getSong(i);
 		snprintf(message, sizeof(message), "%i / %i", i + 1, songCount);
-		int playerReturn = playFile(song->fileName, message);
+		int playerReturn = playFile(song->fileName, "", message);
 		//Played tracks:
 		int found = 0;
 		int ci = 0;
@@ -876,7 +875,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 					currentTrack++;
 				}
 			}else{
-				//Controllo se Ë finita la playlist e non sono in repeat:
+				//Controllo se √® finita la playlist e non sono in repeat:
 				if ((playerReturn == PLAYER_END) & (i == songCount - 1) & (userSettings->playMode != MODE_REPEAT_ALL)){
 					break;
 				}

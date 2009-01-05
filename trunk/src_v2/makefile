@@ -12,7 +12,7 @@ OBJS = prx/supportlib.o \
 
 #To build for custom firmware:
 BUILD_PRX = 1
-PSP_FW_VERSION=371
+PSP_FW_VERSION=500
 PSP_LARGE_MEMORY=1
 
 #To debug -g

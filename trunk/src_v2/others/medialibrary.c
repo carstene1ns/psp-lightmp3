@@ -117,7 +117,7 @@ int ML_createEmptyDB(char *directory, char *fileName){
 
     snprintf(sql, sizeof(sql), "create table media (artist varchar(256), album varchar(256), \
                                       title varchar(256), genre varchar(256), year varchar(4), \
-                                      path varchar(264), realpath varchar(264), extension varchar(4), \
+                                      path varchar(264), shortpath varchar(264), extension varchar(4), \
                                       seconds integer, tracknumber integer, rating integer, \
                                       samplerate integer, bitrate integer, played integer, \
                                       PRIMARY KEY (path));");
@@ -265,7 +265,7 @@ int ML_scanMS(char extFilter[][5], int extNumber,
                     ML_fixStringField(info.genre);
                     //ML_fixStringField(fullName);
                     ML_fixStringField(fullNameShort);
-                    snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, realpath, \
+                    snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, shortpath, \
                                                      extension, seconds, samplerate, bitrate, tracknumber) \
                                   values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %li, %li, %i, %i);",
                                   info.artist, info.album, info.title, info.genre, info.year,
@@ -359,7 +359,7 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
         return ML_ERROR_OPENDB;
     snprintf(sql, sizeof(sql), "Select coalesce(artist, ''), coalesce(album, ''), coalesce(title, ''), coalesce(genre, ''), coalesce(year, ''), \
                          path, coalesce(extension, ''), seconds, rating, \
-                         samplerate, bitrate, played, coalesce(realpath, '') \
+                         samplerate, bitrate, played, coalesce(shortpath, '') \
                   From media \
                   Where %s \
                   Order by %s \
@@ -390,6 +390,7 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
         resultBuffer[count].bitrate = sqlite3_column_int(stmt, 10);
         resultBuffer[count].played = sqlite3_column_int(stmt, 11);
         strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, 12));
+        strcpy(resultBuffer[count].shortpath, (char*)sqlite3_column_text(stmt, 12));        
         if (++count > ML_BUFFERSIZE)
             break;
     }
@@ -437,8 +438,10 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
                 strcpy(resultBuffer[count].genre, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "year"))
                 strcpy(resultBuffer[count].year, (char*)sqlite3_column_text(stmt, i));
-            else if (!stricmp(columnName, "realpath"))
-                strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, i));
+            else if (!stricmp(columnName, "path"))
+                strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, i));                
+            else if (!stricmp(columnName, "shortpath"))
+                strcpy(resultBuffer[count].shortpath, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "extension"))
                 strcpy(resultBuffer[count].extension, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "seconds"))
@@ -491,7 +494,7 @@ int ML_addEntry(struct libraryEntry entry){
     else if (entry.rating < 0)
         entry.rating = 0;
 
-    snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, realpath, \
+    snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, shortpath, \
                                      extension, seconds, samplerate, bitrate, tracknumber, \
                                      rating, played) \
                   values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %i, %i, %i, %i, %i, %i);",
@@ -568,7 +571,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
-    snprintf(sql, sizeof(sql), "Select path, coalesce(realpath, '') From media Order by path");
+    snprintf(sql, sizeof(sql), "Select path, coalesce(shortpath, '') From media Order by path");
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
@@ -576,7 +579,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
     }
 
     while(sqlite3_step(stmt) == SQLITE_ROW) {
-        FILE *test;
+        int test = 0;
         char fileName[264] = "";
         char path[264] = "";
         sqlite3_stmt *del;
@@ -586,8 +589,8 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
             if ((*checkFile)(fileName) < 0)
                 break;
 
-        test = fopen(fileName, "r");
-        if (test == NULL){
+        test = sceIoOpen(fileName, PSP_O_RDONLY, 0777);
+        if (test < 0){
             ML_fixStringField(fileName);
             snprintf(sql, sizeof(sql), "Delete From media Where path = upper('%s');", path);
             int retValue = sqlite3_prepare(db, sql, -1, &del, 0);
@@ -596,7 +599,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
             sqlite3_step(del);
             sqlite3_finalize(del);
         }else{
-            fclose(test);
+            sceIoClose(test);
         }
     }
     sqlite3_finalize(stmt);

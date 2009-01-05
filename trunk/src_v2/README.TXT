@@ -167,6 +167,13 @@ For further informations please refer to this forum:
 http://www.sakya.it/forums/viewforum.php?f=5
 
 
+KOREAN LANGUAGE:
+----------------
+To use the Korean language:
+1.Replace the default/skin.cfg with the default/skin_korean.cfg file
+2.Set in the setting tab the Korean language
+
+
 BUGS:
 -----
 To report a bug or check for known bugs please refer to:

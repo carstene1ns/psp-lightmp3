@@ -368,14 +368,15 @@ int gui_fileBrowser(){
                 USBactive = !USBactive;
                 if (USBactive){
 					cpuBoost();
-
-                    int retVal = oslInitUsbStorage();
+                    oslInitUsbStorage();
+                    oslStartUsbStorage();
+                    /*int retVal = oslInitUsbStorage();
                     if (retVal){
                         snprintf(buffer, sizeof(buffer), "Error InitUsbStorage: %i", retVal);
                         //debugMessageBox(buffer);
                     }else{
                         oslStartUsbStorage();
-                    }
+                    }*/
                 }else{
                     oslStopUsbStorage();
                     oslDeinitUsbStorage();
