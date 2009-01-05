@@ -383,14 +383,18 @@ void drawMLinfo(){
 				int size = 0;
 
 				cpuBoost();
-				snprintf(dirName, sizeof(dirName), "%s", MLresult[commonMenu.selected - mlBufferPosition].path);
+				snprintf(dirName, sizeof(dirName), "%s", MLresult[commonMenu.selected - mlBufferPosition].shortpath);
 				directoryUp(dirName);
 				//Look for folder.jpg in the same directory:
 				snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
+                
 				size = fileExists(buffer);
 				if (size > 0 && size <= MAX_IMAGE_DIMENSION)
-					tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-				else{
+                {
+					tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);                    
+                }
+				else
+                {
 					//Look for cover.jpg in same directory:
 					snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "cover.jpg");
 					size = fileExists(buffer);

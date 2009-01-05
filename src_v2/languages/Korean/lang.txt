@@ -2,7 +2,7 @@
 #By         : Kevin
 #Contacts   : sosaria@empal.com
 #UTF-8 Encoding : NexTOS, nextos@korea.com
-ENCODING=UTF8
+ENCODING=UTF-8
 TAG_ENCODING=EUC-KR
 
 #Language to use in the On Screen Keyboard.

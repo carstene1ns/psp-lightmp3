@@ -113,7 +113,9 @@ int decodeThread(SceSize args, void *argp){
     size -= data_start;
 
     memset(MP3ME_codec_buffer, 0, sizeof(MP3ME_codec_buffer));
-
+    memset(MP3ME_input_buffer, 0, sizeof(MP3ME_input_buffer));
+    memset(MP3ME_output_buffer, 0, sizeof(MP3ME_output_buffer));
+    
     if ( sceAudiocodecCheckNeedMem(MP3ME_codec_buffer, 0x1002) < 0 )
         MP3ME_threadActive = 0;
 
@@ -300,9 +302,9 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
 }
 
 //Get info on file:
-//Uso LibMad per calcolare la durata del pezzo perché
-//altrimenti dovrei gestire il buffer anche nella seekNextFrame (senza è troppo lenta).
-//E' una porcheria ma è più semplice. :)
+//Uso LibMad per calcolare la durata del pezzo perchÃ©
+//altrimenti dovrei gestire il buffer anche nella seekNextFrame (senza Ã¨ troppo lenta).
+//E' una porcheria ma Ã¨ piÃ¹ semplice. :)
 int MP3MEgetInfo(){
 	unsigned long FrameCount = 0;
     int fd = -1;

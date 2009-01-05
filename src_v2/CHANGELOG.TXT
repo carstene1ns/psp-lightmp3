@@ -4,7 +4,7 @@ LightMP3 Changelog
 Version 2.0.0 RC1
 -----------------
 -Added: You can sort records in the Media Library (press TRIANGLE)
--Added: support for filename with foreign characters (àèìòù...)
+-Added: support for filename with foreign characters (Ã Ã¨Ã¬Ã²Ã¹...)
         Many thanks to cooleyes for the FAT driver
 -Added: cpu clock set to minimum value when music is paused
 -Added: French, German, Polish, Spanish language
@@ -13,6 +13,8 @@ Version 2.0.0 RC1
 -Added: New ICON0.PNG and PIC1.PNG (many thanks to dario1crisafulli)
 -Added: Display will turn off when HOLD is set to ON, and will turn on when HOLD is set to off
 -Added: In Media Library when you select an artist you see an album's list (not a song list)
+-Fixed: Crash with some album art (switched to libjpeg, thanks to Kevin Kim)
+-Fixed: Better Korean support (thanks to Kevin Kim)
 -Fixed: Strings are limited inside the menu area.
 -Fixed: Sleep bug for MP3 and ATRAC3+ files (doesen't work with OGG)
 -Fixed: Some crash in the Media Library.
@@ -90,7 +92,7 @@ Version 1.7.2
 -------------
 -Added: Sleep mode (press TRIANGLE while playing a track).
         The psp will shutdown after the track or playlist/directory.
-        @mico: va bene così? ;)
+        @mico: va bene cosÃ¬? ;)
 -Added: Option to use the Sony On Screen Keyboard
 -Fixed: Files named like "dfgeerr...mp3" weren't recognized as mp3
 -Fixed: Freeze on "Opening..." or time stucked at 0 after 20 tracks

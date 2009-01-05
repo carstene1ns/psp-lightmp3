@@ -331,6 +331,9 @@ int fat_locate(const char * name, char * sname, u32 clus, p_fat_entry info)
 {
 	u32 count;
 	p_fat_entry entrys;
+    if (clus < 0)
+        clus = (fat_type == fat32) ? dbr.ufat.fat32.root_clus : 1;
+        
 	if(!fat_dir_list(clus, &count, &entrys))
 		return 0;
 	SceUID dl = sceIoDopen(sname);
