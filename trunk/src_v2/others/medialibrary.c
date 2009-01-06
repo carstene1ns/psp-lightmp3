@@ -44,19 +44,27 @@ static char dirToScanShort[500][264];
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private functions:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int ML_INTERNAL_closeDB(){
+    sqlite3_close(db);
+    return 0;
+}
+
 int ML_INTERNAL_openDB(char *directory, char *fileName){
     if (sceIoChdir(directory) < 0)
         return ML_ERROR_CHDIR;
 	int result = sqlite3_open(fileName, &db);
     if (result)
         return ML_ERROR_OPENDB;
+        
+    int retValue = sqlite3_exec(db, "PRAGMA synchronous=OFF", NULL, 0, &zErr);
+    if (retValue != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }        
+        
     return 0;
 }
 
-int ML_INTERNAL_closeDB(){
-    sqlite3_close(db);
-    return 0;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Clear buffer:
@@ -224,12 +232,11 @@ int ML_scanMS(char *rootDir,
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
-    retValue = sqlite3_prepare(db, "BEGIN TRANSACTION", -1, &stmt, 0);
+    retValue = sqlite3_exec(db, "BEGIN TRANSACTION", NULL, 0, &zErr);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
-    sqlite3_finalize(stmt);
 
     //FILE *log = fopen("ML_scan.txt", "w");
 
@@ -312,12 +319,11 @@ int ML_scanMS(char *rootDir,
     }
     //fclose(log);
 
-    retValue = sqlite3_prepare(db, "COMMIT", -1, &stmt, 0);
+    retValue = sqlite3_exec(db, "COMMIT", NULL, 0, &zErr);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
-    sqlite3_finalize(stmt);
     
     ML_INTERNAL_closeDB();
     return mediaFound;
@@ -597,8 +603,14 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
+    int retValue = sqlite3_exec(db, "BEGIN TRANSACTION", NULL, 0, &zErr);
+    if (retValue != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+    
     snprintf(sql, sizeof(sql), "Select path, coalesce(shortpath, '') From media Order by path");
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -630,6 +642,12 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
     }
     sqlite3_finalize(stmt);
 
+    retValue = sqlite3_exec(db, "COMMIT", NULL, 0, &zErr);
+    if (retValue != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+    
     ML_INTERNAL_closeDB();
     return 0;
 }
