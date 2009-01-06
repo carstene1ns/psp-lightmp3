@@ -25,6 +25,17 @@ Simply copy the LightMP3 directory under ms0:/PSP/GAME3xx, ms0:/PSP/GAME4XX or m
 The src directory contains source code: you don't need it to run the application.
 
 
+A NOTE ON CPU CLOCK
+-------------------
+Please note that default cpu clocks are higher than it needs.
+This is because if you have some plugins running you can encounter problems due to cpu clock too low.
+If you don't have any cpu-hungry plugin running try to set the clock with this values:
+-MP3 with libMad        = 65
+-MP3 with Media Engine  = 15
+-OGG Vorbis             = 45
+-Atrac3+                = 15
+
+
 FEATURES
 --------
 -Skinnable and multilanguage (english, italian, portuguese, french, polish, dutch)
@@ -184,9 +195,9 @@ http://www.sakya.it/forums/viewforum.php?f=5
 KOREAN LANGUAGE
 ---------------
 To use the Korean language:
-1.Set in the setting tab the Korean language
-2.Exit the app (the settings file is saved)
-3.Replace the default/skin.cfg with the default/skin_korean.cfg file
+1.Edit the default/skin.cfg file and uncomment this line (just remove the '#'):
+  #STR_FONT_ALT_NAME=flash0:/font/kr0.pgf
+2.Set in the setting tab the Korean language
 
 
 BUGS
