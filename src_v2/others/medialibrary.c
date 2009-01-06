@@ -219,9 +219,17 @@ int ML_scanMS(char *rootDir,
 	struct opendir_struct openedDir;
     char *result = NULL;
     int i = 0;
-
+    int retValue = 0;
+    
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
+
+    retValue = sqlite3_prepare(db, "BEGIN TRANSACTION", -1, &stmt, 0);
+    if (retValue != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+    sqlite3_finalize(stmt);
 
     //FILE *log = fopen("ML_scan.txt", "w");
 
@@ -272,7 +280,7 @@ int ML_scanMS(char *rootDir,
                                   info.artist, info.album, info.title, info.genre, info.year,
                                   fullNameShort, fullNameShort, ext,
                                   info.length, info.hz, info.kbit, atoi(info.trackNumber));
-                    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+                    retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
                     if (retValue != SQLITE_OK){
                         ML_INTERNAL_closeDB();
                         return ML_ERROR_SQL;
@@ -304,6 +312,13 @@ int ML_scanMS(char *rootDir,
     }
     //fclose(log);
 
+    retValue = sqlite3_prepare(db, "COMMIT", -1, &stmt, 0);
+    if (retValue != SQLITE_OK){
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+    sqlite3_finalize(stmt);
+    
     ML_INTERNAL_closeDB();
     return mediaFound;
 }
