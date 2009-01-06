@@ -56,7 +56,7 @@ int ML_existsDB(char *directory, char *fileName);
 int ML_createEmptyDB(char *directory, char *fileName);
 int ML_openDB(char *directory, char *fileName);
 int ML_closeDB();
-int ML_scanMS(char extFilter[][5], int extNumber, int (*scanDir)(char *dirName), int (*scanFile)(char *fileName, int errorCode));
+int ML_scanMS(char *rootDir, char extFilter[][5], int extNumber, int (*scanDir)(char *dirName), int (*scanFile)(char *fileName, int errorCode));
 int ML_countRecords(char *whereCondition);
 int ML_countRecordsSelect(char *select);
 int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int limit, struct libraryEntry *result);
@@ -64,7 +64,7 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
 
 int ML_clearEntry(struct libraryEntry *entry);
 int ML_addEntry(struct libraryEntry entry);
-int ML_updateEntry(struct libraryEntry entry);
+int ML_updateEntry(struct libraryEntry entry, char *newPath);
 int ML_checkFiles(int (*checkFile)(char *fileName));
 int ML_getLastSQL(char *sqlOut);
 int ML_vacuum();

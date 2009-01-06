@@ -103,7 +103,6 @@ int M3U_open(char *fileName){
 			}
 			singleEntry->title[263] = '\0';
 			singleEntry->length = atoi(chrLength);
-			//lPlayList.songs[playListCount++] = singleEntry;
 			if (playListCount == MAX_SONGS){
 				break;
 			}

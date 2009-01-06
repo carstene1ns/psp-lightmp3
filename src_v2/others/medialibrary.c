@@ -202,7 +202,8 @@ int ML_closeDB(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Scan all memory stick for media (returns number of media found):
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int ML_scanMS(char extFilter[][5], int extNumber,
+int ML_scanMS(char *rootDir,
+              char extFilter[][5], int extNumber,
               int (*scanDir)(char *dirName),
               int (*scanFile)(char *fileName, int errorCode)){
     int mediaFound = 0;
@@ -224,8 +225,8 @@ int ML_scanMS(char extFilter[][5], int extNumber,
 
     //FILE *log = fopen("ML_scan.txt", "w");
 
-    strcpy(dirToScan[0], "ms0:/");
-    strcpy(dirToScanShort[0], "ms0:/");
+    strcpy(dirToScan[0], rootDir);
+    strcpy(dirToScanShort[0], rootDir);
     while (dirScanned < dirToScanNumber){
         //fwrite("Scanning: ", sizeof(char), strlen("Scanning: "), log);
         //fwrite(dirToScan[dirScanned], sizeof(char), strlen(dirToScan[dirScanned]), log);
@@ -497,7 +498,10 @@ int ML_addEntry(struct libraryEntry entry){
     snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, shortpath, \
                                      extension, seconds, samplerate, bitrate, tracknumber, \
                                      rating, played) \
-                  values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %i, %i, %i, %i, %i, %i);",
+                  values('%s', '%s', '%s', '%s', '%s', \
+                         upper('%s'), '%s', '%s', \
+                         %i, %i, %i, %i, \
+                         %i, %i);",
                   entry.artist, entry.album, entry.title, entry.genre, entry.year,
                   entry.path, entry.path, entry.extension,
                   entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber,
@@ -515,12 +519,14 @@ int ML_addEntry(struct libraryEntry entry){
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Update a single entry in the library:
+// Pass newPath to change the path (PrimaryKey)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int ML_updateEntry(struct libraryEntry entry){
+int ML_updateEntry(struct libraryEntry entry, char *newPath){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
     ML_fixStringField(entry.path);
+    ML_fixStringField(entry.shortpath);
     ML_fixStringField(entry.artist);
     ML_fixStringField(entry.album);
     ML_fixStringField(entry.title);
@@ -530,17 +536,22 @@ int ML_updateEntry(struct libraryEntry entry){
     else if (entry.rating < 0)
         entry.rating = 0;
 
+    if (!strlen(newPath))
+        strcpy(newPath, entry.path);
+        
     snprintf(sql, sizeof(sql), 
 				 "update media \
                   set artist = '%s', album = '%s', title = '%s', genre = '%s', \
                       year = '%s', extension = '%s', \
                       seconds = %i, samplerate = %i, bitrate = %i, tracknumber = %i, \
-                      rating = %i, played = %i \
+                      rating = %i, played = %i, shortpath = '%s', \
+                      path = upper('%s') \
                   where path = upper('%s');",
                   entry.artist, entry.album, entry.title, entry.genre, 
 				  entry.year, entry.extension,
                   entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber, 
-				  entry.rating, entry.played, 
+				  entry.rating, entry.played, entry.shortpath, 
+                  newPath, 
 				  entry.path);
     int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){

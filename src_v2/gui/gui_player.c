@@ -295,7 +295,7 @@ int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
 //				 PLAYER_PREVIOUS if user pressed PREVIOUS
 //				 PLAYER_STOP     if user pressed STOP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int playFile(char *fileName, char *shortName, char *trackMessage){
+int playFile(char *fileName, char *trackMessage){
     int retValue = PLAYER_END;
     struct fileInfo tagInfo;
 	struct fileInfo *info = NULL;
@@ -371,7 +371,36 @@ int playFile(char *fileName, char *shortName, char *trackMessage){
     if (update > 0)
         libEntry = MLresult[0];
     else
-        ML_clearEntry(&libEntry);
+    {
+        //Look for an entry with same artist, album, title but with dead link:
+        char fixedArtist[260] = "";
+        char fixedAlbum[260] = "";
+        char fixedTitle[260] = "";
+        
+        strcpy(fixedArtist, tagInfo.artist);
+        ML_fixStringField(fixedArtist);
+        strcpy(fixedAlbum, tagInfo.album);
+        ML_fixStringField(fixedAlbum);
+        strcpy(fixedTitle, tagInfo.title);
+        ML_fixStringField(fixedTitle);        
+        snprintf(whereCond, sizeof(whereCond), "artist = '%s' and album = '%s' and title = '%s'", fixedArtist, fixedAlbum, fixedTitle);
+        update = ML_queryDB(whereCond, "path", 0, 1, MLresult);
+        if (update > 0)
+        {
+            if (fileExists(MLresult[0].shortpath) < 0)
+            {
+                libEntry = MLresult[0];            
+                strcpy(libEntry.shortpath, fileName);
+            }                
+            else
+            {
+                ML_clearEntry(&libEntry);        
+                update = 0;
+            }
+        }
+        else
+            ML_clearEntry(&libEntry);        
+    }
 
     //Save temp coverart file:
     coverArt = NULL;
@@ -463,7 +492,8 @@ int playFile(char *fileName, char *shortName, char *trackMessage){
     strcpy(libEntry.title, info->title);
     strcpy(libEntry.genre, info->genre);
     strcpy(libEntry.year, info->year);
-    strcpy(libEntry.path, fileName);
+    if (update <= 0)
+        strcpy(libEntry.path, fileName);
     libEntry.seconds = info->length;
     libEntry.bitrate = info->kbit;
     libEntry.samplerate = info->hz;
@@ -766,7 +796,7 @@ int playFile(char *fileName, char *shortName, char *trackMessage){
     if (lastPercentage >= 50)
         libEntry.played++;
     if (update > 0)
-        ML_updateEntry(libEntry);
+        ML_updateEntry(libEntry, fileName);
     else
         ML_addEntry(libEntry);
 
@@ -837,7 +867,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 	while(!osl_quit){
 		song = M3U_getSong(i);
 		snprintf(message, sizeof(message), "%i / %i", i + 1, songCount);
-		int playerReturn = playFile(song->fileName, "", message);
+		int playerReturn = playFile(song->fileName, message);
 		//Played tracks:
 		int found = 0;
 		int ci = 0;

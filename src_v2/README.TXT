@@ -57,18 +57,21 @@ File Browser:
 	SQUARE  = Play directory
 	CIRCLE  = Go up one level
 	START   = Add directory/file to current playlist
+    SELECT  = Toggle USB mode
 
 
 Playlist Browser:
 	CROSS   = Play selected playlist
 	SQUARE  = Load selected playlist
 	CIRCLE  = Remove selected playlist
+    START   = Add selected playlist to current one
 
 
 Playlist Editor:
 	CROSS   = Move selected track down
 	SQUARE  = Move selected track up
 	CIRCLE  = Remove selected track from playlist
+    TRIANGLE= To check files (removes dead links)
 	NOTE    = Play playlist
 	START   = Save playlist
 	SELECT  = Clear playlist
@@ -79,6 +82,7 @@ Media Library:
 	CIRCLE  = Exit selection
 	SQUARE  = Play selection
 	START   = Add selection to current playlist
+    TRIANGLE= Sort tracks
 
 
 Player:
@@ -141,6 +145,16 @@ LightMP3 will look for cover:
 5.For a file named cover.jpg in the same directory
 
 
+MEDIA LIBRARY
+-------------
+You can choose the media library root directory (the directory that will be scanned when you choose "Scan MS for media").
+Open the settings file and change this setting:
+
+ML_ROOT=ms0:/
+Ex:
+ML_ROOT=ms0:/MUSIC/
+
+
 DEPENDENCIES
 ------------
 To compile LightMP3 you need:
@@ -157,8 +171,8 @@ CFLAGS += -O3 -frename-registers -ffast-math -fomit-frame-pointer
 I often update my sdk so you'll need an updated sdk to compile LightMP3.
 
 
-SKINS:
-------
+SKINS
+-----
 LightMP3 is totally skinnable.
 You can find more skins for LightMP3 here:
 http://sakya.altervista.org/new/index.php?mod=none_lightmp3skins
@@ -167,23 +181,24 @@ For further informations please refer to this forum:
 http://www.sakya.it/forums/viewforum.php?f=5
 
 
-KOREAN LANGUAGE:
-----------------
+KOREAN LANGUAGE
+---------------
 To use the Korean language:
-1.Replace the default/skin.cfg with the default/skin_korean.cfg file
-2.Set in the setting tab the Korean language
+1.Set in the setting tab the Korean language
+2.Exit the app (the settings file is saved)
+3.Replace the default/skin.cfg with the default/skin_korean.cfg file
 
 
-BUGS:
------
+BUGS
+----
 To report a bug or check for known bugs please refer to:
 http://code.google.com/p/lightmp3/issues/list
 You can also check this forum:
 http://www.sakya.it/forums/viewforum.php?f=4
 
 
-SOURCE:
--------
+SOURCE
+------
 Sources are included in every release.
 If you want to check the development version (untested, maybe broken) you can use svn:
 svn checkout http://lightmp3.googlecode.com/svn/trunk/ lightmp3-read-only
