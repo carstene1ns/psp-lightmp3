@@ -161,7 +161,7 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
                 			M3U_addSong(localResult[i - offset].path, info->length, onlyName);
                 		}
                     	localResult[i - offset].seconds = info->length;
-                        ML_updateEntry(localResult[i - offset]);
+                        ML_updateEntry(localResult[i - offset], "");
                 	}
                 	(*endFunct)();
                     unsetAudioFunctions();
@@ -255,7 +255,7 @@ int scanMS(){
 
 	cpuBoost();
 	ML_checkFiles(checkFileCallback);
-    int found = ML_scanMS(fileExt, fileExtCount-1, scanDirCallback, NULL);
+    int found = ML_scanMS(userSettings->mediaLibraryRoot, fileExt, fileExtCount-1, scanDirCallback, NULL);
     cpuRestore();
 
     snprintf(strFound, sizeof(strFound), "%i", found);
@@ -850,7 +850,7 @@ int showOrderByMenu(){
         oslStartDrawing();
         drawCommonGraphics();
         drawButtonBar(MODE_MEDIA_LIBRARY);
-        //drawMenu(&commonMenu);
+
         if (mediaLibraryStatus == STATUS_QUERYMENU)
             drawMLinfo();
         drawMenu(&commonSubMenu);
@@ -965,13 +965,13 @@ int gui_mediaLibrary(){
                 if (++MLresult[commonMenu.selected - mlBufferPosition].rating > ML_MAX_RATING)
                     MLresult[commonMenu.selected - mlBufferPosition].rating = ML_MAX_RATING;
                 ratingChangedUpDown = 1;
-                ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
+                ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition], "");
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
             }else if (osl_pad.held.cross && osl_pad.held.down  && commonMenu.numberOfElements && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                 if (--MLresult[commonMenu.selected - mlBufferPosition].rating < 0)
                     MLresult[commonMenu.selected - mlBufferPosition].rating = 0;
                 ratingChangedUpDown = 1;
-                ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition]);
+                ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition], "");
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
             }else if(osl_pad.released.R){
                 mediaLibraryRetValue = nextAppMode(MODE_MEDIA_LIBRARY);

@@ -76,6 +76,8 @@ struct settings{
 	int previousMode;
     char currentPlaylistName[264];
     int playlistStartIndex;
+    
+    char mediaLibraryRoot[264];
 };
 
 int SETTINGS_load(char *fileName);

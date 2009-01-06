@@ -13,6 +13,8 @@ Version 2.0.0 RC1
 -Added: New ICON0.PNG and PIC1.PNG (many thanks to dario1crisafulli)
 -Added: Display will turn off when HOLD is set to ON, and will turn on when HOLD is set to off
 -Added: In Media Library when you select an artist you see an album's list (not a song list)
+-Added: You can add a playlist to the current one by pressing start in the file browser (or square on the directory containing the playlist)
+-Added: Option to change the media library root dir (look at the file "settings", this option doesen't appear in the settings tab)
 -Fixed: Crash with some album art (switched to libjpeg, thanks to Kevin Kim)
 -Fixed: Better Korean support (thanks to Kevin Kim)
 -Fixed: Strings are limited inside the menu area.

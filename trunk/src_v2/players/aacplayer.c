@@ -179,9 +179,11 @@ void getAACTagInfo(char *filename, struct fileInfo *targetInfo){
 int AACgetInfo(){
     getAACTagInfo(AAC_fileName, &AAC_info);
 
+    strcpy(AAC_info.mode, "normal LR stereo");
     AAC_info.length = 0;
     strcpy(AAC_info.strLength, "00:00:00");
     AAC_info.hz = 44100;
+    AAC_info.fileType = AAC_TYPE;
     return 0;
 }
 

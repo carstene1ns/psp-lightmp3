@@ -74,30 +74,41 @@ int drawUSBmessage(){
 void addFileToPlaylist(char *fileName, int save){
 	struct fileInfo *info = NULL;
 	char onlyName[264] = "";
-
+    char extension[5] = "";
+    
 	if (save == 1){
 		M3U_clear();
 		M3U_open(tempM3Ufile);
 	}
 
-    if (setAudioFunctions(fileName, userSettings->MP3_ME))
-		return;
+    getExtension(fileName, extension, 4);
+    if (!strcmp(extension, "M3U"))
+    {
+        //Add a playlist:
+        M3U_open(fileName);      
+    }
+    else
+    {        
+        //Add a file:
+        if (setAudioFunctions(fileName, userSettings->MP3_ME))
+            return;
 
-	(*initFunct)(0);
-	if ((*loadFunct)(fileName) == OPENING_OK){
-		info = (*getInfoFunct)();
-		(*endFunct)();
-		if (strlen(info->title)){
-			M3U_addSong(fileName, info->length, info->title);
-		}else{
-			getFileName(fileName, onlyName);
-			M3U_addSong(fileName, info->length, onlyName);
-		}
-
-		if (save == 1)
-			M3U_save(tempM3Ufile);
-	}
-    unsetAudioFunctions();
+        (*initFunct)(0);
+        if ((*loadFunct)(fileName) == OPENING_OK){
+            info = (*getInfoFunct)();
+            (*endFunct)();
+            if (strlen(info->title)){
+                M3U_addSong(fileName, info->length, info->title);
+            }else{
+                getFileName(fileName, onlyName);
+                M3U_addSong(fileName, info->length, onlyName);
+            }
+        }
+        unsetAudioFunctions();
+    }
+    
+    if (save == 1)
+        M3U_save(tempM3Ufile);    
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +123,7 @@ void addDirectoryToPlaylist(char *dirName, char *dirNameShort){
 	struct opendir_struct dirToAdd;
 
 	cpuBoost();
-	char *result = opendir_open(&dirToAdd, dirName, dirNameShort, fileExt, fileExtCount - 1, 0);
+	char *result = opendir_open(&dirToAdd, dirName, dirNameShort, fileExt, fileExtCount, 0);
 	if (result == 0){
 		M3U_clear();
         M3U_open(tempM3Ufile);
@@ -157,6 +168,7 @@ int gui_fileBrowser(){
     int USBactive = 0;
     int status = STATUS_NORMAL;
 	OSL_IMAGE *coverArt = NULL;
+    OSL_IMAGE *tmpCoverArt = NULL;
 	int coverArtFailed = 0;
 	u64 lastMenuChange = 0;
 	int lastSelected = -1;
@@ -261,17 +273,24 @@ int gui_fileBrowser(){
 						snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
 						size = fileExists(buffer);
 						if (size > 0 && size <= MAX_IMAGE_DIMENSION)
-				            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+				            tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 						else{
 							//Look for cover.jpg in same directory:
 							snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "cover.jpg");
 							size = fileExists(buffer);
 							if (size > 0 && size <= MAX_IMAGE_DIMENSION)
-					            coverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+					            tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 						}
-						if (coverArt){
-							coverArt->stretchX = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
-							coverArt->stretchY = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
+						if (tmpCoverArt){
+                            int coverArtWidth  = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
+                            int coverArtHeight = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
+                
+                            coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
+                            oslDeleteImage(tmpCoverArt);
+                            tmpCoverArt = NULL;
+
+                            coverArt->stretchX = coverArtWidth;
+                            coverArt->stretchY = coverArtHeight;                            
 						}else{
 							coverArtFailed = 1;
 						}

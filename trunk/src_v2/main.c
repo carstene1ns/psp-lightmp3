@@ -150,7 +150,7 @@ int SetupCallbacks(void) {
 // Set initial clock:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void setInitialClock(){
-    //Velocit‡ di clock:
+    //Velocit√† di clock:
     if (sceKernelDevkitVersion() < 0x03070110)
     	scePowerSetClockFrequency(222, 222, 111);
     else
@@ -278,7 +278,8 @@ int main(){
     }
     strcpy(userSettings->ebootPath, ebootDirectory);
     userSettings->displayStatus = 1;
-
+    userSettings->BUS = getMinBUSClock(); //Override the saved value (the less == the better!)
+    
     //Splash screen:
 	int splash_thid = 0;
 	if (userSettings->SHOW_SPLASH){
@@ -398,7 +399,7 @@ int main(){
     oslSetReadKeysFunction(readButtons);
 	oslSetDepthTest(1);
 
-	//Controllo luminosit‡:
+	//Controllo luminosit√†:
     int initialBrightness = getBrightness();
 	int initialBrightnessValue = imposeGetBrightness();
 
@@ -444,7 +445,7 @@ int main(){
     strcpy(userSettings->EQ, tEQ.shortName);
 	SETTINGS_save(userSettings);
 
-	//Riporto la luminosit‡ a quella iniziale:
+	//Riporto la luminosit√† a quella iniziale:
     setBrightness(initialBrightness);
     imposeSetBrightness(initialBrightnessValue);
 

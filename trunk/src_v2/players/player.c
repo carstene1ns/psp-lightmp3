@@ -31,7 +31,7 @@
 #include "../system/opendir.h"
 
 //shared global vars
-char fileTypeDescription[4][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC"};
+char fileTypeDescription[5][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC", "AAC"};
 int MUTED_VOLUME = 800;
 int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;

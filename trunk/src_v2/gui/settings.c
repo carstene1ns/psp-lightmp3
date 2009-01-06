@@ -122,6 +122,8 @@ int SETTINGS_load(char *fileName){
 								localSettings.KEY_AUTOREPEAT_GUI = atoi(result);
 							}else if (strcmp(parName, "SHOW_SPLASH") == 0){
 								localSettings.SHOW_SPLASH = atoi(result);
+							}else if (strcmp(parName, "ML_ROOT") == 0){
+								strcpy(localSettings.mediaLibraryRoot, result);                                
 							}
 						}
 						element++;
@@ -178,6 +180,9 @@ struct settings *SETTINGS_default(){
     //Player's settings:
     localSettings.displayStatus = 1;
 
+    //Media Library settings:
+    strcpy(localSettings.mediaLibraryRoot, "ms0:/");
+    
 	return &localSettings;
 }
 
@@ -247,7 +252,8 @@ int SETTINGS_save(struct settings tSettings){
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "SHOW_SPLASH=%i\n", tSettings.SHOW_SPLASH);
     fwrite(testo, 1, strlen(testo), f);
-
+    snprintf(testo, sizeof(testo), "ML_ROOT=%s\n", tSettings.mediaLibraryRoot);
+    fwrite(testo, 1, strlen(testo), f);
 	fclose(f);
     return(0);
 }
