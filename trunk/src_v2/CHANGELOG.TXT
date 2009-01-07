@@ -1,6 +1,10 @@
 LightMP3 Changelog
 ------------------
 
+Version 2.0.0 RC2
+-----------------
+
+
 Version 2.0.0 RC1
 -----------------
 -Added: You can sort records in the Media Library (press TRIANGLE)
