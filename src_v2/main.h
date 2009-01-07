@@ -20,7 +20,7 @@
 
 #include "others/medialibrary.h"
 
-#define VERSION "2.0.0RC1"
+#define VERSION "2.0.0RC2"
 
 #define ML_DB "mediaLibrary.db"
 

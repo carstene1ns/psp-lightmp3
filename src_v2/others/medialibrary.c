@@ -58,6 +58,7 @@ int ML_INTERNAL_openDB(char *directory, char *fileName){
         
     int retValue = sqlite3_exec(db, "PRAGMA synchronous=OFF", NULL, 0, &zErr);
     if (retValue != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }        
@@ -131,6 +132,7 @@ int ML_createEmptyDB(char *directory, char *fileName){
                                       PRIMARY KEY (path));");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
@@ -139,12 +141,14 @@ int ML_createEmptyDB(char *directory, char *fileName){
                                         PRIMARY KEY (varname));");
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
 	snprintf(sql, sizeof(sql), "Insert into sysvars(varname, varvalue) values('DB_VERSION', '%s');", ML_DB_VERSION);
     result = sqlite3_exec(db, sql, NULL, 0, &zErr);
     if (result != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
@@ -174,6 +178,7 @@ int ML_createEmptyDB(char *directory, char *fileName){
 		snprintf(sql, sizeof(sql), "create index media_idx_%2.2i on media (%s);", i + 1, indexes[i]);
 		result = sqlite3_exec(db, sql, NULL, 0, &zErr);
 		if (result != SQLITE_OK){
+            sqlite3_free(zErr);
 			ML_INTERNAL_closeDB();
 			return ML_ERROR_SQL;
 		}
@@ -208,7 +213,7 @@ int ML_closeDB(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Scan all memory stick for media (returns number of media found):
+// Scan all memory stick for media (returns number of media found or < 0 if an error occurred):
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int ML_scanMS(char *rootDir,
               char extFilter[][5], int extNumber,
@@ -234,6 +239,7 @@ int ML_scanMS(char *rootDir,
 
     retValue = sqlite3_exec(db, "BEGIN TRANSACTION", NULL, 0, &zErr);
     if (retValue != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
@@ -286,11 +292,13 @@ int ML_scanMS(char *rootDir,
                                   values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %li, %li, %i, %i);",
                                   info.artist, info.album, info.title, info.genre, info.year,
                                   fullNameShort, fullNameShort, ext,
-                                  info.length, info.hz, info.kbit, atoi(info.trackNumber));
+                                  info.length, info.hz, info.kbit, atoi(info.trackNumber));                                  
                     retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
                     if (retValue != SQLITE_OK){
-                        ML_INTERNAL_closeDB();
-                        return ML_ERROR_SQL;
+                        //ML_INTERNAL_closeDB();
+                        //return ML_ERROR_SQL;
+                        sqlite3_finalize(stmt);
+                        continue;
                     }
 
                     if (sqlite3_step(stmt) == SQLITE_CONSTRAINT){
@@ -321,6 +329,7 @@ int ML_scanMS(char *rootDir,
 
     retValue = sqlite3_exec(db, "COMMIT", NULL, 0, &zErr);
     if (retValue != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
@@ -605,6 +614,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
 
     int retValue = sqlite3_exec(db, "BEGIN TRANSACTION", NULL, 0, &zErr);
     if (retValue != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
@@ -644,6 +654,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
 
     retValue = sqlite3_exec(db, "COMMIT", NULL, 0, &zErr);
     if (retValue != SQLITE_OK){
+        sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
