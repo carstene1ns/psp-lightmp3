@@ -1,5 +1,24 @@
 #Language   : Polish
 #By         : G-King
+#Contacts   : psp-team.pl
+ISO-8859-2
+ENCODING=UTF-8
+TAG_ENCODING=UTF-8
+
+#Language to use in the On Screen Keyboard.
+#			JAPANESE			0
+#			ENGLISH				1
+#			FRENCH				2
+#			SPANISH				3
+#			GERMAN				4
+#			ITALIAN				5
+#			DUTCH				6
+#			PORTUGUESE			7
+#			RUSSIAN				8
+#			KOREAN				9
+#			CHINESE_TRADITIONAL	10
+#			CHINESE_SIMPLIFIED	11
+OSK_LANGUAGE=1
 
 
 YES=Tak
@@ -71,7 +90,7 @@ CONFIRM_CLEAR_PLAYLIST=Wyczyscic ta playliste?
 CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Akceptuj
 CONFIRM_REMOVE_FROM_PLAYLIST=Usunac wybrany utwor z playlisty?
 PLAYLIST_NAME=Nazwa Playlisty
-TOTAL_TRACKS=Ilosc Nut
+TOTAL_TRACKS=Ilosc Utworow
 
 SETTINGS_01=Skin
 SETTINGS_02=Jezyk
@@ -79,7 +98,7 @@ SETTINGS_03=Zapisz audio Scrobbler Log
 SETTINGS_04=Sciszaj Kiedy Omijasz Utwor
 SETTINGS_05=Stopien Wyciszenia Glosnosci
 SETTINGS_06=Opcja Sprawdzania Jasnosci
-SETTINGS_07=Graj MP3 uzywajac Media Engine
+SETTINGS_07=Odwatarzaj MP3 uzywajac Media Engine
 SETTINGS_08=Boost dla MP3 uzywajac libMAD
 SETTINGS_09=Automatyczny Zegar CPU 
 SETTINGS_10=CPU Clock: GUI
@@ -88,8 +107,8 @@ SETTINGS_12=CPU Clock: MP3 Media Engine
 SETTINGS_13=CPU Clock: OGG Vorbis
 SETTINGS_14=CPU Clock: Flac
 SETTINGS_15=CPU Clock: ATRAC3
-CONFIRM_APPLY_SETTINGS_TITLE=Akceptuj
-CONFIRM_APPLY_SETTINGS=Zapisac ustawienia teraz?
+CONFIRM_SAVE_SETTINGS_TITLE=Akceptuj
+CONFIRM_SAVE_SETTINGS=Zapisac ustawienia teraz?
 
 HELP_PLAYER_TITLE=Pomoc
 HELP_PLAYER_01=R : Nastepny utwor
@@ -162,32 +181,31 @@ HELP_MEDIALIBRARY_02=Kolko : Cofa do poprzedniego folderu
 HELP_MEDIALIBRARY_03=Kwadrat : Odtwarza wybrane
 HELP_MEDIALIBRARY_04=Start : Dodaje wybrane/utwor do playlisty
 HELP_MEDIALIBRARY_05=Krzyzyk : + Gora/Dol ocenia utwor
+HELP_SETTINGS_TITLE=Pomoc Ustawien
+HELP_SETTINGS_01=Lewo/Prawo do zmiany ustawienia
+HELP_SETTINGS_02=Zapis ustawien
 
-HELP_SETTINGS_TITLE=Settings help
-HELP_SETTINGS_01=Left/Right to cange setting
-HELP_SETTINGS_02=Start to save settings
+LOADING_SKIN_TITLE=Prosze czekac
+LOADING_SKIN=Wgrywanie nowego skina
+CHECKING_PLAYLIST=Sprawdz. plikow playlisty
 
-LOADING_SKIN_TITLE=Please Wait
-LOADING_SKIN=Loading new skin
-CHECKING_PLAYLIST=Checking playlist's files
-
-SETTINGS_16=Keys repeat interval
-SETTINGS_17=Show splash screen
+SETTINGS_16=Predkosc Przesuwu Wskaznika
+SETTINGS_17=Pokazuj obrazek startowy
 
 BROWSE_TOP100=Top 100
-BROWSE_ALL=Browse all
+BROWSE_ALL=Przegladaj Wszystko
 
 ################################################################################
 #2.0.0 RC1
 ################################################################################
-HELP_MEDIALIBRARY_06=Triangle to sort tracks
+HELP_MEDIALIBRARY_06=Trojkat segreguje utwory
 
-ORDER_BY_01=Artist, Album, Track#
-ORDER_BY_02=Artist, Album, Title
-ORDER_BY_03=Artist, Title
-ORDER_BY_04=Title
-ORDER_BY_05=Year, Title
-ORDER_BY_06=Year, Artist, Album, Track#
-ORDER_BY_07=Year, Artist, Album, Title
-ORDER_BY_08=Rating, Artist, Album, Track#
-ORDER_BY_09=Rating, Artist, Album, Title
+ORDER_BY_01=Artysta, Album, Utwor#
+ORDER_BY_02=Artysta, Album, Tytul
+ORDER_BY_03=Artysta, Tytul
+ORDER_BY_04=Tytul
+ORDER_BY_05=Rok, Tytul
+ORDER_BY_06=Rok, Artysta, Album, Utwor#
+ORDER_BY_07=Rok, Artysta, Album, Tytul
+ORDER_BY_08=Ocena, Artysta, Album, Utwor#
+ORDER_BY_09=Ocena, Artysta, Album, Tytul
