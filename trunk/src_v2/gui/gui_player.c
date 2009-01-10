@@ -821,7 +821,8 @@ int randomTrack(int max, unsigned int played, unsigned int used[]){
 
 	found = 1;
 	while (found == 1){
-		random = (int)oslRandf(0, max);
+		//random = (int)oslRandf(0, max);
+        random = rand()%max;
 		//Controllo se l'ho già suonata:
 		int i;
 		found = 0;

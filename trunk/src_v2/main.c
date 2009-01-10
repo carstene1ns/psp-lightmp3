@@ -391,7 +391,9 @@ int main(){
     //Random seed:
 	u64 mytime = 0;
 	sceRtcGetCurrentTick (&mytime);
-    oslSrand(mytime);
+    //oslSrand(mytime);
+    srand(mytime);
+
 
     //Wait for splash:
 	if (userSettings->SHOW_SPLASH)

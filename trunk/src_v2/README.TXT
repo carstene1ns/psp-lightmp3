@@ -195,8 +195,7 @@ http://www.sakya.it/forums/viewforum.php?f=5
 KOREAN LANGUAGE
 ---------------
 To use the Korean language:
-1.Edit the default/skin.cfg file and uncomment this line (just remove the '#'):
-  #STR_FONT_ALT_NAME=flash0:/font/kr0.pgf
+1.Set in the setting tab the default_KOR skin
 2.Set in the setting tab the Korean language
 
 

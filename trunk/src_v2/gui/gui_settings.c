@@ -253,14 +253,18 @@ int changeSettingVal(int index, int delta){
             }
             snprintf(buffer, sizeof(buffer), "%slanguages/%s/lang.txt", userSettings->ebootPath, userSettings->lang);
             if (langLoad(buffer)){
-                debugMessageBox("Error loading language file.");
+                char message[512] = "";
+                snprintf(message, sizeof(message), "Error loading language file:\n%s", buffer);
+                debugMessageBox(message);
             	oslQuit ();
                 return 0;
             }
 			//Reset intraFont:
-			//oslIntraFontShutdown();
-			//initFonts();
-
+            unloadFonts();
+			oslIntraFontShutdown();
+			initFonts();
+            loadFonts();
+            
             buildSettingsMenu(&commonMenu, &commonSubMenu);
             break;
         case 2:

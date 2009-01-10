@@ -171,6 +171,15 @@ int loadCommonGraphics(){
             errorLoadImage(buffer);
     }
 
+    loadFonts();
+	return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Load fonts:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void loadFonts()
+{
     //snprintf(buffer, sizeof(buffer), "flash0:/font/ltn0.pgf");
 	skinGetString("STR_FONT_NORMAL_NAME", buffer);
     //snprintf(buffer, sizeof(buffer), "%s/fontNormal.pgf", userSettings->skinImagesPath);
@@ -178,10 +187,12 @@ int loadCommonGraphics(){
     if (!fontNormal)
         errorLoadImage(buffer);
 	if ( skinGetString("STR_FONT_ALT_NAME", buffer) == 0 )
+    {
 		oslLoadAltIntraFontFile(fontNormal, buffer);
+        if (!fontNormal->intraAlt)
+            errorLoadImage(buffer);
+    }
     setFontStyle(fontNormal, defaultTextSize,0xFFFFFFFF,0xFF000000,INTRAFONT_ALIGN_LEFT);
-
-	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,10 +239,20 @@ int unLoadCommonGraphics(){
     folderIcon = NULL;
     oslDeleteImage(musicIcon);
     musicIcon = NULL;
-    oslDeleteFont(fontNormal);
-    fontNormal = NULL;
+
+    unloadFonts();
     return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Unload fonts:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void unloadFonts()
+{
+    oslDeleteFont(fontNormal);
+    fontNormal = NULL;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw toolbars:
@@ -571,15 +592,16 @@ int initFonts(){
 	//Init intraFont based on language settings:
 	char encoding[10];
 	char* temp;
-	
+
 	strncpy(encoding, langGetString("ENCODING"), 9);
 	encoding[9] = '\0';
-	if (!strcmp(encoding, "UTF8"))
+	if (!strcmp(encoding, "UTF-8"))
 	    oslIntraFontInit(INTRAFONT_CACHE_LARGE | INTRAFONT_STRING_UTF8);
 	else if (!strcmp(encoding, "SJIS"))
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_SJIS);
 	else
-	    oslIntraFontInit(INTRAFONT_CACHE_ALL);
+	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_ASCII);
+
 	temp = langGetString("TAG_ENCODING");
 	if ( temp != NULL )
 	{
@@ -587,7 +609,7 @@ int initFonts(){
 		encoding[9] = '\0';
 		miniConvSetDefaultSubtitleConv(encoding);
 	}
-	
+
 	return 0;
 }
 
@@ -649,7 +671,7 @@ void initTimezone(){
    } else {
       tz = malloc(10*sizeof(char));
       sprintf(tz, "GMT%s%02i:%02i", tzOffset < 0 ? "+" : "-", hours, minutes);
-   }   
+   }
    setenv("TZ", tz, 1);
-   tzset(); 
-} 
+   tzset();
+}
