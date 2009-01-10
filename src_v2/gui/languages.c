@@ -153,7 +153,10 @@ void langLoadList(char *dirName){
     char *result = opendir_open(&dhDir, dirName, dirName, NULL, 0, 1);
 	if (result == 0){
         for (i = 0; i < dhDir.number_of_directory_entries; i++)
-            strcpy(languagesList[i], dhDir.directory_entry[languagesCount++].d_name);
+        {
+            if (dhDir.directory_entry[i].d_name[0] != '.')
+                strcpy(languagesList[languagesCount++], dhDir.directory_entry[i].d_name);   
+        }
     }
 }
 

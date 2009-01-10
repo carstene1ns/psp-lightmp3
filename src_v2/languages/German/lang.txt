@@ -1,7 +1,7 @@
 #Language   : German
 #By         : booder
 #Contacts   : http://www.pspsource.de
-ENCODING=UTF8
+ENCODING=UTF-8
 
 #Language to use in the On Screen Keyboard.
 #			JAPANESE			0

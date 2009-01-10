@@ -200,7 +200,8 @@ int skinLoad(char *fileName){
 									strcpy(imagePath, fileName);
 									directoryUp(imagePath);
 									directoryUp(imagePath);
-									strcat(imagePath, "result");
+                                    strcat(imagePath, "/");
+									strcat(imagePath, result);
 									strcat(imagePath, "/images");
 								}
                                 if (skinStrings.stringCount < MAX_SKINSTRINGS){
@@ -336,6 +337,7 @@ void skinLoadList(char *dirName){
     char *result = opendir_open(&dhDir, dirName, dirName, NULL, 0, 1);
 	if (result == 0){
         for (i = 0; i < dhDir.number_of_directory_entries; i++)
-            strcpy(skinsList[i], dhDir.directory_entry[skinsCount++].d_name);
+            if (dhDir.directory_entry[i].d_name[0] != '.')
+                strcpy(skinsList[skinsCount++], dhDir.directory_entry[i].d_name);
     }
 }

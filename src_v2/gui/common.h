@@ -49,6 +49,8 @@ extern OSL_FONT *fontNormal;
 
 int loadCommonGraphics();
 int unLoadCommonGraphics();
+void loadFonts();
+void unloadFonts();
 int drawCommonGraphics();
 int drawButtonBar(int selectedButton);
 void errorLoadImage(char *imageName);
