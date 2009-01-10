@@ -3,6 +3,7 @@ LightMP3 Changelog
 
 Version 2.0.0 RC2
 -----------------
+-Fixed: Korean langiage support.
 
 
 Version 2.0.0 RC1
