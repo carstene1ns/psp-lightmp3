@@ -49,6 +49,7 @@ static float MP3ME_playingTime = 0;
 static int MP3ME_volume = 0;
 int MP3ME_defaultCPUClock = 20;
 static double MP3ME_filePos = 0;
+static double MP3ME_newFilePos = 0;
 
 //Globals for decoding:
 static SceUID MP3ME_handle = -1;
@@ -115,7 +116,7 @@ int decodeThread(SceSize args, void *argp){
     memset(MP3ME_codec_buffer, 0, sizeof(MP3ME_codec_buffer));
     memset(MP3ME_input_buffer, 0, sizeof(MP3ME_input_buffer));
     memset(MP3ME_output_buffer, 0, sizeof(MP3ME_output_buffer));
-    
+
     if ( sceAudiocodecCheckNeedMem(MP3ME_codec_buffer, 0x1002) < 0 )
         MP3ME_threadActive = 0;
 
@@ -683,6 +684,16 @@ void MP3ME_setVolumeBoostType(char *boostType){
     MAX_VOLUME_BOOST = 4;
     //MAX_VOLUME_BOOST = 0;
     MIN_VOLUME_BOOST = 0;
+}
+
+double MP3ME_getFilePosition()
+{
+    return MP3ME_filePos;
+}
+
+void MP3ME_setFilePosition(double position)
+{
+    MP3ME_newFilePos = position;
 }
 
 //TODO:

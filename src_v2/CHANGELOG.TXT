@@ -3,7 +3,11 @@ LightMP3 Changelog
 
 Version 2.0.0 RC2
 -----------------
--Fixed: Korean langiage support.
+-Added: Bookmark function (for audiobook): press L+Circle while listening to a track.
+        The next time you'll start LightMP3 it will automatically start from the saved bookmark.
+-Fixed: Korean language support.
+-Fixed: shuffle (always the same number were generated)
+-Fixed: Added sql transaction to playPlaylist (faster change of track)
 
 
 Version 2.0.0 RC1

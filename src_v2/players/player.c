@@ -85,6 +85,9 @@ int (*suspendFunct)();
 int (*resumeFunct)();
 void (*fadeOutFunct)(float seconds);
 
+double (*getFilePositionFunct)();
+void (*setFilePositionFunct)(double positionInSecs);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions for ME
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -321,6 +324,9 @@ int setAudioFunctions(char *filename, int useME_MP3){
 			suspendFunct = MP3ME_suspend;
 			resumeFunct = MP3ME_resume;
 			fadeOutFunct = MP3ME_fadeOut;
+
+            getFilePositionFunct = MP3ME_getFilePosition;
+            setFilePositionFunct = MP3ME_setFilePosition;
 		}
 		else
 		{
@@ -468,6 +474,9 @@ void unsetAudioFunctions(){
 
     suspendFunct = NULL;
     resumeFunct = NULL;
+
+    getFilePositionFunct = NULL;
+    setFilePositionFunct = NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

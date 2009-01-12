@@ -338,6 +338,11 @@ void skinLoadList(char *dirName){
 	if (result == 0){
         for (i = 0; i < dhDir.number_of_directory_entries; i++)
             if (dhDir.directory_entry[i].d_name[0] != '.')
-                strcpy(skinsList[skinsCount++], dhDir.directory_entry[i].d_name);
+            {
+                char fileName[264] = "";
+                snprintf(fileName, sizeof(fileName), "%s%s/skin.cfg", dirName, dhDir.directory_entry[i].d_name);
+                if (fileExists(fileName) > 0)
+                    strcpy(skinsList[skinsCount++], dhDir.directory_entry[i].longname);                    
+            }
     }
 }
