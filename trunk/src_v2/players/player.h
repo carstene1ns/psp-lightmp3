@@ -122,6 +122,9 @@ extern int (*suspendFunct)();
 extern int (*resumeFunct)();
 extern void (*fadeOutFunct)(float seconds);
 
+extern double (*getFilePositionFunct)();                     //Gets current file position in bytes
+extern void (*setFilePositionFunct)(double position);          //Set current file position in butes
+
 extern int setAudioFunctions(char *filename, int useME);
 extern void unsetAudioFunctions();
 

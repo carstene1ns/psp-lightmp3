@@ -155,7 +155,12 @@ void langLoadList(char *dirName){
         for (i = 0; i < dhDir.number_of_directory_entries; i++)
         {
             if (dhDir.directory_entry[i].d_name[0] != '.')
-                strcpy(languagesList[languagesCount++], dhDir.directory_entry[i].d_name);   
+            {
+                char fileName[264] = "";
+                snprintf(fileName, sizeof(fileName), "%s%s/lang.txt", dirName, dhDir.directory_entry[i].d_name);
+                if (fileExists(fileName) > 0)                
+                    strcpy(languagesList[languagesCount++], dhDir.directory_entry[i].longname);   
+            }
         }
     }
 }

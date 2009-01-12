@@ -69,4 +69,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName));
 int ML_getLastSQL(char *sqlOut);
 int ML_vacuum();
 
+int ML_startTransaction();
+int ML_commitTransaction();
+
 #endif

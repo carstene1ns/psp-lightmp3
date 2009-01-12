@@ -48,6 +48,9 @@ void MP3ME_disableFilter();
 int MP3ME_isFilterEnabled();
 int MP3ME_isFilterSupported();
 
+double MP3ME_getFilePosition();
+void MP3ME_setFilePosition(double position);
+
 //Manage suspend:
 int MP3ME_suspend();
 int MP3ME_resume();

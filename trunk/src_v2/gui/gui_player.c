@@ -1,5 +1,5 @@
 //    LightMP3
-//    Copyright (C) 2007,2008 Sakya
+//    Copyright (C) 2007,2008,2009 Sakya
 //    sakya_tg@yahoo.it
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -38,6 +38,8 @@
 #include "../players/id3.h"
 #include "../others/audioscrobbler.h"
 #include "../others/medialibrary.h"
+#include "../others/bookmark.h"
+#include "../others/strreplace.h"
 
 #define PLAYER_STOP 2
 #define PLAYER_NEXT 1
@@ -46,6 +48,7 @@
 
 #define STATUS_NORMAL 0
 #define STATUS_HELP 1
+#define STATUS_CONFIRM_BOOKMARK 2
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions imported from prx:
@@ -283,8 +286,53 @@ int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
 	drawCoverArt();
 	if (status == STATUS_HELP)
 		drawHelp("PLAYER");
+    else if(status == STATUS_CONFIRM_BOOKMARK)
+        drawConfirm(langGetString("CONFIRM_BOOKMARK_TITLE"), langGetString("CONFIRM_BOOKMARK"));
 	oslEndDrawing();
 	return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ask to confirm the creation of a bookmark and exit
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int confirmBookmark(struct libraryEntry *libEntry, char *trackMessage, int index)
+{
+    struct bookmark bookm;
+    char bookmarkName[264] = "";
+    int skip = 0;
+
+    snprintf(bookmarkName, sizeof(bookmarkName), "%s%s", userSettings->ebootPath, "bookmark.bkm");
+
+    while(!osl_quit)
+    {
+        if (!skip)
+            drawPlayer(STATUS_CONFIRM_BOOKMARK, libEntry, trackMessage);
+        oslEndFrame();
+        skip = oslSyncFrame();
+
+        oslReadKeys();
+        if(osl_pad.released.cross)
+        {
+            strcpy(bookm.fileName, libEntry->shortpath);
+            bookm.playListIndex = index;
+            if (getFilePositionFunct != NULL)
+                bookm.position = (*getFilePositionFunct)();
+            else
+                bookm.position = 0;
+            saveBookmark(bookmarkName, &bookm);
+            snprintf(bookmarkName, sizeof(bookmarkName), "%s%s", userSettings->ebootPath, "bookmark.m3u");
+            M3U_save(bookmarkName);
+            return 1;
+        }
+        else if(osl_pad.released.circle)
+        {
+            break;
+        }
+    }
+
+    oslReadKeys();
+    return 0;
 }
 
 
@@ -295,7 +343,7 @@ int drawPlayer(int status, struct libraryEntry *libEntry, char *trackMessage){
 //				 PLAYER_PREVIOUS if user pressed PREVIOUS
 //				 PLAYER_STOP     if user pressed STOP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int playFile(char *fileName, char *trackMessage){
+int playFile(char *fileName, char *trackMessage, int index){
     int retValue = PLAYER_END;
     struct fileInfo tagInfo;
 	struct fileInfo *info = NULL;
@@ -313,7 +361,7 @@ int playFile(char *fileName, char *trackMessage){
 	OSL_IMAGE* tmpCoverArt;
 
     MEEnable();
-    
+
 	cpuBoost();
 
     if (userSettings->displayStatus){
@@ -326,11 +374,14 @@ int playFile(char *fileName, char *trackMessage){
 
     setVolume(0,0x8000);
     if (setAudioFunctions(fileName, userSettings->MP3_ME)){
-        snprintf(buffer, sizeof(buffer), "Unknown audio format for file\n%s", fileName);
-        debugMessageBox(buffer);
+        snprintf(buffer, sizeof(buffer), "Unknown audio format for file\n%s\n\nContinue with next file?", fileName);
+        int response = errorMessageBox(buffer, 1);
         oslReadKeys();
 		cpuRestore();
-		return 0;
+		if (response == OSL_MB_YES)
+			return PLAYER_END;
+		else
+			return PLAYER_STOP;
 	}
 
     //Tipo di volume boost:
@@ -376,30 +427,30 @@ int playFile(char *fileName, char *trackMessage){
         char fixedArtist[260] = "";
         char fixedAlbum[260] = "";
         char fixedTitle[260] = "";
-        
+
         strcpy(fixedArtist, tagInfo.artist);
         ML_fixStringField(fixedArtist);
         strcpy(fixedAlbum, tagInfo.album);
         ML_fixStringField(fixedAlbum);
         strcpy(fixedTitle, tagInfo.title);
-        ML_fixStringField(fixedTitle);        
+        ML_fixStringField(fixedTitle);
         snprintf(whereCond, sizeof(whereCond), "artist = '%s' and album = '%s' and title = '%s'", fixedArtist, fixedAlbum, fixedTitle);
         update = ML_queryDB(whereCond, "path", 0, 1, MLresult);
         if (update > 0)
         {
             if (fileExists(MLresult[0].shortpath) < 0)
             {
-                libEntry = MLresult[0];            
+                libEntry = MLresult[0];
                 strcpy(libEntry.shortpath, fileName);
-            }                
+            }
             else
             {
-                ML_clearEntry(&libEntry);        
+                ML_clearEntry(&libEntry);
                 update = 0;
             }
         }
         else
-            ML_clearEntry(&libEntry);        
+            ML_clearEntry(&libEntry);
     }
 
     //Save temp coverart file:
@@ -591,7 +642,23 @@ int playFile(char *fileName, char *trackMessage){
             if (osl_pad.released.cross || osl_pad.released.circle)
                 status = STATUS_NORMAL;
         }else{
-            if (osl_pad.held.L && osl_pad.held.R){
+            if (osl_pad.held.L && osl_pad.released.circle){
+                if (currentSpeed)
+                    (*setPlayingSpeedFunct)(0);
+                if (playerStatus)
+                    (*pauseFunct)();
+
+                if (confirmBookmark(&libEntry, trackMessage, index))
+                {
+                    flagExit = 1;
+                    osl_quit = 1;
+                }
+                else
+                {
+                    if (playerStatus)
+                        (*pauseFunct)();
+                }
+            }else if (osl_pad.held.L && osl_pad.held.R){
                 if (userSettings->displayStatus){
                     helpShown = 1;
                     status = STATUS_HELP;
@@ -849,13 +916,15 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
     char message[20] = "";
 
 	//Chdir for playlist with relative paths:
-	if (strlen(playList->fileName))
+	/*if (strlen(playList->fileName))
 	{
 		char onlyDir[256] = "";
 		strcpy(onlyDir, playList->fileName);
 		directoryUp(onlyDir);
 		sceIoChdir(onlyDir);
-	}
+	}*/
+
+    ML_startTransaction();
 
     if (startIndex >= 0)
         i = startIndex;
@@ -868,7 +937,7 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 	while(!osl_quit){
 		song = M3U_getSong(i);
 		snprintf(message, sizeof(message), "%i / %i", i + 1, songCount);
-		int playerReturn = playFile(song->fileName, message);
+		int playerReturn = playFile(song->fileName, message, i);
 		//Played tracks:
 		int found = 0;
 		int ci = 0;
@@ -932,6 +1001,8 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 			}
 		}
     }
+
+    ML_commitTransaction();
 	if (!userSettings->displayStatus){
         oslStartDrawing();
         oslClearScreen(RGBA(0, 0, 0, 255));
@@ -1061,10 +1132,26 @@ int gui_player(){
     if (FIO_S_ISREG(stat.st_mode)){
         getExtension(userSettings->selectedBrowserItemShort, ext, 4);
         if (!strcmp(ext, "M3U")){
+            //Playlist:
             M3U_clear();
             M3U_open(userSettings->selectedBrowserItemShort);
             playPlaylist(M3U_getPlaylist(), userSettings->playlistStartIndex);
+        }else if (!strcmp(ext, "BKM")){
+            //Bookmark:
+            struct bookmark book;
+            M3U_clear();
+            char *repStr = NULL;
+            repStr = replace(userSettings->selectedBrowserItemShort, ".bkm", ".m3u");
+            if (repStr != NULL){
+                M3U_open(repStr);
+                sceIoRemove(repStr);
+                free(repStr);
+            }
+            readBookmark(userSettings->selectedBrowserItemShort, &book);
+            sceIoRemove(userSettings->selectedBrowserItemShort);
+            playPlaylist(M3U_getPlaylist(), book.playListIndex);
         }else{
+            //File:
             strcpy(dir, userSettings->selectedBrowserItem);
             strcpy(dirShort, userSettings->selectedBrowserItemShort);
 			directoryUp(dir);
@@ -1072,6 +1159,7 @@ int gui_player(){
 			playDirectory(dir, dirShort, userSettings->selectedBrowserItemShort);
         }
     }else if (FIO_S_ISDIR(stat.st_mode)){
+        //Directory:
         playDirectory(userSettings->selectedBrowserItem, userSettings->selectedBrowserItemShort, "");
     }
 

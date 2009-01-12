@@ -31,9 +31,9 @@ Please note that default cpu clocks are higher than it needs.
 This is because if you have some plugins running you can encounter problems due to cpu clock too low.
 If you don't have any cpu-hungry plugin running try to set the clock with this values:
 -MP3 with libMad        = 65
--MP3 with Media Engine  = 15
+-MP3 with Media Engine  = 19
 -OGG Vorbis             = 45
--Atrac3+                = 15
+-Atrac3+                = 19
 
 
 FEATURES
@@ -111,6 +111,7 @@ Player:
     NOTE                = Change equalizer (if supported)
     CROSS + DPAD UP     = Raise track rating
     CROSS + DPAD DOWN   = Lower track rating
+    L + CIRCLE          = Create a bookmark and exit the application
 
 
 VOLUME BOOST
@@ -194,6 +195,7 @@ http://www.sakya.it/forums/viewforum.php?f=5
 
 KOREAN LANGUAGE
 ---------------
+To use korean language you must have flash0:/font/kr0.pgf (not all PSP has this font)
 To use the Korean language:
 1.Set in the setting tab the default_KOR skin
 2.Set in the setting tab the Korean language

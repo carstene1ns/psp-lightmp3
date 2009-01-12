@@ -84,6 +84,7 @@ int displayDisable(void);
 int getBrightness();
 void setBrightness(int brightness);
 int readButtons(SceCtrlData *pad_data, int count);
+int imposeSetHomePopup(int value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Power Callback:
@@ -98,6 +99,7 @@ int powerCallback(int unknown, int powerInfo, void *common){
            //Riattivo il display:
            if (!userSettings->displayStatus){
                displayEnable();
+               imposeSetHomePopup(1);
                setBrightness(userSettings->curBrightness);
                userSettings->displayStatus = 1;
            }
@@ -279,7 +281,7 @@ int main(){
     strcpy(userSettings->ebootPath, ebootDirectory);
     userSettings->displayStatus = 1;
     userSettings->BUS = getMinBUSClock(); //Override the saved value (the less == the better!)
-    
+
     //Splash screen:
 	int splash_thid = 0;
 	if (userSettings->SHOW_SPLASH){
@@ -344,7 +346,7 @@ int main(){
     skinLoadList(buffer);
     snprintf(buffer, sizeof(buffer), "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
     skinLoad(buffer);
-    
+
    	//Skin's s images path:
 	if ( skinGetString("STR_IMAGE_PATH", buffer) == 0 ) {
     	snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, buffer);
@@ -352,7 +354,7 @@ int main(){
 	else {
     	snprintf(userSettings->skinImagesPath, sizeof(userSettings->skinImagesPath), "%sskins/%s/images", userSettings->ebootPath, userSettings->skinName);
 	}
-	
+
 	//Default text size:
 	defaultTextSize = skinGetParam("FONT_NORMAL_SIZE") / 100.0;
 
@@ -411,6 +413,15 @@ int main(){
 		fadeDisplay(24, DISPLAY_FADE_TIME);
     	userSettings->curBrightness = 24;
         imposeSetBrightness(0);
+    }
+
+    //Check for bookmark:
+    snprintf(buffer, sizeof(buffer), "%s%s", userSettings->ebootPath, "bookmark.bkm");
+    if (fileExists(buffer) > 0)
+    {
+        currentMode = MODE_PLAYER;
+        strcpy(userSettings->selectedBrowserItemShort, buffer);
+        strcpy(userSettings->selectedBrowserItem, buffer);
     }
 
     while(!osl_quit){

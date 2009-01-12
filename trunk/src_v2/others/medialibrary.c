@@ -41,28 +41,35 @@ static long recordsCount = 0;
 static char dirToScan[500][264];
 static char dirToScanShort[500][264];
 
+static int transaction = 0;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private functions:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int ML_INTERNAL_closeDB(){
+    if (transaction)
+        return 0;
     sqlite3_close(db);
     return 0;
 }
 
 int ML_INTERNAL_openDB(char *directory, char *fileName){
+    if (transaction)
+        return 0;
+
     if (sceIoChdir(directory) < 0)
         return ML_ERROR_CHDIR;
 	int result = sqlite3_open(fileName, &db);
     if (result)
         return ML_ERROR_OPENDB;
-        
-    int retValue = sqlite3_exec(db, "PRAGMA synchronous=OFF", NULL, 0, &zErr);
-    if (retValue != SQLITE_OK){
+
+    result = sqlite3_exec(db, "PRAGMA synchronous=OFF", NULL, 0, &zErr);
+    if (result != SQLITE_OK){
         sqlite3_free(zErr);
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
-    }        
-        
+    }
+
     return 0;
 }
 
@@ -155,10 +162,10 @@ int ML_createEmptyDB(char *directory, char *fileName){
 
 
 	char indexes[20][100] = {
-							 "artist, album", 
+							 "artist, album",
 							 "genre",
-							 "rating", 
-							 "played desc, rating desc, title", 
+							 "rating",
+							 "played desc, rating desc, title",
 							 "title, artist",
  							 "artist, album, tracknumber",
                              "artist, album, title",
@@ -233,7 +240,7 @@ int ML_scanMS(char *rootDir,
     char *result = NULL;
     int i = 0;
     int retValue = 0;
-    
+
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
@@ -292,8 +299,8 @@ int ML_scanMS(char *rootDir,
                                   values('%s', '%s', '%s', '%s', '%s', upper('%s'), '%s', '%s', %li, %li, %i, %i);",
                                   info.artist, info.album, info.title, info.genre, info.year,
                                   fullNameShort, fullNameShort, ext,
-                                  info.length, info.hz, info.kbit, atoi(info.trackNumber));                                  
-                    retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+                                  info.length, info.hz, info.kbit, atoi(info.trackNumber));
+                    retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
                     if (retValue != SQLITE_OK){
                         //ML_INTERNAL_closeDB();
                         //return ML_ERROR_SQL;
@@ -333,7 +340,7 @@ int ML_scanMS(char *rootDir,
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
-    
+
     ML_INTERNAL_closeDB();
     return mediaFound;
 }
@@ -348,7 +355,7 @@ int ML_countRecords(char *whereCondition){
                   From media \
                   Where %s;", whereCondition);
     recordsCount = 0;
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -369,7 +376,7 @@ int ML_countRecordsSelect(char *select){
         return ML_ERROR_OPENDB;
     snprintf(sql, sizeof(sql), "%s", select);
     recordsCount = 0;
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -395,7 +402,7 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
                   Where %s \
                   Order by %s \
                   LIMIT %i OFFSET %i", whereCondition, orderByCondition, limit, offset);
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -421,7 +428,7 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
         resultBuffer[count].bitrate = sqlite3_column_int(stmt, 10);
         resultBuffer[count].played = sqlite3_column_int(stmt, 11);
         strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, 12));
-        strcpy(resultBuffer[count].shortpath, (char*)sqlite3_column_text(stmt, 12));        
+        strcpy(resultBuffer[count].shortpath, (char*)sqlite3_column_text(stmt, 12));
         if (++count > ML_BUFFERSIZE)
             break;
     }
@@ -446,7 +453,7 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
 	else
 	    snprintf(sql, sizeof(sql), "%s LIMIT %i OFFSET %i", select, limit, offset);
 
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -470,7 +477,7 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
             else if (!stricmp(columnName, "year"))
                 strcpy(resultBuffer[count].year, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "path"))
-                strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, i));                
+                strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "shortpath"))
                 strcpy(resultBuffer[count].shortpath, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "extension"))
@@ -536,7 +543,7 @@ int ML_addEntry(struct libraryEntry entry){
                   entry.path, entry.path, entry.extension,
                   entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber,
                   entry.rating, entry.played);
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -568,8 +575,8 @@ int ML_updateEntry(struct libraryEntry entry, char *newPath){
 
     if (!strlen(newPath))
         strcpy(newPath, entry.path);
-        
-    snprintf(sql, sizeof(sql), 
+
+    snprintf(sql, sizeof(sql),
 				 "update media \
                   set artist = '%s', album = '%s', title = '%s', genre = '%s', \
                       year = '%s', extension = '%s', \
@@ -577,13 +584,13 @@ int ML_updateEntry(struct libraryEntry entry, char *newPath){
                       rating = %i, played = %i, shortpath = '%s', \
                       path = upper('%s') \
                   where path = upper('%s');",
-                  entry.artist, entry.album, entry.title, entry.genre, 
+                  entry.artist, entry.album, entry.title, entry.genre,
 				  entry.year, entry.extension,
-                  entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber, 
-				  entry.rating, entry.played, entry.shortpath, 
-                  newPath, 
+                  entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber,
+				  entry.rating, entry.played, entry.shortpath,
+                  newPath,
 				  entry.path);
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -618,9 +625,9 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
-    
+
     snprintf(sql, sizeof(sql), "Select path, coalesce(shortpath, '') From media Order by path");
-    retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -641,7 +648,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
         if (test < 0){
             ML_fixStringField(fileName);
             snprintf(sql, sizeof(sql), "Delete From media Where path = upper('%s');", path);
-            int retValue = sqlite3_prepare(db, sql, -1, &del, 0);
+            int retValue = sqlite3_prepare_v2(db, sql, -1, &del, 0);
             if (retValue != SQLITE_OK)
                 continue;
             sqlite3_step(del);
@@ -658,7 +665,7 @@ int ML_checkFiles(int (*checkFile)(char *fileName)){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
     }
-    
+
     ML_INTERNAL_closeDB();
     return 0;
 }
@@ -679,7 +686,7 @@ int ML_vacuum(){
         return ML_ERROR_OPENDB;
 
     snprintf(sql, sizeof(sql), "VACUUM");
-    int retValue = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
         return ML_ERROR_SQL;
@@ -687,6 +694,42 @@ int ML_vacuum(){
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
+    ML_INTERNAL_closeDB();
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Start a transaction:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int ML_startTransaction()
+{
+    if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
+        return ML_ERROR_OPENDB;
+
+    int retValue = sqlite3_exec(db, "BEGIN TRANSACTION", NULL, 0, &zErr);
+    if (retValue != SQLITE_OK){
+        sqlite3_free(zErr);
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+    transaction = 1;
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Commit transaction:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int ML_commitTransaction()
+{
+    int retValue = sqlite3_exec(db, "COMMIT", NULL, 0, &zErr);
+    if (retValue != SQLITE_OK){
+        sqlite3_free(zErr);
+        transaction = 0;
+        ML_INTERNAL_closeDB();
+        return ML_ERROR_SQL;
+    }
+
+    transaction = 0;
     ML_INTERNAL_closeDB();
     return 0;
 }
