@@ -397,10 +397,15 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 
     //Equalizzatore:
     if (!(*isFilterSupportedFunct)())
-      userSettings->currentEQ = 0;
+    {
+        userSettings->currentEQ = 0;
+    }
+    else
+    {
+        tEQ = EQ_getIndex(userSettings->currentEQ);
+        (*setFilterFunct)(tEQ.filter, 1);
+    }
 
-    tEQ = EQ_getIndex(userSettings->currentEQ);
-    (*setFilterFunct)(tEQ.filter, 1);
     if (!userSettings->currentEQ)
       (*disableFilterFunct)();
     else
@@ -464,17 +469,21 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
             snprintf(buffer, sizeof(buffer), "%scoverart.png", userSettings->ebootPath);
 		int out = sceIoOpen(buffer, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
 
-		int buffSize = 4*1024;
-        unsigned char cover[4*1024] = "";
-		sceIoLseek(in, tagInfo.encapsulatedPictureOffset, PSP_SEEK_SET);
-        int remaining = tagInfo.encapsulatedPictureLength;
-        while (remaining > 0){
-            if (remaining < buffSize)
-                buffSize = remaining;
-			int write = sceIoRead(in, cover, buffSize);
-			sceIoWrite(out, cover, write);
-            remaining -= write;
-        }
+		int buffSize = 128*1024;
+        u8 *cover = (unsigned char *) malloc(buffSize);
+        if (cover != NULL)
+         {
+            sceIoLseek(in, tagInfo.encapsulatedPictureOffset, PSP_SEEK_SET);
+            int remaining = tagInfo.encapsulatedPictureLength;
+            while (remaining > 0){
+                if (remaining < buffSize)
+                    buffSize = remaining;
+                int write = sceIoRead(in, cover, buffSize);
+                sceIoWrite(out, cover, write);
+                remaining -= write;
+            }
+            free(cover);
+         }
 		sceIoClose(out);
 		sceIoClose(in);
 		if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)

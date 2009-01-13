@@ -50,6 +50,7 @@ static int MP3ME_volume = 0;
 int MP3ME_defaultCPUClock = 20;
 static double MP3ME_filePos = 0;
 static double MP3ME_newFilePos = 0;
+static int MP3ME_tagRead = 0;
 
 //Globals for decoding:
 static SceUID MP3ME_handle = -1;
@@ -318,6 +319,9 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
     targetInfo->encapsulatedPictureType = ID3.ID3EncapsulatedPictureType;
     targetInfo->encapsulatedPictureOffset = ID3.ID3EncapsulatedPictureOffset;
     targetInfo->encapsulatedPictureLength = ID3.ID3EncapsulatedPictureLength;
+
+    MP3ME_info = *targetInfo;
+    MP3ME_tagRead = 1;
 }
 
 //Get info on file:
@@ -327,7 +331,7 @@ void getMP3METagInfo(char *filename, struct fileInfo *targetInfo){
 int MP3MEgetInfo(){
 	unsigned long FrameCount = 0;
     int fd = -1;
-    int bufferSize = 1024*500;
+    int bufferSize = 1024*496;
     u8 *localBuffer;
     long singleDataRed = 0;
 	struct mad_stream stream;
@@ -338,7 +342,8 @@ int MP3MEgetInfo(){
     struct xing xing;
 	memset(&xing, 0, sizeof xing);
 
-    getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
+    if (!MP3ME_tagRead)
+        getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
 
 	mad_stream_init (&stream);
 	mad_header_init (&header);
@@ -519,6 +524,8 @@ void MP3ME_Init(int channel){
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
 	initMEAudioModules();
+    initFileInfo(&MP3ME_info);
+    MP3ME_tagRead = 0;
 }
 
 
@@ -526,7 +533,7 @@ int MP3ME_Load(char *fileName){
     MP3ME_filePos = 0;
     MP3ME_playingSpeed = 0;
     MP3ME_isPlaying = 0;
-    initFileInfo(&MP3ME_info);
+    //initFileInfo(&MP3ME_info);
     strcpy(MP3ME_fileName, fileName);
     if (MP3MEgetInfo() != 0){
         strcpy(MP3ME_fileName, "");
