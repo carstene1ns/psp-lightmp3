@@ -49,3 +49,6 @@ int OGG_isFilterSupported();
 //Manage suspend:
 int OGG_suspend();
 int OGG_resume();
+
+double OGG_getFilePosition();
+void OGG_setFilePosition(double position);

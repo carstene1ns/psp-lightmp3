@@ -177,6 +177,24 @@ int decodeThread(SceSize args, void *argp){
 
 			sceIoLseek32(MP3ME_handle, data_start, PSP_SEEK_SET); //seek back
 
+            if (MP3ME_newFilePos)
+            {
+                long old_start = data_start;
+                if (sceIoLseek32(MP3ME_handle, MP3ME_newFilePos, PSP_SEEK_SET) != old_start){
+                    data_start = SeekNextFrameMP3(MP3ME_handle);
+                    if(data_start < 0){
+                        MP3ME_eof = 1;
+                    }
+                    float framesSkipped = (float)data_start / (float)frame_size;
+                    MP3ME_playingTime = framesSkipped * (float)sample_per_frame/(float)samplerate;
+
+                    offset = data_start;
+                    size = total_size - data_start;
+                }
+                MP3ME_newFilePos = 0;
+                continue;
+            }
+
 			size -= frame_size;
 			if ( size <= 0)
 			{

@@ -50,3 +50,5 @@ int FLAC_isFilterSupported();
 int FLAC_suspend();
 int FLAC_resume();
 
+double FLAC_getFilePosition();
+void FLAC_setFilePosition(double position);

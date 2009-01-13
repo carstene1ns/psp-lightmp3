@@ -53,3 +53,5 @@ int AA3ME_isFilterSupported();
 int AA3ME_suspend();
 int AA3ME_resume();
 
+double AA3ME_getFilePosition();
+void AA3ME_setFilePosition(double position);

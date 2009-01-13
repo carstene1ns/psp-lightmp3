@@ -381,9 +381,13 @@ int AAC_isFilterEnabled(){
 //Manage suspend:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int AAC_suspend(){
+    AAC_suspendPosition = AAC_filePos;
+    AAC_suspendIsPlaying = AAC_isPlaying;
     return 0;
 }
 
 int AAC_resume(){
+    AAC_suspendPosition = -1;
+    AAC_suspendIsPlaying = 0;
     return 0;
 }

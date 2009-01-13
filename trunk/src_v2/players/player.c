@@ -294,6 +294,9 @@ int setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = OGG_suspend;
         resumeFunct = OGG_resume;
         fadeOutFunct = OGG_fadeOut;
+
+        getFilePositionFunct = OGG_getFilePosition;
+        setFilePositionFunct = OGG_setFilePosition;
 		return 0;
     } else if (!stricmp(ext, "MP3")){
 		if (useME_MP3)
@@ -356,6 +359,9 @@ int setAudioFunctions(char *filename, int useME_MP3){
 			suspendFunct = MP3_suspend;
 			resumeFunct = MP3_resume;
 			fadeOutFunct = MP3_fadeOut;
+
+            getFilePositionFunct = MP3_getFilePosition;
+            setFilePositionFunct = MP3_setFilePosition;
 		}
 		return 0;
     } else if (!stricmp(ext, "AA3") || !stricmp(ext, "OMA") || !stricmp(ext, "OMG")){
@@ -385,6 +391,9 @@ int setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = AA3ME_suspend;
         resumeFunct = AA3ME_resume;
         fadeOutFunct = AA3ME_fadeOut;
+
+        getFilePositionFunct = AA3ME_getFilePosition;
+        setFilePositionFunct = AA3ME_setFilePosition;
 		return 0;
     } else if (!stricmp(ext, "FLAC") || !stricmp(ext, "FLA")){
         //FLAC

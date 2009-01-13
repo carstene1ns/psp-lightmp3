@@ -4,6 +4,9 @@ LightMP3 Changelog
 Version 2.0.0 RC2
 -----------------
 -Added: Bookmark function (for audiobook): press L+Circle while listening to a track.
+        There's a new option in the settings file.
+        SHUTDOWN_AFTER_BOOKMARK=0
+        The default is 0, if set to 1 the psp will shut down after creating a bookmark.
         The next time you'll start LightMP3 it will automatically start from the saved bookmark.
 -Fixed: Korean language support.
 -Fixed: shuffle (always the same number were generated)

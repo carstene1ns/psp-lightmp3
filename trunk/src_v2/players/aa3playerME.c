@@ -49,6 +49,7 @@ static unsigned int AA3ME_volume_boost = 0;
 static long AA3ME_suspendPosition = -1;
 static long AA3ME_suspendIsPlaying = 0;
 static double AA3ME_filePos = 0;
+static double AA3ME_newFilePos = 0;
 
 static unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
 static unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
@@ -171,6 +172,14 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				AA3ME_threadActive = 0;
 				continue;
 			}
+
+            if (AA3ME_newFilePos)
+            {
+                sceIoLseek32(AA3ME_handle, AA3ME_newFilePos, PSP_SEEK_SET);
+                AA3ME_playingTime = (float)(AA3ME_newFilePos) / (float)data_align * (float)sample_per_frame/(float)samplerate;
+                AA3ME_filePos = AA3ME_newFilePos;
+                AA3ME_newFilePos = 0;
+            }
 
 			if ( at3_type == TYPE_ATRAC3 ) {
 				memset( AA3ME_input_buffer, 0, 0x180);
@@ -623,6 +632,16 @@ void AA3ME_setVolumeBoost(int boost){
 
 int AA3ME_getVolumeBoost(){
     return AA3ME_volume_boost;
+}
+
+double AA3ME_getFilePosition()
+{
+    return AA3ME_filePos;
+}
+
+void AA3ME_setFilePosition(double position)
+{
+    AA3ME_newFilePos = position;
 }
 
 //TODO:
