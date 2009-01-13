@@ -328,7 +328,7 @@ void getMP3TagInfo(char *filename, struct fileInfo *targetInfo){
 int MP3getInfo(){
 	unsigned long FrameCount = 0;
     int fd;
-    int bufferSize = 1024*500;
+    int bufferSize = 1024*496;
     u8 *localBuffer;
     long singleDataRed = 0;
 	struct mad_stream stream;
