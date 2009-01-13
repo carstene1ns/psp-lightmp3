@@ -123,7 +123,9 @@ int SETTINGS_load(char *fileName){
 							}else if (strcmp(parName, "SHOW_SPLASH") == 0){
 								localSettings.SHOW_SPLASH = atoi(result);
 							}else if (strcmp(parName, "ML_ROOT") == 0){
-								strcpy(localSettings.mediaLibraryRoot, result);                                
+								strcpy(localSettings.mediaLibraryRoot, result);
+							}else if (strcmp(parName, "SHUTDOWN_AFTER_BOOKMARK") == 0){
+								localSettings.shutDownAfterBookmark = atoi(result);
 							}
 						}
 						element++;
@@ -182,7 +184,8 @@ struct settings *SETTINGS_default(){
 
     //Media Library settings:
     strcpy(localSettings.mediaLibraryRoot, "ms0:/");
-    
+
+    localSettings.shutDownAfterBookmark = 0;
 	return &localSettings;
 }
 
@@ -253,6 +256,8 @@ int SETTINGS_save(struct settings tSettings){
     snprintf(testo, sizeof(testo), "SHOW_SPLASH=%i\n", tSettings.SHOW_SPLASH);
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "ML_ROOT=%s\n", tSettings.mediaLibraryRoot);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "SHUTDOWN_AFTER_BOOKMARK=%i\n", tSettings.shutDownAfterBookmark);
     fwrite(testo, 1, strlen(testo), f);
 	fclose(f);
     return(0);

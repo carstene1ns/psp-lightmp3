@@ -90,12 +90,18 @@ int imposeSetHomePopup(int value);
 // Power Callback:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int powerCallback(int unknown, int powerInfo, void *common){
+    static int reopenTrans = 0;
     if ((powerInfo & PSP_POWER_CB_SUSPENDING) || (powerInfo & PSP_POWER_CB_POWER_SWITCH)){
        if (!suspended){
            resuming = 1;
            //Suspend
            if (suspendFunct != NULL)
               (*suspendFunct)();
+           if (ML_inTransaction())
+           {
+              ML_commitTransaction();
+              reopenTrans = 1;
+           }
            //Riattivo il display:
            if (!userSettings->displayStatus){
                displayEnable();
@@ -110,6 +116,11 @@ int powerCallback(int unknown, int powerInfo, void *common){
        resuming = 1;
     }else if (powerInfo & PSP_POWER_CB_RESUME_COMPLETE){
        //Resume
+       if (reopenTrans)
+       {
+          ML_startTransaction();
+          reopenTrans = 0;
+       }
        if (resumeFunct != NULL)
           (*resumeFunct)();
        resuming = 0;

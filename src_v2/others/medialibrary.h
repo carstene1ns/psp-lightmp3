@@ -71,5 +71,6 @@ int ML_vacuum();
 
 int ML_startTransaction();
 int ML_commitTransaction();
+int ML_inTransaction();
 
 #endif

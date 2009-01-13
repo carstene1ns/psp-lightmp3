@@ -343,7 +343,7 @@ int confirmBookmark(struct libraryEntry *libEntry, char *trackMessage, int index
 //				 PLAYER_PREVIOUS if user pressed PREVIOUS
 //				 PLAYER_STOP     if user pressed STOP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int playFile(char *fileName, char *trackMessage, int index){
+int playFile(char *fileName, char *trackMessage, int index, double startFilePos){
     int retValue = PLAYER_END;
     struct fileInfo tagInfo;
 	struct fileInfo *info = NULL;
@@ -568,6 +568,8 @@ int playFile(char *fileName, char *trackMessage, int index){
     /*if (!info->needsME && sceKernelDevkitVersion() < 0x03070110 && !getModel())
         MEDisable();*/
 
+    if (setFilePositionFunct != NULL && startFilePos > 0)
+        (*setFilePositionFunct)(startFilePos);
     (*playFunct)();
     playerStatus = 1;
 
@@ -652,6 +654,8 @@ int playFile(char *fileName, char *trackMessage, int index){
                 {
                     flagExit = 1;
                     osl_quit = 1;
+                    if (userSettings->shutDownAfterBookmark)
+                        userSettings->shutDown = 1;
                 }
                 else
                 {
@@ -906,7 +910,7 @@ int randomTrack(int max, unsigned int played, unsigned int used[]){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Play playlist:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int playPlaylist(struct M3U_playList *playList, int startIndex){
+int playPlaylist(struct M3U_playList *playList, int startIndex, double startFilePos){
 	int songCount = M3U_getSongCount();
 	unsigned int playedTracks[songCount];
 	unsigned int playedTracksNumber = 0;
@@ -937,7 +941,8 @@ int playPlaylist(struct M3U_playList *playList, int startIndex){
 	while(!osl_quit){
 		song = M3U_getSong(i);
 		snprintf(message, sizeof(message), "%i / %i", i + 1, songCount);
-		int playerReturn = playFile(song->fileName, message, i);
+		int playerReturn = playFile(song->fileName, message, i, startFilePos);
+        startFilePos = 0;
 		//Played tracks:
 		int found = 0;
 		int ci = 0;
@@ -1050,7 +1055,7 @@ int playDirectory(char *dirName, char *dirNameShort, char *startFile){
         }
         opendir_close(&directory);
 		if (M3U_getSongCount())
-	        playPlaylist(M3U_getPlaylist(), startIndex);
+	        playPlaylist(M3U_getPlaylist(), startIndex, 0);
     }
     M3U_clear();
     return 0;
@@ -1135,7 +1140,7 @@ int gui_player(){
             //Playlist:
             M3U_clear();
             M3U_open(userSettings->selectedBrowserItemShort);
-            playPlaylist(M3U_getPlaylist(), userSettings->playlistStartIndex);
+            playPlaylist(M3U_getPlaylist(), userSettings->playlistStartIndex, 0);
         }else if (!strcmp(ext, "BKM")){
             //Bookmark:
             struct bookmark book;
@@ -1149,7 +1154,7 @@ int gui_player(){
             }
             readBookmark(userSettings->selectedBrowserItemShort, &book);
             sceIoRemove(userSettings->selectedBrowserItemShort);
-            playPlaylist(M3U_getPlaylist(), book.playListIndex);
+            playPlaylist(M3U_getPlaylist(), book.playListIndex, book.position);
         }else{
             //File:
             strcpy(dir, userSettings->selectedBrowserItem);

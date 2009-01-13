@@ -51,3 +51,6 @@ int MP3_isFilterSupported();
 //Manage suspend:
 int MP3_suspend();
 int MP3_resume();
+
+double MP3_getFilePosition();
+void MP3_setFilePosition(double position);

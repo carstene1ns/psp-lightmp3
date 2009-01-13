@@ -58,7 +58,7 @@ static long FLAC_tempmixleft = 0;
 static long samples_played = 0;
 
 static FLAC__StreamDecoder *decoder = 0;
-
+static double FLAC_newFilePos = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //dummy functions for FLAC metadata iterators
@@ -149,7 +149,7 @@ int flacThread(SceSize args, void *argp)
    //printf("    state: %s\n", FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
    FLAC_eos = 1;
 
-   if(FLAC__stream_decoder_get_state(decoder) != FLAC__STREAM_DECODER_UNINITIALIZED) 
+   if(FLAC__stream_decoder_get_state(decoder) != FLAC__STREAM_DECODER_UNINITIALIZED)
 		FLAC__stream_decoder_finish(decoder);
    FLAC__stream_decoder_delete(decoder);
 
@@ -200,6 +200,12 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 				FLAC_mixBuffer[j] = FLAC_mixBuffer[(numSamples<<1) + j];
 				FLAC_mixBuffer[j + 1] = FLAC_mixBuffer[(numSamples<<1) + j + 1];
 			}
+
+            if (FLAC_newFilePos)
+            {
+                FLAC_newFilePos = 0;
+            }
+
             //Check for playing speed:
             if (FLAC_playingSpeed){
 				FLAC__stream_decoder_flush(decoder);
@@ -540,4 +546,16 @@ int FLAC_resume(){
        suspendPosition = -1;
     }
     return 0;
+}
+
+double FLAC_getFilePosition()
+{
+    FLAC__uint64 pos = 0;
+    FLAC__stream_decoder_get_decode_position(decoder, &pos);
+    return (double)pos;
+}
+
+void FLAC_setFilePosition(double position)
+{
+    FLAC_newFilePos = position;
 }
