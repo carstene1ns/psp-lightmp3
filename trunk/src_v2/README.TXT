@@ -38,6 +38,7 @@ If you don't have any cpu-hungry plugin running try to set the clock with this v
 
 FEATURES
 --------
+-Bookmark function for audiobook
 -Skinnable and multilanguage (english, italian, portuguese, french, polish, dutch)
 -Support for kernel 3.x and Slim&Light
 -Support for MP3, OGG Vorbis, ATRAC3+ (*.aa3, *.omg, *.oma), FLAC
@@ -111,7 +112,7 @@ Player:
     NOTE                = Change equalizer (if supported)
     CROSS + DPAD UP     = Raise track rating
     CROSS + DPAD DOWN   = Lower track rating
-    L + CIRCLE          = Create a bookmark and exit the application
+    L + CIRCLE          = Create a bookmark and exit the application (or shut down, see the settings file)
 
 
 VOLUME BOOST
@@ -165,6 +166,16 @@ Open the settings file and change this setting:
 ML_ROOT=ms0:/
 Ex:
 ML_ROOT=ms0:/MUSIC/
+
+
+BOOKMARKS
+---------
+You can create a bookmark by pressing L + CIRCLE while listening to a track.
+The app will quit, the next time you'll start it the player will resume playling from the saved position.
+NOTE: If you want the app to shut down after creating a bookmark edit the settings file and change:
+SHUTDOWN_AFTER_BOOKMARK=0
+to
+SHUTDOWN_AFTER_BOOKMARK=1
 
 
 DEPENDENCIES
