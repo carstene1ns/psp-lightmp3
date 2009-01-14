@@ -62,7 +62,7 @@ int ML_countRecordsSelect(char *select);
 int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int limit, struct libraryEntry *result);
 int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *resultBuffer);
 
-int ML_clearEntry(struct libraryEntry *entry);
+void ML_clearEntry(struct libraryEntry *entry);
 int ML_addEntry(struct libraryEntry entry);
 int ML_updateEntry(struct libraryEntry entry, char *newPath);
 int ML_checkFiles(int (*checkFile)(char *fileName));

@@ -196,7 +196,7 @@ int pspAudioInit()
             if (AudioStatus[i].threadhandle != -1) {
                 sceKernelWaitThreadEnd(AudioStatus[i].threadhandle, NULL);
                 while (AudioStatus[i].threadactive)
-                    sceKernelDelayThread(100000);
+                    sceKernelDelayThread(1000);
                 sceKernelDeleteThread(AudioStatus[i].threadhandle);
             }
             AudioStatus[i].threadhandle = -1;
@@ -226,7 +226,7 @@ void pspAudioEnd()
             pspReleaseAudio();
             sceKernelWaitThreadEnd(AudioStatus[i].threadhandle,NULL);
             while (AudioStatus[i].threadactive)
-                sceKernelDelayThread(100000);
+                sceKernelDelayThread(1000);
             sceKernelDeleteThread(AudioStatus[i].threadhandle);
         }
         AudioStatus[i].threadhandle = -1;
