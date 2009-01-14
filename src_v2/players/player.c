@@ -545,7 +545,8 @@ int setAudioFrequency(unsigned short samples, unsigned short freq, char car){
 //Release audio:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int releaseAudio(void){
-	while(sceAudioOutput2GetRestSample() > 0);
+	while(sceAudioOutput2GetRestSample() > 0)
+        sceKernelDelayThread(10);
 	return sceAudioSRCChRelease();
 }
 

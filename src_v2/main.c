@@ -262,6 +262,44 @@ void checkBrightness(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ask to confirm to load a bookmark at startup
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int confirmLoadBookmark()
+{
+    int retValue = 0;
+    int skip = 0;
+
+    while(!osl_quit)
+    {
+        if (!skip)
+        {
+            oslStartDrawing();
+            drawCommonGraphics();
+            drawConfirm(langGetString("CONFIRM_BOOKMARK_TITLE"), langGetString("CONFIRM_BOOKMARK_LOAD"));
+        	oslEndDrawing();
+        }
+        oslEndFrame();
+        skip = oslSyncFrame();
+
+        oslReadKeys();
+        if(osl_pad.released.cross)
+        {
+            retValue = 1;
+            break;
+        }
+        else if(osl_pad.released.circle)
+        {
+            retValue = 0;
+            break;
+        }
+    }
+
+    oslReadKeys();
+    return retValue;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Main:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main(){
@@ -430,9 +468,12 @@ int main(){
     snprintf(buffer, sizeof(buffer), "%s%s", userSettings->ebootPath, "bookmark.bkm");
     if (fileExists(buffer) > 0)
     {
-        currentMode = MODE_PLAYER;
-        strcpy(userSettings->selectedBrowserItemShort, buffer);
-        strcpy(userSettings->selectedBrowserItem, buffer);
+        if (confirmLoadBookmark())
+        {
+            currentMode = MODE_PLAYER;
+            strcpy(userSettings->selectedBrowserItemShort, buffer);
+            strcpy(userSettings->selectedBrowserItem, buffer);
+        }
     }
 
     while(!osl_quit){
