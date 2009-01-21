@@ -210,3 +210,11 @@ ORDER_BY_06=발매년도, 아티스트, 앨범, 트랙번호
 ORDER_BY_07=발매년도, 아티스트, 앨범, 타이틀
 ORDER_BY_08=선호도, 아티스트, 앨범, 트랙번호
 ORDER_BY_09=선호도, 아티스트, 앨범, 타이틀
+
+################################################################################
+#2.0.0 RC2
+################################################################################
+HELP_PLAYER_10=L + Circle to create a bookmark and exit
+CONFIRM_BOOKMARK_TITLE=Confirm
+CONFIRM_BOOKMARK=Create a bookmark and exit?
+CONFIRM_BOOKMARK_LOAD=Load the saved bookmark?

@@ -9,7 +9,7 @@ Version 2.0.0 RC2
         The default is 0, if set to 1 the psp will shut down after creating a bookmark.
         The next time you'll start LightMP3 will ask you if you want to load the saved bookmark.
 -Fixed: Korean language support.
--Fixed: shuffle (always the same number were generated)
+-Fixed: shuffle (always the same number were generated in RC1)
 -Fixed: Added sql transaction to playPlaylist (faster change of track)
 
 

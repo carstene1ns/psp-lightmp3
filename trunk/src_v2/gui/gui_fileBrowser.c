@@ -75,7 +75,7 @@ void addFileToPlaylist(char *fileName, int save){
 	struct fileInfo *info = NULL;
 	char onlyName[264] = "";
     char extension[5] = "";
-    
+
 	if (save == 1){
 		M3U_clear();
 		M3U_open(tempM3Ufile);
@@ -85,10 +85,10 @@ void addFileToPlaylist(char *fileName, int save){
     if (!strcmp(extension, "M3U"))
     {
         //Add a playlist:
-        M3U_open(fileName);      
+        M3U_open(fileName);
     }
     else
-    {        
+    {
         //Add a file:
         if (setAudioFunctions(fileName, userSettings->MP3_ME))
             return;
@@ -106,9 +106,9 @@ void addFileToPlaylist(char *fileName, int save){
         }
         unsetAudioFunctions();
     }
-    
+
     if (save == 1)
-        M3U_save(tempM3Ufile);    
+        M3U_save(tempM3Ufile);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,13 +284,13 @@ int gui_fileBrowser(){
 						if (tmpCoverArt){
                             int coverArtWidth  = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
                             int coverArtHeight = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
-                
+
                             coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
                             oslDeleteImage(tmpCoverArt);
                             tmpCoverArt = NULL;
 
                             coverArt->stretchX = coverArtWidth;
-                            coverArt->stretchY = coverArtHeight;                            
+                            coverArt->stretchY = coverArtHeight;
 						}else{
 							coverArtFailed = 1;
 						}

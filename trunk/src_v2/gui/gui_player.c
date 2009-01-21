@@ -358,7 +358,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
     int status = STATUS_NORMAL;
 	int headphone = sceHprmIsHeadphoneExist();
 	int skip = 0;
-	OSL_IMAGE* tmpCoverArt;
+	OSL_IMAGE* tmpCoverArt = NULL;
 
     MEEnable();
 

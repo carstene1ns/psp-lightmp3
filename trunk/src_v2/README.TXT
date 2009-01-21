@@ -171,7 +171,9 @@ ML_ROOT=ms0:/MUSIC/
 BOOKMARKS
 ---------
 You can create a bookmark by pressing L + CIRCLE while listening to a track.
-The app will quit, the next time you'll start it the player will resume playling from the saved position.
+The app will quit, the next time you'll start it the player will ask you if you want to load the saved bookmark.
+Once loaded, the bookmark is deleted from the ms.
+
 NOTE: If you want the app to shut down after creating a bookmark edit the settings file and change:
 SHUTDOWN_AFTER_BOOKMARK=0
 to

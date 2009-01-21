@@ -1,8 +1,10 @@
-#Language   : Italiano
+﻿#Language   : Italiano
 #By         : Magic PSP
 #Contacts   : aliquo93@hotmail.it
-ENCODING=UTF-8
 
+#Encoding is one of: UTF-8, GBK, BIG5, SHIFT-JIS, EUC-KR, MS-EE, MS-CYRL, ISO-8859-1, ISO-8859-2
+ENCODING=UTF-8
+TAG_ENCODING=UTF-8
 #Language to use in the On Screen Keyboard.
 #			JAPANESE			0
 #			ENGLISH				1
@@ -18,11 +20,11 @@ ENCODING=UTF-8
 #			CHINESE_SIMPLIFIED	11
 OSK_LANGUAGE=5
 
-YES=Sì
+YES=Si
 NO=No
 WAIT=Attendere...
-CHECK_BRIGHTNESS_TITLE=Controllo luminosità
-CHECK_BRIGHTNESS=Abbassare la luminosità?
+CHECK_BRIGHTNESS_TITLE=Controllo luminosita'
+CHECK_BRIGHTNESS=Abbassare la luminosita'?
 BRIGHTNESS_NO=No
 BRIGHTNESS_YES_WARNING=Si, con avviso
 BRIGHTNESS_YES=Si, senza avviso
@@ -42,7 +44,7 @@ RATING=Voto
 PLAYED=Avviata v.
 NOT_SUPPORTED=Non supportato
 
-MODE=Modalità
+MODE=Modalita'
 BITRATE=Bitrate
 SAMPLERATE=Frequenza
 LAYER=Layer
@@ -94,7 +96,7 @@ SETTINGS_02=Lingua
 SETTINGS_03=Scrivere audio Scrobbler Log
 SETTINGS_04=Diminuzione graduale quando si salta una traccia
 SETTINGS_05=Abbassamento volume
-SETTINGS_06=Controllo luminosità
+SETTINGS_06=Controllo luminosita'
 SETTINGS_07=Esegui MP3 utilizzando il Media Engine
 SETTINGS_08=Tipo di boost per MP3 utilizzando libMAD
 SETTINGS_09=Frequenza CPU automatica
@@ -153,7 +155,7 @@ HELP_FILE_BROWSER_01=X per entrare nella cartella/riprodurre brano
 HELP_FILE_BROWSER_02=O per andare nella cartella precedente
 HELP_FILE_BROWSER_03=[] per riprodurre l'intera cartella
 HELP_FILE_BROWSER_04=START per aggiungere cartella/brano nella playlist
-HELP_FILE_BROWSER_05=SELECT per attivare la modalità USB
+HELP_FILE_BROWSER_05=SELECT per attivare la modalita' USB
 
 HELP_PLAYLIST_BROWSER_TITLE=Aiuto playlist
 HELP_PLAYLIST_BROWSER_01=X per riprodurre la playlist
@@ -168,9 +170,10 @@ HELP_PLAYLIST_EDITOR_TITLE=Aiuto modifica playlist
 HELP_PLAYLIST_EDITOR_01=[] per spostare la traccia in alto
 HELP_PLAYLIST_EDITOR_02=X per spostare la traccia in basso
 HELP_PLAYLIST_EDITOR_03=O per eliminare la traccia dalla playlist
-HELP_PLAYLIST_EDITOR_04=START per salvare la playlist
-HELP_PLAYLIST_EDITOR_05=SELECT per azzerare la playlist
-HELP_PLAYLIST_EDITOR_06=Nota per riprodurre la playlist
+HELP_PLAYLIST_EDITOR_04=/\ per controllare i files
+HELP_PLAYLIST_EDITOR_05=START per salvare la playlist
+HELP_PLAYLIST_EDITOR_06=SELECT per azzerare la playlist
+HELP_PLAYLIST_EDITOR_07=Nota per riprodurre la playlist
 
 HELP_MEDIALIBRARY_TITLE=Aiuto Media Library
 HELP_MEDIALIBRARY_01=X per cliccare selezionati/riprodurre traccia
@@ -199,14 +202,22 @@ BROWSE_ALL=Browse all
 ################################################################################
 #2.0.0 RC1
 ################################################################################
-HELP_MEDIALIBRARY_06=Triangle to sort tracks
+HELP_MEDIALIBRARY_06=/\ per ordinare le tracce
 
-ORDER_BY_01=Artist, Album, Track#
-ORDER_BY_02=Artist, Album, Title
-ORDER_BY_03=Artist, Title
-ORDER_BY_04=Title
-ORDER_BY_05=Year, Title
-ORDER_BY_06=Year, Artist, Album, Track#
-ORDER_BY_07=Year, Artist, Album, Title
-ORDER_BY_08=Rating, Artist, Album, Track#
-ORDER_BY_09=Rating, Artist, Album, Title
+ORDER_BY_01=Artista, Album, Traccia#
+ORDER_BY_02=Artista, Album, Titolo
+ORDER_BY_03=Artista, Titolo
+ORDER_BY_04=Titolo
+ORDER_BY_05=Anno, Titolo
+ORDER_BY_06=Anno, Artista, Album, Traccia#
+ORDER_BY_07=Anno, Artista, Album, Titolo
+ORDER_BY_08=Valutazione, Artista, Album, Traccia#
+ORDER_BY_09=Valutazione, Artista, Album, Titolo
+
+################################################################################
+#2.0.0 RC2
+################################################################################
+HELP_PLAYER_10=L + Circle to create a bookmark and exit
+CONFIRM_BOOKMARK_TITLE=Confirm
+CONFIRM_BOOKMARK=Create a bookmark and exit?
+CONFIRM_BOOKMARK_LOAD=Load the saved bookmark?
