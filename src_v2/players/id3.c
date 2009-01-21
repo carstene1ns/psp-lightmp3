@@ -129,7 +129,7 @@ void readTagData(int fp, int tagLength, char *tagValue){
     unsigned short carattere16[tagLength/2+2];
     unsigned char* carattere = (unsigned char*)carattere16;
 	char* utf8Tag;
-	
+
     strcpy(tagValue, "");
     tagValue[0] = '\0';
 
@@ -159,7 +159,7 @@ void readTagData(int fp, int tagLength, char *tagValue){
 	{
 		strcpy( tagValue, utf8Tag );
 	}
-	
+
 }
 
 int ID3v2TagSize(const char *mp3path)
@@ -264,7 +264,10 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
          else if(!strncmp("TYE",tag,3)) /* Year */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Year);
+            if (tag_length - 1 >= 12)
+                readTagData(fp, 11, id3tag->ID3Year);
+            else
+                readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
          else if(!strncmp("TLE",tag,3)) /* Length */
          {
@@ -366,7 +369,10 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
          else if(!strncmp("TYER",tag,4)) /* Year */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Year);
+            if (tag_length - 1 >= 12)
+                readTagData(fp, 11, id3tag->ID3Year);
+            else
+                readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
          else if(!strncmp("TLEN",tag,4)) /* Length in milliseconds */
          {
@@ -468,7 +474,10 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
          else if(!strncmp("TYER",tag,4)) /* Year */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Year);
+            if (tag_length - 1 >= 12)
+                readTagData(fp, 11, id3tag->ID3Year);
+            else
+                readTagData(fp, tag_length - 1, id3tag->ID3Year);
          }
          else if(!strncmp("TLEN",tag,4)) /* Length in milliseconds */
          {

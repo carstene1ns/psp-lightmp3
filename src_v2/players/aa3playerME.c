@@ -50,6 +50,7 @@ static long AA3ME_suspendPosition = -1;
 static long AA3ME_suspendIsPlaying = 0;
 static double AA3ME_filePos = 0;
 static double AA3ME_newFilePos = 0;
+static int AA3ME_tagRead = 0;
 
 static unsigned char AA3ME_input_buffer[2889]__attribute__((aligned(64)));//mp3 has the largest max frame, at3+ 352 is 2176
 static unsigned long AA3ME_codec_buffer[65]__attribute__((aligned(64)));
@@ -356,6 +357,9 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
     if (!strlen(targetInfo->title))
         getFileName(AA3ME_fileName, targetInfo->title);
 	sceIoClose(fp);
+
+    AA3ME_info = *targetInfo;
+    AA3ME_tagRead = 1;
 }
 
 struct fileInfo AA3ME_GetTagInfoOnly(char *filename){
@@ -454,7 +458,8 @@ int AA3MEgetInfo(){
 	sceIoClose(fd);
     fd = -1;
 
-    getAA3METagInfo(AA3ME_fileName, &AA3ME_info);
+    if (!AA3ME_tagRead)
+        getAA3METagInfo(AA3ME_fileName, &AA3ME_info);
     return 0;
 }
 
@@ -467,6 +472,10 @@ void AA3ME_Init(int channel){
     AA3ME_volume = PSP_AUDIO_VOLUME_MAX;
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
+
+    initFileInfo(&AA3ME_info);
+    AA3ME_tagRead = 0;
+
 	initMEAudioModules();
 }
 
@@ -475,7 +484,6 @@ int AA3ME_Load(char *fileName){
     AA3ME_filePos = 0;
     AA3ME_playingSpeed = 0;
     AA3ME_isPlaying = 0;
-    initFileInfo(&AA3ME_info);
     strcpy(AA3ME_fileName, fileName);
     if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;

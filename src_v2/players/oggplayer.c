@@ -47,6 +47,7 @@ int OGG_defaultCPUClock = 50;
 static short OGG_mixBuffer[PSP_NUM_AUDIO_SAMPLES * 2 * 2]__attribute__ ((aligned(64)));
 static unsigned long OGG_tempmixleft = 0;
 static double OGG_newFilePos = 0;
+static int OGG_tagRead = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //Audio callback
@@ -221,6 +222,9 @@ void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
 	}
     if (!strlen(targetInfo->title))
         getFileName(OGG_fileName, targetInfo->title);
+
+    OGG_info = *targetInfo;
+    OGG_tagRead = 1;
 }
 
 void OGGgetInfo(){
@@ -252,7 +256,8 @@ void OGGgetInfo(){
 	s = secs - h * 3600 - m * 60;
 	snprintf(OGG_info.strLength, sizeof(OGG_info.strLength), "%2.2i:%2.2i:%2.2i", h, m, s);
 
-    getOGGTagInfo(&OGG_VorbisFile, &OGG_info);
+    if (!OGG_tagRead)
+        getOGGTagInfo(&OGG_VorbisFile, &OGG_info);
 }
 
 
@@ -260,6 +265,8 @@ void OGG_Init(int channel){
     initAudioLib();
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
+    initFileInfo(&OGG_info);
+    OGG_tagRead = 0;
     OGG_audio_channel = channel;
     OGG_milliSeconds = 0.0;
     OGG_tempmixleft = 0;
@@ -277,7 +284,6 @@ int OGG_Load(char *filename){
     OGG_playingDelta = 0;
 	strcpy(OGG_fileName, filename);
 	//Apro il file OGG:
-	initFileInfo(&OGG_info);
     OGG_file = sceIoOpen(OGG_fileName, PSP_O_RDONLY, 0777);
 	if (OGG_file >= 0) {
         OGG_info.fileSize = sceIoLseek(OGG_file, 0, PSP_SEEK_END);
@@ -379,6 +385,7 @@ struct fileInfo OGG_GetTagInfoOnly(char *filename){
         if (tempFile >= 0)
             sceIoClose(tempFile);
 	}
+
     return tempInfo;
 }
 

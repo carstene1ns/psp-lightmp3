@@ -209,3 +209,12 @@ ORDER_BY_06=Rok, Artysta, Album, Utwor#
 ORDER_BY_07=Rok, Artysta, Album, Tytul
 ORDER_BY_08=Ocena, Artysta, Album, Utwor#
 ORDER_BY_09=Ocena, Artysta, Album, Tytul
+
+
+################################################################################
+#2.0.0 RC2
+################################################################################
+HELP_PLAYER_10=L + Circle to create a bookmark and exit
+CONFIRM_BOOKMARK_TITLE=Confirm
+CONFIRM_BOOKMARK=Create a bookmark and exit?
+CONFIRM_BOOKMARK_LOAD=Load the saved bookmark?

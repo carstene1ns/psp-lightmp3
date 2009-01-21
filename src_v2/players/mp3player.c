@@ -55,6 +55,7 @@ static struct mad_synth Synth;
 static mad_timer_t Timer;
 static int MP3_outputInProgress = 0;
 static int MP3_channels = 0;
+static int MP3_tagRead = 0;
 
 // The following variables are maintained and updated by the tracker during playback
 static int MP3_isPlaying;		// Set to true when a mod is being played
@@ -275,6 +276,9 @@ void MP3_Init(int channel){
 	MP3_volume_boost = 0;
     MP3_volume_boost_old = 0;
 
+    initFileInfo(&MP3_info);
+    MP3_tagRead = 0;
+
     pspAudioSetChannelCallback(myChannel, MP3Callback,0);
 
     MIN_PLAYING_SPEED=-10;
@@ -323,6 +327,10 @@ void getMP3TagInfo(char *filename, struct fileInfo *targetInfo){
     targetInfo->encapsulatedPictureType = ID3.ID3EncapsulatedPictureType;
     targetInfo->encapsulatedPictureOffset = ID3.ID3EncapsulatedPictureOffset;
     targetInfo->encapsulatedPictureLength = ID3.ID3EncapsulatedPictureLength;
+
+    MP3_info = *targetInfo;
+    MP3_tagRead = 1;
+
 }
 
 int MP3getInfo(){
@@ -336,7 +344,8 @@ int MP3getInfo(){
     int timeFromID3 = 0;
     float mediumBitrate = 0.0f;
 
-    getMP3TagInfo(MP3_fileName, &MP3_info);
+    if (!MP3_tagRead)
+        getMP3TagInfo(MP3_fileName, &MP3_info);
 
 	mad_stream_init (&stream);
 	mad_header_init (&header);
@@ -506,7 +515,6 @@ int MP3_Load(char *filename){
     MP3_filePos = 0;
     fileSize = 0;
     samplesRead = 0;
-    initFileInfo(&MP3_info);
     MP3_fd = sceIoOpen(filename, PSP_O_RDONLY, 0777);
     if (MP3_fd < 0)
         return ERROR_OPENING;

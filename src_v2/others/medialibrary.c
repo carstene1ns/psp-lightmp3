@@ -561,6 +561,7 @@ int ML_updateEntry(struct libraryEntry entry, char *newPath){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
+    char localNewPath[264] = "";
     ML_fixStringField(entry.path);
     ML_fixStringField(entry.shortpath);
     ML_fixStringField(entry.artist);
@@ -573,7 +574,13 @@ int ML_updateEntry(struct libraryEntry entry, char *newPath){
         entry.rating = 0;
 
     if (!strlen(newPath))
-        strcpy(newPath, entry.path);
+        strcpy(localNewPath, entry.path);
+    else
+    {
+        strcpy(localNewPath, newPath);
+        ML_fixStringField(localNewPath);
+
+    }
 
     snprintf(sql, sizeof(sql),
 				 "update media \
@@ -587,7 +594,7 @@ int ML_updateEntry(struct libraryEntry entry, char *newPath){
 				  entry.year, entry.extension,
                   entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber,
 				  entry.rating, entry.played, entry.shortpath,
-                  newPath,
+                  localNewPath,
 				  entry.path);
     int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
