@@ -313,32 +313,32 @@ void getAA3METagInfo(char *filename, struct fileInfo *targetInfo){
         if(!strncmp("TPE1",tag,4)) /* Artist */
         {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, targetInfo->artist);
+            readTagData(fp, tag_length - 1, 260, targetInfo->artist);
         }
         else if(!strncmp("TIT2",tag,4)) /* Title */
         {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-			readTagData(fp, tag_length - 1, targetInfo->title);
+			readTagData(fp, tag_length - 1, 260, targetInfo->title);
         }
         else if(!strncmp("TALB",tag,4)) /* Album */
         {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, targetInfo->album);
+            readTagData(fp, tag_length - 1, 260, targetInfo->album);
         }
         else if(!strncmp("TRCK",tag,4)) /* Track No. */
         {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, targetInfo->trackNumber);
+            readTagData(fp, tag_length - 1, 8, targetInfo->trackNumber);
         }
         else if(!strncmp("TYER",tag,4)) /* Year */
         {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, targetInfo->year);
+            readTagData(fp, tag_length - 1, 12, targetInfo->year);
         }
         else if(!strncmp("TCON",tag,4)) /* Genre */
         {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, targetInfo->genre);
+            readTagData(fp, tag_length - 1, 260, targetInfo->genre);
         }
         else if(!strncmp("APIC",tag,4)) /* Picture */
         {

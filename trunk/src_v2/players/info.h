@@ -43,7 +43,7 @@ struct fileInfo{
 	char title[260];
 	char artist[260];
 	char genre[260];
-    char year[8];
+    char year[12];
     char trackNumber[8];
 };
 
