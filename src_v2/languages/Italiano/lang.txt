@@ -217,7 +217,7 @@ ORDER_BY_09=Valutazione, Artista, Album, Titolo
 ################################################################################
 #2.0.0 RC2
 ################################################################################
-HELP_PLAYER_10=L + Circle to create a bookmark and exit
-CONFIRM_BOOKMARK_TITLE=Confirm
-CONFIRM_BOOKMARK=Create a bookmark and exit?
-CONFIRM_BOOKMARK_LOAD=Load the saved bookmark?
+HELP_PLAYER_10=L + Circle per creare un segnalibro
+CONFIRM_BOOKMARK_TITLE=Conferma
+CONFIRM_BOOKMARK=Creare un segnalibro ed uscire?
+CONFIRM_BOOKMARK_LOAD=Caricare il segnalibro salvato?

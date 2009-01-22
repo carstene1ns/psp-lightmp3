@@ -123,7 +123,10 @@ int swapInt32BigToHost(int arg)
 }
 
 //Reads tag data purging invalid characters:
-void readTagData(int fp, int tagLength, char *tagValue){
+void readTagData(int fp, int tagLength, int maxTagLength, char *tagValue){
+    if (tagLength > maxTagLength)
+        tagLength = maxTagLength;
+
     int i;
     int count = 0;
     unsigned short carattere16[tagLength/2+2];
@@ -243,47 +246,44 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
          if(!strncmp("TP1",tag,3)) /* Artist */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Artist);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Artist);
          }
          else if(!strncmp("TP2",tag,3)) /* Title */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Title);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Title);
          }
          else if(!strncmp("TAL",tag,3)) /* Album */
          {
 		    sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Album);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Album);
          }
          else if(!strncmp("TRK",tag,3)) /* Track No. */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3TrackText);
+            readTagData(fp, tag_length - 1, 8, id3tag->ID3TrackText);
             id3tag->ID3Track = atoi(id3tag->ID3TrackText);
          }
          else if(!strncmp("TYE",tag,3)) /* Year */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            if (tag_length - 1 >= 12)
-                readTagData(fp, 11, id3tag->ID3Year);
-            else
-                readTagData(fp, tag_length - 1, id3tag->ID3Year);
+            readTagData(fp, tag_length - 1, 12, id3tag->ID3Year);
          }
          else if(!strncmp("TLE",tag,3)) /* Length */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, buffer);
+            readTagData(fp, tag_length - 1, 264, buffer);
             id3tag->ID3Length = atoi(buffer);
          }
          else if(!strncmp("COM",tag,3)) /* Comment */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Comment);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Comment);
          }
          else if(!strncmp("TCO",tag,3)) /* Genre */
          {
 			sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3GenreText);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3GenreText);
          }
          else if(!strncmp("PIC",tag,3)) /* Picture */
          {
@@ -348,47 +348,44 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
          if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Artist);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Artist);
          }
          else if(!strncmp("TIT2",tag,4)) /* Title */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Title);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Title);
          }
          else if(!strncmp("TALB",tag,4)) /* Album */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Album);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Album);
          }
          else if(!strncmp("TRCK",tag,4)) /* Track No. */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3TrackText);
+            readTagData(fp, tag_length - 1, 8, id3tag->ID3TrackText);
             id3tag->ID3Track = atoi(id3tag->ID3TrackText);
          }
          else if(!strncmp("TYER",tag,4)) /* Year */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            if (tag_length - 1 >= 12)
-                readTagData(fp, 11, id3tag->ID3Year);
-            else
-                readTagData(fp, tag_length - 1, id3tag->ID3Year);
+            readTagData(fp, tag_length - 1, 12, id3tag->ID3Year);
          }
          else if(!strncmp("TLEN",tag,4)) /* Length in milliseconds */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, buffer);
+            readTagData(fp, tag_length - 1, 264, buffer);
             id3tag->ID3Length = atol(buffer) / 1000;
          }
          else if(!strncmp("TCON",tag,4)) /* Genre */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3GenreText);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3GenreText);
          }
 		 else if(!strncmp("COMM",tag,4)) /* Comment */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Comment);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Comment);
          }
          else if(!strncmp("APIC",tag,4)) /* Picture */
          {
@@ -453,47 +450,44 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
          if(!strncmp("TPE1",tag,4)) /* Artist */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Artist);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Artist);
          }
          else if(!strncmp("TIT2",tag,4)) /* Title */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Title);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Title);
          }
          else if(!strncmp("TALB",tag,4)) /* Album */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Album);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Album);
          }
          else if(!strncmp("TRCK",tag,4)) /* Track No. */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3TrackText);
+            readTagData(fp, tag_length - 1, 8, id3tag->ID3TrackText);
             id3tag->ID3Track = atoi(id3tag->ID3TrackText);
          }
          else if(!strncmp("TYER",tag,4)) /* Year */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            if (tag_length - 1 >= 12)
-                readTagData(fp, 11, id3tag->ID3Year);
-            else
-                readTagData(fp, tag_length - 1, id3tag->ID3Year);
+            readTagData(fp, tag_length - 1, 12, id3tag->ID3Year);
          }
          else if(!strncmp("TLEN",tag,4)) /* Length in milliseconds */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, buffer);
+            readTagData(fp, tag_length - 1, 264, buffer);
             id3tag->ID3Length = atol(buffer) / 1000;
          }
          else if(!strncmp("TCON",tag,4)) /* Genre */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3GenreText);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3GenreText);
          }
          else if(!strncmp("COMM",tag,4)) /* Comment */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
-            readTagData(fp, tag_length - 1, id3tag->ID3Comment);
+            readTagData(fp, tag_length - 1, 260, id3tag->ID3Comment);
          }
          else if(!strncmp("APIC",tag,4)) /* Picture */
          {
