@@ -68,7 +68,6 @@ extern int MIN_PLAYING_SPEED;
 extern int MAX_PLAYING_SPEED;
 
 //shared global vars for ME
-extern int HW_ModulesInit;
 extern SceUID fd;
 extern u16 data_align;
 extern u32 sample_per_frame;

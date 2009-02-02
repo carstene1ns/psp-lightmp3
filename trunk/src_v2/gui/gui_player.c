@@ -58,8 +58,6 @@ int displayDisable(void);
 int getBrightness();
 void setBrightness(int brightness);
 int imposeSetHomePopup(int value);
-void MEDisable();
-void MEEnable();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Globals:
@@ -360,8 +358,6 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 	int skip = 0;
 	OSL_IMAGE* tmpCoverArt = NULL;
 
-    MEEnable();
-
 	cpuBoost();
 
     if (userSettings->displayStatus){
@@ -571,11 +567,6 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
         clock = info->defaultCPUClock;
     }else
         clock = getCpuClock();
-
-    //COMMENTED BECAUSE IT PREVENTS TO GO IN SLEEP MODE
-    //Disable media engine if safe and unused
-    /*if (!info->needsME && sceKernelDevkitVersion() < 0x03070110 && !getModel())
-        MEDisable();*/
 
     if (setFilePositionFunct != NULL && startFilePos > 0)
         (*setFilePositionFunct)(startFilePos);
