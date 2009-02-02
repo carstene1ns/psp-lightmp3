@@ -24,6 +24,7 @@
 #include <math.h>
 
 #include "id3.h"
+#include "mp3xing.h"
 #include "player.h"
 #include "mp3player.h"
 #include "pspaudiolib.h"
@@ -338,6 +339,11 @@ int MP3getInfo(){
     int fd;
     int bufferSize = 1024*496;
     u8 *localBuffer;
+
+    int has_xing = 0;
+    struct xing xing;
+	memset(&xing, 0, sizeof xing);
+
     long singleDataRed = 0;
 	struct mad_stream stream;
 	struct mad_header header;
@@ -452,23 +458,39 @@ int MP3getInfo(){
     				break;
     			}
 
+				//Check for xing frame:
+	            if(parse_xing(&xing, stream.anc_ptr, stream.anc_bitlen))
+				{
+					if (xing.flags & XING_FRAMES)
+					{
+						/* We use the Xing tag only for frames. If it doesn't have that
+						   information, it's useless to us and we have to treat it as a
+						   normal VBR file */
+						has_xing = 1;
+						FrameCount = xing.frames;
+						timeFromID3 = 1;
+						break;
+					}
+				}
+
     			//Check if lenght found in tag info:
                 if (MP3_info.length > 0){
                     timeFromID3 = 1;
                     break;
                 }
             }
-			if (timeFromID3)
-				break;
 
             totalBitrate += header.bitrate;
-            if (size == bufferSize)
-                break;
-            else if (i==0)
-                sceIoLseek(fd, startPos + size/3, PSP_SEEK_SET);
-            else if (i==1)
-                sceIoLseek(fd, startPos + 2 * size/3, PSP_SEEK_SET);
 		}
+        if (size == bufferSize)
+            break;
+        else if (i==0)
+            sceIoLseek(fd, startPos + size/3, PSP_SEEK_SET);
+        else if (i==1)
+            sceIoLseek(fd, startPos + 2 * size/3, PSP_SEEK_SET);
+
+        if (timeFromID3)
+            break;
 	}
 	mad_header_finish (&header);
 	mad_stream_finish (&stream);
@@ -477,7 +499,14 @@ int MP3getInfo(){
     sceIoClose(fd);
 
     int secs = 0;
-    if (!MP3_info.length){
+    if (has_xing)
+    {
+        /* modify header.duration since we don't need it anymore */
+        mad_timer_multiply(&header.duration, FrameCount);
+        secs = mad_timer_count(header.duration, MAD_UNITS_SECONDS);
+		MP3_info.length = secs;
+	}
+    else if (!MP3_info.length){
 		mediumBitrate = totalBitrate / (float)FrameCount;
 		secs = size * 8 / mediumBitrate;
         MP3_info.length = secs;

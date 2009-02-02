@@ -147,18 +147,18 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
 
             if (!fastMode){
         	    if (localResult[i - offset].seconds > 0){
-                    M3U_addSong(localResult[i - offset].path, localResult[i - offset].seconds, localResult[i - offset].title);
+                    M3U_addSong(localResult[i - offset].shortpath, localResult[i - offset].seconds, localResult[i - offset].title);
                 }else{
-                    if (setAudioFunctions(localResult[i - offset].path, userSettings->MP3_ME))
+                    if (setAudioFunctions(localResult[i - offset].shortpath, userSettings->MP3_ME))
 						continue;
             	    (*initFunct)(0);
-                	if ((*loadFunct)(localResult[i - offset].path) == OPENING_OK){
+                	if ((*loadFunct)(localResult[i - offset].shortpath) == OPENING_OK){
                 		info = (*getInfoFunct)();
                 		if (strlen(info->title)){
-                			M3U_addSong(localResult[i - offset].path, info->length, info->title);
+                			M3U_addSong(localResult[i - offset].shortpath, info->length, info->title);
                 		}else{
-                			getFileName(localResult[i - offset].path, onlyName);
-                			M3U_addSong(localResult[i - offset].path, info->length, onlyName);
+                			getFileName(localResult[i - offset].shortpath, onlyName);
+                			M3U_addSong(localResult[i - offset].shortpath, info->length, onlyName);
                 		}
                     	localResult[i - offset].seconds = info->length;
                         ML_updateEntry(localResult[i - offset], "");
@@ -167,8 +167,8 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
                     unsetAudioFunctions();
                 }
             }else{
-                getFileName(localResult[i - offset].path, onlyName);
-                M3U_addSong(localResult[i - offset].path, 0, onlyName);
+                getFileName(localResult[i - offset].shortpath, onlyName);
+                M3U_addSong(localResult[i - offset].shortpath, 0, onlyName);
             }
         }
         M3U_save(m3uName);
@@ -305,7 +305,7 @@ void drawMLinfo(){
 
 	OSL_FONT *font = fontNormal;
 	OSL_IMAGE *tmpCoverArt = NULL;
-	
+
     if (mediaLibraryStatus != STATUS_QUERYMENU)
         return;
 
@@ -387,11 +387,11 @@ void drawMLinfo(){
 				directoryUp(dirName);
 				//Look for folder.jpg in the same directory:
 				snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
-                
+
 				size = fileExists(buffer);
 				if (size > 0 && size <= MAX_IMAGE_DIMENSION)
                 {
-					tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);                    
+					tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
                 }
 				else
                 {
@@ -404,7 +404,7 @@ void drawMLinfo(){
 				if (tmpCoverArt){
     				int coverArtWidth  = skinGetParam("MEDIALIBRARY_COVERART_WIDTH");
     				int coverArtHeight = skinGetParam("MEDIALIBRARY_COVERART_HEIGHT");
-    	
+
 					coverArt = oslScaleImageCreate(tmpCoverArt, OSL_IN_RAM | OSL_SWIZZLED, coverArtWidth, coverArtHeight, OSL_PF_8888);
 					oslDeleteImage(tmpCoverArt);
 					tmpCoverArt = NULL;
@@ -451,8 +451,8 @@ int enterSelection(){
 	buildQueryMenu("Select media.*, \
 								   title || ' - ' || artist || ' (' || album || ')' as strfield,  \
 								   'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-							From media ", 
-				    commonMenu.elements[commonMenu.selected].data, 
+							From media ",
+				    commonMenu.elements[commonMenu.selected].data,
 					"title", exitSelection);
     mlPrevQueryType = mlQueryType;
     mlQueryType = QUERY_SINGLE_ENTRY;
@@ -603,7 +603,7 @@ int browseAll(){
 	buildQueryMenu("Select media.*, \
                            title || ' - ' || artist || ' (' || album || ')' as strfield,  \
                            'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-                    From media ", 
+                    From media ",
 					"1=1",
 					"title, artist",
 					backToMainMenu);
@@ -684,7 +684,7 @@ void askSearchString(char *message, char *initialValue, char *target){
 	int done = 0;
 	unsigned short carattere16[129];
 	char* utf8Str;
-	
+
 	cpuBoost();
 	oslInitOsk(message, initialValue, 128, 1, getOSKlang());
     while(!osl_quit && !done){
@@ -746,7 +746,7 @@ int search(){
                             searchString, searchString, searchString);
         buildQueryMenu("Select media.*, title || ' - ' || artist as strfield, \
                                'path = ''' || replace(path, '''', '''''') || '''' as datafield \
-                        From media", 
+                        From media",
 						tempWhere,
 						"title, artist, album",
 						backToMainMenu);

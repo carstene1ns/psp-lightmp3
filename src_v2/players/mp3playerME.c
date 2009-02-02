@@ -355,7 +355,8 @@ int MP3MEgetInfo(){
 	long size = sceIoLseek(fd, 0, PSP_SEEK_END);
     sceIoLseek(fd, 0, PSP_SEEK_SET);
 
-	double startPos = ID3v2TagSize(MP3ME_fileName);
+    MP3ME_tagsize = ID3v2TagSize(MP3ME_fileName);
+	double startPos = MP3ME_tagsize;
 	sceIoLseek32(fd, startPos, PSP_SEEK_SET);
     //startPos = SeekNextFrameMP3(fd);
     size -= startPos;
@@ -370,7 +371,6 @@ int MP3MEgetInfo(){
 	MP3ME_info.fileSize = size;
 	MP3ME_filesize = size;
     MP3ME_info.framesDecoded = 0;
-    MP3ME_tagsize = ID3v2TagSize(MP3ME_fileName);
 
     double totalBitrate = 0;
     int i = 0;
@@ -468,17 +468,17 @@ int MP3MEgetInfo(){
                 }
             }
 
-			if (timeFromID3)
-				break;
-
             totalBitrate += header.bitrate;
-            if (size == bufferSize)
-                break;
-            else if (i==0)
-                sceIoLseek(fd, startPos + size/3, PSP_SEEK_SET);
-            else if (i==1)
-                sceIoLseek(fd, startPos + 2 * size/3, PSP_SEEK_SET);
 		}
+        if (size == bufferSize)
+            break;
+        else if (i==0)
+            sceIoLseek(fd, startPos + size/3, PSP_SEEK_SET);
+        else if (i==1)
+            sceIoLseek(fd, startPos + 2 * size/3, PSP_SEEK_SET);
+
+        if (timeFromID3)
+            break;
 	}
 	mad_header_finish (&header);
 	mad_stream_finish (&stream);
