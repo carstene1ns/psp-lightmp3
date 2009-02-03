@@ -11,6 +11,7 @@ Version 2.0.0 RC2
 -Fixed: Korean language support.
 -Fixed: shuffle (always the same number were generated in RC1)
 -Fixed: Added sql transaction to playPlaylist (faster change of track)
+-Fixed: Bug in ID3v2.2 parsing
 
 
 Version 2.0.0 RC1
