@@ -249,7 +249,7 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
                         sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, 260, id3tag->ID3Artist);
          }
-         else if(!strncmp("TP2",tag,3)) /* Title */
+         else if(!strncmp("TT2",tag,3)) /* Title */
          {
                         sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, 260, id3tag->ID3Title);
@@ -278,18 +278,26 @@ void ParseID3v2_2(const char *mp3path, struct ID3Tag *id3tag)
          }
          else if(!strncmp("COM",tag,3)) /* Comment */
          {
-                        sceIoLseek(fp, 1, PSP_SEEK_CUR);
+            sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, 260, id3tag->ID3Comment);
          }
          else if(!strncmp("TCO",tag,3)) /* Genre */
          {
-                        sceIoLseek(fp, 1, PSP_SEEK_CUR);
+            sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, 260, id3tag->ID3GenreText);
+            if (id3tag->ID3GenreText[0] == '(' && id3tag->ID3GenreText[strlen(id3tag->ID3GenreText) - 1] == ')')
+            {
+                id3tag->ID3GenreText[0] = ' ';
+                id3tag->ID3GenreText[strlen(id3tag->ID3GenreText) - 1] = '\0';
+                int index = atoi(id3tag->ID3GenreText);
+                if (index >= 0 && index < genreNumber)
+                    strcpy(id3tag->ID3GenreText, genreList[index].text);
+            }
          }
          else if(!strncmp("PIC",tag,3)) /* Picture */
          {
-                        sceIoLseek(fp, 1, PSP_SEEK_CUR);
-                        sceIoLseek(fp, 5, PSP_SEEK_CUR);
+            sceIoLseek(fp, 1, PSP_SEEK_CUR);
+            sceIoLseek(fp, 5, PSP_SEEK_CUR);
             id3tag->ID3EncapsulatedPictureType = JPEG_IMAGE;
             id3tag->ID3EncapsulatedPictureOffset = searchJPGstart(fp, 20);
             if (id3tag->ID3EncapsulatedPictureOffset < 0){
@@ -382,8 +390,16 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, 260, id3tag->ID3GenreText);
+            if (id3tag->ID3GenreText[0] == '(' && id3tag->ID3GenreText[strlen(id3tag->ID3GenreText) - 1] == ')')
+            {
+                id3tag->ID3GenreText[0] = ' ';
+                id3tag->ID3GenreText[strlen(id3tag->ID3GenreText) - 1] = '\0';
+                int index = atoi(id3tag->ID3GenreText);
+                if (index >= 0 && index < genreNumber)
+                    strcpy(id3tag->ID3GenreText, genreList[index].text);
+            }
          }
-                 else if(!strncmp("COMM",tag,4)) /* Comment */
+         else if(!strncmp("COMM",tag,4)) /* Comment */
          {
             sceIoLseek(fp, 1, PSP_SEEK_CUR);
             readTagData(fp, tag_length - 1, 260, id3tag->ID3Comment);
