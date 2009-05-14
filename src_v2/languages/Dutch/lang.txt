@@ -1,0 +1,221 @@
+#Language   : Dutch
+#By         : Lennard Fonteijn
+#Contacts   : lennardfonteijn@hotmail.com
+
+#Encoding is one of: UTF-8, GBK, BIG5, SHIFT-JIS, EUC-KR, MS-EE, MS-CYRL, ISO-8859-1, ISO-8859-2
+ENCODING=ISO-8859-1
+TAG_ENCODING=ISO-8859-1
+
+#Language to use in the On Screen Keyboard.
+#			JAPANESE			0
+#			ENGLISH				1
+#			FRENCH				2
+#			SPANISH				3
+#			GERMAN				4
+#			ITALIAN				5
+#			DUTCH				6
+#			PORTUGUESE			7
+#			RUSSIAN				8
+#			KOREAN				9
+#			CHINESE_TRADITIONAL	10
+#			CHINESE_SIMPLIFIED	11
+OSK_LANGUAGE=6
+
+YES=Ja
+NO=Nee
+WAIT=Even wachten A.U.B...
+CHECK_BRIGHTNESS_TITLE=Helderheid waarschuwing
+CHECK_BRIGHTNESS=Verlaag scherm helderheid?
+BRIGHTNESS_NO=Nee
+BRIGHTNESS_YES_WARNING=Ja, met waarschuwing
+BRIGHTNESS_YES=Ja, zonder waarschuwing
+FREE_MEMORY=Geheugen:
+
+USB_ACTIVE=USB actief
+USB_MESSAGE=Druk op SELECT om USB te deactiveren.
+TITLE=Titel
+ARTIST=Artiest
+ALBUM=Album
+GENRE=Genre
+YEAR=Jaar
+TIME=Tijd
+TRACK=Nummer
+ADDING_PLAYLIST=Nummers aan de afspeellijst toevoegen
+RATING=Waardering
+PLAYED=Gespeeld
+NOT_SUPPORTED=Niet ondersteund
+
+MODE=Modus
+BITRATE=Bitrate
+SAMPLERATE=Samplerate
+LAYER=Laag
+FILE_FORMAT=Formaat
+EMPHASIS=Emphasis
+SLEEP_MODE=Slaap-modus
+PLAY_MODE=Afspeel-modus
+STATUS=Status
+VOLUME_BOOST=Volume boost
+EQUALIZER=Equalizer
+NOCOVER=Geen cover-art
+BUTTON_1=Verkenner
+BUTTON_2=Afspeellijsten
+BUTTON_3=AL-bewerker
+BUTTON_4=Media Bibliotheek
+BUTTON_5=Instellingen
+
+SLEEP_MODE_0=Uit
+SLEEP_MODE_1=Einde van het nummer
+SLEEP_MODE_2=Einde map/afspeellijst
+
+PLAY_MODE_0=Normaal
+PLAY_MODE_1=Alles herhalen
+PLAY_MODE_2=Nummer herhalen
+PLAY_MODE_3=Shuffle
+PLAY_MODE_4=Shuffle/herhalen
+
+PLAYER_STATUS_0=Bestand aan het openen
+PLAYER_STATUS_1=Gepauzeerd
+PLAYER_STATUS_2=Aan het afspelen
+
+CONFIRM_MESSAGE=X is bevestigen; O is annuleren
+CONFIRM_LOAD_TITLE=Bevestigen
+CONFIRM_LOAD=Geselecteerde afspeellijst laden?
+
+CONFIRM_REMOVE_TITLE=Bevestingen
+CONFIRM_REMOVE=Geselecteerde afspeellijst verwijderen?
+ASK_PLAYLIST_NAME=Afspeellijst naam invoeren
+
+CONFIRM_CLEAR_PLAYLIST_TITLE=Bevestigen
+CONFIRM_CLEAR_PLAYLIST=Deze afspeellijst legen?
+CONFIRM_REMOVE_FROM_PLAYLIST_TITLE=Bevestigen
+CONFIRM_REMOVE_FROM_PLAYLIST=Nummer van de afspeellijst verwijderen?
+PLAYLIST_NAME=Naam
+TOTAL_TRACKS=Nummers #
+
+SETTINGS_01=Uiterlijk
+SETTINGS_02=Taal
+SETTINGS_03=Schrijf Audio Scrobbler Log
+SETTINGS_04=Fadeout bij overslaan nummer
+SETTINGS_05=Gedempt volume
+SETTINGS_06=Helderheid controle
+SETTINGS_07=Speel MP3's met de Media Engine
+SETTINGS_08=Boost type voor MP3 met libMAD
+SETTINGS_09=Automatische CPU Kloksnelheid
+SETTINGS_10=CPU Kloksnelheid: GUI
+SETTINGS_11=CPU Kloksnelheid: MP3 libMAD
+SETTINGS_12=CPU Kloksnelheid: MP3 Media Engine
+SETTINGS_13=CPU Kloksnelheid: OGG Vorbis
+SETTINGS_14=CPU Kloksnelheid: Flac
+SETTINGS_15=CPU Kloksnelheid: ATRAC3
+CONFIRM_SAVE_SETTINGS_TITLE=Bevestigen
+CONFIRM_SAVE_SETTINGS=Instellingen nu opslaan?
+
+HELP_PLAYER_TITLE=Speler hulp
+HELP_PLAYER_01=R: Volgend nummer
+HELP_PLAYER_02=L: Vorig nummer
+HELP_PLAYER_03=Kruisje: Afspelen/pauzeren
+HELP_PLAYER_04=Rondje: Stoppen
+HELP_PLAYER_05=Vierkantje: Dempen-status wijzigen
+HELP_PLAYER_06=Driehoekje: Slaap-modus wijzigen
+HELP_PLAYER_07=Select: Afspeel-modus wijzigen
+HELP_PLAYER_08=Start: Scherm in- of uitschakelen
+HELP_PLAYER_09=Kruisje + Omhoog/Omlaag: Waardering wijzigen
+
+BROWSE_ARTIST=Verkennen per artiest
+BROWSE_ALBUM=Verkennen per album
+BROWSE_GENRE=Verkennen per genre
+BROWSE_RATING=Verkennen per waardering
+SEARCH=Zoeken
+SCAN_MS=Scan MS voor media
+
+CONFIRM_SCAN_MS_TITLE=Bevestigen
+CONFIRM_SCAN_MS=Scan de Memory Stick voor media?
+CHECKING_FILE=Bestanden op de Memory Stick aan het controleren
+SCANNING=Bezig met het scannen naar media op de Memory Stick
+MESSAGEBOX_CONTINUE=Druk op X om door te gaan
+SCAN_FINISHED=Memory stick gescanned
+MEDIA_FOUND=XX media-bestanden gevonden
+ASK_SEARCH_STRING=Zoekopdracht invoeren
+QUERY_RUNNING_TITLE=Even wachten A.U.B.
+QUERY_RUNNING=Zoekopdracht wordt uitgevoerd
+TOTAL_TIME=Totale tijd
+WORKING=Bezig
+
+#This is used for the message "xx% done"
+DONE=gedaan
+
+################################################################################
+#2.0.0 BETA2
+################################################################################
+ALL=Alles
+BOOST_NEW=Nieuw
+BOOST_OLD=Oud
+
+HELP_FILE_BROWSER_TITLE=Verkenner hulp
+HELP_FILE_BROWSER_01=Kruisje: Map openen/bestand afspelen
+HELP_FILE_BROWSER_02=Rondje: Map omhoog
+HELP_FILE_BROWSER_03=Vierkantje: Map afspelen
+HELP_FILE_BROWSER_04=Start: Map/bestand aan afspeelijst toevoegen
+HELP_FILE_BROWSER_05=Select: USB in- of uitschakelen
+
+HELP_PLAYLIST_BROWSER_TITLE=Afspeellijsten hulp
+HELP_PLAYLIST_BROWSER_01=Kruisje: Afspeellijst afspelen
+HELP_PLAYLIST_BROWSER_02=Rondje: Afspeellijst verwijderen
+HELP_PLAYLIST_BROWSER_03=Vierkantje: Afspeellijst in de AL-bewerker laden
+HELP_PLAYLIST_BROWSER_04=Start: Afspeellijst aan de AL-bewerker toevoegen
+
+CONFIRM_ADD_PLAYLIST_TITLE=Bevestigen
+CONFIRM_ADD_PLAYLIST=Afspeellijst aan de AL-bewerker toevoegen?
+
+HELP_PLAYLIST_EDITOR_TITLE=AL-bewerker hulp
+HELP_PLAYLIST_EDITOR_01=Vierkantje: Nummer omhoog verplaatsen
+HELP_PLAYLIST_EDITOR_02=Kruisje: Nummer omlaag verplaatsen
+HELP_PLAYLIST_EDITOR_03=Rondje: Nummer van afspeellijst verwijderen
+HELP_PLAYLIST_EDITOR_04=Driehoekje: Afspeellijst controleren
+HELP_PLAYLIST_EDITOR_05=Start: Afspeellijst opslaan
+HELP_PLAYLIST_EDITOR_06=Select: Afspeellijst legen 
+HELP_PLAYLIST_EDITOR_07=Muzieknootje: Nummer afspelen
+
+HELP_MEDIALIBRARY_TITLE=Media Bibliotheek hulp
+HELP_MEDIALIBRARY_01=Kruisje: Selectie openen/afspelen
+HELP_MEDIALIBRARY_02=Rondje:  Map omhoog
+HELP_MEDIALIBRARY_03=Vierkantje: Selectie afspelen
+HELP_MEDIALIBRARY_04=Start: Selectie aan afspeellijst toevoegen
+HELP_MEDIALIBRARY_05=Kruisje + Omhoog/Omlaag: Waardering wijzigen
+
+HELP_SETTINGS_TITLE=Instellingen hulp
+HELP_SETTINGS_01=Links/rechts: Instellingen veranderen
+HELP_SETTINGS_02=Start: Instellingen opslaan
+
+LOADING_SKIN_TITLE=Even wachten A.U.B.
+LOADING_SKIN=Nieuw uiterlijk aan het laden
+CHECKING_PLAYLIST=Afspeellijst aan het controleren
+
+SETTINGS_16=Toets-herhaling tussentijd
+SETTINGS_17=Laat opstartscherm zien
+
+BROWSE_TOP100=Top 100
+BROWSE_ALL=Alles verkennen
+
+################################################################################
+#2.0.0 RC1
+################################################################################
+HELP_MEDIALIBRARY_06=Driehoekje: Nummers sorteren
+
+ORDER_BY_01=Artiest, Album, Nummer#
+ORDER_BY_02=Artiest, Album, Titel
+ORDER_BY_03=Artiest, Titel
+ORDER_BY_04=Titel
+ORDER_BY_05=Jaar, Titel
+ORDER_BY_06=Jaar, Artiest, Album, Nummer#
+ORDER_BY_07=Jaar, Artiest, Album, Titel
+ORDER_BY_08=Waardering, Artiest, Album, Nummer#
+ORDER_BY_09=Waardering, Artiest, Album, Titel
+
+################################################################################
+#2.0.0 RC2
+################################################################################
+HELP_PLAYER_10=L + Rondje: Voeg toe aan favorieten en sluit
+CONFIRM_BOOKMARK_TITLE=Bevestingen
+CONFIRM_BOOKMARK=Voeg toe aan favorieten en sluit?
+CONFIRM_BOOKMARK_LOAD=Laad de opgeslagen favoriet?

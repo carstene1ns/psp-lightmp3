@@ -20,7 +20,7 @@
 
 #include "others/medialibrary.h"
 
-#define VERSION "2.0.0RC2"
+#define VERSION "2.0.0RC3"
 
 #define ML_DB "mediaLibrary.db"
 
@@ -37,7 +37,7 @@
 //Shared globals:
 extern struct settings *userSettings;
 extern int fileExtCount;
-extern char fileExt[8][5];
+extern char fileExt[9][5];
 extern char tempM3Ufile[264];
 extern char MLtempM3Ufile[264];
 extern struct libraryEntry MLresult[ML_BUFFERSIZE];

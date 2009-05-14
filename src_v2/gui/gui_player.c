@@ -570,6 +570,9 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 
     if (setFilePositionFunct != NULL && startFilePos > 0)
         (*setFilePositionFunct)(startFilePos);
+
+    time_t startTime;
+    sceKernelLibcTime(&startTime);
     (*playFunct)();
     playerStatus = 1;
 
@@ -847,12 +850,10 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 	cpuBoost();
 	//Srobbler LOG:
     if (userSettings->SCROBBLER && strlen(info->title)){
-        time_t mytime;
-        sceKernelLibcTime(&mytime);
         if (lastPercentage >= 50)
-            SCROBBLER_addTrack(*info, info->length, "L", mytime);
+            SCROBBLER_addTrack(*info, info->length, "L", startTime);
         else
-        	SCROBBLER_addTrack(*info, info->length, "S", mytime);
+        	SCROBBLER_addTrack(*info, info->length, "S", startTime);
     }
 
     unsetAudioFunctions();

@@ -1,6 +1,12 @@
 LightMP3 Changelog
 ------------------
 
+Version 2.0.0 RC3
+-----------------
+-Added: support for WMA (Windows Media Audio).
+        Many thanks to cooleyes and hrimfaxi for the sample
+
+
 Version 2.0.0 RC2
 -----------------
 -Added: Bookmark function (for audiobook): press L+Circle while listening to a track.
@@ -12,6 +18,7 @@ Version 2.0.0 RC2
 -Fixed: shuffle (always the same number were generated in RC1)
 -Fixed: Added sql transaction to playPlaylist (faster change of track)
 -Fixed: Bug in ID3v2.2 parsing
+-Fixed: Bug in scrobbler log (time saved to file was the end of the track)
 
 
 Version 2.0.0 RC1

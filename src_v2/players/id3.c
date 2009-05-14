@@ -340,11 +340,11 @@ void ParseID3v2_3(const char *mp3path, struct ID3Tag *id3tag)
       sceIoLseek(fp, 10, PSP_SEEK_SET);
 
       while (size != 0) {
-             sceIoRead(fp, tag, 4);
+         sceIoRead(fp, tag, 4);
          size -= 4;
 
          /* read 4 byte big endian tag length */
-                 sceIoRead(fp, &tag_length, sizeof(unsigned int));
+         sceIoRead(fp, &tag_length, sizeof(unsigned int));
          tag_length = (unsigned int) swapInt32BigToHost((int)tag_length);
          size -= 4;
 
@@ -451,7 +451,7 @@ void ParseID3v2_4(const char *mp3path, struct ID3Tag *id3tag)
       sceIoLseek(fp, 10, PSP_SEEK_SET);
 
       while (size != 0) {
-                 sceIoRead(fp, tag, 4);
+         sceIoRead(fp, tag, 4);
          size -= 4;
 
          /* read 4 byte big endian tag length */

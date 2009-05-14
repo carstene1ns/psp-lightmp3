@@ -368,7 +368,6 @@ int gui_fileBrowser(){
 					directoryUp(curDirShort);
                     int i;
                     opendir_close(&directory);
-					//debugMessageBox(curDir);
 					cpuBoost();
                     result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
                     buildMenuFromDirectory(&commonMenu, &directory, "");
@@ -389,13 +388,6 @@ int gui_fileBrowser(){
 					cpuBoost();
                     oslInitUsbStorage();
                     oslStartUsbStorage();
-                    /*int retVal = oslInitUsbStorage();
-                    if (retVal){
-                        snprintf(buffer, sizeof(buffer), "Error InitUsbStorage: %i", retVal);
-                        //debugMessageBox(buffer);
-                    }else{
-                        oslStartUsbStorage();
-                    }*/
                 }else{
                     oslStopUsbStorage();
                     oslDeinitUsbStorage();

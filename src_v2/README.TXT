@@ -41,7 +41,7 @@ FEATURES
 -Bookmark function for audiobook
 -Skinnable and multilanguage (english, italian, portuguese, french, polish, dutch)
 -Support for kernel 3.x and Slim&Light
--Support for MP3, OGG Vorbis, ATRAC3+ (*.aa3, *.omg, *.oma), FLAC
+-Support for MP3, OGG Vorbis, ATRAC3+ (*.aa3, *.omg, *.oma), FLAC, WMA
 -File browser
 -Support for m3u playlist
 -Playlist Editor
@@ -245,3 +245,4 @@ MANY THANKS TO
 -cooleyes for the fat driver
 -dario1crisafulli for the skins, ICON0 and PIC1 images.
 -Kevin Kim for his work for better Korean language support and other fixes/improvements
+-cooleyes and hrimfaxi for the WMA decode sample 
