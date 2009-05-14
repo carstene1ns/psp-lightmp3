@@ -31,7 +31,7 @@
 #include "../system/opendir.h"
 
 //shared global vars
-char fileTypeDescription[5][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC", "AAC"};
+char fileTypeDescription[6][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC", "AAC", "WMA"};
 int MUTED_VOLUME = 800;
 int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;
@@ -124,8 +124,11 @@ int initMEAudioModules(){
        if (sceKernelDevkitVersion() == 0x01050001){
            LoadStartAudioModule("flash0:/kd/me_for_vsh.prx", PSP_MEMORY_PARTITION_KERNEL);
            LoadStartAudioModule("flash0:/kd/audiocodec.prx", PSP_MEMORY_PARTITION_KERNEL);
-       }else
+       }else{
            sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
+		   sceUtilityLoadAvModule(PSP_AV_MODULE_ATRAC3PLUS); 
+	   }
+
        HW_ModulesInit = 1;
    }
    return 0;
@@ -450,6 +453,37 @@ int setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = AAC_suspend;
         resumeFunct = AAC_resume;
         fadeOutFunct = AAC_fadeOut;
+		return 0;
+    } else if (!stricmp(ext, "WMA")){
+        //WMA
+		initFunct = WMA_Init;
+		loadFunct = WMA_Load;
+		playFunct = WMA_Play;
+		pauseFunct = WMA_Pause;
+		endFunct = WMA_End;
+        setVolumeBoostTypeFunct = WMA_setVolumeBoostType;
+        setVolumeBoostFunct = WMA_setVolumeBoost;
+        getInfoFunct = WMA_GetInfo;
+        getTagInfoFunct = WMA_GetTagInfoOnly;
+        getTimeStringFunct = WMA_GetTimeString;
+        getPercentageFunct = WMA_GetPercentage;
+        getPlayingSpeedFunct = WMA_getPlayingSpeed;
+        setPlayingSpeedFunct = WMA_setPlayingSpeed;
+        endOfStreamFunct = WMA_EndOfStream;
+
+        setMuteFunct = WMA_setMute;
+        setFilterFunct = WMA_setFilter;
+        enableFilterFunct = WMA_enableFilter;
+        disableFilterFunct = WMA_disableFilter;
+        isFilterEnabledFunct = WMA_isFilterEnabled;
+        isFilterSupportedFunct = WMA_isFilterSupported;
+
+        suspendFunct = WMA_suspend;
+        resumeFunct = WMA_resume;
+        fadeOutFunct = WMA_fadeOut;
+
+        getFilePositionFunct = WMA_getFilePosition;
+        setFilePositionFunct = WMA_setFilePosition;
 		return 0;
     }
 	return -1;

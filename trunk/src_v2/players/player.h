@@ -37,6 +37,7 @@
 #include "oggplayer.h"
 #include "flacplayer.h"
 #include "aacplayer.h"
+#include "wmaplayerme.h"
 
 #define OPENING_OK 0
 #define ERROR_OPENING -1
@@ -49,6 +50,7 @@
 #define AT3_TYPE 2
 #define FLAC_TYPE 3
 #define AAC_TYPE 4
+#define WMA_TYPE 5
 #define UNK_TYPE -1
 
 #define FASTFORWARD_VOLUME 0x2200
@@ -58,7 +60,7 @@
 
 extern int CLOCK_WHEN_PAUSE;
 
-extern char fileTypeDescription[5][20];
+extern char fileTypeDescription[6][20];
 
 extern int MUTED_VOLUME;
 extern int currentVolume;
