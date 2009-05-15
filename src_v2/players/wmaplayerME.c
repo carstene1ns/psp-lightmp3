@@ -60,11 +60,11 @@ static double WMA_tagsize = 0;
 static SceUID WMA_handle = -1;
 
 unsigned long WMA_codec_buffer[65] __attribute__((aligned(64)));
-short WMA_mix_buffer[8192] __attribute__((aligned(64)));
-short WMA_cache_buffer[16384] __attribute__((aligned(64)));
+static short WMA_mix_buffer[8192] __attribute__((aligned(64)));
+static short WMA_cache_buffer[16384] __attribute__((aligned(64)));
 unsigned long WMA_cache_samples = 0;
 
-short WMA_output_buffer[2][WMA_OUTPUT_BUFFER_SIZE * 2] __attribute__((aligned(64)));
+static short WMA_output_buffer[2][WMA_OUTPUT_BUFFER_SIZE * 2] __attribute__((aligned(64)));
 int WMA_output_index = 0;
 
 void* WMA_frame_buffer;
@@ -460,14 +460,18 @@ void WMA_Init(int channel){
 
         int devkitVersion = sceKernelDevkitVersion();
         SceUID modid = -1;
-        if ( devkitVersion < 0x03050000)
+        /*if ( devkitVersion < 0x03050000)
             modid = pspSdkLoadStartModule("libasfparser330.prx", PSP_MEMORY_PARTITION_USER);
         else if ( devkitVersion < 0x03070000)
             modid = pspSdkLoadStartModule("libasfparser350.prx", PSP_MEMORY_PARTITION_USER);
         else
             modid = pspSdkLoadStartModule("libasfparser370.prx", PSP_MEMORY_PARTITION_USER);
 		if (modid < 0)
-			pspDebugScreenPrintf("Error loading libasfparserXXX.prx\n");
+			pspDebugScreenPrintf("Error loading libasfparserXXX.prx\n");*/
+
+        modid = pspSdkLoadStartModule("flash0:/kd/libasfparser.prx", PSP_MEMORY_PARTITION_USER);
+		if (modid < 0)
+			pspDebugScreenPrintf("Error loading libasfparser.prx\n");
 
         modid = pspSdkLoadStartModule("cooleyesBridge.prx", PSP_MEMORY_PARTITION_KERNEL);
 		if (modid < 0)
