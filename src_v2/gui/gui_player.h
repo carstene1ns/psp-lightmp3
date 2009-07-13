@@ -26,5 +26,9 @@
 #define SLEEP_NONE 0
 #define SLEEP_TRACK 1
 #define SLEEP_PLAYLIST 2
+#define SLEEP_30 3
+#define SLEEP_60 4
+#define SLEEP_90 5
+#define SLEEP_120 6
 
 int gui_player();

@@ -72,11 +72,12 @@ static OSL_IMAGE *progress;
 static OSL_IMAGE *playerStatusBkg;
 static char buffer[264];
 
-static char sleepModeDesc[3][102];
+static char sleepModeDesc[7][102];
 static char playModeDesc[5][102];
 static char playerStatusDesc[3][102];
 static int playerStatus = 0; //-1=open 0=paused 1=playing
 static struct equalizer tEQ;
+static u64 sleepStartTime = 0; //Current ticks when sleep timer was started.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draws a file's info
@@ -785,8 +786,10 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
                 sceKernelDelayThread(100000);
             }else if (osl_pad.released.triangle){
         		//Change sleep mode:
-        		if (++userSettings->sleepMode > SLEEP_PLAYLIST)
+        		if (++userSettings->sleepMode > SLEEP_120)
         			userSettings->sleepMode = 0;
+				if (userSettings->sleepMode >= SLEEP_30)
+					sceRtcGetCurrentTick(&sleepStartTime);
     		}else if(osl_pad.released.note){
     			//Cambio equalizzatore:
                 if ((*isFilterSupportedFunct)()){
@@ -874,8 +877,24 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 
     //Sleep mode:
     if (userSettings->sleepMode == SLEEP_TRACK){
-      osl_quit = 1;
-      userSettings->shutDown = 1;
+		osl_quit = 1;
+		userSettings->shutDown = 1;
+    }
+    else {
+    	//Not sure whether the resolution is dependent on the current clock speed, so safer to get 'res' everytime:
+    	u32 res = sceRtcGetTickResolution();
+		u64 currentTime = 0;
+		sceRtcGetCurrentTick(&currentTime);
+		u32 diff = (u32)((currentTime - sleepStartTime)/((float)res));
+
+    	if (((userSettings->sleepMode == SLEEP_30) && (diff >= 30*60)) ||\
+			((userSettings->sleepMode == SLEEP_60) && (diff >= 60*60)) ||\
+			((userSettings->sleepMode == SLEEP_90) && (diff >= 90*60)) ||\
+			((userSettings->sleepMode == SLEEP_120) && (diff >= 120*60))) {
+			userSettings->sleepMode = SLEEP_NONE;
+			scePowerRequestSuspend(); //Suspend is probably better than Standby over here as they might want to turn it on again and continue listening.
+			sceKernelDelayThread(3000*1000); //Makes it Suspend immediately right here before the next file handle is opened and invalidated due to Suspend.
+    	}
     }
 	cpuRestore();
     return retValue;
@@ -1109,6 +1128,14 @@ int gui_player(){
 	sleepModeDesc[1][100] = '\0';
 	strncpy(sleepModeDesc[2], langGetString("SLEEP_MODE_2"), 100);
 	sleepModeDesc[2][100] = '\0';
+	strncpy(sleepModeDesc[3], langGetString("SLEEP_MODE_3"), 100);
+	sleepModeDesc[3][100] = '\0';
+    strncpy(sleepModeDesc[4], langGetString("SLEEP_MODE_4"), 100);
+	sleepModeDesc[4][100] = '\0';
+	strncpy(sleepModeDesc[5], langGetString("SLEEP_MODE_5"), 100);
+	sleepModeDesc[5][100] = '\0';
+	strncpy(sleepModeDesc[6], langGetString("SLEEP_MODE_6"), 100);
+	sleepModeDesc[6][100] = '\0';
 
     strncpy(playModeDesc[0], langGetString("PLAY_MODE_0"), 100);
 	playModeDesc[0][100] = '\0';

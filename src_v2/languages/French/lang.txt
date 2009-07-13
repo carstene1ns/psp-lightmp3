@@ -217,3 +217,11 @@ HELP_PLAYER_10=L + Circle to create a bookmark and exit
 CONFIRM_BOOKMARK_TITLE=Confirm
 CONFIRM_BOOKMARK=Create a bookmark and exit?
 CONFIRM_BOOKMARK_LOAD=Load the saved bookmark?
+
+################################################################################
+#2.0.0 RC3
+################################################################################
+SLEEP_MODE_3=0:30 Hour
+SLEEP_MODE_4=1:00 Hour
+SLEEP_MODE_5=1:30 Hours
+SLEEP_MODE_6=2:00 Hours

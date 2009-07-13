@@ -37,7 +37,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static int WMA_initDone = 0;
 static int WMA_threadActive = 0;
 static char WMA_fileName[264];
 static int WMA_isPlaying = 0;
@@ -239,7 +238,6 @@ int WMA_decodeThread(SceSize args, void *argp){
                     }
                 }
                 audioOutput(WMA_volume, WMA_output_buffer[WMA_output_index]);
-                //sceAudioSRCOutputBlocking(WMA_volume, WMA_output_buffer[WMA_output_index]);
 				WMA_output_index = (WMA_output_index + 1) % 2;
 				continue;
 			}
@@ -247,7 +245,6 @@ int WMA_decodeThread(SceSize args, void *argp){
 			memset(WMA_frame_buffer, 0, WMA_block_align);
 			parser->sFrame.pData = WMA_frame_buffer;
 			ret = sceAsfGetFrameData(parser, 1, &parser->sFrame);
-			//mesg("sceAsfGetFrameData = 0x%08x\n", ret);
 
 			if (ret < 0) {
 				WMA_eof = 1;
@@ -303,20 +300,9 @@ int WMA_decodeThread(SceSize args, void *argp){
 
 
 void getWMATagInfo(char *filename, struct fileInfo *targetInfo){
-    //ID3:
-    struct ID3Tag ID3;
     strcpy(WMA_fileName, filename);
-    ParseID3(filename, &ID3);
-    strcpy(targetInfo->title, ID3.ID3Title);
-    strcpy(targetInfo->artist, ID3.ID3Artist);
-    strcpy(targetInfo->album, ID3.ID3Album);
-    strcpy(targetInfo->year, ID3.ID3Year);
-    strcpy(targetInfo->genre, ID3.ID3GenreText);
-    strcpy(targetInfo->trackNumber, ID3.ID3TrackText);
-    targetInfo->length = ID3.ID3Length;
-    targetInfo->encapsulatedPictureType = ID3.ID3EncapsulatedPictureType;
-    targetInfo->encapsulatedPictureOffset = ID3.ID3EncapsulatedPictureOffset;
-    targetInfo->encapsulatedPictureLength = ID3.ID3EncapsulatedPictureLength;
+
+	strcpy(targetInfo->title, filename);
 
     WMA_info = *targetInfo;
     WMA_tagRead = 1;
@@ -402,6 +388,8 @@ int WMAgetInfo(){
 	WMA_info.hz = *((u32*)(need_mem_buffer+4));
 	WMA_format_tag = 0x0161;
 	WMA_avg_bytes_per_sec = *((u32*)(need_mem_buffer+8));
+    WMA_info.kbit = WMA_avg_bytes_per_sec * 8 / 1000;
+    WMA_info.instantBitrate = WMA_avg_bytes_per_sec * 8;
 	WMA_block_align = *((u16*)(need_mem_buffer+12));
 	WMA_bits_per_sample = 16;
 	WMA_flag = *((u16*)(need_mem_buffer+14));
@@ -453,33 +441,7 @@ void WMA_Init(int channel){
     MIN_PLAYING_SPEED=-10;
     MAX_PLAYING_SPEED=9;
 
-    if (!WMA_initDone)
-    {
-		int result = sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
-		result = sceUtilityLoadAvModule(PSP_AV_MODULE_ATRAC3PLUS);
-
-        int devkitVersion = sceKernelDevkitVersion();
-        SceUID modid = -1;
-        /*if ( devkitVersion < 0x03050000)
-            modid = pspSdkLoadStartModule("libasfparser330.prx", PSP_MEMORY_PARTITION_USER);
-        else if ( devkitVersion < 0x03070000)
-            modid = pspSdkLoadStartModule("libasfparser350.prx", PSP_MEMORY_PARTITION_USER);
-        else
-            modid = pspSdkLoadStartModule("libasfparser370.prx", PSP_MEMORY_PARTITION_USER);
-		if (modid < 0)
-			pspDebugScreenPrintf("Error loading libasfparserXXX.prx\n");*/
-
-        modid = pspSdkLoadStartModule("flash0:/kd/libasfparser.prx", PSP_MEMORY_PARTITION_USER);
-		if (modid < 0)
-			pspDebugScreenPrintf("Error loading libasfparser.prx\n");
-
-        modid = pspSdkLoadStartModule("cooleyesBridge.prx", PSP_MEMORY_PARTITION_KERNEL);
-		if (modid < 0)
-			pspDebugScreenPrintf("Error loading cooleyesBridge.prx\n");
-
-        cooleyesMeBootStart(devkitVersion, 3);
-        WMA_initDone = 1;
-    }
+	initMEAudioModules();
     initFileInfo(&WMA_info);
     WMA_tagRead = 0;
 }
