@@ -880,7 +880,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 		osl_quit = 1;
 		userSettings->shutDown = 1;
     }
-    else {
+    else if ((userSettings->sleepMode >= SLEEP_30) && (userSettings->sleepMode <= SLEEP_120)) {
     	//Not sure whether the resolution is dependent on the current clock speed, so safer to get 'res' everytime:
     	u32 res = sceRtcGetTickResolution();
 		u64 currentTime = 0;
