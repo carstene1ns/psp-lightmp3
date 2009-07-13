@@ -29,6 +29,8 @@
 #include <pspaudio.h>
 #include "player.h"
 #include "../system/opendir.h"
+#include "cooleyesBridge.h"
+#include "libasfparser/pspasfparser.h"
 
 //shared global vars
 char fileTypeDescription[6][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC", "AAC", "WMA"};
@@ -126,7 +128,20 @@ int initMEAudioModules(){
            LoadStartAudioModule("flash0:/kd/audiocodec.prx", PSP_MEMORY_PARTITION_KERNEL);
        }else{
            sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
-		   sceUtilityLoadAvModule(PSP_AV_MODULE_ATRAC3PLUS); 
+		   sceUtilityLoadAvModule(PSP_AV_MODULE_ATRAC3PLUS);
+
+            int devkitVersion = sceKernelDevkitVersion();
+            SceUID modid = -1;
+
+            modid = pspSdkLoadStartModule("flash0:/kd/libasfparser.prx", PSP_MEMORY_PARTITION_USER);
+            if (modid < 0)
+                pspDebugScreenPrintf("Error loading libasfparser.prx\n");
+
+            modid = pspSdkLoadStartModule("cooleyesBridge.prx", PSP_MEMORY_PARTITION_KERNEL);
+            if (modid < 0)
+                pspDebugScreenPrintf("Error loading cooleyesBridge.prx\n");
+
+            cooleyesMeBootStart(devkitVersion, 3);
 	   }
 
        HW_ModulesInit = 1;

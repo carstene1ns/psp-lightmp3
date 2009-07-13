@@ -221,3 +221,11 @@ HELP_PLAYER_10=L + Circle per creare un segnalibro
 CONFIRM_BOOKMARK_TITLE=Conferma
 CONFIRM_BOOKMARK=Creare un segnalibro ed uscire?
 CONFIRM_BOOKMARK_LOAD=Caricare il segnalibro salvato?
+
+################################################################################
+#2.0.0 RC3
+################################################################################
+SLEEP_MODE_3=0:30 Hour
+SLEEP_MODE_4=1:00 Hour
+SLEEP_MODE_5=1:30 Hours
+SLEEP_MODE_6=2:00 Hours

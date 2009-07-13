@@ -173,7 +173,7 @@ HELP_PLAYLIST_EDITOR_02=Kruisje: Nummer omlaag verplaatsen
 HELP_PLAYLIST_EDITOR_03=Rondje: Nummer van afspeellijst verwijderen
 HELP_PLAYLIST_EDITOR_04=Driehoekje: Afspeellijst controleren
 HELP_PLAYLIST_EDITOR_05=Start: Afspeellijst opslaan
-HELP_PLAYLIST_EDITOR_06=Select: Afspeellijst legen 
+HELP_PLAYLIST_EDITOR_06=Select: Afspeellijst legen
 HELP_PLAYLIST_EDITOR_07=Muzieknootje: Nummer afspelen
 
 HELP_MEDIALIBRARY_TITLE=Media Bibliotheek hulp
@@ -219,3 +219,11 @@ HELP_PLAYER_10=L + Rondje: Voeg toe aan favorieten en sluit
 CONFIRM_BOOKMARK_TITLE=Bevestingen
 CONFIRM_BOOKMARK=Voeg toe aan favorieten en sluit?
 CONFIRM_BOOKMARK_LOAD=Laad de opgeslagen favoriet?
+
+################################################################################
+#2.0.0 RC3
+################################################################################
+SLEEP_MODE_3=0:30 Hour
+SLEEP_MODE_4=1:00 Hour
+SLEEP_MODE_5=1:30 Hours
+SLEEP_MODE_6=2:00 Hours
