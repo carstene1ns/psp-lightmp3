@@ -438,8 +438,8 @@ void WMA_Init(int channel){
     WMA_playingTime = 0;
 	WMA_volume_boost = 0;
 	WMA_volume = PSP_AUDIO_VOLUME_MAX;
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED=-119;
+    MAX_PLAYING_SPEED=119;
 
 	initMEAudioModules();
     initFileInfo(&WMA_info);

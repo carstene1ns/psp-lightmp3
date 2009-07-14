@@ -264,8 +264,8 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				AT3_OutputPtr = AT3_OutputBuffer[OutputBuffer_flip];
 		        //Check for playing speed:
                 if (AA3ME_playingSpeed){
-                    sceIoLseek32(AA3ME_handle, sceIoLseek32(AA3ME_handle, 0, PSP_SEEK_CUR) + data_align * 3 * AA3ME_playingSpeed, PSP_SEEK_SET);
-                    AA3ME_playingTime += (float)(data_align * 3 * AA3ME_playingSpeed) / (float)data_align * (float)sample_per_frame/(float)samplerate;
+                    sceIoLseek32(AA3ME_handle, sceIoLseek32(AA3ME_handle, 0, PSP_SEEK_CUR) + data_align * AA3ME_playingSpeed, PSP_SEEK_SET);
+                    AA3ME_playingTime += (float)(data_align * AA3ME_playingSpeed) / (float)data_align * (float)sample_per_frame/(float)samplerate;
                 }
 			}
 		}
@@ -470,8 +470,8 @@ void AA3ME_Init(int channel){
     AA3ME_audio_channel = channel;
     AA3ME_playingTime = 0;
     AA3ME_volume = PSP_AUDIO_VOLUME_MAX;
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED=-119;
+    MAX_PLAYING_SPEED=119;
 
     initFileInfo(&AA3ME_info);
     AA3ME_tagRead = 0;

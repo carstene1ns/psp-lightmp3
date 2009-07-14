@@ -37,8 +37,8 @@ char fileTypeDescription[6][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC", "AAC"
 int MUTED_VOLUME = 800;
 int MAX_VOLUME_BOOST=15;
 int MIN_VOLUME_BOOST=-15;
-int MIN_PLAYING_SPEED=0;
-int MAX_PLAYING_SPEED=9;
+int MIN_PLAYING_SPEED=-119;
+int MAX_PLAYING_SPEED=119;
 int currentVolume = 0;
 int CLOCK_WHEN_PAUSE = 0;
 

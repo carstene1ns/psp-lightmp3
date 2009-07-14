@@ -282,8 +282,8 @@ void MP3_Init(int channel){
 
     pspAudioSetChannelCallback(myChannel, MP3Callback,0);
 
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED=-119;
+    MAX_PLAYING_SPEED=119;
 
     /* First the structures used by libmad must be initialized. */
     mad_stream_init(&Stream);

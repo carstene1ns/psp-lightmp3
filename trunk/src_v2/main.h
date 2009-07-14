@@ -25,7 +25,7 @@
 #define ML_DB "mediaLibrary.db"
 
 #define DISPLAY_FADE_TIME 0.2
-#define FFWDREW_CPU_BOOST 20
+#define FFWDREW_CPU_BOOST 100
 
 #define MODE_FILEBROWSER 0
 #define MODE_PLAYLISTS 1

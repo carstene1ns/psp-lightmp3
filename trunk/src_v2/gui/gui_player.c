@@ -750,10 +750,18 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
             			(*setVolumeBoostFunct)(--userSettings->volumeBoost);
             }else if (osl_pad.released.right && playerStatus == 1){
                 currentSpeed = (*getPlayingSpeedFunct)();
-                if (currentSpeed < MAX_PLAYING_SPEED){
-					(*setPlayingSpeedFunct)(++currentSpeed);
+				if (currentSpeed < MAX_PLAYING_SPEED){
+					if (currentSpeed < 0)
+						currentSpeed = 0;
+					else if (currentSpeed < 9)
+						currentSpeed = 9;
+					else if (currentSpeed < 29)
+						currentSpeed = 29;
+					else
+						currentSpeed = MAX_PLAYING_SPEED;
+
 					if (userSettings->CLOCK_AUTO){
-						if (currentSpeed == 1){
+						if (currentSpeed == 9){
 						    setBusClock(userSettings->BUS);
 							setCpuClock(getCpuClock() + FFWDREW_CPU_BOOST);
 						}else if (currentSpeed == 0){
@@ -761,13 +769,22 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 							setCpuClock(getCpuClock() - FFWDREW_CPU_BOOST);
 						}
 					}
+					(*setPlayingSpeedFunct)(currentSpeed);
 				}
             }else if (osl_pad.released.left && playerStatus == 1){
                 currentSpeed = (*getPlayingSpeedFunct)();
-                if (currentSpeed > MIN_PLAYING_SPEED){
-                    (*setPlayingSpeedFunct)(--currentSpeed);
+				if (currentSpeed > MIN_PLAYING_SPEED){
+					if (currentSpeed > 0)
+						currentSpeed = 0;
+					else if (currentSpeed > -9)
+						currentSpeed = -9;
+					else if (currentSpeed > -29)
+						currentSpeed = -29;
+					else
+						currentSpeed = MIN_PLAYING_SPEED;
+
 					if (userSettings->CLOCK_AUTO){
-						if (currentSpeed == -1){
+						if (currentSpeed == -9){
 						    setBusClock(userSettings->BUS);
 							setCpuClock(getCpuClock() + FFWDREW_CPU_BOOST);
 						}else if (currentSpeed == 0){
@@ -775,6 +792,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 							setCpuClock(getCpuClock() - FFWDREW_CPU_BOOST);
 						}
 					}
+					(*setPlayingSpeedFunct)(currentSpeed);
 				}
             }else if (osl_pad.analogY < -ANALOG_SENS && !osl_pad.pressed.hold){
                 if (clock < 222)
