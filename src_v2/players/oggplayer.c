@@ -263,8 +263,8 @@ void OGGgetInfo(){
 
 void OGG_Init(int channel){
     initAudioLib();
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED=-119;
+    MAX_PLAYING_SPEED=119;
     initFileInfo(&OGG_info);
     OGG_tagRead = 0;
     OGG_audio_channel = channel;
@@ -435,7 +435,7 @@ int OGG_setPlayingSpeed(int playingSpeed){
 			setVolume(OGG_audio_channel, 0x8000);
 		else
 			setVolume(OGG_audio_channel, FASTFORWARD_VOLUME);
-        OGG_playingDelta = PSP_NUM_AUDIO_SAMPLES * 4 * OGG_playingSpeed;
+        OGG_playingDelta = PSP_NUM_AUDIO_SAMPLES * (int)(OGG_playingSpeed/2);
 		return 0;
 	}else{
 		return -1;

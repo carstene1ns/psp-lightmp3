@@ -193,8 +193,8 @@ int AACgetInfo(){
 /////////////////////////////////////////////////////////////////////////////////////////
 void AAC_Init(int channel){
     initAudioLib();
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED=-119;
+    MAX_PLAYING_SPEED=119;
     AAC_audio_channel = channel;
     pspAudioSetChannelCallback(AAC_audio_channel, AACDecodeThread, NULL);
     hAACDecoder = (HAACDecoder *) AACInitDecoder();

@@ -325,8 +325,8 @@ void FLACgetInfo(char *filename){
 
 void FLAC_Init(int channel){
     initAudioLib();
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED=-119;
+    MAX_PLAYING_SPEED=119;
 	FLAC_audio_channel = channel;
 	samples_played = 0;
     bufferLow = sceKernelCreateSema("bufferLow", 0, 1, 1, 0);
@@ -482,7 +482,7 @@ int FLAC_setPlayingSpeed(int playingSpeed){
 			setVolume(FLAC_audio_channel, 0x8000);
 		else
 			setVolume(FLAC_audio_channel, FASTFORWARD_VOLUME);
-        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * 5 * playingSpeed;
+        FLAC_playingDelta = PSP_NUM_AUDIO_SAMPLES * playingSpeed;
 		FLAC_playingSpeed = playingSpeed;
 		return 0;
 	}else{

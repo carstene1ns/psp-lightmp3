@@ -271,7 +271,7 @@ int decodeThread(SceSize args, void *argp){
 		        //Check for playing speed:
                 if (MP3ME_playingSpeed){
                     long old_start = data_start;
-                    if (sceIoLseek32(MP3ME_handle, frame_size * 8 * MP3ME_playingSpeed, PSP_SEEK_CUR) != old_start){
+                    if (sceIoLseek32(MP3ME_handle, frame_size * MP3ME_playingSpeed, PSP_SEEK_CUR) != old_start){
                         data_start = SeekNextFrameMP3(MP3ME_handle);
                         if(data_start < 0){
                             MP3ME_eof = 1;
@@ -521,8 +521,8 @@ void MP3ME_Init(int channel){
     MP3ME_playingTime = 0;
 	MP3ME_volume_boost = 0;
 	MP3ME_volume = PSP_AUDIO_VOLUME_MAX;
-    MIN_PLAYING_SPEED=-10;
-    MAX_PLAYING_SPEED=9;
+    MIN_PLAYING_SPEED=-119;
+    MAX_PLAYING_SPEED=119;
 	initMEAudioModules();
     initFileInfo(&MP3ME_info);
     MP3ME_tagRead = 0;
