@@ -602,42 +602,44 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 		}
 		headphone = sceHprmIsHeadphoneExist();
 
-		//Spengo il display se HOLD:
-        if (osl_pad.pressed.hold && userSettings->displayStatus){
-			//Spengo il display:
-			userSettings->curBrightness = getBrightness();
-			if (!info->needsME){
-				cpuBoost();
-				fadeDisplay(0, DISPLAY_FADE_TIME);
-				cpuRestore();
-			}else
-				fadeDisplay(0, DISPLAY_FADE_TIME);
-			displayDisable();
-			imposeSetHomePopup(0);
-			userSettings->displayStatus = 0;
-			//Downclock:
-			if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
-				setCpuClock(clock - userSettings->CLOCK_DELTA_ECONOMY_MODE);
-		}
+		if (userSettings->HOLD_DISPLAYOFF){
+			//Spengo il display se HOLD:
+			if (osl_pad.pressed.hold && userSettings->displayStatus){
+				//Spengo il display:
+				userSettings->curBrightness = getBrightness();
+				if (!info->needsME){
+					cpuBoost();
+					fadeDisplay(0, DISPLAY_FADE_TIME);
+					cpuRestore();
+				}else
+					fadeDisplay(0, DISPLAY_FADE_TIME);
+				displayDisable();
+				imposeSetHomePopup(0);
+				userSettings->displayStatus = 0;
+				//Downclock:
+				if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
+					setCpuClock(clock - userSettings->CLOCK_DELTA_ECONOMY_MODE);
+			}
 
-		//Accendo il display al release di hold:
-		if (osl_pad.released.hold && !userSettings->displayStatus){
-			//Accendo il display:
-			if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
-				setCpuClock(clock);
-			drawPlayer(status, &libEntry, trackMessage);
-			oslEndFrame();
-			skip = oslSyncFrame();
-			displayEnable();
-			setBrightness(0);
-			imposeSetHomePopup(1);
-			if (!info->needsME){
-				cpuBoost();
-				fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
-				cpuRestore();
-			}else
-				fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
-			userSettings->displayStatus = 1;
+			//Accendo il display al release di hold:
+			if (osl_pad.released.hold && !userSettings->displayStatus){
+				//Accendo il display:
+				if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
+					setCpuClock(clock);
+				drawPlayer(status, &libEntry, trackMessage);
+				oslEndFrame();
+				skip = oslSyncFrame();
+				displayEnable();
+				setBrightness(0);
+				imposeSetHomePopup(1);
+				if (!info->needsME){
+					cpuBoost();
+					fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
+					cpuRestore();
+				}else
+					fadeDisplay(userSettings->curBrightness, DISPLAY_FADE_TIME);
+				userSettings->displayStatus = 1;
+			}
 		}
 
         lastPercentage = (*getPercentageFunct)();
