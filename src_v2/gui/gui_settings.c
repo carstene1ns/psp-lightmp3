@@ -110,6 +110,9 @@ int getSettingVal(int index, char *value, int valueLimit){
         case 16:
             snprintf(value, valueLimit, "%s", yesNo[userSettings->SHOW_SPLASH]);
             break;
+		case 17:
+            snprintf(value, valueLimit, "%s", yesNo[userSettings->HOLD_DISPLAYOFF]);
+            break;
 	}
 
     return 0;
@@ -163,7 +166,7 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     char settingVal[50] = "";
     struct menuElement tMenuEl;
 
-    menu->numberOfElements = 17;
+    menu->numberOfElements = 18;
 
     values->first = menu->first;
     values->selected = menu->selected;
@@ -264,7 +267,7 @@ int changeSettingVal(int index, int delta){
 			oslIntraFontShutdown();
 			initFonts();
             loadFonts();
-            
+
             buildSettingsMenu(&commonMenu, &commonSubMenu);
             break;
         case 2:
@@ -335,6 +338,9 @@ int changeSettingVal(int index, int delta){
             break;
         case 16:
             userSettings->SHOW_SPLASH = !userSettings->SHOW_SPLASH;
+            break;
+		case 17:
+            userSettings->HOLD_DISPLAYOFF = !userSettings->HOLD_DISPLAYOFF;
             break;
     }
     return 0;

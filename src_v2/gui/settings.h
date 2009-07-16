@@ -79,6 +79,7 @@ struct settings{
 
     char mediaLibraryRoot[264];
     int shutDownAfterBookmark;
+    int HOLD_DISPLAYOFF;
 };
 
 int SETTINGS_load(char *fileName);
