@@ -245,4 +245,4 @@ MANY THANKS TO
 -cooleyes for the fat driver
 -dario1crisafulli for the skins, ICON0 and PIC1 images.
 -Kevin Kim for his work for better Korean language support and other fixes/improvements
--cooleyes and hrimfaxi for the WMA decode sample 
+-cooleyes and hrimfaxi for the WMA decode sample

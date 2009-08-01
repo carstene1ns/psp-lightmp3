@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <unistd.h>
 
 #include "id3.h"
 #include "mp3xing.h"
@@ -97,6 +98,7 @@ int decodeThread(SceSize args, void *argp){
     OutputBuffer_flip = 0;
     OutputPtrME = OutputBuffer[0];
 
+    sceIoChdir(audioCurrentDir);
     MP3ME_handle = sceIoOpen(MP3ME_fileName, PSP_O_RDONLY, 0777);
     if (MP3ME_handle < 0)
         MP3ME_threadActive = 0;
@@ -533,6 +535,9 @@ int MP3ME_Load(char *fileName){
     MP3ME_filePos = 0;
     MP3ME_playingSpeed = 0;
     MP3ME_isPlaying = 0;
+
+    getcwd(audioCurrentDir, 256);
+
     //initFileInfo(&MP3ME_info);
     strcpy(MP3ME_fileName, fileName);
     if (MP3MEgetInfo() != 0){
