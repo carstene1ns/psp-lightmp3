@@ -3,6 +3,7 @@ LightMP3 Changelog
 
 Version 2.0.0 RC3
 -----------------
+-Added: support for relative pathin playlists
 -Added: support for WMA (Windows Media Audio).
         Many thanks to cooleyes and hrimfaxi for the sample
 -Added: "Sleep Timer" feature (kurian2z5)

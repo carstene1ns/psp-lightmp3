@@ -22,6 +22,7 @@
 //    and the source code of Music prx by joek2100
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "player.h"
 #include "id3.h"
@@ -76,6 +77,7 @@ int AA3ME_decodeThread(SceSize args, void *argp){
     OutputBuffer_flip = 0;
     AT3_OutputPtr = AT3_OutputBuffer[0];
 
+    sceIoChdir(audioCurrentDir);
     tag_size = GetID3TagSize(AA3ME_fileName);
     AA3ME_handle = sceIoOpen(AA3ME_fileName, PSP_O_RDONLY, 0777);
     if (AA3ME_handle < 0)
@@ -484,6 +486,8 @@ int AA3ME_Load(char *fileName){
     AA3ME_filePos = 0;
     AA3ME_playingSpeed = 0;
     AA3ME_isPlaying = 0;
+
+    getcwd(audioCurrentDir, 256);
     strcpy(AA3ME_fileName, fileName);
     if (AA3MEgetInfo() != 0){
         return ERROR_OPENING;

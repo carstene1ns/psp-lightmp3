@@ -960,13 +960,13 @@ int playPlaylist(struct M3U_playList *playList, int startIndex, double startFile
     char message[20] = "";
 
 	//Chdir for playlist with relative paths:
-	/*if (strlen(playList->fileName))
+	if (strlen(playList->fileName))
 	{
 		char onlyDir[256] = "";
 		strcpy(onlyDir, playList->fileName);
 		directoryUp(onlyDir);
 		sceIoChdir(onlyDir);
-	}*/
+	}
 
     ML_startTransaction();
 

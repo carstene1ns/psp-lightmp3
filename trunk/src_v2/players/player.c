@@ -33,6 +33,7 @@
 #include "libasfparser/pspasfparser.h"
 
 //shared global vars
+char audioCurrentDir[264];
 char fileTypeDescription[6][20] = {"MP3", "OGG Vorbis", "ATRAC3+", "FLAC", "AAC", "WMA"};
 int MUTED_VOLUME = 800;
 int MAX_VOLUME_BOOST=15;

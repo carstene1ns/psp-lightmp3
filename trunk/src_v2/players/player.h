@@ -62,6 +62,7 @@ extern int CLOCK_WHEN_PAUSE;
 
 extern char fileTypeDescription[6][20];
 
+extern char audioCurrentDir[264];
 extern int MUTED_VOLUME;
 extern int currentVolume;
 extern int MAX_VOLUME_BOOST;

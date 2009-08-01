@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <unistd.h>
 #include <psputility_avmodules.h>
 
 #include "id3.h"
@@ -110,6 +111,7 @@ int WMA_decodeThread(SceSize args, void *argp){
 	sceAudiocodecReleaseEDRAM(WMA_codec_buffer); //Fix: ReleaseEDRAM at the end is not enough to play another file.
 	WMA_threadActive = 1;
 
+    sceIoChdir(audioCurrentDir);
     WMA_handle = sceIoOpen(WMA_fileName, PSP_O_RDONLY, 0777);
     if (WMA_handle < 0)
         WMA_threadActive = 0;
@@ -451,6 +453,8 @@ int WMA_Load(char *fileName){
     WMA_filePos = 0;
     WMA_playingSpeed = 0;
     WMA_isPlaying = 0;
+
+    getcwd(audioCurrentDir, 256);
     strcpy(WMA_fileName, fileName);
     if (WMAgetInfo() != 0){
         strcpy(WMA_fileName, "");
