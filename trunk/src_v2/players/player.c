@@ -441,8 +441,11 @@ int setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = FLAC_suspend;
         resumeFunct = FLAC_resume;
         fadeOutFunct = FLAC_fadeOut;
+
+        getFilePositionFunct = FLAC_getFilePosition;
+        setFilePositionFunct = FLAC_setFilePosition;
 		return 0;
-    } else if (!stricmp(ext, "AAC")){
+    } else if (!stricmp(ext, "AAC") || !stricmp(ext, "M4A")){
         //AAC e AAC+ software
 		initFunct = AAC_Init;
 		loadFunct = AAC_Load;
@@ -469,6 +472,9 @@ int setAudioFunctions(char *filename, int useME_MP3){
         suspendFunct = AAC_suspend;
         resumeFunct = AAC_resume;
         fadeOutFunct = AAC_fadeOut;
+
+        getFilePositionFunct = AAC_getFilePosition;
+        setFilePositionFunct = AAC_setFilePosition;
 		return 0;
     } else if (!stricmp(ext, "WMA")){
         //WMA

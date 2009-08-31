@@ -50,7 +50,7 @@ static float MP3ME_playingTime = 0;
 static int MP3ME_volume = 0;
 int MP3ME_defaultCPUClock = 20;
 static double MP3ME_filePos = 0;
-static double MP3ME_newFilePos = 0;
+static double MP3ME_newFilePos = -1;
 static int MP3ME_tagRead = 0;
 
 //Globals for decoding:
@@ -180,7 +180,7 @@ int decodeThread(SceSize args, void *argp){
 
 			sceIoLseek32(MP3ME_handle, data_start, PSP_SEEK_SET); //seek back
 
-            if (MP3ME_newFilePos)
+            if (MP3ME_newFilePos >= 0)
             {
                 long old_start = data_start;
                 if (sceIoLseek32(MP3ME_handle, MP3ME_newFilePos, PSP_SEEK_SET) != old_start){
@@ -194,7 +194,7 @@ int decodeThread(SceSize args, void *argp){
                     offset = data_start;
                     size = total_size - data_start;
                 }
-                MP3ME_newFilePos = 0;
+                MP3ME_newFilePos = -1;
                 continue;
             }
 

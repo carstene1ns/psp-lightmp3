@@ -46,7 +46,7 @@ static long OGG_suspendIsPlaying = 0;
 int OGG_defaultCPUClock = 50;
 static short OGG_mixBuffer[PSP_NUM_AUDIO_SAMPLES * 2 * 2]__attribute__ ((aligned(64)));
 static unsigned long OGG_tempmixleft = 0;
-static double OGG_newFilePos = 0;
+static double OGG_newFilePos = -1;
 static int OGG_tagRead = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -82,10 +82,10 @@ static void oggDecodeThread(void *_buf2, unsigned int numSamples, void *pdata){
         OGG_info.instantBitrate = ov_bitrate_instant(&OGG_VorbisFile);
 		OGG_milliSeconds = ov_time_tell(&OGG_VorbisFile);
 
-        if (OGG_newFilePos)
+        if (OGG_newFilePos >= 0)
         {
             ov_raw_seek(&OGG_VorbisFile, (ogg_int64_t)OGG_newFilePos);
-            OGG_newFilePos = 0;
+            OGG_newFilePos = -1;
         }
 
         //Check for playing speed:

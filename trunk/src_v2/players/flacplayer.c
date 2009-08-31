@@ -58,7 +58,7 @@ static long FLAC_tempmixleft = 0;
 static long samples_played = 0;
 
 static FLAC__StreamDecoder *decoder = 0;
-static double FLAC_newFilePos = 0;
+static double FLAC_newFilePos = -1;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //dummy functions for FLAC metadata iterators
@@ -201,9 +201,9 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 				FLAC_mixBuffer[j + 1] = FLAC_mixBuffer[(numSamples<<1) + j + 1];
 			}
 
-            if (FLAC_newFilePos)
+            if (FLAC_newFilePos >= 0)
             {
-                FLAC_newFilePos = 0;
+                FLAC_newFilePos = -1;
             }
 
             //Check for playing speed:

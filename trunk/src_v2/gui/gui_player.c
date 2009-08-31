@@ -710,11 +710,16 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
                 if (helpShown)
                     helpShown = 0;
                 else{
-                    if (userSettings->FADE_OUT)
-                        (*fadeOutFunct)(0.3);
-                    (*endFunct)();
-                    retValue = PLAYER_PREVIOUS;
-                    flagExit = 1;
+                    if ((*getPercentageFunct)() > 2.0f)
+                    {
+                        (*setFilePositionFunct)(0.0);
+                    }else{
+                        if (userSettings->FADE_OUT)
+                            (*fadeOutFunct)(0.3);
+                        (*endFunct)();
+                        retValue = PLAYER_PREVIOUS;
+                        flagExit = 1;
+                    }
                 }
             }else if (osl_pad.released.cross || osl_remote.released.rmplaypause){
                 if (ratingChangedCross)
