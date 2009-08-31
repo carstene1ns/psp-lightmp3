@@ -46,6 +46,9 @@ void AAC_disableFilter();
 int AAC_isFilterEnabled();
 int AAC_isFilterSupported();
 
+double AAC_getFilePosition();
+void AAC_setFilePosition(double position);
+
 //Manage suspend:
 int AAC_suspend();
 int AAC_resume();

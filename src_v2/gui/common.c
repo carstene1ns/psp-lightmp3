@@ -189,7 +189,7 @@ void loadFonts()
 	if ( skinGetString("STR_FONT_ALT_NAME", buffer) == 0 )
     {
 		oslLoadAltIntraFontFile(fontNormal, buffer);
-        if (!fontNormal->intraAlt)
+        if (!fontNormal->intra->altFont)
             errorLoadImage(buffer);
     }
     setFontStyle(fontNormal, defaultTextSize,0xFFFFFFFF,0xFF000000,INTRAFONT_ALIGN_LEFT);

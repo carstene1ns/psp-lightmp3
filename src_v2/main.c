@@ -56,8 +56,8 @@ static int suspended = 0;
 struct settings *userSettings;
 
 //Shared globals:
-int fileExtCount = 9;
-char fileExt[9][5] = {"MP3", "OGG", "AA3", "OMA", "OMG", "FLAC", "AAC", "WMA", "M3U"};
+int fileExtCount = 10;
+char fileExt[10][5] = {"MP3", "OGG", "AA3", "OMA", "OMG", "FLAC", "AAC", "M4A", "WMA", "M3U"};
 char tempM3Ufile[264] = "";
 char MLtempM3Ufile[264] = "";
 struct libraryEntry MLresult[ML_BUFFERSIZE];

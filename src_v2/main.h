@@ -37,7 +37,7 @@
 //Shared globals:
 extern struct settings *userSettings;
 extern int fileExtCount;
-extern char fileExt[9][5];
+extern char fileExt[10][5];
 extern char tempM3Ufile[264];
 extern char MLtempM3Ufile[264];
 extern struct libraryEntry MLresult[ML_BUFFERSIZE];

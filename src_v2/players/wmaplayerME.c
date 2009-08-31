@@ -235,12 +235,22 @@ int WMA_decodeThread(SceSize args, void *argp){
 				//Volume Boost:
 				if (WMA_volume_boost){
                     int i;
-                    for (i=0; i<WMA_cache_samples*2; i++){
+                    for (i=0; i<WMA_OUTPUT_BUFFER_SIZE*2; i++){
     					WMA_output_buffer[WMA_output_index][i] = volume_boost(&WMA_output_buffer[WMA_output_index][i], &WMA_volume_boost);
                     }
                 }
                 audioOutput(WMA_volume, WMA_output_buffer[WMA_output_index]);
 				WMA_output_index = (WMA_output_index + 1) % 2;
+
+                //Check for playing speed:
+                if (WMA_playingSpeed){
+                    npt = WMA_playingTime * 1000 + WMA_playingSpeed * 300;
+                    ret = sceAsfSeekTime(parser, 1, &npt);
+                    if (ret < 0) {
+                        WMA_setPlayingSpeed(0);
+                    }else
+                        WMA_playingTime = (float)npt / 1000.0f;
+                }
 				continue;
 			}
 
@@ -270,12 +280,11 @@ int WMA_decodeThread(SceSize args, void *argp){
 				break;
 			}
             WMA_playingTime += (float)(WMA_codec_buffer[9]/4)/(float)WMA_samplerate;
-		    WMA_info.framesDecoded++;\
+		    WMA_info.framesDecoded++;
 
 			memcpy(WMA_cache_buffer+(WMA_cache_samples*2), WMA_mix_buffer, WMA_codec_buffer[9]);
 
 			WMA_cache_samples += (WMA_codec_buffer[9]/4);
-
 		}
 		sceKernelDelayThread(10000);
 	}
