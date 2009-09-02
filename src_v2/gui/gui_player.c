@@ -459,7 +459,22 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
     coverArt = NULL;
     tmpCoverArt = NULL;
     if (tagInfo.encapsulatedPictureOffset && tagInfo.encapsulatedPictureLength <= MAX_IMAGE_DIMENSION){
-		int in = sceIoOpen(fileName, PSP_O_RDONLY, 0777);
+        u8 *tCover = (unsigned char *) malloc(tagInfo.encapsulatedPictureLength);
+        if (tCover != NULL)
+        {
+            int in = sceIoOpen(fileName, PSP_O_RDONLY, 0777);
+            if (in >= 0){
+                sceIoLseek(in, tagInfo.encapsulatedPictureOffset, PSP_SEEK_SET);
+                sceIoRead(in, tCover, tagInfo.encapsulatedPictureLength);
+                sceIoClose(in);
+
+                oslSetTempFileData(tCover, tagInfo.encapsulatedPictureLength, &VF_MEMORY);
+                tmpCoverArt = oslLoadImageFileJPG(oslGetTempFileName(), OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+                free(tCover);
+            }
+        }
+
+		/*int in = sceIoOpen(fileName, PSP_O_RDONLY, 0777);
         if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
             snprintf(buffer, sizeof(buffer), "%scoverart.jpg", userSettings->ebootPath);
         else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
@@ -489,7 +504,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 		}
         else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
             tmpCoverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-        sceIoRemove(buffer);
+        sceIoRemove(buffer);*/
     }else if (strlen(tagInfo.coverArtImageName))
         tmpCoverArt = oslLoadImageFileJPG(tagInfo.coverArtImageName, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 

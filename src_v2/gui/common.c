@@ -596,7 +596,7 @@ int initFonts(){
 	strncpy(encoding, langGetString("ENCODING"), 9);
 	encoding[9] = '\0';
 	if (!strcmp(encoding, "UTF-8"))
-	    oslIntraFontInit(INTRAFONT_CACHE_LARGE | INTRAFONT_STRING_UTF8);
+	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_UTF8);
 	else if (!strcmp(encoding, "CP437"))
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_CP437);
 	else if (!strcmp(encoding, "CP437"))
