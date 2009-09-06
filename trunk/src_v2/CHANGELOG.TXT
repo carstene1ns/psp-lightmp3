@@ -3,9 +3,9 @@ LightMP3 Changelog
 
 Version 2.0.0 RC3
 -----------------
--Added: When pressing R the song will restart if more than 2% has been played
+-Added: When pressing L the song will restart if more than 2% has been played
 -Added: support for relative path in playlists
--Added: support for WMA (Windows Media Audio), no tag reading.
+-Added: support for WMA (Windows Media Audio)
         Many thanks to cooleyes and hrimfaxi for the sample
 -Added: "Sleep Timer" feature (kurian2z5)
 -Fixed: standardized the fast forward/rewind speed for the different codecs (kurian2z5)

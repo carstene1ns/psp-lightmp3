@@ -1,7 +1,7 @@
 TARGET = lightmp3
 OBJS = prx/supportlib.o \
        players/m3u.o players/pspaudiolib.o players/id3.o players/mp3xing.o players/mp3player.o players/oggplayer.o players/aacplayer.o \
-       players/mp3playerME.o players/aa3playerME.o players/flacplayer.o players/player.o players/wmaplayerME.o players/equalizer.o \
+       players/mp3playerME.o players/aa3playerME.o players/flacplayer.o players/player.o players/wma_tag.o players/wmaplayerME.o players/equalizer.o \
        system/clock.o system/freeMem.o system/mem64.o miniconv/MiniConv.o system/fat.o system/opendir.o \
        system/exception.o system/brightness.o \
        others/bookmark.o others/audioscrobbler.o others/medialibrary.o others/log.o others/strreplace.o \

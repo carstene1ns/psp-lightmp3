@@ -470,8 +470,8 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 
                 oslSetTempFileData(tCover, tagInfo.encapsulatedPictureLength, &VF_MEMORY);
                 tmpCoverArt = oslLoadImageFileJPG(oslGetTempFileName(), OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-                free(tCover);
             }
+            free(tCover);
         }
 
 		/*int in = sceIoOpen(fileName, PSP_O_RDONLY, 0777);

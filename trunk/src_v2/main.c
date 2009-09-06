@@ -19,6 +19,7 @@
 #include <pspsdk.h>
 #include <psprtc.h>
 #include <stdio.h>
+#include <kubridge.h>
 #include <oslib/oslib.h>
 
 #include "main.h"
@@ -239,7 +240,14 @@ void endOSLib(){
 void checkBrightness(){
     int done = 0;
 
-    if (getBrightness() > 24){
+    int initialB = getBrightness();
+    int minB = 0;
+    if (getModel() == PSP_MODEL_SLIM_AND_LITE || sceKernelDevkitVersion() >= 0x03070110)
+        minB = 36;
+    else
+        minB = 24;
+
+    if (initialB > minB){
         while(!osl_quit && !done){
             oslStartDrawing();
             drawCommonGraphics();
@@ -250,8 +258,8 @@ void checkBrightness(){
 
             oslReadKeys();
             if(osl_pad.released.cross){
-				fadeDisplay(24, DISPLAY_FADE_TIME);
-            	userSettings->curBrightness = 24;
+				fadeDisplay(minB, DISPLAY_FADE_TIME);
+            	userSettings->curBrightness = minB;
                 imposeSetBrightness(0);
                 done = 1;
             }else if(osl_pad.released.circle){
