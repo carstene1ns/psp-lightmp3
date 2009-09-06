@@ -31,9 +31,13 @@
 #include "cooleyesBridge.h"
 #include "libasfparser/pspasfparser.h"
 #include "system/mem64.h"
+#include "wma_tag.h"
 
 #define THREAD_PRIORITY 12
 #define WMA_OUTPUT_BUFFER_SIZE	2048
+
+#define WMA_JPEG_IMAGE 1
+#define WMA_PNG_IMAGE 2
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Globals:
@@ -315,6 +319,96 @@ void getWMATagInfo(char *filename, struct fileInfo *targetInfo){
 
 	strcpy(targetInfo->title, filename);
 
+    FILE *in = fopen(filename, "r");
+    if (!in)
+        goto end;
+
+    //Read buffer:
+    fseek(in, 0, SEEK_SET);
+	unsigned char *tag_buffer, *bp;
+
+	tag_buffer = (unsigned char *)malloc(WMA_TAG_BUFFER_SIZE);
+	if (tag_buffer == NULL)
+        goto end;
+
+	fread(tag_buffer, 1, WMA_TAG_BUFFER_SIZE, in);
+	fclose(in);
+    int pos = 0;
+
+    //Check if it is a WMA:
+    bp = tag_buffer;
+	if(memcmp(bp, WMA_GUID, 16))
+	{
+		free(tag_buffer);
+        goto end;
+	}
+
+    //Check if extended info are present:
+    pos = wmaSearchExtendedStart(bp, pos, 500);
+    if (pos < 0){
+		free(tag_buffer);
+		goto end;
+    }
+
+    bp += 28;
+    pos += 28;
+
+    int lastPos = pos;
+    while(1){
+        wmaTagValue tag;
+        pos = wmaReadTag(tag_buffer, pos, &tag);
+        if (!pos)
+            break;
+        lastPos = pos;
+
+        if (!strcmp(tag.name, "ALBUM_ARTIST"))
+            strcpy(targetInfo->artist, tag.value);
+        else if (!strcmp(tag.name, "GENRE"))
+            strcpy(targetInfo->genre, tag.value);
+        else if (!strcmp(tag.name, "ALBUM_TITLE"))
+            strcpy(targetInfo->album, tag.value);
+        else if (!strcmp(tag.name, "YEAR"))
+            strcpy(targetInfo->year, tag.value);
+        else if (!strcmp(tag.name, "TRACK_NUMBER"))
+            strcpy(targetInfo->trackNumber, tag.value);
+        else if (!strcmp(tag.name, "PICTURE"))
+        {
+            targetInfo->encapsulatedPictureOffset = tag.start;
+            targetInfo->encapsulatedPictureLength = tag.size;
+            if (!strcmp(tag.value, "JPEG"))
+                targetInfo->encapsulatedPictureType = WMA_JPEG_IMAGE;
+            else if (!strcmp(tag.value, "PNG"))
+                targetInfo->encapsulatedPictureType = WMA_PNG_IMAGE;
+        }
+    }
+
+    bp += lastPos - 28;
+    pos = wmaSearchContentStart(bp, lastPos, 500);
+	if(pos < 0)
+	{
+        bp = tag_buffer;
+        pos = wmaSearchContentStart(bp, pos, 500);
+        if(pos < 0)
+        {
+            free(tag_buffer);
+            goto end;
+        }
+	}
+    bp += 24;
+    pos += 24;
+
+
+    wmaContentTag contentTag;
+    wmaReadContentTag(tag_buffer, pos, &contentTag);
+
+    if (strlen(contentTag.author) && !strlen(targetInfo->artist))
+        strcpy(targetInfo->artist, contentTag.author);
+    if (strlen(contentTag.title))
+        strcpy(targetInfo->title, contentTag.title);
+
+    free(tag_buffer);
+
+    end:
     WMA_info = *targetInfo;
     WMA_tagRead = 1;
 }
@@ -324,16 +418,11 @@ int WMAgetInfo(){
     if (!WMA_tagRead)
         getWMATagInfo(WMA_fileName, &WMA_info);
 
-    pspDebugScreenPrintf("Artist: %s\n", WMA_info.artist);
-    pspDebugScreenPrintf("Album : %s\n", WMA_info.album);
-    pspDebugScreenPrintf("Title : %s\n", WMA_info.title);
-
 	sceAudiocodecReleaseEDRAM(WMA_codec_buffer);
 
     WMA_handle = sceIoOpen(WMA_fileName, PSP_O_RDONLY, 0777);
     if (WMA_handle < 0)
     {
-        pspDebugScreenPrintf("Error opening file\n");
         return -1;
     }
 	WMA_filesize = sceIoLseek(WMA_handle, 0, PSP_SEEK_END);
@@ -348,7 +437,6 @@ int WMAgetInfo(){
 
 	parser = malloc_64(sizeof(SceAsfParser));
 	if ( !parser ) {
-        pspDebugScreenPrintf("Error allocing parser\n");
 		return -1;
 	}
 	memset(parser, 0, sizeof(SceAsfParser));
@@ -364,21 +452,18 @@ int WMAgetInfo(){
 
 	int ret = sceAsfCheckNeedMem(parser);
 	if ( ret < 0 ) {
-        pspDebugScreenPrintf("Error AsfCheckNeedMem\n");
         sceIoClose(WMA_handle);
         WMA_handle = -1;
 		return -1;
 	}
 
 	if ( parser->iNeedMem > 0x8000 ) {
-        pspDebugScreenPrintf("Error parser->iNeedMem\n");
         sceIoClose(WMA_handle);
 	    return -1;
 	}
 
 	need_mem_buffer = malloc_64(parser->iNeedMem);
 	if ( !need_mem_buffer ) {
-        pspDebugScreenPrintf("Error need_mem_buffer\n");
         sceIoClose(WMA_handle);
         WMA_handle = -1;
 		return -1;
@@ -389,7 +474,6 @@ int WMAgetInfo(){
 
 	ret = sceAsfInitParser(parser, 0, &asf_read_cb, &asf_seek_cb);
 	if ( ret < 0 ) {
-        pspDebugScreenPrintf("Error sceAsfInitParser = 0x%08x\n", ret);
         sceIoClose(WMA_handle);
         WMA_handle = -1;
 		return -1;

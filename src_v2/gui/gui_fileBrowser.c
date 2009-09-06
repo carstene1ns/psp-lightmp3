@@ -363,7 +363,7 @@ int gui_fileBrowser(){
             }else if(!USBactive && osl_pad.released.circle){
                 //Up one level:
                 char tempDir[264] = "";
-                strcpy(tempDir, curDir);
+                getFileName(curDir, tempDir);
                 if (directoryUp(curDir) == 0){
 					directoryUp(curDirShort);
                     int i;
@@ -373,7 +373,7 @@ int gui_fileBrowser(){
                     buildMenuFromDirectory(&commonMenu, &directory, "");
                     //Mi riposiziono:
                     for (i = 0; i < directory.number_of_directory_entries; i++){
-                        if (strstr(tempDir, directory.directory_entry[i].longname) != NULL){
+                        if (strcmp(tempDir, directory.directory_entry[i].longname) == 0){
                             commonMenu.first = i;
                             commonMenu.selected = i;
                             break;
