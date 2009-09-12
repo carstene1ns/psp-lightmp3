@@ -73,4 +73,8 @@ int getOSKlang();
 int limitString(const char *string, const int width, char *target);
 void initTimezone();
 
+void setSwapButton();
+int getConfirmButton();
+int getCancelButton();
+
 #endif

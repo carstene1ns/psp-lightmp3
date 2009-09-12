@@ -449,13 +449,12 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
     oslSetFont(fontMenuNormal);
 
     for (i=0; i<directory->number_of_directory_entries; i++){
-        //strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
+        strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
         if (FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode))
             menu->elements[i].icon = folderIcon;
         else
             menu->elements[i].icon = musicIcon;
         menu->elements[i].triggerFunction = NULL;
-        limitString(directory->directory_entry[i].longname, menu->width - menu->elements[i].icon->sizeX - 6, menu->elements[i].text);
 
         if (!strcmp(selected, directory->directory_entry[i].d_name)){
             menu->first = i;
@@ -692,4 +691,33 @@ void initTimezone(){
    }
    setenv("TZ", tz, 1);
    tzset();
+   free(tz);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Set Swap Button
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static int SwapXO = 1; //1 = X is accept, O is cancel
+void setSwapButton()
+{
+    sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_UNKNOWN, &SwapXO);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Get confirm button:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int getConfirmButton()
+{
+    if (!SwapXO)
+        return osl_pad.released.circle;
+    else
+        return osl_pad.released.cross;
+}
+
+int getCancelButton()
+{
+    if (!SwapXO)
+        return osl_pad.released.cross;
+    else
+        return osl_pad.released.circle;
 }

@@ -112,6 +112,8 @@ int SETTINGS_load(char *fileName){
 								localSettings.CLOCK_AA3 = atoi(result);
 							}else if (strcmp(parName, "CLOCK_AAC") == 0){
 								localSettings.CLOCK_AAC = atoi(result);
+							}else if (strcmp(parName, "CLOCK_WMA") == 0){
+								localSettings.CLOCK_WMA = atoi(result);
                             }else if (strcmp(parName, "CLOCK_DELTA_ECONOMY_MODE") == 0){
 								localSettings.CLOCK_DELTA_ECONOMY_MODE = atoi(result);
 							}else if (strcmp(parName, "SKIN") == 0){
@@ -128,6 +130,8 @@ int SETTINGS_load(char *fileName){
 								localSettings.shutDownAfterBookmark = atoi(result);
 							}else if (strcmp(parName, "HOLD_DISPLAYOFF") == 0){
 								localSettings.HOLD_DISPLAYOFF = atoi(result);
+							}else if (strcmp(parName, "FRAMESKIP") == 0){
+								localSettings.frameskip = atoi(result);
 							}
 						}
 						element++;
@@ -159,7 +163,7 @@ struct settings *SETTINGS_default(){
 	localSettings.BOOST_VALUE = 0;
 	localSettings.SCROBBLER = 0;
 	localSettings.VOLUME = 20;
-	localSettings.MP3_ME = 0;
+	localSettings.MP3_ME = 1;
 	localSettings.FADE_OUT = 0;
 	localSettings.BRIGHTNESS_CHECK = 1;
 	localSettings.MUTED_VOLUME = 800;
@@ -171,12 +175,14 @@ struct settings *SETTINGS_default(){
 	localSettings.CLOCK_FLAC = 166;
 	localSettings.CLOCK_AA3 = 40;
 	localSettings.CLOCK_AAC = 60;
+    localSettings.CLOCK_WMA = 40;
 	localSettings.CLOCK_DELTA_ECONOMY_MODE = 1;
 	localSettings.USE_OSK = 1;
     localSettings.playMode = 0;
     localSettings.KEY_AUTOREPEAT_GUI = 10;
     localSettings.KEY_AUTOREPEAT_PLAYER = 10;
 	localSettings.SHOW_SPLASH = 1;
+    localSettings.frameskip = 0;
 
 	//Skin's settings:
     strcpy(localSettings.skinName, "default");
@@ -250,6 +256,8 @@ int SETTINGS_save(struct settings tSettings){
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "CLOCK_AAC=%i\n", tSettings.CLOCK_AAC);
     fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "CLOCK_WMA=%i\n", tSettings.CLOCK_WMA);
+    fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "CLOCK_DELTA_ECONOMY_MODE=%i\n", tSettings.CLOCK_DELTA_ECONOMY_MODE);
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "KEY_AUTOREPEAT_PLAYER=%i\n", tSettings.KEY_AUTOREPEAT_PLAYER);
@@ -263,6 +271,8 @@ int SETTINGS_save(struct settings tSettings){
     snprintf(testo, sizeof(testo), "SHUTDOWN_AFTER_BOOKMARK=%i\n", tSettings.shutDownAfterBookmark);
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "HOLD_DISPLAYOFF=%i\n", tSettings.HOLD_DISPLAYOFF);
+    fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "FRAMESKIP=%i\n", tSettings.frameskip);
     fwrite(testo, 1, strlen(testo), f);
 	fclose(f);
     return(0);

@@ -92,7 +92,7 @@ static int MP3_fd = -1;
 static unsigned char fileBuffer[INPUT_BUFFER_SIZE];
 static unsigned int samplesRead;
 static unsigned int MP3_filePos;
-static double MP3_newFilePos;
+static double MP3_newFilePos = -1;
 static double fileSize = 0;
 static double tagsize = 0;
 
@@ -224,13 +224,16 @@ static void MP3Callback(void *buffer, unsigned int samplesToWrite, void *pdata){
                 samplesRead += samplesToWrite;
                 samplesToWrite = 0;
 
-                if (MP3_newFilePos)
+                if (MP3_newFilePos >= 0)
                 {
+                    if (!MP3_newFilePos)
+                        MP3_newFilePos = ID3v2TagSize(MP3_fileName);
+
                     if (sceIoLseek32(MP3_fd, MP3_newFilePos, PSP_SEEK_SET) != MP3_filePos){
                         MP3_filePos = MP3_newFilePos;
                         mad_timer_set(&Timer, (int)((float)MP3_info.length / 100.0 * MP3_GetPercentage()), 1, 1);
                     }
-                    MP3_newFilePos = 0;
+                    MP3_newFilePos = -1;
                 }
 
 		        //Check for playing speed:
@@ -370,7 +373,8 @@ int MP3getInfo(){
 
     if (size < bufferSize * 3)
         bufferSize = size;
-    localBuffer = (unsigned char *) malloc(bufferSize);
+    localBuffer = (unsigned char *) malloc(sizeof(unsigned char) * bufferSize);
+    unsigned char *buff = localBuffer;
 
 	MP3_channels = 2;
 	MP3_info.fileType = MP3_TYPE;
@@ -494,8 +498,8 @@ int MP3getInfo(){
 	}
 	mad_header_finish (&header);
 	mad_stream_finish (&stream);
-    if (localBuffer)
-    	free(localBuffer);
+    if (buff)
+    	free(buff);
     sceIoClose(fd);
 
     int secs = 0;

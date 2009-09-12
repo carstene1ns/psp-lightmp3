@@ -33,6 +33,7 @@ struct menuElement{
     int value;
     char data[1024];
     int (*triggerFunction)();
+    float xPos; //For scrolling
 };
 
 struct menuElements{

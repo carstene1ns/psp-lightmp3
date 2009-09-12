@@ -105,12 +105,15 @@ int getSettingVal(int index, char *value, int valueLimit){
             snprintf(value, valueLimit, "%i", userSettings->CLOCK_AA3);
             break;
         case 15:
-            snprintf(value, valueLimit, "%i", userSettings->KEY_AUTOREPEAT_GUI);
+            snprintf(value, valueLimit, "%i", userSettings->CLOCK_WMA);
             break;
         case 16:
+            snprintf(value, valueLimit, "%i", userSettings->KEY_AUTOREPEAT_GUI);
+            break;
+        case 17:
             snprintf(value, valueLimit, "%s", yesNo[userSettings->SHOW_SPLASH]);
             break;
-		case 17:
+		case 18:
             snprintf(value, valueLimit, "%s", yesNo[userSettings->HOLD_DISPLAYOFF]);
             break;
 	}
@@ -166,7 +169,7 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     char settingVal[50] = "";
     struct menuElement tMenuEl;
 
-    menu->numberOfElements = 18;
+    menu->numberOfElements = 19;
 
     values->first = menu->first;
     values->selected = menu->selected;
@@ -250,25 +253,48 @@ int changeSettingVal(int index, int delta){
                     break;
                 }
             }
+
             if (current + delta < languagesCount && current + delta >= 0){
+                cpuBoost();
+
+                oslStartDrawing();
+                drawCommonGraphics();
+                drawButtonBar(MODE_SETTINGS);
+                drawMenu(&commonMenu);
+                drawMenu(&commonSubMenu);
+                drawWait(langGetString("LOADING_LANGUAGE_TITLE"), langGetString("LOADING_LANGUAGE"));
+                oslEndDrawing();
+                oslEndFrame();
+                oslSyncFrame();
+
                 current += delta;
                 strcpy(userSettings->lang, languagesList[current]);
-            }
-            snprintf(buffer, sizeof(buffer), "%slanguages/%s/lang.txt", userSettings->ebootPath, userSettings->lang);
-            if (langLoad(buffer)){
-                char message[512] = "";
-                snprintf(message, sizeof(message), "Error loading language file:\n%s", buffer);
-                debugMessageBox(message);
-            	oslQuit ();
-                return 0;
-            }
-			//Reset intraFont:
-            unloadFonts();
-			oslIntraFontShutdown();
-			initFonts();
-            loadFonts();
 
-            buildSettingsMenu(&commonMenu, &commonSubMenu);
+                snprintf(buffer, sizeof(buffer), "%slanguages/%s/lang.txt", userSettings->ebootPath, userSettings->lang);
+                if (langLoad(buffer)){
+                    char message[512] = "";
+                    snprintf(message, sizeof(message), "Error loading language file:\n%s", buffer);
+                    debugMessageBox(message);
+                    oslQuit ();
+                    return 0;
+                }
+				clearMenu(&commonMenu);
+			    clearMenu(&commonSubMenu);
+				endMenu();
+
+                unloadFonts();
+                oslIntraFontShutdown();
+                initFonts();
+                loadFonts();
+
+				initMenu();
+                initSettingsMenu();
+				oslSetFont(fontNormal);
+                buildSettingsMenu(&commonMenu, &commonSubMenu);
+                commonMenu.selected = 1;
+
+                cpuRestore();
+            }
             break;
         case 2:
             userSettings->SCROBBLER = !userSettings->SCROBBLER;
@@ -304,6 +330,8 @@ int changeSettingVal(int index, int delta){
         case 9:
             if (userSettings->CLOCK_GUI + delta <= 222 && userSettings->CLOCK_GUI + delta >= getMinCPUClock())
                 userSettings->CLOCK_GUI += delta;
+                if (userSettings->CLOCK_AUTO)
+                    setCpuClock(userSettings->CLOCK_GUI);
             break;
         case 10:
             if (userSettings->CLOCK_MP3 + delta <= 222 && userSettings->CLOCK_MP3 + delta >= getMinCPUClock())
@@ -331,15 +359,20 @@ int changeSettingVal(int index, int delta){
                 AA3ME_defaultCPUClock = userSettings->CLOCK_AA3;
             break;
         case 15:
+            if (userSettings->CLOCK_WMA + delta <= 222 && userSettings->CLOCK_WMA + delta >= getMinCPUClock())
+                userSettings->CLOCK_WMA += delta;
+                WMA_defaultCPUClock = userSettings->CLOCK_WMA;
+            break;
+        case 16:
             if (userSettings->KEY_AUTOREPEAT_GUI + delta <= 30 && userSettings->KEY_AUTOREPEAT_GUI + delta >= 1){
                 userSettings->KEY_AUTOREPEAT_GUI += delta;
                 oslSetKeyAutorepeatInterval(userSettings->KEY_AUTOREPEAT_GUI);
             }
             break;
-        case 16:
+        case 17:
             userSettings->SHOW_SPLASH = !userSettings->SHOW_SPLASH;
             break;
-		case 17:
+		case 18:
             userSettings->HOLD_DISPLAYOFF = !userSettings->HOLD_DISPLAYOFF;
             break;
     }
@@ -381,14 +414,14 @@ int gui_settings(){
 
         oslReadKeys();
         if (confirmStatus == STATUS_CONFIRM_SAVE){
-            if(osl_pad.released.cross){
+            if(getConfirmButton()){
                 SETTINGS_save(userSettings);
                 confirmStatus = STATUS_CONFIRM_NONE;
             }else if(osl_pad.pressed.circle){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }else if (confirmStatus == STATUS_HELP){
-            if (osl_pad.released.cross || osl_pad.released.circle)
+            if (getConfirmButton() || getCancelButton())
                 confirmStatus = STATUS_CONFIRM_NONE;
         }else{
             processMenuKeys(&commonMenu);
@@ -414,6 +447,9 @@ int gui_settings(){
             }
         }
     }
+    //save settings:
+    SETTINGS_save(userSettings);
+
     //unLoad images:
     clearMenu(&commonMenu);
     clearMenu(&commonSubMenu);

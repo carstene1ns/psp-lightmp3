@@ -189,8 +189,8 @@ LOADING_SKIN_TITLE=Prosze czekac
 LOADING_SKIN=Wgrywanie nowego skina
 CHECKING_PLAYLIST=Sprawdz. plikow playlisty
 
-SETTINGS_16=Predkosc Przesuwu Wskaznika
-SETTINGS_17=Pokazuj obrazek startowy
+SETTINGS_17=Predkosc Przesuwu Wskaznika
+SETTINGS_18=Pokazuj obrazek startowy
 
 BROWSE_TOP100=Top 100
 BROWSE_ALL=Przegladaj Wszystko
@@ -214,17 +214,25 @@ ORDER_BY_09=Ocena, Artysta, Album, Tytul
 ################################################################################
 #2.0.0 RC2
 ################################################################################
-HELP_PLAYER_10=L + Circle to create a bookmark and exit
-CONFIRM_BOOKMARK_TITLE=Confirm
-CONFIRM_BOOKMARK=Create a bookmark and exit?
-CONFIRM_BOOKMARK_LOAD=Load the saved bookmark?
+HELP_PLAYER_10=L + kó³ko tworzy Zakladke i wychodzi
+CONFIRM_BOOKMARK_TITLE=Akceptuj
+CONFIRM_BOOKMARK=Stworzyc Zak³adke i wyjsc?
+CONFIRM_BOOKMARK_LOAD=Wgrac zapisana Zakladke?
 
 ################################################################################
 #2.0.0 RC3
 ################################################################################
-SLEEP_MODE_3=0:30 Hour
-SLEEP_MODE_4=1:00 Hour
-SLEEP_MODE_5=1:30 Hours
-SLEEP_MODE_6=2:00 Hours
+SLEEP_MODE_3=0:30 Minut
+SLEEP_MODE_4=1:00 Godzina
+SLEEP_MODE_5=1:30 Godziny
+SLEEP_MODE_6=2:00 Godziny
 
-SETTINGS_18=Display Off on Hold
+
+################################################################################
+#2.0.0 RC4
+################################################################################
+SETTINGS_16=CPU Clock: WMA
+SETTINGS_19=Wylacza ekran na Hold
+
+LOADING_LANGUAGE_TITLE=Please Wait
+LOADING_LANGUAGE=Loading new language

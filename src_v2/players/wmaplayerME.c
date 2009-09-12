@@ -1,4 +1,4 @@
-//    Copyright (C) 2007 Sakya
+//    Copyright (C) 2009 Sakya
 //    sakya_tg@yahoo.it
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ static int WMA_volume = 0;
 int WMA_defaultCPUClock = 20;
 static double WMA_filesize = 0;
 static double WMA_filePos = 0;
-static double WMA_newFilePos = 0;
+static double WMA_newFilePos = -1;
 static int WMA_tagRead = 0;
 static double WMA_tagsize = 0;
 
@@ -258,6 +258,16 @@ int WMA_decodeThread(SceSize args, void *argp){
 				continue;
 			}
 
+            if (WMA_newFilePos >= 0)
+            {
+                npt = (float)WMA_newFilePos / 16384.0f / (float)WMA_samplerate;
+                ret = sceAsfSeekTime(parser, 1, &npt);
+                if (ret >= 0) {
+                    WMA_playingTime = npt / 1000.0f;
+                }
+                WMA_newFilePos = -1;
+            }
+
 			memset(WMA_frame_buffer, 0, WMA_block_align);
 			parser->sFrame.pData = WMA_frame_buffer;
 			ret = sceAsfGetFrameData(parser, 1, &parser->sFrame);
@@ -270,7 +280,7 @@ int WMA_decodeThread(SceSize args, void *argp){
 
 			WMA_codec_buffer[6] = (unsigned long)WMA_frame_buffer;
 			WMA_codec_buffer[8] = (unsigned long)WMA_mix_buffer;
-			WMA_codec_buffer[9] = 16384;;
+			WMA_codec_buffer[9] = 16384;
 
 			WMA_codec_buffer[15] = parser->sFrame.iUnk2;
 			WMA_codec_buffer[16] = parser->sFrame.iUnk3;
@@ -327,7 +337,7 @@ void getWMATagInfo(char *filename, struct fileInfo *targetInfo){
     fseek(in, 0, SEEK_SET);
 	unsigned char *tag_buffer, *bp;
 
-	tag_buffer = (unsigned char *)malloc(WMA_TAG_BUFFER_SIZE);
+	tag_buffer = (unsigned char *)malloc(sizeof(unsigned char) * WMA_TAG_BUFFER_SIZE);
 	if (tag_buffer == NULL)
         goto end;
 

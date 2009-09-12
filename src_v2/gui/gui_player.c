@@ -79,6 +79,8 @@ static int playerStatus = 0; //-1=open 0=paused 1=playing
 static struct equalizer tEQ;
 static u64 sleepStartTime = 0; //Current ticks when sleep timer was started.
 
+static float scrollTitleX = -1.0f;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Draws a file's info
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +116,15 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
     skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
     setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_TITLE_VALUE", tempPos);
-    oslDrawString(tempPos[0], tempPos[1], info->title);
+    int titleWidth = skinGetParam("TITLE_VALUE_WIDTH");
+    if (titleWidth > 0 && oslGetStringWidth(info->title) > titleWidth){
+        setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_SCROLL_SEESAW);
+        if (scrollTitleX < 0)
+            scrollTitleX = 2 + tempPos[0] + titleWidth / 2.0f;
+        scrollTitleX = oslIntraFontPrintColumn(fontNormal, scrollTitleX, tempPos[1], titleWidth, 0, info->title);
+        setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    }else
+        oslDrawString(tempPos[0], tempPos[1], info->title);
     skinGetPosition("POS_ARTIST_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->artist);
     skinGetPosition("POS_ALBUM_VALUE", tempPos);
@@ -311,7 +321,7 @@ int confirmBookmark(struct libraryEntry *libEntry, char *trackMessage, int index
         skip = oslSyncFrame();
 
         oslReadKeys();
-        if(osl_pad.released.cross)
+        if(getConfirmButton())
         {
             strcpy(bookm.fileName, libEntry->shortpath);
             bookm.playListIndex = index;
@@ -360,6 +370,8 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 	OSL_IMAGE* tmpCoverArt = NULL;
 
 	cpuBoost();
+
+    scrollTitleX = -1;
 
     if (userSettings->displayStatus){
         oslStartDrawing();
@@ -455,11 +467,11 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
             ML_clearEntry(&libEntry);
     }
 
-    //Save temp coverart file:
+    //Load coverart:
     coverArt = NULL;
     tmpCoverArt = NULL;
     if (tagInfo.encapsulatedPictureOffset && tagInfo.encapsulatedPictureLength <= MAX_IMAGE_DIMENSION){
-        u8 *tCover = (unsigned char *) malloc(tagInfo.encapsulatedPictureLength);
+        u8 *tCover = (unsigned char *) malloc(sizeof(unsigned char) * tagInfo.encapsulatedPictureLength);
         if (tCover != NULL)
         {
             int in = sceIoOpen(fileName, PSP_O_RDONLY, 0777);
@@ -474,37 +486,6 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
             free(tCover);
         }
 
-		/*int in = sceIoOpen(fileName, PSP_O_RDONLY, 0777);
-        if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
-            snprintf(buffer, sizeof(buffer), "%scoverart.jpg", userSettings->ebootPath);
-        else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
-            snprintf(buffer, sizeof(buffer), "%scoverart.png", userSettings->ebootPath);
-		int out = sceIoOpen(buffer, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
-
-		int buffSize = 128*1024;
-        u8 *cover = (unsigned char *) malloc(buffSize);
-        if (cover != NULL)
-         {
-            sceIoLseek(in, tagInfo.encapsulatedPictureOffset, PSP_SEEK_SET);
-            int remaining = tagInfo.encapsulatedPictureLength;
-            while (remaining > 0){
-                if (remaining < buffSize)
-                    buffSize = remaining;
-                int write = sceIoRead(in, cover, buffSize);
-                sceIoWrite(out, cover, write);
-                remaining -= write;
-            }
-            free(cover);
-         }
-		sceIoClose(out);
-		sceIoClose(in);
-		if (tagInfo.encapsulatedPictureType == JPEG_IMAGE)
-		{
-            tmpCoverArt = oslLoadImageFileJPG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-		}
-        else if (tagInfo.encapsulatedPictureType == PNG_IMAGE)
-            tmpCoverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
-        sceIoRemove(buffer);*/
     }else if (strlen(tagInfo.coverArtImageName))
         tmpCoverArt = oslLoadImageFileJPG(tagInfo.coverArtImageName, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
 
@@ -662,10 +643,10 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
         oslReadRemoteKeys();
 
         if (status == STATUS_HELP){
-            if (osl_pad.released.cross || osl_pad.released.circle)
+            if (getConfirmButton() || getCancelButton())
                 status = STATUS_NORMAL;
         }else{
-            if (osl_pad.held.L && osl_pad.released.circle){
+            if (osl_pad.held.L && getCancelButton()){
                 if (currentSpeed)
                     (*setPlayingSpeedFunct)(0);
                 if (playerStatus)
@@ -700,7 +681,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
                 ratingChangedUpDown = 1;
                 ratingChangedCross= 1;
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
-            }else if (osl_pad.released.circle){
+            }else if (getCancelButton()){
                 (*endFunct)();
                 playerStatus = 0;
                 retValue = PLAYER_STOP;
@@ -736,7 +717,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
                         flagExit = 1;
                     }
                 }
-            }else if (osl_pad.released.cross || osl_remote.released.rmplaypause){
+            }else if (getConfirmButton() || osl_remote.released.rmplaypause){
                 if (ratingChangedCross)
                     ratingChangedCross = 0;
                 else{

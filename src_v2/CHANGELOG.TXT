@@ -1,6 +1,18 @@
 LightMP3 Changelog
 ------------------
 
+Version 2.0.0 RC4
+-----------------
+-Added: Scrolling text when string is too long in all menues and song title
+-Fixed: Navigation in the Media Library (when pressing circle you'll be taken to the previous selection, not on the main menu)
+-Fixed: Added setting to set CPU clock for WMA
+-Fixed: Track restart when pressing L on WMA, FLAC, ATRAC3(+), MP3 when played with libMad
+-Fixed: Suspend and resume for WMA
+-Fixed: Changed the default setting to play MP3 with Media Engine
+-Fixed: X/O Swap (please note that help screen will always say X=Confirm, O=Cancel, I din't changed it)
+-Fixed: Bug when creating playlist from Media Library
+
+
 Version 2.0.0 RC3
 -----------------
 -Added: When pressing L the song will restart if more than 2% has been played

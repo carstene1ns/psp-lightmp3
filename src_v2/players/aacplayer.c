@@ -72,8 +72,8 @@ int AAC_fillFileBuffer(unsigned char *target, unsigned int bytesRequired){
         bytesRequired -= bytesRead;
         AAC_filePos += bytesRead;
     }
-    pspDebugScreenSetXY(0, 19);
-    pspDebugScreenPrintf("File position: %i / %i\n", AAC_filePos, (int)AAC_fileSize);
+    //pspDebugScreenSetXY(0, 19);
+    //pspDebugScreenPrintf("File position: %i / %i\n", AAC_filePos, (int)AAC_fileSize);
     return bytesRed;
 }
 
@@ -124,11 +124,11 @@ static void AACDecodeThread(void *buffer, unsigned int samplesToWrite, void *pda
             } else if (ret == ERR_AAC_NONE){
                 AACGetLastFrameInfo(hAACDecoder, &aacFrameInfo);
                 AAC_info.instantBitrate = aacFrameInfo.bitRate;
-                pspDebugScreenSetXY(0, 20);
-                pspDebugScreenPrintf("Frame's info: bitrate=%i nChans=%i sampRateOut=%i profile=%i\n", aacFrameInfo.bitRate, aacFrameInfo.nChans, aacFrameInfo.sampRateOut, aacFrameInfo.profile);
+                //pspDebugScreenSetXY(0, 20);
+                //pspDebugScreenPrintf("Frame's info: bitrate=%i nChans=%i sampRateOut=%i profile=%i\n", aacFrameInfo.bitRate, aacFrameInfo.nChans, aacFrameInfo.sampRateOut, aacFrameInfo.profile);
             }else{
-                pspDebugScreenSetXY(0, 20);
-                pspDebugScreenPrintf("Decoder error %li filePos: %i\n", ret, AAC_filePos);
+                //pspDebugScreenSetXY(0, 20);
+                //pspDebugScreenPrintf("Decoder error %li filePos: %i\n", ret, AAC_filePos);
                 AAC_eos = 1;
                 return;
             }
