@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "../system/opendir.h"
 #include "../system/libminiconv.h"
+#include "../system/mem64.h"
 
 #include "id3.h"
 struct genre
@@ -38,18 +39,23 @@ int genreNumber = sizeof (genreList) / sizeof (struct genre);
 int searchJPGstart(int fp, int delta){
     int retValue = -1;
     int i = 0;
-    unsigned char threeChar[3];
+
+    unsigned char *tBuffer = malloc(sizeof(unsigned char) * (delta + 2));
+    if (tBuffer == NULL)
+        return -1;
 
     int startPos = sceIoLseek(fp, 0, PSP_SEEK_CUR);
+    sceIoRead(fp, tBuffer, delta + 2);
+    sceIoLseek(fp, startPos, PSP_SEEK_SET);
+
+    unsigned char *buff = tBuffer;
     for (i=0; i<delta; i++){
-                sceIoRead(fp, threeChar, sizeof(threeChar));
-        if (threeChar[0] == 0xFF && threeChar[1] == 0xD8 && threeChar[2] == 0xFF){
-            retValue = sceIoLseek(fp, 0, PSP_SEEK_CUR) - 3;
+        if(!memcmp(buff++, ID3_JPEG, 3)){
+            retValue = startPos + i;
             break;
         }
-                sceIoLseek(fp, -2, PSP_SEEK_CUR);
     }
-        sceIoLseek(fp, startPos, PSP_SEEK_SET);
+    free(tBuffer);
     return retValue;
 }
 
@@ -58,30 +64,24 @@ int searchJPGstart(int fp, int delta){
 int searchPNGstart(int fp, int delta){
     int retValue = -1;
     int i = 0;
-    int j = 0;
-    int testResult = 0;
-    unsigned char testChar[16];
-    unsigned char pngChar[16] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-                                 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52};
-    int startPos = sceIoLseek(fp, 0, PSP_SEEK_CUR);
 
+    unsigned char *tBuffer = malloc(sizeof(unsigned char) * (delta + 15));
+    if (tBuffer == NULL)
+        return -1;
+
+    int startPos = sceIoLseek(fp, 0, PSP_SEEK_CUR);
+    sceIoRead(fp, tBuffer, delta + 15);
+    sceIoLseek(fp, startPos, PSP_SEEK_SET);
+
+    unsigned char *buff = tBuffer;
     for (i=0; i<delta; i++){
-                sceIoRead(fp, testChar, sizeof(testChar));
-        testResult = 1;
-        for (j=0; j<16; j++){
-            if (testChar[j] != pngChar[j]){
-                testResult = 0;
-                break;
-            }
-        }
-        if (testResult){
-            retValue = sceIoLseek(fp, 0, PSP_SEEK_CUR) - 16;
+        if(!memcmp(buff++, ID3_PNG, 16)){
+            retValue = startPos + i;
             break;
         }
-                sceIoLseek(fp, -15, PSP_SEEK_CUR);
     }
-        sceIoLseek(fp, startPos, PSP_SEEK_SET);
-        return retValue;
+    free(tBuffer);
+    return retValue;
 }
 
 // ID3v2 code taken from libID3 by Xart
@@ -131,12 +131,12 @@ void readTagData(int fp, int tagLength, int maxTagLength, char *tagValue){
     int count = 0;
     unsigned short carattere16[tagLength/2+2];
     unsigned char* carattere = (unsigned char*)carattere16;
-        char* utf8Tag;
+    char* utf8Tag;
 
     strcpy(tagValue, "");
     tagValue[0] = '\0';
 
-        sceIoRead(fp, carattere, tagLength);
+    sceIoRead(fp, carattere, tagLength);
     carattere[tagLength] = '\0';
     carattere[tagLength+1] = '\0';
 
@@ -150,19 +150,18 @@ void readTagData(int fp, int tagLength, int maxTagLength, char *tagValue){
                 utf8Tag = miniConvDefaultSubtitleConv( carattere );
         else
                 utf8Tag = (char*)carattere;
-        }
-        if ( utf8Tag == NULL || !strlen(utf8Tag)) {
-            for (i=0; i<tagLength; i++){
+    }
+    if ( utf8Tag == NULL || !strlen(utf8Tag)) {
+        for (i=0; i<tagLength; i++){
             if (carattere[i] >= 0x20 && carattere[i] <= 0xfd) //<= 0x7f
                     tagValue[count++] = carattere[i];
         }
         tagValue[count] = '\0';
-        }
-        else
-        {
-                strcpy( tagValue, utf8Tag );
-        }
-
+    }
+    else
+    {
+            strcpy( tagValue, utf8Tag );
+    }
 }
 
 int ID3v2TagSize(const char *mp3path)

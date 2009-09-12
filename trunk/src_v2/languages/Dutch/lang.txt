@@ -191,8 +191,8 @@ LOADING_SKIN_TITLE=Even wachten A.U.B.
 LOADING_SKIN=Nieuw uiterlijk aan het laden
 CHECKING_PLAYLIST=Afspeellijst aan het controleren
 
-SETTINGS_16=Toets-herhaling tussentijd
-SETTINGS_17=Laat opstartscherm zien
+SETTINGS_17=Toets-herhaling tussentijd
+SETTINGS_18=Laat opstartscherm zien
 
 BROWSE_TOP100=Top 100
 BROWSE_ALL=Alles verkennen
@@ -228,4 +228,11 @@ SLEEP_MODE_4=1:00 Hour
 SLEEP_MODE_5=1:30 Hours
 SLEEP_MODE_6=2:00 Hours
 
-SETTINGS_18=Display Off on Hold
+################################################################################
+#2.0.0 RC4
+################################################################################
+SETTINGS_16=CPU Clock: WMA
+SETTINGS_19=Display Off on Hold
+
+LOADING_LANGUAGE_TITLE=Please Wait
+LOADING_LANGUAGE=Loading new language

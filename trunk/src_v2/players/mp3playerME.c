@@ -182,6 +182,9 @@ int decodeThread(SceSize args, void *argp){
 
             if (MP3ME_newFilePos >= 0)
             {
+                if (!MP3ME_newFilePos)
+                    MP3ME_newFilePos = ID3v2TagSize(MP3ME_fileName);
+
                 long old_start = data_start;
                 if (sceIoLseek32(MP3ME_handle, MP3ME_newFilePos, PSP_SEEK_SET) != old_start){
                     data_start = SeekNextFrameMP3(MP3ME_handle);
@@ -365,7 +368,8 @@ int MP3MEgetInfo(){
 
     if (size < bufferSize * 3)
         bufferSize = size;
-    localBuffer = (unsigned char *) malloc(bufferSize);
+    localBuffer = (unsigned char *) malloc(sizeof(unsigned char)  * bufferSize);
+    unsigned char *buff = localBuffer;
 
     MP3ME_info.fileType = MP3_TYPE;
     MP3ME_info.defaultCPUClock = MP3ME_defaultCPUClock;
@@ -484,8 +488,8 @@ int MP3MEgetInfo(){
 	}
 	mad_header_finish (&header);
 	mad_stream_finish (&stream);
-    if (localBuffer)
-    	free(localBuffer);
+    if (buff)
+    	free(buff);
     sceIoClose(fd);
 
     int secs = 0;

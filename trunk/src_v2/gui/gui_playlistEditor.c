@@ -59,8 +59,7 @@ int buildMenuFromPlaylist(struct menuElements *menu){
     menu->numberOfElements = M3U_getSongCount();
     for (i=0; i<menu->numberOfElements; i++){
         entry = M3U_getSong(i);
-        limitString(entry->title, menu->width, tMenuEl.text);
-        //strcpy(tMenuEl.text, entry->title);
+        strcpy(tMenuEl.text, entry->title);
         tMenuEl.triggerFunction = NULL;
         tMenuEl.icon = musicIcon;
         menu->elements[i] = tMenuEl;
@@ -218,17 +217,17 @@ int gui_playlistEditor(){
 
         oslReadKeys();
         if (confirmStatus == STATUS_CONFIRM_CLEAR){
-            if(osl_pad.released.cross){
+            if(getConfirmButton()){
                 M3U_clear();
                 strcpy(userSettings->currentPlaylistName, "");
                 memset(&tagInfo, 0, sizeof(tagInfo));
                 buildMenuFromPlaylist(&commonMenu);
                 confirmStatus = STATUS_CONFIRM_NONE;
-            }else if(osl_pad.released.circle){
+            }else if(getCancelButton()){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
-            if(osl_pad.released.cross){
+            if(getConfirmButton()){
                 M3U_removeSong(commonMenu.selected);
                 oldSelected = commonMenu.selected;
                 oldFirst = commonMenu.first;
@@ -242,11 +241,11 @@ int gui_playlistEditor(){
                 else
                     commonMenu.first = oldFirst - 1;
                 confirmStatus = STATUS_CONFIRM_NONE;
-            }else if(osl_pad.released.circle){
+            }else if(getCancelButton()){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }else if (confirmStatus == STATUS_HELP){
-            if (osl_pad.released.cross || osl_pad.released.circle)
+            if (getConfirmButton() || getCancelButton())
                 confirmStatus = STATUS_CONFIRM_NONE;
         }else{
             oldSelected = commonMenu.selected;
@@ -302,7 +301,7 @@ int gui_playlistEditor(){
                     if (commonMenu.selected == oldFirst + commonMenu.maxNumberVisible)
                         commonMenu.first++;
                 }
-            }else if(osl_pad.released.circle && M3U_getSongCount()){
+            }else if(getCancelButton() && M3U_getSongCount()){
                 confirmStatus = STATUS_CONFIRM_REMOVE;
             }else if(osl_pad.released.start && M3U_getSongCount()){
                 char onlyName[264] = "";

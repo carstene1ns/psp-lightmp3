@@ -190,8 +190,8 @@ LOADING_SKIN_TITLE=기다려 주세요
 LOADING_SKIN=새 스킨을 적용중입니다
 CHECKING_PLAYLIST=재생목록의 파일을 검사중입니다
 
-SETTINGS_16=키 반복 지연
-SETTINGS_17=시작 화면 보기
+SETTINGS_17=키 반복 지연
+SETTINGS_18=시작 화면 보기
 
 BROWSE_TOP100=상위 100곡
 BROWSE_ALL=모든 곡
@@ -227,4 +227,11 @@ SLEEP_MODE_4=1:00 Hour
 SLEEP_MODE_5=1:30 Hours
 SLEEP_MODE_6=2:00 Hours
 
-SETTINGS_18=Display Off on Hold
+################################################################################
+#2.0.0 RC4
+################################################################################
+SETTINGS_16=CPU Clock: WMA
+SETTINGS_19=Display Off on Hold
+
+LOADING_LANGUAGE_TITLE=Please Wait
+LOADING_LANGUAGE=Loading new language

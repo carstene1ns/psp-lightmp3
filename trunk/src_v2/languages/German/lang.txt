@@ -187,8 +187,8 @@ LOADING_SKIN_TITLE=Bitte Warten
 LOADING_SKIN=Lade neues Thema
 CHECKING_PLAYLIST=Untersuche Datein in Wiedergabeliste
 
-SETTINGS_16=Tastenwiederholungsintervall
-SETTINGS_17=Zeige Intro
+SETTINGS_17=Tastenwiederholungsintervall
+SETTINGS_18=Zeige Intro
 
 BROWSE_TOP100=Top 100
 BROWSE_ALL=Alles durchsuchen
@@ -224,4 +224,11 @@ SLEEP_MODE_4=1:00 Hour
 SLEEP_MODE_5=1:30 Hours
 SLEEP_MODE_6=2:00 Hours
 
-SETTINGS_18=Display Off on Hold
+################################################################################
+#2.0.0 RC4
+################################################################################
+SETTINGS_16=CPU Clock: WMA
+SETTINGS_19=Display Off on Hold
+
+LOADING_LANGUAGE_TITLE=Please Wait
+LOADING_LANGUAGE=Loading new language

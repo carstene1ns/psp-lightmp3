@@ -241,7 +241,7 @@ int gui_fileBrowser(){
 
         oslReadKeys();
         if (status == STATUS_HELP){
-            if (osl_pad.released.cross || osl_pad.released.circle)
+            if (getConfirmButton() || getCancelButton())
                 status = STATUS_NORMAL;
         }else{
             if (!USBactive){
@@ -301,7 +301,7 @@ int gui_fileBrowser(){
 
             if (!USBactive && osl_pad.held.L && osl_pad.held.R){
                 status = STATUS_HELP;
-            }else if (!USBactive && osl_pad.released.cross && commonMenu.numberOfElements){
+            }else if (!USBactive && getConfirmButton() && commonMenu.numberOfElements){
                 if (FIO_S_ISDIR(directory.directory_entry[commonMenu.selected].d_stat.st_mode)){
                     //Enter directory:
                     if (curDir[strlen(curDir)-1] != '/'){
@@ -360,7 +360,7 @@ int gui_fileBrowser(){
                     userSettings->previousMode = MODE_FILEBROWSER;
                     exitFlagFileBrowser = 1;
                 }
-            }else if(!USBactive && osl_pad.released.circle){
+            }else if(!USBactive && getCancelButton()){
                 //Up one level:
                 char tempDir[264] = "";
                 getFileName(curDir, tempDir);

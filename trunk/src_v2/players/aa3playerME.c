@@ -167,6 +167,15 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 	while (AA3ME_threadActive){
 		while( !AA3ME_eof && AA3ME_isPlaying )
 		{
+            if (AA3ME_newFilePos >= 0)
+            {
+                if (!AA3ME_newFilePos)
+                    AA3ME_newFilePos = tag_size + 0x60;
+                sceIoLseek32(AA3ME_handle, AA3ME_newFilePos, PSP_SEEK_SET);
+                AA3ME_playingTime = (float)(AA3ME_newFilePos) / (float)data_align * (float)sample_per_frame/(float)samplerate;
+                AA3ME_newFilePos = -1;
+            }
+
 			data_start = sceIoLseek32(AA3ME_handle, 0, PSP_SEEK_CUR);
             AA3ME_filePos = data_start;
 
@@ -175,14 +184,6 @@ int AA3ME_decodeThread(SceSize args, void *argp){
 				AA3ME_threadActive = 0;
 				continue;
 			}
-
-            if (AA3ME_newFilePos >= 0)
-            {
-                sceIoLseek32(AA3ME_handle, AA3ME_newFilePos, PSP_SEEK_SET);
-                AA3ME_playingTime = (float)(AA3ME_newFilePos) / (float)data_align * (float)sample_per_frame/(float)samplerate;
-                AA3ME_filePos = AA3ME_newFilePos;
-                AA3ME_newFilePos = -1;
-            }
 
 			if ( at3_type == TYPE_ATRAC3 ) {
 				memset( AA3ME_input_buffer, 0, 0x180);

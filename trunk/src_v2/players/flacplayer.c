@@ -203,6 +203,15 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 
             if (FLAC_newFilePos >= 0)
             {
+                if (!FLAC_newFilePos){
+                    FLAC__stream_decoder_flush(decoder);
+                    FLAC__uint64 sample = 0;
+                    if (FLAC__stream_decoder_seek_absolute(decoder, sample)) {
+                        samples_played = 0;
+                        //FLAC_tempmixleft = 0; // clear buffer of stale samples
+                    }
+                    FLAC__stream_decoder_flush(decoder);
+                }
                 FLAC_newFilePos = -1;
             }
 

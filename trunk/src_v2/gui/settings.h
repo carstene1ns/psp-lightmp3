@@ -50,6 +50,7 @@ struct settings{
     int CLOCK_FLAC;
     int CLOCK_AA3;
     int CLOCK_AAC;
+    int CLOCK_WMA;
     int CLOCK_DELTA_ECONOMY_MODE;
 
     int USE_OSK;
@@ -80,6 +81,7 @@ struct settings{
     char mediaLibraryRoot[264];
     int shutDownAfterBookmark;
     int HOLD_DISPLAYOFF;
+    int frameskip;
 };
 
 int SETTINGS_load(char *fileName);

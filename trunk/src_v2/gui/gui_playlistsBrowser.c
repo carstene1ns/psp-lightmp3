@@ -167,7 +167,7 @@ int gui_playlistsBrowser(){
         oslReadKeys();
         if (!confirmStatus){
             processMenuKeys(&commonMenu);
-            if(osl_pad.released.cross && commonMenu.numberOfElements){
+            if(getConfirmButton() && commonMenu.numberOfElements){
 				snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s/%s", playlistsDir, directory.directory_entry[commonMenu.selected].longname);
 				snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s/%s", playlistsDir, directory.directory_entry[commonMenu.selected].d_name);
 				userSettings->playlistStartIndex = -1;
@@ -176,7 +176,7 @@ int gui_playlistsBrowser(){
                 exitFlagPlaylistsBrowser = 1;
             }else if(osl_pad.released.square && commonMenu.numberOfElements){
                 confirmStatus = STATUS_CONFIRM_LOAD;
-            }else if(osl_pad.released.circle && commonMenu.numberOfElements){
+            }else if(getCancelButton() && commonMenu.numberOfElements){
                 confirmStatus = STATUS_CONFIRM_REMOVE;
             }else if(osl_pad.released.start && commonMenu.numberOfElements){
                 confirmStatus = STATUS_CONFIRM_ADD;
@@ -190,32 +190,32 @@ int gui_playlistsBrowser(){
                 confirmStatus = STATUS_HELP;
             }
         }else if (confirmStatus == STATUS_HELP){
-            if (osl_pad.released.cross || osl_pad.released.circle)
+            if (getConfirmButton() || getCancelButton())
                 confirmStatus = STATUS_CONFIRM_NONE;
         }else if (confirmStatus == STATUS_CONFIRM_LOAD){
-            if(osl_pad.released.cross){
+            if(getConfirmButton()){
                 snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                 M3U_clear();
                 M3U_open(buffer);
                 M3U_save(tempM3Ufile);
                 strcpy(userSettings->currentPlaylistName, buffer);
                 confirmStatus = STATUS_CONFIRM_NONE;
-            }else if(osl_pad.released.circle){
+            }else if(getCancelButton()){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }else if (confirmStatus == STATUS_CONFIRM_ADD){
-            if(osl_pad.released.cross){
+            if(getConfirmButton()){
                 M3U_clear();
                 M3U_open(tempM3Ufile);
                 snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                 M3U_open(buffer);
                 M3U_save(tempM3Ufile);
                 confirmStatus = STATUS_CONFIRM_NONE;
-            }else if(osl_pad.released.circle){
+            }else if(getCancelButton()){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
-            if(osl_pad.released.cross){
+            if(getConfirmButton()){
                 snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
                 sceIoRemove(buffer);
                 opendir_close(&directory);
@@ -226,7 +226,7 @@ int gui_playlistsBrowser(){
                 commonMenu.first = 0;
                 commonMenu.selected = 0;
                 confirmStatus = STATUS_CONFIRM_NONE;
-            }else if(osl_pad.released.circle){
+            }else if(getCancelButton()){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }

@@ -187,8 +187,8 @@ LOADING_SKIN_TITLE=Please Wait
 LOADING_SKIN=Loading new skin
 CHECKING_PLAYLIST=Checking playlist's files
 
-SETTINGS_16=Keys repeat interval
-SETTINGS_17=Show splash screen
+SETTINGS_17=Keys repeat interval
+SETTINGS_18=Show splash screen
 
 BROWSE_TOP100=Top 100
 BROWSE_ALL=Browse all
@@ -224,4 +224,11 @@ SLEEP_MODE_4=1:00 Hour
 SLEEP_MODE_5=1:30 Hours
 SLEEP_MODE_6=2:00 Hours
 
-SETTINGS_18=Display Off on Hold
+################################################################################
+#2.0.0 RC4
+################################################################################
+SETTINGS_16=CPU Clock: WMA
+SETTINGS_19=Display Off on Hold
+
+LOADING_LANGUAGE_TITLE=Please Wait
+LOADING_LANGUAGE=Loading new language

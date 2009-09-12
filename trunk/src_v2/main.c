@@ -257,12 +257,12 @@ void checkBrightness(){
         	oslSyncFrame();
 
             oslReadKeys();
-            if(osl_pad.released.cross){
+            if(getConfirmButton()){
 				fadeDisplay(minB, DISPLAY_FADE_TIME);
             	userSettings->curBrightness = minB;
                 imposeSetBrightness(0);
                 done = 1;
-            }else if(osl_pad.released.circle){
+            }else if(getCancelButton()){
                 done = 1;
             }
         }
@@ -290,12 +290,12 @@ int confirmLoadBookmark()
         skip = oslSyncFrame();
 
         oslReadKeys();
-        if(osl_pad.released.cross)
+        if(getConfirmButton())
         {
             retValue = 1;
             break;
         }
-        else if(osl_pad.released.circle)
+        else if(getCancelButton())
         {
             retValue = 0;
             break;
@@ -321,6 +321,7 @@ int main(){
     //Init:
     SetupCallbacks();
     initOSLib();
+    setSwapButton();
 
     getcwd(ebootDirectory, 256);
 	//Full name for settings' file:
@@ -338,6 +339,7 @@ int main(){
     strcpy(userSettings->ebootPath, ebootDirectory);
     userSettings->displayStatus = 1;
     userSettings->BUS = getMinBUSClock(); //Override the saved value (the less == the better!)
+    oslSetFrameskip(userSettings->frameskip);
 
     //Splash screen:
 	int splash_thid = 0;
@@ -386,6 +388,7 @@ int main(){
     FLAC_defaultCPUClock = userSettings->CLOCK_FLAC;
     AA3ME_defaultCPUClock = userSettings->CLOCK_AA3;
     AAC_defaultCPUClock = userSettings->CLOCK_AAC;
+    WMA_defaultCPUClock = userSettings->CLOCK_WMA;
 	CLOCK_WHEN_PAUSE = getMinCPUClock();
 
     //Load language file:

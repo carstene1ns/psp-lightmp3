@@ -6,6 +6,15 @@
 #define JPEG_IMAGE 1
 #define PNG_IMAGE 2
 
+#define ID3_JPEG (unsigned char [3]) \
+                        { \
+                        0xFF,0xD8,0xFF \
+                        }
+
+#define ID3_PNG (unsigned char [16]) \
+                        { \
+                        0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52 \
+                        }
 struct ID3Tag {
     char   ID3Title[260];
     char   ID3Artist[260];

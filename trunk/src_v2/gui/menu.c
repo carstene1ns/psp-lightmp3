@@ -69,6 +69,7 @@ int clearPage(struct menuElements *menu){
         if (i >= menu->numberOfElements)
             break;
         strcpy(menu->elements[i].text, "");
+        menu->elements[i].xPos = 0;
     }
     return 0;
 }
@@ -97,6 +98,7 @@ int clearMenu(struct menuElements *menu){
     for (i=0; i < menu->numberOfElements; i++){
         menu->elements[i].icon = NULL;
         strcpy(menu->elements[i].text, "");
+        menu->elements[i].xPos = 0;
         menu->elements[i].triggerFunction = NULL;
     }
     menu->align = ALIGN_LEFT;
@@ -136,6 +138,8 @@ int drawMenu(struct menuElements *menu){
     }
 
     oslSetFont(fontMenuNormal);
+    int textLength = 0;
+
     for (i=menu->first; i<menu->first + menu->maxNumberVisible; i++){
         if (i >= menu->numberOfElements)
             break;
@@ -144,10 +148,14 @@ int drawMenu(struct menuElements *menu){
         if (i == menu->selected){
             if (menu->highlight != NULL)
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
-            setFontStyle(fontMenuNormal, defaultTextSize, RGBA(selColor[0], selColor[1], selColor[2], selColor[3]), RGBA(selColorShadow[0], selColorShadow[1], selColorShadow[2], selColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+            textLength = oslGetStringWidth(menu->elements[i].text);
+            if (textLength > menu->width)
+                setFontStyle(fontMenuNormal, defaultTextSize, RGBA(selColor[0], selColor[1], selColor[2], selColor[3]), RGBA(selColorShadow[0], selColorShadow[1], selColorShadow[2], selColorShadow[3]), INTRAFONT_SCROLL_SEESAW);
+            else
+                setFontStyle(fontMenuNormal, defaultTextSize, RGBA(selColor[0], selColor[1], selColor[2], selColor[3]), RGBA(selColorShadow[0], selColorShadow[1], selColorShadow[2], selColorShadow[3]), INTRAFONT_ALIGN_LEFT);
 		}else{
             setFontStyle(fontMenuNormal, defaultTextSize, RGBA(normColor[0], normColor[1], normColor[2], normColor[3]), RGBA(normColorShadow[0], normColorShadow[1], normColorShadow[2], normColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-		}
+        }
 
         if (menu->dataFeedFunction != NULL)
             menu->dataFeedFunction(i, &menu->elements[i]);
@@ -170,7 +178,15 @@ int drawMenu(struct menuElements *menu){
             }
             if (menu->elements[i].icon)
                 oslDrawImageXY(menu->elements[i].icon, xPosIcon, yPos);
-	        oslDrawString(xPos, yPos, menu->elements[i].text);
+
+            if (i == menu->selected && textLength > menu->width){
+                if (!menu->elements[i].xPos)
+                    menu->elements[i].xPos = xPos + 1 + (menu->width - (xPos - menu->xPos)) / 2.0f;
+                menu->elements[i].xPos = oslIntraFontPrintColumn(fontMenuNormal, menu->elements[i].xPos, yPos, menu->width  - (xPos - menu->xPos) - 8, 0, menu->elements[i].text);
+            }else{
+                oslIntraFontPrintColumn(fontMenuNormal, xPos, yPos, menu->width - (xPos - menu->xPos), 0, menu->elements[i].text);
+                //oslDrawString(xPos, yPos, menu->elements[i].text);
+            }
 		}
         count++;
     }
@@ -183,6 +199,10 @@ int drawMenu(struct menuElements *menu){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int processMenuKeys(struct menuElements *menu){
     struct menuElement selected;
+
+    int oldSelected = menu->selected;
+    if (menu->numberOfElements && oldSelected >= 0)
+        selected = menu->elements[oldSelected];
 
     if (menu->numberOfElements && osl_pad.pressed.down){
         if (menu->selected < menu->numberOfElements - 1){
@@ -244,5 +264,8 @@ int processMenuKeys(struct menuElements *menu){
         if (menu->cancelFunction != NULL)
             menu->cancelFunction();
     }
+
+    if (oldSelected >= 0 && oldSelected != menu->selected)
+        selected.xPos = 0;
     return 0;
 }

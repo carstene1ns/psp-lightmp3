@@ -15,4 +15,16 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program; if not, write to the Free Software
 //    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+typedef struct {
+    int queryType;
+    char select[ML_SQLMAXLENGTH];
+    char where[ML_SQLMAXLENGTH];
+    char orderBy[ML_SQLMAXLENGTH];
+    int offset;
+    int selected;
+    int (*exitFunction)();
+    int (*triggerFunction)();
+    int orderByMenuSelected;
+} ML_status;
+
 int gui_mediaLibrary();
