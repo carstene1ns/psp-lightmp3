@@ -179,13 +179,16 @@ int drawMenu(struct menuElements *menu){
             if (menu->elements[i].icon)
                 oslDrawImageXY(menu->elements[i].icon, xPosIcon, yPos);
 
-            if (i == menu->selected && textLength > menu->width){
-                if (!menu->elements[i].xPos)
-                    menu->elements[i].xPos = xPos + 1 + (menu->width - (xPos - menu->xPos)) / 2.0f;
-                menu->elements[i].xPos = oslIntraFontPrintColumn(fontMenuNormal, menu->elements[i].xPos, yPos, menu->width  - (xPos - menu->xPos) - 8, 0, menu->elements[i].text);
+            if (fontMenuNormal->fontType == OSL_FONT_INTRA){
+                if (i == menu->selected && textLength > menu->width){
+                    if (!menu->elements[i].xPos)
+                        menu->elements[i].xPos = xPos + 1 + (menu->width - (xPos - menu->xPos)) / 2.0f;
+                    menu->elements[i].xPos = oslIntraFontPrintColumn(fontMenuNormal, menu->elements[i].xPos, yPos, menu->width  - (xPos - menu->xPos) - 8, 0, menu->elements[i].text);
+                }else{
+                    oslIntraFontPrintColumn(fontMenuNormal, xPos, yPos, menu->width - (xPos - menu->xPos), 0, menu->elements[i].text);
+                }
             }else{
-                oslIntraFontPrintColumn(fontMenuNormal, xPos, yPos, menu->width - (xPos - menu->xPos), 0, menu->elements[i].text);
-                //oslDrawString(xPos, yPos, menu->elements[i].text);
+                oslDrawStringLimited(xPos, yPos, menu->width - (xPos - menu->xPos), menu->elements[i].text);
             }
 		}
         count++;
@@ -198,11 +201,7 @@ int drawMenu(struct menuElements *menu){
 // NOTE: the oslReadKeys(); must be done in the calling function.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int processMenuKeys(struct menuElements *menu){
-    struct menuElement selected;
-
     int oldSelected = menu->selected;
-    if (menu->numberOfElements && oldSelected >= 0)
-        selected = menu->elements[oldSelected];
 
     if (menu->numberOfElements && osl_pad.pressed.down){
         if (menu->selected < menu->numberOfElements - 1){
@@ -257,7 +256,7 @@ int processMenuKeys(struct menuElements *menu){
         if (menu->dataFeedFunction != NULL)
             clearPage(menu);
     }else if (menu->numberOfElements && osl_pad.pressed.cross){
-        selected = menu->elements[menu->selected];
+        struct menuElement selected = menu->elements[menu->selected];
         if (selected.triggerFunction != NULL)
             selected.triggerFunction();
     }else if (osl_pad.pressed.circle){
@@ -265,7 +264,7 @@ int processMenuKeys(struct menuElements *menu){
             menu->cancelFunction();
     }
 
-    if (oldSelected >= 0 && oldSelected != menu->selected)
-        selected.xPos = 0;
+    if (menu->selected >= 0 && oldSelected != menu->selected)
+        menu->elements[menu->selected].xPos = 0;
     return 0;
 }

@@ -363,7 +363,23 @@ int MP3MEgetInfo(){
     MP3ME_tagsize = ID3v2TagSize(MP3ME_fileName);
 	double startPos = MP3ME_tagsize;
 	sceIoLseek32(fd, startPos, PSP_SEEK_SET);
-    //startPos = SeekNextFrameMP3(fd);
+
+    //Check for xing frame:
+	unsigned char *xing_buffer;
+	xing_buffer = (unsigned char *)malloc(XING_BUFFER_SIZE);
+	if (xing_buffer != NULL)
+	{
+        sceIoRead(fd, xing_buffer, XING_BUFFER_SIZE);
+        if(parse_xing(xing_buffer, 0, &xing))
+        {
+            if (xing.flags & XING_FRAMES && xing.frames){
+                has_xing = 1;
+                bufferSize = 50 * 1024;
+            }
+        }
+        free(xing_buffer);
+    }
+
     size -= startPos;
 
     if (size < bufferSize * 3)
@@ -452,26 +468,13 @@ int MP3MEgetInfo(){
     				break;
     			}
 
-				//Check for xing frame:
-	            if(parse_xing(&xing, stream.anc_ptr, stream.anc_bitlen))
-				{
-					if (xing.flags & XING_FRAMES)
-					{
-						/* We use the Xing tag only for frames. If it doesn't have that
-						   information, it's useless to us and we have to treat it as a
-						   normal VBR file */
-						has_xing = 1;
-						FrameCount = xing.frames;
-						timeFromID3 = 1;
-						break;
-					}
-				}
-
     			//Check if lenght found in tag info:
                 if (MP3ME_info.length > 0){
                     timeFromID3 = 1;
                     break;
                 }
+                if (has_xing)
+                    break;
             }
 
             totalBitrate += header.bitrate;
@@ -483,7 +486,7 @@ int MP3MEgetInfo(){
         else if (i==1)
             sceIoLseek(fd, startPos + 2 * size/3, PSP_SEEK_SET);
 
-        if (timeFromID3)
+        if (timeFromID3 || has_xing)
             break;
 	}
 	mad_header_finish (&header);
@@ -496,7 +499,7 @@ int MP3MEgetInfo(){
     if (has_xing)
     {
         /* modify header.duration since we don't need it anymore */
-        mad_timer_multiply(&header.duration, FrameCount);
+        mad_timer_multiply(&header.duration, xing.frames);
         secs = mad_timer_count(header.duration, MAD_UNITS_SECONDS);
 		MP3ME_info.length = secs;
 	}

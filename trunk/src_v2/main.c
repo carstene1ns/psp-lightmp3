@@ -336,6 +336,7 @@ int main(){
         userSettings = SETTINGS_default();
 		strcpy(userSettings->fileName, buffer);
     }
+    currentMode = userSettings->startTab;
     strcpy(userSettings->ebootPath, ebootDirectory);
     userSettings->displayStatus = 1;
     userSettings->BUS = getMinBUSClock(); //Override the saved value (the less == the better!)

@@ -492,7 +492,7 @@ void queryDataFeed(int index, struct menuElement *element){
 	{
 	case QUERY_COUNT:
         if (!strlen(element->text)){
-            snprintf(element->text, sizeof(buffer), "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
+            snprintf(element->text, sizeof(element->text), "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
             strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
             element->icon = folderIcon;
             element->triggerFunction = MlStatus[currentStatus].triggerFunction;
@@ -516,7 +516,7 @@ void queryDataFeed(int index, struct menuElement *element){
 		break;
 	case QUERY_COUNT_ARTIST:
         if (!strlen(element->text)){
-            snprintf(element->text, sizeof(buffer), "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
+            snprintf(element->text, sizeof(element->text), "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
             strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
             element->icon = folderIcon;
             element->triggerFunction = MlStatus[currentStatus].triggerFunction;

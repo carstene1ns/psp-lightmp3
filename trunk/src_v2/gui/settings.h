@@ -53,8 +53,6 @@ struct settings{
     int CLOCK_WMA;
     int CLOCK_DELTA_ECONOMY_MODE;
 
-    int USE_OSK;
-
 	//Skin's settings:
     char skinName[52];
     char skinImagesPath[264];
@@ -82,6 +80,8 @@ struct settings{
     int shutDownAfterBookmark;
     int HOLD_DISPLAYOFF;
     int frameskip;
+
+    int startTab;
 };
 
 int SETTINGS_load(char *fileName);

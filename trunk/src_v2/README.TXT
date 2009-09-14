@@ -11,7 +11,7 @@ LightMP3 is ditributed under GNU General Public License, read LICENSE.TXT for de
 
 WHAT IS IT?
 -----------
-LightMP3 is a MP3/OGG Vorbis/FLAC/Atrac3+ player designed to drain little energy from your battery.
+LightMP3 is a MP3/OGG Vorbis/FLAC/Atrac3+/WMA player designed to drain little energy from your battery.
 Can decode MP3 and ATRAC3+ via Media Engine with CPU set at 20Mhz, OGG Vorbis with CPU set at 50Mhz, MP3 via libMAD
 with CPU set at 70Mhz, FLAC with CPU set at 100Mhz.
 With battery at 100% and display set to minimum brightness it should last 9 hours.
@@ -180,6 +180,19 @@ to
 SHUTDOWN_AFTER_BOOKMARK=1
 
 
+STARTING TAB
+------------
+You can choose the starting tab by changing the setting START_TAB
+There's no setting in the setting tab for this, so you'll have to manually modify the settings file.
+
+START_TAB possible values:
+    0 = File browser
+    1 = Playlist
+    2 = Playlist editor
+    3 = Media Library
+    4 = Settings
+
+
 DEPENDENCIES
 ------------
 To compile LightMP3 you need:
@@ -213,12 +226,14 @@ To use the Korean language:
 1.Set in the setting tab the default_KOR skin
 2.Set in the setting tab the Korean language
 
+
 JAPANESE LANGUAGE
 ---------------
 To use japanese language you must have flash0:/font/jpn0.pgf (not all PSP has this font)
 To use the Japanese language:
 1.Set in the setting tab the default_JPN skin
 2.Set in the setting tab the Japanese language
+
 
 BUGS
 ----
