@@ -86,8 +86,6 @@ int SETTINGS_load(char *fileName){
 								localSettings.VOLUME = atoi(result);
 							}else if (strcmp(parName, "MP3_ME") == 0){
 								localSettings.MP3_ME = atoi(result);
-							}else if (strcmp(parName, "USE_OSK") == 0){
-								localSettings.USE_OSK = atoi(result);
 							}else if (strcmp(parName, "FADE_OUT") == 0){
 								localSettings.FADE_OUT = atoi(result);
 							}else if (strcmp(parName, "PLAY_MODE") == 0){
@@ -177,12 +175,12 @@ struct settings *SETTINGS_default(){
 	localSettings.CLOCK_AAC = 60;
     localSettings.CLOCK_WMA = 40;
 	localSettings.CLOCK_DELTA_ECONOMY_MODE = 1;
-	localSettings.USE_OSK = 1;
     localSettings.playMode = 0;
     localSettings.KEY_AUTOREPEAT_GUI = 10;
     localSettings.KEY_AUTOREPEAT_PLAYER = 10;
 	localSettings.SHOW_SPLASH = 1;
     localSettings.frameskip = 0;
+    localSettings.startTab = 0;
 
 	//Skin's settings:
     strcpy(localSettings.skinName, "default");
@@ -230,8 +228,6 @@ int SETTINGS_save(struct settings tSettings){
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "MP3_ME=%i\n", tSettings.MP3_ME);
     fwrite(testo, 1, strlen(testo), f);
-    snprintf(testo, sizeof(testo), "USE_OSK=%i\n", tSettings.USE_OSK);
-    fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "SCROBBLER=%i\n", tSettings.SCROBBLER);
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "VOLUME=%i\n", tSettings.VOLUME);
@@ -274,6 +270,9 @@ int SETTINGS_save(struct settings tSettings){
     fwrite(testo, 1, strlen(testo), f);
     snprintf(testo, sizeof(testo), "FRAMESKIP=%i\n", tSettings.frameskip);
     fwrite(testo, 1, strlen(testo), f);
+    snprintf(testo, sizeof(testo), "START_TAB=%i\n", tSettings.startTab);
+    fwrite(testo, 1, strlen(testo), f);
+
 	fclose(f);
     return(0);
 }

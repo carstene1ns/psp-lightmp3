@@ -4,6 +4,14 @@ LightMP3 Changelog
 Version 2.0.0 RC4
 -----------------
 -Added: Scrolling text when string is too long in all menues and song title
+-Added: Setting to choose the tab to start from.
+        Values:
+        0 = File browser
+        1 = Playlist
+        2 = Playlist editor
+        3 = Media Library
+        4 = Settings
+-Added: Total number of frames red from Xing frame (faster opening of VBR mp3 file, if Xing is found)
 -Fixed: Navigation in the Media Library (when pressing circle you'll be taken to the previous selection, not on the main menu)
 -Fixed: Added setting to set CPU clock for WMA
 -Fixed: Track restart when pressing L on WMA, FLAC, ATRAC3(+), MP3 when played with libMad

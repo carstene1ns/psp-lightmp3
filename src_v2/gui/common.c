@@ -186,7 +186,7 @@ void loadFonts()
 	fontNormal = oslLoadFontFile(buffer);
     if (!fontNormal)
         errorLoadImage(buffer);
-	if ( skinGetString("STR_FONT_ALT_NAME", buffer) == 0 )
+	if ( fontNormal->fontType == OSL_FONT_INTRA && skinGetString("STR_FONT_ALT_NAME", buffer) == 0 )
     {
 		oslLoadAltIntraFontFile(fontNormal, buffer);
         if (!fontNormal->intra->altFont)
