@@ -56,6 +56,7 @@ static short FLAC_mixBuffer[MIX_BUF_SIZE * 4]__attribute__ ((aligned(64)));
 
 static long FLAC_tempmixleft = 0;
 static long samples_played = 0;
+static long FLAC_total_samples = 0;
 
 static FLAC__StreamDecoder *decoder = 0;
 static double FLAC_newFilePos = -1;
@@ -90,10 +91,8 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
    if (FLAC_tempmixleft + frame->header.blocksize > MIX_BUF_SIZE)
       sceKernelWaitSema(bufferLow, 1, 0); // wait for buffer to get low
 
-   if (kill_flac_thread){
-      //FLAC_eos = 1;
+   if (kill_flac_thread)
       return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
-   }
 
    /* copy decoded PCM samples to buffer */
    for (i=0; i<frame->header.blocksize; i++)
@@ -163,7 +162,12 @@ int flacThread(SceSize args, void *argp)
         //Check for playing speed:
         if (FLAC_playingSpeed){
             FLAC__uint64 sample = (FLAC__uint64)(samples_played + PSP_NUM_AUDIO_SAMPLES + FLAC_playingDelta);
-            if (sample < 0 || !FLAC__stream_decoder_seek_absolute(decoder, sample)) {
+            if (sample > FLAC_total_samples)
+                break;
+            if (sample < 0)
+                sample = 0;
+
+            if (!FLAC__stream_decoder_seek_absolute(decoder, sample)) {
                 FLAC_setPlayingSpeed(0);
             } else {
                 samples_played += FLAC_playingDelta;
@@ -314,6 +318,7 @@ void FLACgetInfo(char *filename){
 	    FLAC_info.instantBitrate = streaminfo.data.stream_info.sample_rate * streaminfo.data.stream_info.bits_per_sample * streaminfo.data.stream_info.channels;
 		FLAC_info.hz = streaminfo.data.stream_info.sample_rate;
 		FLAC_info.length = (long)(streaminfo.data.stream_info.total_samples / streaminfo.data.stream_info.sample_rate);
+        FLAC_total_samples = (long)streaminfo.data.stream_info.total_samples;
         FLAC_info.needsME = 0;
 	    if (streaminfo.data.stream_info.channels == 1)
 	        strcpy(FLAC_info.mode, "single channel");
@@ -341,6 +346,7 @@ void FLAC_Init(int channel){
     MAX_PLAYING_SPEED=119;
 	FLAC_audio_channel = channel;
 	samples_played = 0;
+    FLAC_total_samples = 0;
     bufferLow = sceKernelCreateSema("bufferLow", 0, 1, 1, 0);
     memset(FLAC_mixBuffer, 0, sizeof(FLAC_mixBuffer));
     FLAC_tempmixleft = 0;
