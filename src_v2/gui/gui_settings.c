@@ -146,12 +146,12 @@ int initSettingsMenu(){
 
     //Values menu:
     commonSubMenu.yPos = tempPos[1];
-    commonSubMenu.xPos = tempPos[0] + 350;
+    commonSubMenu.xPos = tempPos[0];
     commonSubMenu.align = ALIGN_RIGHT;
     commonSubMenu.fastScrolling = 0;
     commonSubMenu.background = NULL;
     commonSubMenu.highlight = NULL;
-    commonSubMenu.width = commonMenu.width - 350;
+    commonSubMenu.width = commonMenu.width;
     commonSubMenu.height = commonMenu.height;
     commonSubMenu.interline = commonMenu.interline;
     commonSubMenu.maxNumberVisible = commonMenu.maxNumberVisible;

@@ -90,8 +90,10 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
    if (FLAC_tempmixleft + frame->header.blocksize > MIX_BUF_SIZE)
       sceKernelWaitSema(bufferLow, 1, 0); // wait for buffer to get low
 
-   if (kill_flac_thread)
+   if (kill_flac_thread){
+      //FLAC_eos = 1;
       return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+   }
 
    /* copy decoded PCM samples to buffer */
    for (i=0; i<frame->header.blocksize; i++)
@@ -124,14 +126,12 @@ void error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderError
 
 int flacThread(SceSize args, void *argp)
 {
-   FLAC__bool ok = true;
    FLAC__StreamDecoderInitStatus init_status;
 
    if((decoder = FLAC__stream_decoder_new()) == NULL)
       sceKernelExitDeleteThread(0);
 
    (void)FLAC__stream_decoder_set_md5_checking(decoder, true);
-   //(void)FLAC__stream_decoder_set_md5_checking(decoder, false);
 
    init_status = FLAC__stream_decoder_init_file(decoder, FLAC_fileName, write_callback, metadata_callback, error_callback, FLAC_file);
    if(init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK) {
@@ -144,9 +144,39 @@ int flacThread(SceSize args, void *argp)
    sceKernelSignalSema(bufferLow, 1); // so it fills the buffer to start
 
    kill_flac_thread = 0;
-   ok = FLAC__stream_decoder_process_until_end_of_stream(decoder);
-   //printf(" decoding: %s\n", ok ? "succeeded" : "FAILED");
-   //printf("    state: %s\n", FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+   //FLAC__stream_decoder_process_until_end_of_stream(decoder);
+   while (FLAC__stream_decoder_process_single(decoder) != false){
+        if (FLAC_newFilePos >= 0)
+        {
+            if (!FLAC_newFilePos){
+                FLAC__uint64 sample = 0;
+                if (FLAC__stream_decoder_seek_absolute(decoder, sample)) {
+                    samples_played = 0;
+                    FLAC_tempmixleft = 0; // clear buffer of stale samples
+                }
+                if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
+                    FLAC__stream_decoder_flush(decoder);
+            }
+            FLAC_newFilePos = -1;
+        }
+
+        //Check for playing speed:
+        if (FLAC_playingSpeed){
+            FLAC__uint64 sample = (FLAC__uint64)(samples_played + PSP_NUM_AUDIO_SAMPLES + FLAC_playingDelta);
+            if (sample < 0 || !FLAC__stream_decoder_seek_absolute(decoder, sample)) {
+                FLAC_setPlayingSpeed(0);
+            } else {
+                samples_played += FLAC_playingDelta;
+                FLAC_tempmixleft = 0; // clear buffer of stale samples
+            }
+            if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
+                FLAC__stream_decoder_flush(decoder);
+        }
+
+        if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_END_OF_STREAM )
+            break;
+   }
+
    FLAC_eos = 1;
 
    if(FLAC__stream_decoder_get_state(decoder) != FLAC__STREAM_DECODER_UNINITIALIZED)
@@ -200,33 +230,6 @@ static void audioCallback(void *_buf2, unsigned int numSamples, void *pdata){
 				FLAC_mixBuffer[j] = FLAC_mixBuffer[(numSamples<<1) + j];
 				FLAC_mixBuffer[j + 1] = FLAC_mixBuffer[(numSamples<<1) + j + 1];
 			}
-
-            if (FLAC_newFilePos >= 0)
-            {
-                if (!FLAC_newFilePos){
-                    FLAC__stream_decoder_flush(decoder);
-                    FLAC__uint64 sample = 0;
-                    if (FLAC__stream_decoder_seek_absolute(decoder, sample)) {
-                        samples_played = 0;
-                        //FLAC_tempmixleft = 0; // clear buffer of stale samples
-                    }
-                    FLAC__stream_decoder_flush(decoder);
-                }
-                FLAC_newFilePos = -1;
-            }
-
-            //Check for playing speed:
-            if (FLAC_playingSpeed){
-				FLAC__stream_decoder_flush(decoder);
-                FLAC__uint64 sample = (FLAC__uint64)(samples_played + numSamples + FLAC_playingDelta);
-            	if (sample < 0 || !FLAC__stream_decoder_seek_absolute(decoder, sample)) {
-                    FLAC_setPlayingSpeed(0);
-                } else {
-                	samples_played += FLAC_playingDelta;
-                	//FLAC_tempmixleft = 0; // clear buffer of stale samples
-                }
-				FLAC__stream_decoder_flush(decoder);
-            }
 		}
 		samples_played += numSamples;
         outputInProgress = 0;

@@ -130,6 +130,8 @@ int SETTINGS_load(char *fileName){
 								localSettings.HOLD_DISPLAYOFF = atoi(result);
 							}else if (strcmp(parName, "FRAMESKIP") == 0){
 								localSettings.frameskip = atoi(result);
+							}else if (strcmp(parName, "START_TAB") == 0){
+								localSettings.startTab = atoi(result);
 							}
 						}
 						element++;

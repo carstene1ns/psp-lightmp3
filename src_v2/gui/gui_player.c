@@ -117,12 +117,15 @@ int drawFileInfo(struct fileInfo *info, struct libraryEntry *libEntry, char *tra
     setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
     skinGetPosition("POS_TITLE_VALUE", tempPos);
     int titleWidth = skinGetParam("TITLE_VALUE_WIDTH");
-    if (titleWidth > 0 && fontNormal->fontType == OSL_FONT_INTRA && oslGetStringWidth(info->title) > titleWidth){
-        setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_SCROLL_SEESAW);
-        if (scrollTitleX < 0)
-            scrollTitleX = 2 + tempPos[0] + titleWidth / 2.0f;
-        scrollTitleX = oslIntraFontPrintColumn(fontNormal, scrollTitleX, tempPos[1], titleWidth, 0, info->title);
-        setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+    if (titleWidth > 0 && oslGetStringWidth(info->title) > titleWidth){
+        if (fontNormal->fontType == OSL_FONT_INTRA){
+            setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_SCROLL_SEESAW);
+            if (scrollTitleX < 0)
+                scrollTitleX = 2 + tempPos[0] + titleWidth / 2.0f;
+            scrollTitleX = oslIntraFontPrintColumn(fontNormal, scrollTitleX, tempPos[1], titleWidth, 0, info->title);
+            setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
+        }else
+            oslDrawStringLimited(tempPos[0], tempPos[1], titleWidth, info->title);
     }else
         oslDrawString(tempPos[0], tempPos[1], info->title);
     skinGetPosition("POS_ARTIST_VALUE", tempPos);

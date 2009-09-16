@@ -22,7 +22,7 @@
 
 struct strLangString{
     char name[52];
-    char value[100];
+    char value[156];
 };
 
 struct strLangStrings{
