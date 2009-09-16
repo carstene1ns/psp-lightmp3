@@ -18,7 +18,6 @@
 #include "wma_tag.h"
 #include <stdio.h>
 #include <string.h>
-#include "../system/libminiconv.h"
 
 int wmaJpegStart(unsigned char *buffer, int startPos, int maxSearch)
 {

@@ -12,13 +12,14 @@ Version 2.0.0 RC4
         3 = Media Library
         4 = Settings
 -Added: Total number of frames red from Xing frame (faster opening of VBR mp3 file, if Xing is found)
+-Fixed: Crash when seeking FLAC files
 -Fixed: Navigation in the Media Library (when pressing circle you'll be taken to the previous selection, not on the main menu)
 -Fixed: Added setting to set CPU clock for WMA
 -Fixed: Track restart when pressing L on WMA, FLAC, ATRAC3(+), MP3 when played with libMad
 -Fixed: Suspend and resume for WMA
 -Fixed: Changed the default setting to play MP3 with Media Engine
--Fixed: X/O Swap (please note that help screen will always say X=Confirm, O=Cancel, I din't changed it)
--Fixed: Bug when creating playlist from Media Library
+-Fixed: X/O button swap (please note that help screen will always say X=Confirm, O=Cancel, I din't changed it)
+-Fixed: Bug when creating playlist from Media Library (the first 500 tracks were repeated)
 
 
 Version 2.0.0 RC3

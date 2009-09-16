@@ -598,8 +598,6 @@ int initFonts(){
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_UTF8);
 	else if (!strcmp(encoding, "CP437"))
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_CP437);
-	else if (!strcmp(encoding, "CP437"))
-	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_CP437);
 	else if (!strcmp(encoding, "CP850"))
 	    oslIntraFontInit(INTRAFONT_CACHE_ALL | INTRAFONT_STRING_CP850);
 	else if (!strcmp(encoding, "CP866"))
