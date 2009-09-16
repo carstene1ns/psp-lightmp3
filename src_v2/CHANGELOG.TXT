@@ -4,7 +4,7 @@ LightMP3 Changelog
 Version 2.0.0 RC4
 -----------------
 -Added: Scrolling text when string is too long in all menues and song title
--Added: Setting to choose the tab to start from.
+-Added: Setting to choose the tab to start from (START_TAB)
         Values:
         0 = File browser
         1 = Playlist
