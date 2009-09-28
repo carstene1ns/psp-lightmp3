@@ -311,18 +311,19 @@ int wmaReadTag(unsigned char *buffer, int position, wmaTagValue *tag)
         buffer += 1;
         position += 1;
         tagSize = le2int(buffer);
-
-	    strcpy(tag->name, "PICTURE");
-	    tag->size = tagSize;
-	    tag->start = wmaJpegStart(buffer, position, 300);
-	    if (tag->start < 0){
-            tag->start = wmaPngStart(buffer, position, 300);
+        if (imageType == 3){
+            strcpy(tag->name, "PICTURE");
+            tag->size = tagSize;
+            tag->start = wmaJpegStart(buffer, position, 300);
+            if (tag->start < 0){
+                tag->start = wmaPngStart(buffer, position, 300);
+                if (tag->start >= 0)
+                    strcpy(tag->value, "PNG");
+            } else
+                strcpy(tag->value, "JPEG");
             if (tag->start >= 0)
-                strcpy(tag->value, "PNG");
-        } else
-            strcpy(tag->value, "JPEG");
-        if (tag->start >= 0)
-            position = tag->start;
+                position = tag->start;
+        }
 	    return position + tagSize;
 	}
 

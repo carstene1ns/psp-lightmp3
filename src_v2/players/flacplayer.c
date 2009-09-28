@@ -143,7 +143,6 @@ int flacThread(SceSize args, void *argp)
    sceKernelSignalSema(bufferLow, 1); // so it fills the buffer to start
 
    kill_flac_thread = 0;
-   //FLAC__stream_decoder_process_until_end_of_stream(decoder);
    while (FLAC__stream_decoder_process_single(decoder) != false){
         if (FLAC_newFilePos >= 0)
         {
@@ -170,7 +169,7 @@ int flacThread(SceSize args, void *argp)
             if (!FLAC__stream_decoder_seek_absolute(decoder, sample)) {
                 FLAC_setPlayingSpeed(0);
             } else {
-                samples_played += FLAC_playingDelta;
+                samples_played = sample;
                 FLAC_tempmixleft = 0; // clear buffer of stale samples
             }
             if (FLAC__stream_decoder_get_state(decoder) == FLAC__STREAM_DECODER_SEEK_ERROR)
@@ -283,20 +282,20 @@ void getFLACTagInfo(char *filename, struct fileInfo *targetInfo){
 		if(info->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
 			for(i = 0; i < info->data.vorbis_comment.num_comments; ++i) {
 				splitComment((char*)info->data.vorbis_comment.comments[i].entry, name, value);
-				if (!strcmp(name, "TITLE"))
+				if (!strcasecmp(name, "TITLE"))
 					strcpy(targetInfo->title, value);
-				else if(!strcmp(name, "ALBUM"))
+				else if(!strcasecmp(name, "ALBUM"))
 					strcpy(targetInfo->album, value);
-				else if(!strcmp(name, "ARTIST"))
+				else if(!strcasecmp(name, "ARTIST"))
 					strcpy(targetInfo->artist, value);
-				else if(!strcmp(name, "GENRE"))
+				else if(!strcasecmp(name, "GENRE"))
 					strcpy(targetInfo->genre, value);
-				else if(!strcmp(name, "DATE")){
+				else if(!strcasecmp(name, "DATE") || !strcasecmp(name, "YEAR")){
                     strncpy(targetInfo->year, value, 4);
                     targetInfo->year[4] = '\0';
-				}else if(!strcmp(name, "TRACKNUMBER"))
+				}else if(!strcasecmp(name, "TRACKNUMBER"))
 		            strcpy(targetInfo->trackNumber, value);
-        		else if(!strcmp(name, "COVERART_UUENCODED")){
+        		else if(!strcasecmp(name, "COVERART_UUENCODED")){
                     //COVER ART
                 }
 			}
@@ -461,7 +460,6 @@ float FLAC_GetPercentage(){
     if (perc > 100)
         perc = 100;
 	return perc;
-
 }
 
 

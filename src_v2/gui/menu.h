@@ -19,7 +19,7 @@
 #define __menu_h (1)
 
 #include "settings.h"
-#define MENU_MAX_ELEMENTS 3000
+#define MENU_MAX_ELEMENTS 5000
 
 #define ALIGN_LEFT 0
 #define ALIGN_RIGHT 1
@@ -50,7 +50,7 @@ struct menuElements{
     int interline;
     int fastScrolling;
     int align;
-    struct menuElement elements[MENU_MAX_ELEMENTS];
+    struct menuElement *elements[MENU_MAX_ELEMENTS];
     int (*cancelFunction)();
     void (*dataFeedFunction)(int index, struct menuElement *element);
 };
@@ -58,6 +58,7 @@ struct menuElements{
 
 int initMenu();
 int clearMenu(struct menuElements *menu);
+void clearMenuElement(struct menuElement *element);
 int drawMenu(struct menuElements *menu);
 int processMenuKeys(struct menuElements *menu);
 int endMenu();

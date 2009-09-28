@@ -72,7 +72,7 @@ int drawPlaylistInfo(){
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
         setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         skinGetPosition("POS_PLAYLIST_NAME_VALUE", tempPos);
-        oslDrawString(tempPos[0], tempPos[1], commonMenu.elements[commonMenu.selected].text);
+        oslDrawString(tempPos[0], tempPos[1], commonMenu.elements[commonMenu.selected]->text);
         skinGetPosition("POS_PLAYLIST_TOTAL_TRACKS_VALUE", tempPos);
         snprintf(tBuffer, sizeof(tBuffer), "%i", M3U_getSongCount());
         oslDrawString(tempPos[0], tempPos[1], tBuffer);
@@ -117,6 +117,7 @@ int gui_playlistsBrowser(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
+    fixMenuSize(&commonMenu);
     commonMenu.interline = skinGetParam("MENU_INTERLINE");
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
@@ -132,11 +133,11 @@ int gui_playlistsBrowser(){
 		if (!skip){
 			oslStartDrawing();
 
-			if (commonMenu.selected >= 0 && strcmp(buffer, commonMenu.elements[commonMenu.selected].text)){
-				snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+			if (commonMenu.selected >= 0 && strcmp(buffer, commonMenu.elements[commonMenu.selected]->text)){
+				snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected]->text);
 				M3U_clear();
 				M3U_open(buffer);
-				strcpy(buffer, commonMenu.elements[commonMenu.selected].text);
+				strcpy(buffer, commonMenu.elements[commonMenu.selected]->text);
 			}
 
 			drawCommonGraphics();
@@ -194,7 +195,7 @@ int gui_playlistsBrowser(){
                 confirmStatus = STATUS_CONFIRM_NONE;
         }else if (confirmStatus == STATUS_CONFIRM_LOAD){
             if(getConfirmButton()){
-                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected]->text);
                 M3U_clear();
                 M3U_open(buffer);
                 M3U_save(tempM3Ufile);
@@ -207,7 +208,7 @@ int gui_playlistsBrowser(){
             if(getConfirmButton()){
                 M3U_clear();
                 M3U_open(tempM3Ufile);
-                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected]->text);
                 M3U_open(buffer);
                 M3U_save(tempM3Ufile);
                 confirmStatus = STATUS_CONFIRM_NONE;
@@ -216,7 +217,7 @@ int gui_playlistsBrowser(){
             }
         }else if (confirmStatus == STATUS_CONFIRM_REMOVE){
             if(getConfirmButton()){
-                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected].text);
+                snprintf(buffer, sizeof(buffer), "%s/%s", playlistsDir, commonMenu.elements[commonMenu.selected]->text);
                 sceIoRemove(buffer);
                 opendir_close(&directory);
 				cpuBoost();

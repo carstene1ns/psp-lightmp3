@@ -61,6 +61,19 @@ int endMenu(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// clearMenuElement: clear a single element
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void clearMenuElement(struct menuElement *element)
+{
+    strcpy(element->text, "");
+    element->value = 0;
+    element->xPos = 0;
+    element->icon = NULL;
+    strcpy(element->data, "");
+    element->triggerFunction = NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // clearPage: clear elements currently visualized:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int clearPage(struct menuElements *menu){
@@ -68,8 +81,7 @@ int clearPage(struct menuElements *menu){
     for (i=menu->first; i<menu->first + menu->maxNumberVisible; i++){
         if (i >= menu->numberOfElements)
             break;
-        strcpy(menu->elements[i].text, "");
-        menu->elements[i].xPos = 0;
+        clearMenuElement(menu->elements[i]);
     }
     return 0;
 }
@@ -96,10 +108,10 @@ int clearMenu(struct menuElements *menu){
         menu->highlight = NULL;
     }
     for (i=0; i < menu->numberOfElements; i++){
-        menu->elements[i].icon = NULL;
-        strcpy(menu->elements[i].text, "");
-        menu->elements[i].xPos = 0;
-        menu->elements[i].triggerFunction = NULL;
+        if (menu->elements[i]){
+            free(menu->elements[i]);
+            menu->elements[i] = NULL;
+        }
     }
     menu->align = ALIGN_LEFT;
     menu->numberOfElements = 0;
@@ -148,7 +160,7 @@ int drawMenu(struct menuElements *menu){
         if (i == menu->selected){
             if (menu->highlight != NULL)
                 oslDrawImageXY(menu->highlight, menu->xPos, yPos);
-            textLength = oslGetStringWidth(menu->elements[i].text);
+            textLength = oslGetStringWidth(menu->elements[i]->text);
             if (textLength > menu->width)
                 setFontStyle(fontMenuNormal, defaultTextSize, RGBA(selColor[0], selColor[1], selColor[2], selColor[3]), RGBA(selColorShadow[0], selColorShadow[1], selColorShadow[2], selColorShadow[3]), INTRAFONT_SCROLL_SEESAW);
             else
@@ -157,12 +169,16 @@ int drawMenu(struct menuElements *menu){
             setFontStyle(fontMenuNormal, defaultTextSize, RGBA(normColor[0], normColor[1], normColor[2], normColor[3]), RGBA(normColorShadow[0], normColorShadow[1], normColorShadow[2], normColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         }
 
-        if (menu->dataFeedFunction != NULL)
-            menu->dataFeedFunction(i, &menu->elements[i]);
+        if (menu->dataFeedFunction != NULL){
+            if (!menu->elements[i])
+                menu->elements[i] = malloc(sizeof(struct menuElement));
+            if (menu->elements[i])
+                menu->dataFeedFunction(i, menu->elements[i]);
+        }
 
-		if (strlen(menu->elements[i].text)){
-            if (menu->elements[i].icon != NULL)
-                iconWidth = menu->elements[i].icon->sizeX;
+		if (strlen(menu->elements[i]->text)){
+            if (menu->elements[i]->icon != NULL)
+                iconWidth = menu->elements[i]->icon->sizeX;
             else
                 iconWidth = 0;
 
@@ -170,25 +186,25 @@ int drawMenu(struct menuElements *menu){
 				xPos = menu->xPos + iconWidth + 4;
                 xPosIcon = menu->xPos + 4;
 			}else if (menu->align == ALIGN_RIGHT){
-				xPos = menu->xPos + menu->width - oslGetStringWidth(menu->elements[i].text) - iconWidth - 4;
+				xPos = menu->xPos + menu->width - oslGetStringWidth(menu->elements[i]->text) - iconWidth - 4;
                 xPosIcon = menu->xPos + menu->width -  iconWidth - 4;
             }else if (menu->align == ALIGN_CENTER){
-				xPos = menu->xPos + (menu->width - (oslGetStringWidth(menu->elements[i].text) + iconWidth)) / 2;
+				xPos = menu->xPos + (menu->width - (oslGetStringWidth(menu->elements[i]->text) + iconWidth)) / 2;
                 xPosIcon = xPos - iconWidth;
             }
-            if (menu->elements[i].icon)
-                oslDrawImageXY(menu->elements[i].icon, xPosIcon, yPos);
+            if (menu->elements[i]->icon)
+                oslDrawImageXY(menu->elements[i]->icon, xPosIcon, yPos);
 
             if (fontMenuNormal->fontType == OSL_FONT_INTRA){
                 if (i == menu->selected && textLength > menu->width){
-                    if (!menu->elements[i].xPos)
-                        menu->elements[i].xPos = xPos + 1 + (menu->width - (xPos - menu->xPos)) / 2.0f;
-                    menu->elements[i].xPos = oslIntraFontPrintColumn(fontMenuNormal, menu->elements[i].xPos, yPos, menu->width  - (xPos - menu->xPos) - 8, 0, menu->elements[i].text);
+                    if (!menu->elements[i]->xPos)
+                        menu->elements[i]->xPos = xPos + 1 + (menu->width - (xPos - menu->xPos)) / 2.0f;
+                    menu->elements[i]->xPos = oslIntraFontPrintColumn(fontMenuNormal, menu->elements[i]->xPos, yPos, menu->width  - (xPos - menu->xPos) - 8, 0, menu->elements[i]->text);
                 }else{
-                    oslIntraFontPrintColumn(fontMenuNormal, xPos, yPos, menu->width - (xPos - menu->xPos), 0, menu->elements[i].text);
+                    oslIntraFontPrintColumn(fontMenuNormal, xPos, yPos, menu->width - (xPos - menu->xPos), 0, menu->elements[i]->text);
                 }
             }else{
-                oslDrawStringLimited(xPos, yPos, menu->width - (xPos - menu->xPos), menu->elements[i].text);
+                oslDrawStringLimited(xPos, yPos, menu->width - (xPos - menu->xPos), menu->elements[i]->text);
             }
 		}
         count++;
@@ -208,8 +224,13 @@ int processMenuKeys(struct menuElements *menu){
             menu->selected++;
             if (menu->selected >= menu->first + menu->maxNumberVisible){
                 menu->first++;
-                if (menu->dataFeedFunction != NULL)
-                    strcpy(menu->elements[menu->first + menu->maxNumberVisible].text, "");
+                if (menu->dataFeedFunction != NULL){
+                    int i = menu->first + menu->maxNumberVisible;
+                    if (!menu->elements[i])
+                        menu->elements[i] = malloc(sizeof(struct menuElement));
+                    if (menu->elements[i])
+                        strcpy(menu->elements[i]->text, "");
+                }
             }
         }else{
             menu->selected = 0;
@@ -222,8 +243,13 @@ int processMenuKeys(struct menuElements *menu){
             menu->selected--;
             if (menu->selected < menu->first){
                 menu->first--;
-                if (menu->dataFeedFunction != NULL)
-                    strcpy(menu->elements[menu->first].text, "");
+                if (menu->dataFeedFunction != NULL){
+                    int i = menu->first;
+                    if (!menu->elements[i])
+                        menu->elements[i] = malloc(sizeof(struct menuElement));
+                    if (menu->elements[i])
+                        strcpy(menu->elements[i]->text, "");
+                }
             }
         }else{
             menu->selected = menu->numberOfElements - 1;
@@ -255,16 +281,16 @@ int processMenuKeys(struct menuElements *menu){
     	}
         if (menu->dataFeedFunction != NULL)
             clearPage(menu);
-    }else if (menu->numberOfElements && osl_pad.pressed.cross){
-        struct menuElement selected = menu->elements[menu->selected];
-        if (selected.triggerFunction != NULL)
-            selected.triggerFunction();
-    }else if (osl_pad.pressed.circle){
+    }else if (menu->numberOfElements && osl_pad.released.cross){
+        struct menuElement *selected = menu->elements[menu->selected];
+        if (selected->triggerFunction != NULL)
+            selected->triggerFunction();
+    }else if (osl_pad.released.circle){
         if (menu->cancelFunction != NULL)
             menu->cancelFunction();
     }
 
     if (menu->selected >= 0 && oldSelected != menu->selected)
-        menu->elements[menu->selected].xPos = 0;
+        menu->elements[menu->selected]->xPos = 0;
     return 0;
 }

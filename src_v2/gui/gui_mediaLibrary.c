@@ -60,7 +60,6 @@ int restoreQuery();
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static int mediaLibraryRetValue = 0;
 static int exitFlagMediaLibrary = 0;
-static struct menuElement tMenuEl;
 static char buffer[264];
 static int mediaLibraryStatus = STATUS_MAINMENU;
 static int confirmStatus = STATUS_CONFIRM_NONE;
@@ -78,7 +77,7 @@ static char tempSql[ML_SQLMAXLENGTH] = "";
 
 static OSL_IMAGE *coverArt = NULL;
 static int coverArtFailed = 0;
-static struct libraryEntry localResult[ML_BUFFERSIZE];
+static struct libraryEntry *localResult[ML_BUFFERSIZE];
 
 #define MAX_ORDER_BY 9
 static int selectedOrderBy = 0;
@@ -144,29 +143,29 @@ int addSelectionToPlaylist(char *where, char *orderBy, int fastMode, char *m3uNa
             }
 
             if (!fastMode){
-        	    if (localResult[i - offset].seconds > 0){
-                    M3U_addSong(localResult[i - offset].shortpath, localResult[i - offset].seconds, localResult[i - offset].title);
+        	    if (localResult[i - offset]->seconds > 0){
+                    M3U_addSong(localResult[i - offset]->shortpath, localResult[i - offset]->seconds, localResult[i - offset]->title);
                 }else{
-                    if (setAudioFunctions(localResult[i - offset].shortpath, userSettings->MP3_ME))
+                    if (setAudioFunctions(localResult[i - offset]->shortpath, userSettings->MP3_ME))
 						continue;
             	    (*initFunct)(0);
-                	if ((*loadFunct)(localResult[i - offset].shortpath) == OPENING_OK){
+                	if ((*loadFunct)(localResult[i - offset]->shortpath) == OPENING_OK){
                 		info = (*getInfoFunct)();
                 		if (strlen(info->title)){
-                			M3U_addSong(localResult[i - offset].shortpath, info->length, info->title);
+                			M3U_addSong(localResult[i - offset]->shortpath, info->length, info->title);
                 		}else{
-                			getFileName(localResult[i - offset].shortpath, onlyName);
-                			M3U_addSong(localResult[i - offset].shortpath, info->length, onlyName);
+                			getFileName(localResult[i - offset]->shortpath, onlyName);
+                			M3U_addSong(localResult[i - offset]->shortpath, info->length, onlyName);
                 		}
-                    	localResult[i - offset].seconds = info->length;
+                    	localResult[i - offset]->seconds = info->length;
                         ML_updateEntry(localResult[i - offset], "");
                 	}
                 	(*endFunct)();
                     unsetAudioFunctions();
                 }
             }else{
-                getFileName(localResult[i - offset].shortpath, onlyName);
-                M3U_addSong(localResult[i - offset].shortpath, 0, onlyName);
+                getFileName(localResult[i - offset]->shortpath, onlyName);
+                M3U_addSong(localResult[i - offset]->shortpath, 0, onlyName);
             }
         }
         M3U_save(m3uName);
@@ -327,11 +326,11 @@ void drawMLinfo(){
         skinGetColor("RGBA_TEXT", tempColor);
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
         setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
-        snprintf(buffer, sizeof(buffer), "%.f", MLresult[commonMenu.selected - mlBufferPosition].intField01);
+        snprintf(buffer, sizeof(buffer), "%.f", MLresult[commonMenu.selected - mlBufferPosition]->intField01);
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TRACKS_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
 
-        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].intField02, buffer, sizeof(buffer));
+        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition]->intField02, buffer, sizeof(buffer));
         skinGetPosition("POS_MEDIALIBRARY_TOTAL_TIME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
 		break;
@@ -351,19 +350,19 @@ void drawMLinfo(){
         skinGetColor("RGBA_TEXT_SHADOW", tempColorShadow);
         setFontStyle(fontNormal, defaultTextSize, RGBA(tempColor[0], tempColor[1], tempColor[2], tempColor[3]), RGBA(tempColorShadow[0], tempColorShadow[1], tempColorShadow[2], tempColorShadow[3]), INTRAFONT_ALIGN_LEFT);
         skinGetPosition("POS_MEDIALIBRARY_GENRE_VALUE", tempPos);
-        oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].genre);
+        oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition]->genre);
         skinGetPosition("POS_MEDIALIBRARY_YEAR_VALUE", tempPos);
-        oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].year);
+        oslDrawString(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition]->year);
 
-        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition].seconds, buffer, sizeof(buffer));
+        formatHHMMSS(MLresult[commonMenu.selected - mlBufferPosition]->seconds, buffer, sizeof(buffer));
         skinGetPosition("POS_MEDIALIBRARY_TIME_VALUE", tempPos);
         oslDrawString(tempPos[0], tempPos[1], buffer);
 
         skinGetPosition("POS_MEDIALIBRARY_RATING_VALUE", tempPos);
-        drawRating(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition].rating);
+        drawRating(tempPos[0], tempPos[1], MLresult[commonMenu.selected - mlBufferPosition]->rating);
 
 		skinGetPosition("POS_MEDIALIBRARY_PLAYED_VALUE", tempPos);
-		snprintf(buffer, sizeof(buffer), "%i", MLresult[commonMenu.selected - mlBufferPosition].played);
+		snprintf(buffer, sizeof(buffer), "%i", MLresult[commonMenu.selected - mlBufferPosition]->played);
 		oslDrawString(tempPos[0], tempPos[1], buffer);
 
 		if (commonMenu.selected != lastSelected){
@@ -382,7 +381,7 @@ void drawMLinfo(){
 				int size = 0;
 
 				cpuBoost();
-				snprintf(dirName, sizeof(dirName), "%s", MLresult[commonMenu.selected - mlBufferPosition].shortpath);
+				snprintf(dirName, sizeof(dirName), "%s", MLresult[commonMenu.selected - mlBufferPosition]->shortpath);
 				directoryUp(dirName);
 				//Look for folder.jpg in the same directory:
 				snprintf(buffer, sizeof(buffer), "%s/%s", dirName, "folder.jpg");
@@ -447,7 +446,7 @@ int enterSelection(){
                         title || ' - ' || artist || ' (' || album || ')' as strfield,  \
                         'path = ''' || replace(path, '''', '''''') || '''' as datafield \
                  From media ",
-                 commonMenu.elements[commonMenu.selected].data,
+                 commonMenu.elements[commonMenu.selected]->data,
 				 orderBy[selectedOrderBy], exitSelection, NULL);
     oslReadKeys(); //To avoid reread the CROSS button after entering selection
     return 0;
@@ -460,7 +459,21 @@ int enterArtist(){
 	snprintf(tempSql, sizeof(tempSql), "Select album || ' - ' || artist as strfield, 'artist = ''' || replace(artist, '''', '''''') || ''' and album = ''' || replace(album, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 \
 									    from media \
 									    Where %s \
-										group by album order by upper(album)", commonMenu.elements[commonMenu.selected].data);
+										group by album order by upper(album)", commonMenu.elements[commonMenu.selected]->data);
+
+    changeQuery(QUERY_COUNT, tempSql, "", "", exitSelection, enterSelection);
+    oslReadKeys(); //To avoid reread the CROSS button after entering selection
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Enter in current genre:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int enterGenre(){
+	snprintf(tempSql, sizeof(tempSql), "Select album || ' - ' || artist as strfield, 'artist = ''' || replace(artist, '''', '''''') || ''' and album = ''' || replace(album, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 \
+									    from media \
+									    Where %s \
+										group by album order by upper(album)", commonMenu.elements[commonMenu.selected]->data);
 
     changeQuery(QUERY_COUNT, tempSql, "", "", exitSelection, enterSelection);
     oslReadKeys(); //To avoid reread the CROSS button after entering selection
@@ -492,32 +505,32 @@ void queryDataFeed(int index, struct menuElement *element){
 	{
 	case QUERY_COUNT:
         if (!strlen(element->text)){
-            snprintf(element->text, sizeof(element->text), "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
-            strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+            snprintf(element->text, sizeof(element->text), "%s (%.f)", MLresult[index - mlBufferPosition]->strField, MLresult[index - mlBufferPosition]->intField01);
+            strcpy(element->data, MLresult[index - mlBufferPosition]->dataField);
             element->icon = folderIcon;
             element->triggerFunction = MlStatus[currentStatus].triggerFunction;
         }
 		break;
 	case QUERY_SINGLE_ENTRY:
         if (!strlen(element->text)){
-            strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
-            strcpy(element->text, MLresult[index - mlBufferPosition].strField);
+            strcpy(element->data, MLresult[index - mlBufferPosition]->dataField);
+            strcpy(element->text, MLresult[index - mlBufferPosition]->strField);
             element->icon = musicIcon;
             element->triggerFunction = MlStatus[currentStatus].triggerFunction;
         }
 		break;
 	case QUERY_COUNT_RATING:
 	    startY = commonMenu.yPos + (float)(commonMenu.height -  commonMenu.maxNumberVisible * (fontMenuNormal->charHeight + commonMenu.interline)) / 2.0;
-		startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition].strField));
-        snprintf(buffer, sizeof(buffer), "(%.f)", MLresult[index - mlBufferPosition].intField01);
+		startX = drawRating(commonMenu.xPos + 4, startY + (fontMenuNormal->charHeight * index + commonMenu.interline * index), atoi(MLresult[index - mlBufferPosition]->strField));
+        snprintf(buffer, sizeof(buffer), "(%.f)", MLresult[index - mlBufferPosition]->intField01);
 		strcpy(element->text, "");
-		strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+		strcpy(element->data, MLresult[index - mlBufferPosition]->dataField);
         element->triggerFunction = MlStatus[currentStatus].triggerFunction;
 		break;
 	case QUERY_COUNT_ARTIST:
         if (!strlen(element->text)){
-            snprintf(element->text, sizeof(element->text), "%s (%.f)", MLresult[index - mlBufferPosition].strField, MLresult[index - mlBufferPosition].intField01);
-            strcpy(element->data, MLresult[index - mlBufferPosition].dataField);
+            snprintf(element->text, sizeof(element->text), "%s (%.f)", MLresult[index - mlBufferPosition]->strField, MLresult[index - mlBufferPosition]->intField01);
+            strcpy(element->data, MLresult[index - mlBufferPosition]->dataField);
             element->icon = folderIcon;
             element->triggerFunction = MlStatus[currentStatus].triggerFunction;
         }
@@ -543,6 +556,16 @@ int buildQueryMenu(char *select, char *where, char *orderBy, int (*cancelFunctio
 	cpuRestore();
 
     clearMenu(&commonMenu);
+    int i = 0;
+    for (i=0; i<mlQueryCount; i++){
+        commonMenu.elements[i] = malloc(sizeof(struct menuElement));
+        if (!commonMenu.elements[i]){
+            mlQueryCount = i;
+            break;
+        }
+        clearMenuElement(commonMenu.elements[i]);
+    }
+
     commonMenu.numberOfElements = mlQueryCount;
     commonMenu.first = selected;
     commonMenu.selected = selected;
@@ -557,6 +580,7 @@ int buildQueryMenu(char *select, char *where, char *orderBy, int (*cancelFunctio
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
+    fixMenuSize(&commonMenu);
     commonMenu.dataFeedFunction = queryDataFeed;
     commonMenu.align = ALIGN_LEFT;
     commonMenu.interline = skinGetParam("MENU_INTERLINE");
@@ -671,7 +695,7 @@ int browseByAlbum(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int browseByGenre(){
     changeQuery(QUERY_COUNT, "Select genre as strfield, 'genre = ''' || replace(genre, '''', '''''') || '''' as datafield, count(*) as intfield01, sum(seconds) as intfield02 from media group by genre order by upper(genre)",
-                             "", "", backToMainMenu, enterSelection);
+                             "", "", backToMainMenu, enterGenre);
     oslReadKeys(); //To avoid reread the CROSS button after entering selection
     return 0;
 }
@@ -784,6 +808,22 @@ int search(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Main Menu:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int addMenuElement(int index, char *text, int (*cancelFunction)())
+{
+    if (commonMenu.elements[index]){
+        free(commonMenu.elements[index]);
+        commonMenu.elements[index] = NULL;
+    }
+    commonMenu.elements[index] = malloc(sizeof(struct menuElement));
+    if (!commonMenu.elements[index])
+        return -1;
+
+    strcpy(commonMenu.elements[index]->text, text);
+    commonMenu.elements[index]->icon = NULL;
+    commonMenu.elements[index]->triggerFunction = cancelFunction;
+    return 0;
+}
+
 int buildMainMenu(){
     mediaLibraryStatus = STATUS_MAINMENU;
     skinGetPosition("POS_MEDIALIBRARY", tempPos);
@@ -798,6 +838,7 @@ int buildMainMenu(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
+    fixMenuSize(&commonMenu);
     commonMenu.interline = skinGetParam("MENU_INTERLINE");
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
@@ -805,30 +846,14 @@ int buildMainMenu(){
     commonMenu.first = 0;
     commonMenu.selected = 0;
 
-    strcpy(tMenuEl.text, langGetString("BROWSE_ALL"));
-    tMenuEl.triggerFunction = browseAll;
-    commonMenu.elements[0] = tMenuEl;
-    strcpy(tMenuEl.text, langGetString("BROWSE_ARTIST"));
-    tMenuEl.triggerFunction = browseByArtist;
-    commonMenu.elements[1] = tMenuEl;
-    strcpy(tMenuEl.text, langGetString("BROWSE_ALBUM"));
-    tMenuEl.triggerFunction = browseByAlbum;
-    commonMenu.elements[2] = tMenuEl;
-    strcpy(tMenuEl.text, langGetString("BROWSE_GENRE"));
-    tMenuEl.triggerFunction = browseByGenre;
-    commonMenu.elements[3] = tMenuEl;
-    strcpy(tMenuEl.text, langGetString("BROWSE_RATING"));
-    tMenuEl.triggerFunction = browseByRating;
-    commonMenu.elements[4] = tMenuEl;
-    strcpy(tMenuEl.text, langGetString("BROWSE_TOP100"));
-    tMenuEl.triggerFunction = browseTop100;
-    commonMenu.elements[5] = tMenuEl;
-	strcpy(tMenuEl.text, langGetString("SEARCH"));
-    tMenuEl.triggerFunction = search;
-    commonMenu.elements[6] = tMenuEl;
-    strcpy(tMenuEl.text, langGetString("SCAN_MS"));
-    tMenuEl.triggerFunction = NULL;
-    commonMenu.elements[7] = tMenuEl;
+    addMenuElement(0, langGetString("BROWSE_ALL"), browseAll);
+    addMenuElement(1, langGetString("BROWSE_ARTIST"), browseByArtist);
+    addMenuElement(2, langGetString("BROWSE_ALBUM"), browseByAlbum);
+    addMenuElement(3, langGetString("BROWSE_GENRE"), browseByGenre);
+    addMenuElement(4, langGetString("BROWSE_RATING"), browseByRating);
+    addMenuElement(5, langGetString("BROWSE_TOP100"), browseTop100);
+    addMenuElement(6, langGetString("SEARCH"), search);
+    addMenuElement(7, langGetString("SCAN_MS"), NULL);
 
     commonMenu.numberOfElements = 8;
     return 0;
@@ -861,10 +886,18 @@ int buildOrderByMenu(){
 
     int i = 0;
     for (i=0; i<MAX_ORDER_BY; i++){
-        commonSubMenu.elements[i].icon = NULL;
-        commonSubMenu.elements[i].triggerFunction = NULL;
+        if (commonSubMenu.elements[i]){
+            free(commonSubMenu.elements[i]);
+            commonSubMenu.elements[i] = NULL;
+        }
+        commonSubMenu.elements[i] = malloc(sizeof(struct menuElement));
+        if (!commonSubMenu.elements[i])
+            break;
+
+        commonSubMenu.elements[i]->icon = NULL;
+        commonSubMenu.elements[i]->triggerFunction = NULL;
         snprintf(buffer, sizeof(buffer), "ORDER_BY_%2.2i", i + 1);
-        snprintf(commonSubMenu.elements[i].text, sizeof(commonSubMenu.elements[i].text), "%s", langGetString(buffer));
+        snprintf(commonSubMenu.elements[i]->text, sizeof(commonSubMenu.elements[i]->text), "%s", langGetString(buffer));
     }
     return 0;
 }
@@ -898,6 +931,7 @@ int showOrderByMenu(){
         processMenuKeys(&commonSubMenu);
     }
 
+    oslReadKeys();
     return 0;
 }
 
@@ -954,7 +988,7 @@ int gui_mediaLibrary(){
             if(getConfirmButton()){
                 confirmStatus = STATUS_CONFIRM_NONE;
                 scanMS();
-            }else if(osl_pad.pressed.circle)
+            }else if(osl_pad.released.circle)
                 confirmStatus = STATUS_CONFIRM_NONE;
         }else if (confirmStatus == STATUS_HELP){
             if (getConfirmButton() || getCancelButton())
@@ -967,7 +1001,7 @@ int gui_mediaLibrary(){
             }else if(mediaLibraryStatus == STATUS_MAINMENU && getConfirmButton() && commonMenu.selected == 7){
                 confirmStatus = STATUS_CONFIRM_SCAN;
             }else if(osl_pad.released.start && mediaLibraryStatus == STATUS_QUERYMENU && commonMenu.numberOfElements){
-                addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data, "artist, album, tracknumber, title", 0, tempM3Ufile);
+                addSelectionToPlaylist(commonMenu.elements[commonMenu.selected]->data, "artist, album, tracknumber, title", 0, tempM3Ufile);
             }else if(!ratingChangedUpDown && getConfirmButton() && commonMenu.numberOfElements && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
                 M3U_clear();
                 M3U_save(MLtempM3Ufile);
@@ -981,7 +1015,7 @@ int gui_mediaLibrary(){
             }else if(osl_pad.released.square && mediaLibraryStatus == STATUS_QUERYMENU && commonMenu.numberOfElements && (mlQueryType == QUERY_COUNT || mlQueryType == QUERY_COUNT_RATING || mlQueryType == QUERY_COUNT_ARTIST)){
                 M3U_clear();
                 M3U_save(MLtempM3Ufile);
-                addSelectionToPlaylist(commonMenu.elements[commonMenu.selected].data,  "artist, album, tracknumber, title", 1, MLtempM3Ufile);
+                addSelectionToPlaylist(commonMenu.elements[commonMenu.selected]->data,  "artist, album, tracknumber, title", 1, MLtempM3Ufile);
                 snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s", MLtempM3Ufile);
                 snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s", MLtempM3Ufile);
                 userSettings->playlistStartIndex = -1;
@@ -989,14 +1023,14 @@ int gui_mediaLibrary(){
                 userSettings->previousMode = MODE_MEDIA_LIBRARY;
                 exitFlagMediaLibrary = 1;
             }else if (osl_pad.held.cross && osl_pad.held.up && commonMenu.numberOfElements && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
-                if (++MLresult[commonMenu.selected - mlBufferPosition].rating > ML_MAX_RATING)
-                    MLresult[commonMenu.selected - mlBufferPosition].rating = ML_MAX_RATING;
+                if (++MLresult[commonMenu.selected - mlBufferPosition]->rating > ML_MAX_RATING)
+                    MLresult[commonMenu.selected - mlBufferPosition]->rating = ML_MAX_RATING;
                 ratingChangedUpDown = 1;
                 ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition], "");
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
             }else if (osl_pad.held.cross && osl_pad.held.down  && commonMenu.numberOfElements && mediaLibraryStatus == STATUS_QUERYMENU && mlQueryType == QUERY_SINGLE_ENTRY){
-                if (--MLresult[commonMenu.selected - mlBufferPosition].rating < 0)
-                    MLresult[commonMenu.selected - mlBufferPosition].rating = 0;
+                if (--MLresult[commonMenu.selected - mlBufferPosition]->rating < 0)
+                    MLresult[commonMenu.selected - mlBufferPosition]->rating = 0;
                 ratingChangedUpDown = 1;
                 ML_updateEntry(MLresult[commonMenu.selected - mlBufferPosition], "");
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
@@ -1027,5 +1061,7 @@ int gui_mediaLibrary(){
 		oslDeleteImage(coverArt);
         coverArt = NULL;
     }
+    ML_clearBuffer(localResult);
+    ML_clearBuffer(MLresult);
 	return mediaLibraryRetValue;
 }

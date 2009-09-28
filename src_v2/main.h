@@ -20,7 +20,7 @@
 
 #include "others/medialibrary.h"
 
-#define VERSION "2.0.0RC4"
+#define VERSION "2.0.0RC5"
 
 #define ML_DB "mediaLibrary.db"
 
@@ -40,7 +40,7 @@ extern int fileExtCount;
 extern char fileExt[10][5];
 extern char tempM3Ufile[264];
 extern char MLtempM3Ufile[264];
-extern struct libraryEntry MLresult[ML_BUFFERSIZE];
+extern struct libraryEntry *MLresult[ML_BUFFERSIZE];
 extern struct menuElements commonMenu;
 extern struct menuElements commonSubMenu;
 extern int tempPos[2];

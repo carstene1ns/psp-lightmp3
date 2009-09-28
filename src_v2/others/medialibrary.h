@@ -25,7 +25,7 @@
 #define ML_ERROR_SQL    -3
 
 #define ML_SQLMAXLENGTH 1024*3
-#define ML_BUFFERSIZE 100
+#define ML_BUFFERSIZE 200
 #define ML_MAX_RATING 5
 
 struct libraryEntry{
@@ -59,12 +59,13 @@ int ML_closeDB();
 int ML_scanMS(char *rootDir, char extFilter[][5], int extNumber, int (*scanDir)(char *dirName), int (*scanFile)(char *fileName, int errorCode));
 int ML_countRecords(char *whereCondition);
 int ML_countRecordsSelect(char *select);
-int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int limit, struct libraryEntry *result);
-int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *resultBuffer);
+int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int limit, struct libraryEntry **result);
+int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry **resultBuffer);
 
+void ML_clearBuffer(struct libraryEntry **resultBuffer);
 void ML_clearEntry(struct libraryEntry *entry);
-int ML_addEntry(struct libraryEntry entry);
-int ML_updateEntry(struct libraryEntry entry, char *newPath);
+int ML_addEntry(struct libraryEntry *entry);
+int ML_updateEntry(struct libraryEntry *entry, char *newPath);
 int ML_checkFiles(int (*checkFile)(char *fileName));
 int ML_getLastSQL(char *sqlOut);
 int ML_vacuum();

@@ -199,12 +199,14 @@ int drawFileSpecs(struct fileInfo *info){
     skinGetPosition("POS_SAMPLERATE_VALUE", tempPos);
     snprintf(buffer, sizeof(buffer), "%li Hz", info->hz);
     oslDrawString(tempPos[0], tempPos[1], buffer);
-    skinGetPosition("POS_FILE_FORMAT_VALUE", tempPos);
-    if (info->fileType == MP3_TYPE)
-        snprintf(buffer, sizeof(buffer), "%s %s %s", fileTypeDescription[info->fileType], langGetString("LAYER"), info->layer);
-    else if (info->fileType >= 0)
-        snprintf(buffer, sizeof(buffer), "%s", fileTypeDescription[info->fileType]);
-    oslDrawString(tempPos[0], tempPos[1], buffer);
+    if (info->fileType >= 0){
+        skinGetPosition("POS_FILE_FORMAT_VALUE", tempPos);
+        if (info->fileType == MP3_TYPE)
+            snprintf(buffer, sizeof(buffer), "%s %s %s", fileTypeDescription[info->fileType], langGetString("LAYER"), info->layer);
+        else
+            snprintf(buffer, sizeof(buffer), "%s", fileTypeDescription[info->fileType]);
+        oslDrawString(tempPos[0], tempPos[1], buffer);
+    }
     skinGetPosition("POS_EMPHASIS_VALUE", tempPos);
     oslDrawString(tempPos[0], tempPos[1], info->emphasis);
     return 0;
@@ -359,7 +361,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
     int retValue = PLAYER_END;
     struct fileInfo tagInfo;
 	struct fileInfo *info = NULL;
-    struct libraryEntry libEntry;
+    struct libraryEntry *libEntry = NULL;
     int currentSpeed = 0;
     int clock = 0;
     float lastPercentage = 0.0f;
@@ -455,19 +457,19 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
         update = ML_queryDB(whereCond, "path", 0, 1, MLresult);
         if (update > 0)
         {
-            if (fileExists(MLresult[0].shortpath) < 0)
+            if (fileExists(MLresult[0]->shortpath) < 0)
             {
                 libEntry = MLresult[0];
-                strcpy(libEntry.shortpath, fileName);
+                strcpy(libEntry->shortpath, fileName);
             }
             else
             {
-                ML_clearEntry(&libEntry);
+                ML_clearEntry(libEntry);
                 update = 0;
             }
         }
         else
-            ML_clearEntry(&libEntry);
+            ML_clearEntry(libEntry);
     }
 
     //Load coverart:
@@ -487,6 +489,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
                 tmpCoverArt = oslLoadImageFileJPG(oslGetTempFileName(), OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
             }
             free(tCover);
+            tCover = NULL;
         }
 
     }else if (strlen(tagInfo.coverArtImageName))
@@ -508,7 +511,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
     if (userSettings->displayStatus){
         oslStartDrawing();
         drawCommonGraphics();
-        drawFileInfo(&tagInfo, &libEntry, trackMessage);
+        drawFileInfo(&tagInfo, libEntry, trackMessage);
         drawFileSpecs(&tagInfo);
         drawPlayerStatus();
         drawProgressBar(0.0);
@@ -542,18 +545,18 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
     info = (*getInfoFunct)();
 
     //Update media library info:
-    getExtension(fileName, libEntry.extension, 4);
-    strcpy(libEntry.album, info->album);
-    strcpy(libEntry.artist, info->artist);
-    strcpy(libEntry.title, info->title);
-    strcpy(libEntry.genre, info->genre);
-    strcpy(libEntry.year, info->year);
+    getExtension(fileName, libEntry->extension, 4);
+    strcpy(libEntry->album, info->album);
+    strcpy(libEntry->artist, info->artist);
+    strcpy(libEntry->title, info->title);
+    strcpy(libEntry->genre, info->genre);
+    strcpy(libEntry->year, info->year);
     if (update <= 0)
-        strcpy(libEntry.path, fileName);
-    libEntry.seconds = info->length;
-    libEntry.bitrate = info->kbit;
-    libEntry.samplerate = info->hz;
-    libEntry.tracknumber = atoi(info->trackNumber);
+        strcpy(libEntry->path, fileName);
+    libEntry->seconds = info->length;
+    libEntry->bitrate = info->kbit;
+    libEntry->samplerate = info->hz;
+    libEntry->tracknumber = atoi(info->trackNumber);
 
 	cpuRestore();
 
@@ -579,7 +582,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
     flagExit = 0;
     while(!osl_quit && !flagExit){
         if (userSettings->displayStatus && !skip)
-			drawPlayer(status, &libEntry, trackMessage);
+			drawPlayer(status, libEntry, trackMessage);
 
         if (!userSettings->displayStatus){
 			scePowerTick(0);
@@ -625,7 +628,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 				//Accendo il display:
 				if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
 					setCpuClock(clock);
-				drawPlayer(status, &libEntry, trackMessage);
+				drawPlayer(status, libEntry, trackMessage);
 				oslEndFrame();
 				skip = oslSyncFrame();
 				displayEnable();
@@ -655,7 +658,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
                 if (playerStatus)
                     (*pauseFunct)();
 
-                if (confirmBookmark(&libEntry, trackMessage, index))
+                if (confirmBookmark(libEntry, trackMessage, index))
                 {
                     flagExit = 1;
                     osl_quit = 1;
@@ -673,14 +676,14 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
                     status = STATUS_HELP;
                 }
             }else if (osl_pad.held.cross && osl_pad.held.up){
-                if (++libEntry.rating > ML_MAX_RATING)
-                    libEntry.rating = ML_MAX_RATING;
+                if (++libEntry->rating > ML_MAX_RATING)
+                    libEntry->rating = ML_MAX_RATING;
                 ratingChangedUpDown = 1;
                 ratingChangedCross= 1;
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
             }else if (osl_pad.held.cross && osl_pad.held.down){
-                if (--libEntry.rating < 0)
-                    libEntry.rating = 0;
+                if (--libEntry->rating < 0)
+                    libEntry->rating = 0;
                 ratingChangedUpDown = 1;
                 ratingChangedCross= 1;
                 sceKernelDelayThread(userSettings->KEY_AUTOREPEAT_PLAYER*15000);
@@ -849,7 +852,7 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
         			//Accendo il display:
                     if (userSettings->CLOCK_DELTA_ECONOMY_MODE)
             			setCpuClock(clock);
-					drawPlayer(status, &libEntry, trackMessage);
+					drawPlayer(status, libEntry, trackMessage);
 					oslEndFrame();
 					skip = oslSyncFrame();
 					displayEnable();
@@ -893,12 +896,13 @@ int playFile(char *fileName, char *trackMessage, int index, double startFilePos)
 
     //Update media Library info:
     if (lastPercentage >= 50)
-        libEntry.played++;
+        libEntry->played++;
     if (update > 0)
         ML_updateEntry(libEntry, fileName);
     else
         ML_addEntry(libEntry);
 
+    ML_clearBuffer(MLresult);
     //Sleep mode:
     if (userSettings->sleepMode == SLEEP_TRACK){
 		osl_quit = 1;
@@ -1203,6 +1207,7 @@ int gui_player(){
                 M3U_open(repStr);
                 sceIoRemove(repStr);
                 free(repStr);
+                repStr = NULL;
             }
             readBookmark(userSettings->selectedBrowserItemShort, &book);
             sceIoRemove(userSettings->selectedBrowserItemShort);

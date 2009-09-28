@@ -140,6 +140,7 @@ int initSettingsMenu(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
+    fixMenuSize(&commonMenu);
     commonMenu.interline = skinGetParam("MENU_INTERLINE");
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
@@ -167,7 +168,6 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     int i = 0;
     char name[100] = "";
     char settingVal[50] = "";
-    struct menuElement tMenuEl;
 
     menu->numberOfElements = 19;
 
@@ -175,15 +175,31 @@ int buildSettingsMenu(struct menuElements *menu, struct menuElements *values){
     values->selected = menu->selected;
     values->numberOfElements = menu->numberOfElements;
     for (i=0; i<menu->numberOfElements; i++){
+        if (menu->elements[i]){
+            free(menu->elements[i]);
+            menu->elements[i] = NULL;
+        }
+        menu->elements[i] = malloc(sizeof(struct menuElement));
+        if (!menu->elements[i])
+            break;
+
+        if (values->elements[i]){
+            free(values->elements[i]);
+            values->elements[i] = NULL;
+        }
+        values->elements[i] = malloc(sizeof(struct menuElement));
+        if (!values->elements[i])
+            break;
+
         snprintf(name, sizeof(name), "SETTINGS_%2.2i", i + 1);
-        strcpy(tMenuEl.text, langGetString(name));
-        tMenuEl.icon = NULL;
-        tMenuEl.triggerFunction = NULL;
-        menu->elements[i] = tMenuEl;
+        strcpy(menu->elements[i]->text, langGetString(name));
+        menu->elements[i]->icon = NULL;
+        menu->elements[i]->triggerFunction = NULL;
+
         getSettingVal(i, settingVal, sizeof(settingVal));
-        strcpy(tMenuEl.text, settingVal);
-        tMenuEl.triggerFunction = NULL;
-        values->elements[i] = tMenuEl;
+        strcpy(values->elements[i]->text, settingVal);
+        values->elements[i]->triggerFunction = NULL;
+        values->elements[i]->icon = NULL;
     }
     return 0;
 }
@@ -215,6 +231,8 @@ int changeSettingVal(int index, int delta){
 				oslEndFrame();
 				oslSyncFrame();
 
+                //debugFreeMemory();
+
 				current += delta;
                 strcpy(userSettings->skinName, skinsList[current]);
                 snprintf(buffer, sizeof(buffer), "%sskins/%s/skin.cfg", userSettings->ebootPath, userSettings->skinName);
@@ -243,6 +261,8 @@ int changeSettingVal(int index, int delta){
 				initMenu();
                 initSettingsMenu();
 				oslSetFont(fontNormal);
+
+                //debugFreeMemory();
 				cpuRestore();
             }
             break;
@@ -266,6 +286,8 @@ int changeSettingVal(int index, int delta){
                 oslEndDrawing();
                 oslEndFrame();
                 oslSyncFrame();
+
+                //debugFreeMemory();
 
                 current += delta;
                 strcpy(userSettings->lang, languagesList[current]);
@@ -292,6 +314,8 @@ int changeSettingVal(int index, int delta){
 				oslSetFont(fontNormal);
                 buildSettingsMenu(&commonMenu, &commonSubMenu);
                 commonMenu.selected = 1;
+
+                //debugFreeMemory();
 
                 cpuRestore();
             }
@@ -417,7 +441,7 @@ int gui_settings(){
             if(getConfirmButton()){
                 SETTINGS_save(userSettings);
                 confirmStatus = STATUS_CONFIRM_NONE;
-            }else if(osl_pad.pressed.circle){
+            }else if(osl_pad.released.circle){
                 confirmStatus = STATUS_CONFIRM_NONE;
             }
         }else if (confirmStatus == STATUS_HELP){

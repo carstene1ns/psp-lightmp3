@@ -55,6 +55,7 @@ int drawCommonGraphics();
 int drawButtonBar(int selectedButton);
 void errorLoadImage(char *imageName);
 void debugMessageBox(char *message);
+void debugFreeMemory();
 unsigned int errorMessageBox(char *message, int yesNo);
 int drawConfirm(char *title, char *message);
 int drawWait(char *title, char *message);
@@ -63,6 +64,7 @@ int drawMessageBox(char *title, char *message);
 int nextAppMode(int currentMode);
 int previousAppMode(int currentMode);
 int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *directory, char *selected);
+void fixMenuSize(struct menuElements *menu);
 int drawHelp(char *help);
 int drawRating(int startX, int startY, int rating);
 

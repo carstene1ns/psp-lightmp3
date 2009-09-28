@@ -168,13 +168,13 @@ struct settings *SETTINGS_default(){
 	localSettings.BRIGHTNESS_CHECK = 1;
 	localSettings.MUTED_VOLUME = 800;
 	localSettings.CLOCK_AUTO = 1;
-	localSettings.CLOCK_GUI = 50;
+	localSettings.CLOCK_GUI = 100;
 	localSettings.CLOCK_MP3 = 90;
 	localSettings.CLOCK_MP3ME = 40;
 	localSettings.CLOCK_OGG = 70;
 	localSettings.CLOCK_FLAC = 166;
 	localSettings.CLOCK_AA3 = 40;
-	localSettings.CLOCK_AAC = 60;
+	localSettings.CLOCK_AAC = 40;
     localSettings.CLOCK_WMA = 40;
 	localSettings.CLOCK_DELTA_ECONOMY_MODE = 1;
     localSettings.playMode = 0;

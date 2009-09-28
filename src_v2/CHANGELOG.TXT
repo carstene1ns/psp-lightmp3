@@ -1,6 +1,15 @@
 LightMP3 Changelog
 ------------------
 
+Version 2.0.0 RC5
+-----------------
+-Added: Support for AAC
+-Fixed: Crash using Japanese language and skin
+-Fixed: tags were not read on some FLAC files
+-Fixed: some input bugs (like: pressing note in the playlist editor also changed the equalizer)
+-Fixed: entering a genre in the media library will show an album list (and not a songlist)
+
+
 Version 2.0.0 RC4
 -----------------
 -Added: Scrolling text when string is too long in all menues and song title
@@ -13,7 +22,7 @@ Version 2.0.0 RC4
         4 = Settings
 -Added: Total number of frames red from Xing frame (faster opening of VBR mp3 file, if Xing is found)
 -Fixed: Crash when seeking FLAC files
--Fixed: Navigation in the Media Library (when pressing circle you'll be taken to the previous selection, not on the main menu)
+-Fixed: Navigation in the Media Library (when pressing circle you'll be taken to the previous selection, not to the main menu)
 -Fixed: Added setting to set CPU clock for WMA
 -Fixed: Track restart when pressing L on WMA, FLAC, ATRAC3(+), MP3 when played with libMad
 -Fixed: Suspend and resume for WMA
