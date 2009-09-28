@@ -200,7 +200,6 @@ To compile LightMP3 you need:
 -libMad
 -libTremor
 -libFLAC (built without OGG support)
--LibAac
 -SQLite3
 
 I built libMad, libTremor and libFLAC with

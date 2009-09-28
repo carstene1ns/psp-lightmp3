@@ -28,7 +28,6 @@
 #include "menu.h"
 #include "languages.h"
 #include "../main.h"
-#include "../system/freeMem.h"
 #include "../system/opendir.h"
 #include "../system/libminiconv.h"
 #include "../others/medialibrary.h"
@@ -180,9 +179,7 @@ int loadCommonGraphics(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void loadFonts()
 {
-    //snprintf(buffer, sizeof(buffer), "flash0:/font/ltn0.pgf");
 	skinGetString("STR_FONT_NORMAL_NAME", buffer);
-    //snprintf(buffer, sizeof(buffer), "%s/fontNormal.pgf", userSettings->skinImagesPath);
 	fontNormal = oslLoadFontFile(buffer);
     if (!fontNormal)
         errorLoadImage(buffer);
@@ -259,7 +256,6 @@ void unloadFonts()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int drawToolbars(){
     int m, h, btrh, btrm, btr, rh, battPerc;
-    char remote[3] = "";
 	static u64 lastFreeMemTime = 0;
 	static SceSize freeKMem = 0;
 	u64 currentTime = 0;
@@ -284,9 +280,6 @@ int drawToolbars(){
 		btrh = 0;
 		btrm = 0;
 	}
-
-    if (oslIsRemoteExist())
-        strcpy(remote, "RM");
 
 	//Program name:
     oslSetFont(fontNormal);
@@ -412,6 +405,16 @@ void debugMessageBox(char *message){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Debug message with free memory:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void debugFreeMemory()
+{
+    OSL_MEMSTATUS status = oslGetRamStatus();
+    snprintf(buffer, sizeof(buffer), "Free mem: %i\nMax block: %i", status.maxAvailable, status.maxBlockSize);
+    debugMessageBox(buffer);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Error message with messageBox:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 unsigned int errorMessageBox(char *message, int yesNo){
@@ -449,20 +452,42 @@ int buildMenuFromDirectory(struct menuElements *menu, struct opendir_struct *dir
     oslSetFont(fontMenuNormal);
 
     for (i=0; i<directory->number_of_directory_entries; i++){
-        strcpy(menu->elements[i].text, directory->directory_entry[i].longname);
+        if (i == MENU_MAX_ELEMENTS){
+            i--;
+            break;
+        }
+        if (!menu->elements[i]){
+            menu->elements[i] = malloc(sizeof(struct menuElement));
+            clearMenuElement(menu->elements[i]);
+        }
+        if (!menu->elements[i])
+            break;
+
+        strcpy(menu->elements[i]->text, directory->directory_entry[i].longname);
         if (FIO_S_ISDIR(directory->directory_entry[i].d_stat.st_mode))
-            menu->elements[i].icon = folderIcon;
+            menu->elements[i]->icon = folderIcon;
         else
-            menu->elements[i].icon = musicIcon;
-        menu->elements[i].triggerFunction = NULL;
+            menu->elements[i]->icon = musicIcon;
+        menu->elements[i]->triggerFunction = NULL;
 
         if (!strcmp(selected, directory->directory_entry[i].d_name)){
             menu->first = i;
             menu->selected = i;
         }
     }
-    menu->numberOfElements = directory->number_of_directory_entries;
+    menu->numberOfElements = i;
     return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Fix menu width (with screen width):
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void fixMenuSize(struct menuElements *menu)
+{
+    if (menu->xPos + menu->width > 480)
+        menu->width = 480 - menu->xPos;
+    if (menu->yPos + menu->height > 272)
+        menu->height = 272 - menu->yPos;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -649,7 +674,7 @@ int getOSKlang(){
 	char langCode[10] = "";
 	int retValue = -1;
 
-	strcpy(langCode, langGetString("OSK_LANGUAGE"));
+	strncpy(langCode, langGetString("OSK_LANGUAGE"), sizeof(langCode));
 	if (strlen(langCode))
 		retValue = atoi(langCode);
 	return retValue;

@@ -77,10 +77,15 @@ int ML_INTERNAL_openDB(char *directory, char *fileName){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Clear buffer:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void clearBuffer(struct libraryEntry *resultBuffer){
+void ML_clearBuffer(struct libraryEntry **resultBuffer){
     int i;
-    for (i=0; i<ML_BUFFERSIZE; i++)
-        ML_clearEntry(&resultBuffer[i]);
+    for (i=0; i<ML_BUFFERSIZE; i++){
+        if (resultBuffer[i]){
+            free(resultBuffer[i]);
+            resultBuffer[i] = NULL;
+        }
+    }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,7 +396,7 @@ int ML_countRecordsSelect(char *select){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Query the DB with a where condition:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int limit, struct libraryEntry *resultBuffer){
+int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int limit, struct libraryEntry **resultBuffer){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
     snprintf(sql, sizeof(sql), "Select coalesce(artist, ''), coalesce(album, ''), coalesce(title, ''), coalesce(genre, ''), coalesce(year, ''), \
@@ -407,27 +412,34 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
         return ML_ERROR_SQL;
     }
 
-    clearBuffer(resultBuffer);
+    ML_clearBuffer(resultBuffer);
     int count = 0;
     while(sqlite3_step(stmt) == SQLITE_ROW) {
-        strcpy(resultBuffer[count].artist, (char*)sqlite3_column_text(stmt, 0));
-        strcpy(resultBuffer[count].album, (char*)sqlite3_column_text(stmt, 1));
-        strcpy(resultBuffer[count].title, (char*)sqlite3_column_text(stmt, 2));
-        strcpy(resultBuffer[count].genre, (char*)sqlite3_column_text(stmt, 3));
-        strcpy(resultBuffer[count].year, (char*)sqlite3_column_text(stmt, 4));
-        //strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, 5));
-        strcpy(resultBuffer[count].extension, (char*)sqlite3_column_text(stmt, 6));
-        resultBuffer[count].seconds = sqlite3_column_int(stmt, 7);
-        resultBuffer[count].rating = sqlite3_column_int(stmt, 8);
-        if (resultBuffer[count].rating > ML_MAX_RATING)
-            resultBuffer[count].rating = ML_MAX_RATING;
-        else if (resultBuffer[count].rating < 0)
-            resultBuffer[count].rating = 0;
-        resultBuffer[count].samplerate = sqlite3_column_int(stmt, 9);
-        resultBuffer[count].bitrate = sqlite3_column_int(stmt, 10);
-        resultBuffer[count].played = sqlite3_column_int(stmt, 11);
-        strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, 12));
-        strcpy(resultBuffer[count].shortpath, (char*)sqlite3_column_text(stmt, 12));
+        if (!resultBuffer[count]){
+            resultBuffer[count] = malloc(sizeof(struct libraryEntry));
+            if (!resultBuffer[count])
+                break;
+            ML_clearEntry(resultBuffer[count]);
+        }
+
+        strcpy(resultBuffer[count]->artist, (char*)sqlite3_column_text(stmt, 0));
+        strcpy(resultBuffer[count]->album, (char*)sqlite3_column_text(stmt, 1));
+        strcpy(resultBuffer[count]->title, (char*)sqlite3_column_text(stmt, 2));
+        strcpy(resultBuffer[count]->genre, (char*)sqlite3_column_text(stmt, 3));
+        strcpy(resultBuffer[count]->year, (char*)sqlite3_column_text(stmt, 4));
+        //strcpy(resultBuffer[count]->path, (char*)sqlite3_column_text(stmt, 5));
+        strcpy(resultBuffer[count]->extension, (char*)sqlite3_column_text(stmt, 6));
+        resultBuffer[count]->seconds = sqlite3_column_int(stmt, 7);
+        resultBuffer[count]->rating = sqlite3_column_int(stmt, 8);
+        if (resultBuffer[count]->rating > ML_MAX_RATING)
+            resultBuffer[count]->rating = ML_MAX_RATING;
+        else if (resultBuffer[count]->rating < 0)
+            resultBuffer[count]->rating = 0;
+        resultBuffer[count]->samplerate = sqlite3_column_int(stmt, 9);
+        resultBuffer[count]->bitrate = sqlite3_column_int(stmt, 10);
+        resultBuffer[count]->played = sqlite3_column_int(stmt, 11);
+        strcpy(resultBuffer[count]->path, (char*)sqlite3_column_text(stmt, 12));
+        strcpy(resultBuffer[count]->shortpath, (char*)sqlite3_column_text(stmt, 12));
         if (++count > ML_BUFFERSIZE)
             break;
     }
@@ -444,7 +456,7 @@ int ML_queryDB(char *whereCondition, char *orderByCondition, int offset, int lim
 // intfield01 int
 // intfield02 int
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *resultBuffer){
+int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry **resultBuffer){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 	if (strstr(select, " LIMIT "))
@@ -458,53 +470,60 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
         return ML_ERROR_SQL;
     }
 
-    clearBuffer(resultBuffer);
+    ML_clearBuffer(resultBuffer);
     int count = 0;
     while(sqlite3_step(stmt) == SQLITE_ROW) {
+        if (!resultBuffer[count]){
+            resultBuffer[count] = malloc(sizeof(struct libraryEntry));
+            if (!resultBuffer[count])
+                break;
+            ML_clearEntry(resultBuffer[count]);
+        }
+
         int i = 0;
         char columnName[100] = "";
         for (i=0; i<sqlite3_column_count(stmt); i++){
             strcpy(columnName, sqlite3_column_name(stmt, i));
             if (!stricmp(columnName, "artist"))
-                strcpy(resultBuffer[count].artist, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->artist, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "album"))
-                strcpy(resultBuffer[count].album, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->album, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "title"))
-                strcpy(resultBuffer[count].title, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->title, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "genre"))
-                strcpy(resultBuffer[count].genre, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->genre, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "year"))
-                strcpy(resultBuffer[count].year, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->year, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "path"))
-                strcpy(resultBuffer[count].path, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->path, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "shortpath"))
-                strcpy(resultBuffer[count].shortpath, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->shortpath, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "extension"))
-                strcpy(resultBuffer[count].extension, (char*)sqlite3_column_text(stmt, i));
+                strcpy(resultBuffer[count]->extension, (char*)sqlite3_column_text(stmt, i));
             else if (!stricmp(columnName, "seconds"))
-                resultBuffer[count].seconds = sqlite3_column_int(stmt, i);
+                resultBuffer[count]->seconds = sqlite3_column_int(stmt, i);
             else if (!stricmp(columnName, "rating")){
-                resultBuffer[count].rating = sqlite3_column_int(stmt, i);
-                if (resultBuffer[count].rating > ML_MAX_RATING)
-                    resultBuffer[count].rating = ML_MAX_RATING;
-                else if (resultBuffer[count].rating < 0)
-                    resultBuffer[count].rating = 0;
+                resultBuffer[count]->rating = sqlite3_column_int(stmt, i);
+                if (resultBuffer[count]->rating > ML_MAX_RATING)
+                    resultBuffer[count]->rating = ML_MAX_RATING;
+                else if (resultBuffer[count]->rating < 0)
+                    resultBuffer[count]->rating = 0;
             }else if (!stricmp(columnName, "samplerate"))
-                resultBuffer[count].samplerate = sqlite3_column_int(stmt, i);
+                resultBuffer[count]->samplerate = sqlite3_column_int(stmt, i);
             else if (!stricmp(columnName, "bitrate"))
-                resultBuffer[count].bitrate = sqlite3_column_int(stmt, i);
+                resultBuffer[count]->bitrate = sqlite3_column_int(stmt, i);
             else if (!stricmp(columnName, "played"))
-                resultBuffer[count].played = sqlite3_column_int(stmt, i);
+                resultBuffer[count]->played = sqlite3_column_int(stmt, i);
             else if (!stricmp(columnName, "strfield")){
-                strncpy(resultBuffer[count].strField, (char*)sqlite3_column_text(stmt, i), 263);
-				resultBuffer[count].strField[263] = '\0';
+                strncpy(resultBuffer[count]->strField, (char*)sqlite3_column_text(stmt, i), 263);
+				resultBuffer[count]->strField[263] = '\0';
             }else if (!stricmp(columnName, "datafield")){
-                strncpy(resultBuffer[count].dataField, (char*)sqlite3_column_text(stmt, i), 511);
-				resultBuffer[count].dataField[511] = '\0';
+                strncpy(resultBuffer[count]->dataField, (char*)sqlite3_column_text(stmt, i), 511);
+				resultBuffer[count]->dataField[511] = '\0';
             }else if (!stricmp(columnName, "intfield01"))
-                resultBuffer[count].intField01 = sqlite3_column_double(stmt, i);
+                resultBuffer[count]->intField01 = sqlite3_column_double(stmt, i);
             else if (!stricmp(columnName, "intfield02"))
-                resultBuffer[count].intField02 = sqlite3_column_double(stmt, i);
+                resultBuffer[count]->intField02 = sqlite3_column_double(stmt, i);
         }
         if (++count > ML_BUFFERSIZE)
             break;
@@ -517,19 +536,19 @@ int ML_queryDBSelect(char *select, int offset, int limit, struct libraryEntry *r
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Add a single entry in the library:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int ML_addEntry(struct libraryEntry entry){
+int ML_addEntry(struct libraryEntry *entry){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
-    ML_fixStringField(entry.path);
-    ML_fixStringField(entry.artist);
-    ML_fixStringField(entry.album);
-    ML_fixStringField(entry.title);
-    ML_fixStringField(entry.genre);
-    if (entry.rating > ML_MAX_RATING)
-        entry.rating = ML_MAX_RATING;
-    else if (entry.rating < 0)
-        entry.rating = 0;
+    ML_fixStringField(entry->path);
+    ML_fixStringField(entry->artist);
+    ML_fixStringField(entry->album);
+    ML_fixStringField(entry->title);
+    ML_fixStringField(entry->genre);
+    if (entry->rating > ML_MAX_RATING)
+        entry->rating = ML_MAX_RATING;
+    else if (entry->rating < 0)
+        entry->rating = 0;
 
     snprintf(sql, sizeof(sql), "insert into media (artist, album, title, genre, year, path, shortpath, \
                                      extension, seconds, samplerate, bitrate, tracknumber, \
@@ -538,10 +557,10 @@ int ML_addEntry(struct libraryEntry entry){
                          upper('%s'), '%s', '%s', \
                          %i, %i, %i, %i, \
                          %i, %i);",
-                  entry.artist, entry.album, entry.title, entry.genre, entry.year,
-                  entry.path, entry.path, entry.extension,
-                  entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber,
-                  entry.rating, entry.played);
+                  entry->artist, entry->album, entry->title, entry->genre, entry->year,
+                  entry->path, entry->path, entry->extension,
+                  entry->seconds, entry->samplerate, entry->bitrate, entry->tracknumber,
+                  entry->rating, entry->played);
     int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();
@@ -557,24 +576,24 @@ int ML_addEntry(struct libraryEntry entry){
 // Update a single entry in the library:
 // Pass newPath to change the path (PrimaryKey)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int ML_updateEntry(struct libraryEntry entry, char *newPath){
+int ML_updateEntry(struct libraryEntry *entry, char *newPath){
     if (ML_INTERNAL_openDB(dbDirectory, dbFileName))
         return ML_ERROR_OPENDB;
 
     char localNewPath[264] = "";
-    ML_fixStringField(entry.path);
-    ML_fixStringField(entry.shortpath);
-    ML_fixStringField(entry.artist);
-    ML_fixStringField(entry.album);
-    ML_fixStringField(entry.title);
-    ML_fixStringField(entry.genre);
-    if (entry.rating > ML_MAX_RATING)
-        entry.rating = ML_MAX_RATING;
-    else if (entry.rating < 0)
-        entry.rating = 0;
+    ML_fixStringField(entry->path);
+    ML_fixStringField(entry->shortpath);
+    ML_fixStringField(entry->artist);
+    ML_fixStringField(entry->album);
+    ML_fixStringField(entry->title);
+    ML_fixStringField(entry->genre);
+    if (entry->rating > ML_MAX_RATING)
+        entry->rating = ML_MAX_RATING;
+    else if (entry->rating < 0)
+        entry->rating = 0;
 
     if (!strlen(newPath))
-        strcpy(localNewPath, entry.path);
+        strcpy(localNewPath, entry->path);
     else
     {
         strcpy(localNewPath, newPath);
@@ -590,12 +609,12 @@ int ML_updateEntry(struct libraryEntry entry, char *newPath){
                       rating = %i, played = %i, shortpath = '%s', \
                       path = upper('%s') \
                   where path = upper('%s');",
-                  entry.artist, entry.album, entry.title, entry.genre,
-				  entry.year, entry.extension,
-                  entry.seconds, entry.samplerate, entry.bitrate, entry.tracknumber,
-				  entry.rating, entry.played, entry.shortpath,
+                  entry->artist, entry->album, entry->title, entry->genre,
+				  entry->year, entry->extension,
+                  entry->seconds, entry->samplerate, entry->bitrate, entry->tracknumber,
+				  entry->rating, entry->played, entry->shortpath,
                   localNewPath,
-				  entry.path);
+				  entry->path);
     int retValue = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     if (retValue != SQLITE_OK){
         ML_INTERNAL_closeDB();

@@ -62,7 +62,7 @@ int fileExtCount = 10;
 char fileExt[10][5] = {"MP3", "OGG", "AA3", "OMA", "OMG", "FLAC", "AAC", "M4A", "WMA", "M3U"};
 char tempM3Ufile[264] = "";
 char MLtempM3Ufile[264] = "";
-struct libraryEntry MLresult[ML_BUFFERSIZE];
+struct libraryEntry *MLresult[ML_BUFFERSIZE];
 struct menuElements commonMenu;
 struct menuElements commonSubMenu;
 int tempPos[2];
@@ -489,8 +489,10 @@ int main(){
         }
     }
 
+    //debugFreeMemory();
     while(!osl_quit){
 		cpuBoost();
+        //debugFreeMemory();
         switch (currentMode){
             case (MODE_FILEBROWSER):
                 currentMode = gui_fileBrowser();

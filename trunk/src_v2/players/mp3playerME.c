@@ -191,9 +191,7 @@ int decodeThread(SceSize args, void *argp){
                     if(data_start < 0){
                         MP3ME_eof = 1;
                     }
-                    float framesSkipped = (float)data_start / (float)frame_size;
-                    MP3ME_playingTime = framesSkipped * (float)sample_per_frame/(float)samplerate;
-
+                    MP3ME_playingTime = (float)data_start / (float)frame_size /  (float)samplerate / 1000.0f;
                     offset = data_start;
                     size = total_size - data_start;
                 }
@@ -345,7 +343,7 @@ int MP3MEgetInfo(){
     float mediumBitrate = 0.0f;
     int has_xing = 0;
     struct xing xing;
-	memset(&xing, 0, sizeof xing);
+	memset(&xing, 0, sizeof(xing));
 
     if (!MP3ME_tagRead)
         getMP3METagInfo(MP3ME_fileName, &MP3ME_info);
@@ -378,6 +376,7 @@ int MP3MEgetInfo(){
             }
         }
         free(xing_buffer);
+        xing_buffer = NULL;
     }
 
     size -= startPos;
@@ -491,8 +490,10 @@ int MP3MEgetInfo(){
 	}
 	mad_header_finish (&header);
 	mad_stream_finish (&stream);
-    if (buff)
+    if (buff){
     	free(buff);
+        buff = NULL;
+    }
     sceIoClose(fd);
 
     int secs = 0;

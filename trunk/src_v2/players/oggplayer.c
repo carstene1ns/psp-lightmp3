@@ -194,18 +194,18 @@ void getOGGTagInfo(OggVorbis_File *inVorbisFile, struct fileInfo *targetInfo){
 	vorbis_comment *comment = ov_comment(inVorbisFile, -1);
 	for (i=0;i<comment->comments; i++){
 		splitComment(comment->user_comments[i], name, value);
-		if (!strcmp(name, "TITLE"))
+		if (!strcasecmp(name, "TITLE"))
 			strcpy(targetInfo->title, value);
-		else if(!strcmp(name, "ALBUM"))
+		else if(!strcasecmp(name, "ALBUM"))
 			strcpy(targetInfo->album, value);
-		else if(!strcmp(name, "ARTIST"))
+		else if(!strcasecmp(name, "ARTIST"))
 			strcpy(targetInfo->artist, value);
-		else if(!strcmp(name, "GENRE"))
+		else if(!strcasecmp(name, "GENRE"))
 			strcpy(targetInfo->genre, value);
-		else if(!strcmp(name, "DATE") || !strcmp(name, "YEAR")){
+		else if(!strcasecmp(name, "DATE") || !strcasecmp(name, "YEAR")){
             strncpy(targetInfo->year, value, 4);
             targetInfo->year[4] = '\0';
-		}else if(!strcmp(name, "TRACKNUMBER")){
+		}else if(!strcasecmp(name, "TRACKNUMBER")){
             strncpy(targetInfo->trackNumber, value, 7);
 			targetInfo->trackNumber[7] = '\0';
 		}

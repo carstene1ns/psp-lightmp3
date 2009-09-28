@@ -28,6 +28,7 @@
 #include <pspsdk.h>
 #include <pspaudiocodec.h>
 #include <pspaudio.h>
+#include <pspmpeg.h>
 #include "pspaudiolib.h"
 
 #include "info.h"

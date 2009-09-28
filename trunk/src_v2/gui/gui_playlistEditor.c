@@ -50,7 +50,6 @@ struct fileInfo tagInfo;
 // Build menu from current playlist:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int buildMenuFromPlaylist(struct menuElements *menu){
-    struct menuElement tMenuEl;
     struct M3U_songEntry *entry;
     int i = 0;
 
@@ -59,10 +58,17 @@ int buildMenuFromPlaylist(struct menuElements *menu){
     menu->numberOfElements = M3U_getSongCount();
     for (i=0; i<menu->numberOfElements; i++){
         entry = M3U_getSong(i);
-        strcpy(tMenuEl.text, entry->title);
-        tMenuEl.triggerFunction = NULL;
-        tMenuEl.icon = musicIcon;
-        menu->elements[i] = tMenuEl;
+        if (menu->elements[i]){
+            free(menu->elements[i]);
+            menu->elements[i] = NULL;
+        }
+        menu->elements[i] = malloc(sizeof(struct menuElement));
+        if (!menu->elements[i])
+            break;
+
+        strcpy(menu->elements[i]->text, entry->title);
+        menu->elements[i]->triggerFunction = NULL;
+        menu->elements[i]->icon = musicIcon;
     }
     return 0;
 }
@@ -182,6 +188,7 @@ int gui_playlistEditor(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
+    fixMenuSize(&commonMenu);
     commonMenu.interline = skinGetParam("MENU_INTERLINE");
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
@@ -259,14 +266,14 @@ int gui_playlistEditor(){
 
             if (osl_pad.held.L && osl_pad.held.R){
                 confirmStatus = STATUS_HELP;
-            }else if(osl_pad.pressed.note && M3U_getSongCount()){
+            }else if(osl_pad.released.note && M3U_getSongCount()){
                 snprintf(userSettings->selectedBrowserItem, sizeof(userSettings->selectedBrowserItem), "%s", tempM3Ufile);
                 snprintf(userSettings->selectedBrowserItemShort, sizeof(userSettings->selectedBrowserItemShort), "%s", tempM3Ufile);
                 userSettings->playlistStartIndex = commonMenu.selected;
                 playlistEditorRetValue = MODE_PLAYER;
                 userSettings->previousMode = MODE_PLAYLIST_EDITOR;
                 exitFlagPlaylistEditor = 1;
-            }else if(osl_pad.pressed.triangle && M3U_getSongCount()){
+            }else if(osl_pad.released.triangle && M3U_getSongCount()){
                 drawWait(langGetString("WAIT"), langGetString("CHECKING_PLAYLIST"));
                 M3U_checkFiles();
                 oldSelected = commonMenu.selected;
@@ -281,7 +288,7 @@ int gui_playlistEditor(){
                 else
                     commonMenu.first = oldFirst - 1;
                 continue;
-            }else if(osl_pad.pressed.square && M3U_getSongCount()){
+            }else if(osl_pad.released.square && M3U_getSongCount()){
                 if (M3U_moveSongUp(commonMenu.selected) == 0){
                     oldSelected = commonMenu.selected;
                     oldFirst = commonMenu.first;
@@ -291,7 +298,7 @@ int gui_playlistEditor(){
                     if (commonMenu.selected == oldFirst - 1)
                         commonMenu.first--;
                 }
-            }else if(osl_pad.pressed.cross && M3U_getSongCount()){
+            }else if(osl_pad.released.cross && M3U_getSongCount()){
                 if (M3U_moveSongDown(commonMenu.selected) == 0){
                     oldSelected = commonMenu.selected;
                     oldFirst = commonMenu.first;

@@ -130,6 +130,7 @@ int initMEAudioModules(){
        }else{
            sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
 		   sceUtilityLoadAvModule(PSP_AV_MODULE_ATRAC3PLUS);
+           sceMpegInit();
 
             int devkitVersion = sceKernelDevkitVersion();
             SceUID modid = -1;

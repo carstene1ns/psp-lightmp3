@@ -168,12 +168,23 @@ int gui_fileBrowser(){
     int USBactive = 0;
     int status = STATUS_NORMAL;
 	OSL_IMAGE *coverArt = NULL;
+    OSL_IMAGE *noCoverArt = NULL;
     OSL_IMAGE *tmpCoverArt = NULL;
 	int coverArtFailed = 0;
 	u64 lastMenuChange = 0;
 	int lastSelected = -1;
 
     fileBrowserRetValue = -1;
+
+    int showMissing = skinGetParam("FILE_BROWSER_SHOW_MISSINGCOVERART");
+    if (showMissing == 1){
+        snprintf(buffer, sizeof(buffer), "%s/nocoverart.png", userSettings->skinImagesPath);
+        noCoverArt = oslLoadImageFilePNG(buffer, OSL_IN_RAM | OSL_SWIZZLED, OSL_PF_8888);
+        if (!noCoverArt)
+            errorLoadImage(buffer);
+        noCoverArt->stretchX  = skinGetParam("FILE_BROWSER_COVERART_WIDTH");
+        noCoverArt->stretchY = skinGetParam("FILE_BROWSER_COVERART_HEIGHT");
+    }
 
     //Build menu:
     skinGetPosition("POS_FILE_BROWSER", tempPos);
@@ -187,6 +198,8 @@ int gui_fileBrowser(){
     commonMenu.highlight = commonMenuHighlight;
     commonMenu.width = commonMenu.background->sizeX;
     commonMenu.height = commonMenu.background->sizeY;
+    fixMenuSize(&commonMenu);
+
     commonMenu.interline = skinGetParam("MENU_INTERLINE");
     commonMenu.maxNumberVisible = commonMenu.background->sizeY / (fontMenuNormal->charHeight + commonMenu.interline);
     commonMenu.cancelFunction = NULL;
@@ -200,12 +213,6 @@ int gui_fileBrowser(){
 			strcpy(curDir, music_directory_2);
 			strcpy(curDirShort, music_directory_2);
 			result = opendir_open(&directory, curDir, curDirShort, fileExt, fileExtCount, 1);
-			/*if (result){
-                snprintf(buffer, sizeof(buffer), "\"%s\" and \"%s\" not found or empty", music_directory_1, music_directory_2);
-                debugMessageBox(buffer);
-                oslQuit();
-				return -1;
-			}*/
 		}
     }else{
 		strcpy(curDir, userSettings->lastBrowserDir);
@@ -229,6 +236,10 @@ int gui_fileBrowser(){
 				skinGetPosition("POS_FILE_BROWSER_COVERART", tempPos);
 				oslDrawImageXY(coverArt, tempPos[0], tempPos[1]);
 			}
+            else if (showMissing == 1){
+				skinGetPosition("POS_FILE_BROWSER_COVERART", tempPos);
+				oslDrawImageXY(noCoverArt, tempPos[0], tempPos[1]);
+            }
 			if (status == STATUS_HELP)
 				drawHelp("FILE_BROWSER");
 
@@ -414,6 +425,12 @@ int gui_fileBrowser(){
 		oslDeleteImage(coverArt);
         coverArt = NULL;
     }
+
+    if (noCoverArt){
+        oslDeleteImage(noCoverArt);
+        noCoverArt = NULL;
+    }
+
 	clearMenu(&commonMenu);
 
     strcpy(userSettings->lastBrowserDir, curDir);
